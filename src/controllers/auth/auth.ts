@@ -1,11 +1,7 @@
 import configuration from "../../config";
 import  {readone,createuser}  from "../../dao/users";
 import { isValidPassword, sendTokenResponse, mail } from "../../utils/otherservices";
-//const Webuser = require("../models/webusers");
-//const {v4 : uuidv4} = require('uuid');
-//const {mail} = require("../services");
-//const path = require('path');
-//const {sendTokenResponse} = require("../services");
+
 
 //sign in
 export var signin = async(req:any,res:any) =>{
@@ -56,9 +52,10 @@ export var signup = async (req:any,res:any) =>{
         const {email} = req.body;
         const foundUser =  await readone({email});
         if(foundUser){
-            return res.status(403).json({status:false, msg:"User with this email or password already exist"});
+            throw new Error(configuration.error.erroralreadyexit);
 
         }
+        req.body.password=configuration.defaultPassword;
         //other validations
          const queryresult=await createuser(req.body)
         const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
@@ -66,9 +63,26 @@ export var signup = async (req:any,res:any) =>{
         res.status(200).json({queryresult, status: true});
         
 
-    }catch(err){
-        return res.status(403).json({status: false, msg:"Authentication Server is Down Please Contact administrator"});
+    }catch(error:any){
+        res.status(403).json({ status: false, msg: error.message });
     }
+}
+
+//settings
+export async function settings(req:Request, res:any){
+    try{
+        
+        res.status(200).json({
+            ...configuration.settings,
+            status:true
+          }); 
+
+    }
+    catch(e:any){
+        res.json({status: false, msg:e.message});
+
+    }
+
 }
 
 
