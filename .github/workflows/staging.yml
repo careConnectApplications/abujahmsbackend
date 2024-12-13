@@ -57,7 +57,7 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
             # Stop any existing server (optional)
             #pm2 stop my-app || true
-            # Restart the server (or your app, depending on your setup)
+            # server commands (or your app, depending on your setup)
             cd /home/linuxtraining/hmsbackend
             npm install
             npm run build
