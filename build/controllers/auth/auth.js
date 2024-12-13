@@ -13,14 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signup = exports.signin = void 0;
+exports.settings = settings;
 const config_1 = __importDefault(require("../../config"));
 const users_1 = require("../../dao/users");
 const otherservices_1 = require("../../utils/otherservices");
-//const Webuser = require("../models/webusers");
-//const {v4 : uuidv4} = require('uuid');
-//const {mail} = require("../services");
-//const path = require('path');
-//const {sendTokenResponse} = require("../services");
 //sign in
 var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -61,16 +57,28 @@ var signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { email } = req.body;
         const foundUser = yield (0, users_1.readone)({ email });
         if (foundUser) {
-            return res.status(403).json({ status: false, msg: "User with this email or password already exist" });
+            throw new Error(config_1.default.error.erroralreadyexit);
         }
+        req.body.password = config_1.default.defaultPassword;
         //other validations
         const queryresult = yield (0, users_1.createuser)(req.body);
         const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
         yield (0, otherservices_1.mail)(email, "Account Registration Confrimation", message);
         res.status(200).json({ queryresult, status: true });
     }
-    catch (err) {
-        return res.status(403).json({ status: false, msg: "Authentication Server is Down Please Contact administrator" });
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
     }
 });
 exports.signup = signup;
+//settings
+function settings(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            res.status(200).json(Object.assign(Object.assign({}, config_1.default.settings), { status: true }));
+        }
+        catch (e) {
+            res.json({ status: false, msg: e.message });
+        }
+    });
+}

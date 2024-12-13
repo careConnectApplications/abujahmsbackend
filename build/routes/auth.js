@@ -8,5 +8,6 @@ const express_1 = __importDefault(require("express"));
 const auth_1 = require("../controllers/auth/auth");
 const router = express_1.default.Router();
 router.post('/signup', auth_1.signup);
-//getusertypes
+router.post('/signin', auth_1.signin);
+router.get('/settings', auth_1.settings);
 exports.default = router;
