@@ -2,6 +2,7 @@ import express,{Application} from 'express';
 import cors from 'cors';
 import fileUpload from "express-fileupload";
 import auth from "../routes/auth";
+import users from "../routes/usermanagement";
 
 function createServer(){
     const app:Application=express();
@@ -22,6 +23,7 @@ function createServer(){
     app.use(fileUpload());
   app.use('/api/v1/downloads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
+  app.use('/api/v1/users', users);
     return app;
 
 }

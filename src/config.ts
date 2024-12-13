@@ -17,7 +17,9 @@ const configuration = {
     errorinvaliduser:"invalid credentials",
     errordeactivate:"You have been Deactivated",
     errorpasswordmismatch:"Wrong Password Detected",
-    erroralreadyexit: "User with this email or password already exist"
+    erroralreadyexit: "User with this email or password already exist",
+    errorencryptingpassword:"Error in encrypting Password",
+    errorvalidatingpassword:"Error in Validating Password"
 
   },
     environment: "test",

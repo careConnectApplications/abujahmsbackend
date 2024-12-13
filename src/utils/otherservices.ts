@@ -1,13 +1,28 @@
 import bcrypt from "bcryptjs";
 import  jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import configuration from "../config";
+export var encrypt = async function(password:any){
+    try{
+    //generate a salt
+    const salt = await bcrypt.genSalt(10);
+        //generate password hash
+   return await bcrypt.hash(password, salt);
+    }
+    catch(error:any){
+        throw new Error(configuration.error.errorencryptingpassword);
+
+    }
+
+
+}
 export var isValidPassword = async function(newPassword:any, currentpassword:any){
     try{
         return await bcrypt.compare(newPassword, currentpassword);
   
     }
     catch(error){
-        console.log(error)
+        throw new Error(configuration.error.errorvalidatingpassword);
     }
   
   }
