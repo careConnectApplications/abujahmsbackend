@@ -6,7 +6,7 @@ function dbconnect(){
     mongoose.set('strictQuery', true);
     return mongoose.connect(database as string,{
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+       // useUnifiedTopology: true,
         directConnection:true,
         family: 4,
 
