@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 3: Build the React app
-      - name: Build React app
+      # Step 3: Build the ndejs
+      - name: Build nodejs app
         run: npm run build
       # Step 4: Verify if build directory exists
       - name: Check if build directory exists
@@ -51,7 +51,7 @@ jobs:
           sudo apt-get install -y sshpass
 
           # Deploy build to the server using SCP
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r . "$SSH_USERNAME"@"$SERVER_IP":/home/linuxtraining/apps
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* "$SSH_USERNAME"@"$SERVER_IP":/home/linuxtraining/apps
 
           # Optionally restart your app after copying the build
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
