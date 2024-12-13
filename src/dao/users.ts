@@ -5,7 +5,7 @@ import configuration from "../config";
   //read all payment history
   export async function readall(query:any) {
     try {
-      const userdetails = await User.find(query).select({"_id":1,"title":1,"staffId":1, "firstName":1, "middleName":1, "lastName":1,"country":1,"state":1,"city":1, "address":1,"age":1,"dateOfBirth":1,"gender":1,"licence":1,"phoneNumber":1,"email":1,"role": 1,"degree":1,"profession": 1,"employmentStatus":1,"nativeSpokenLanguage": 1,"otherLanguage": 1,"readWriteLanguage": 1,"zip": 1,"specializationDetails": 1, "status":1});
+      const userdetails = await User.find(query).select({"_id":1,"title":1,"staffId":1, "firstName":1, "middleName":1, "lastName":1,"country":1,"state":1,"city":1, "address":1,"age":1,"dateOfBirth":1,"gender":1,"licence":1,"phoneNumber":1,"email":1,"role": 1,"degree":1,"profession": 1,"employmentStatus":1,"nativeSpokenLanguage": 1,"otherLanguage": 1,"readWriteLanguage": 1,"zip": 1,"specializationDetails": 1, "status":1,"clinic":1});
       const totaluserdetails = await User.countDocuments();
       return { userdetails, totaluserdetails };
     } catch (err) {
@@ -61,21 +61,7 @@ import configuration from "../config";
     }
 
   }
-  export async function updateuseranyparam(query:any,update:any){
-    try{
-      
-    return await User.findOneAndUpdate(query, update,{
-      new: true
-    });
-     
-    }catch(err){
-      console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
-
-    }
-
-  }
-
+ 
   
   
   

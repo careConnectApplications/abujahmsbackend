@@ -6,6 +6,28 @@ const configuration = {
     {role: "Doctor", roleId:"1"},
     {role: "Pharmacist", roleId:"2"}
   ],
+  clinics:[
+  {clinic: "General Outpatient Clinic", id:1},
+  {clinic: "Pediatric Outpatient", id:2},
+   {clinic: "Medical Outpatient", id:3},
+   {clinic:"Surgical Outpatient", id:4},
+	{clinic: "ANC", id: 5},
+   {clinic: "Labour room", id:6},
+   {clinic: "Gynae Emergency room", id:7},
+   {clinic: "Emergency Pediatric Unit", id:8},
+   {clinic: "Accident and Emergency", id:9},
+   {clinic: "Orthopedic Clinic", id:9},
+    {clinic: "Eye Care", id:10},
+	{clinic: "Dialysis Unit", id:11},
+  {clinic: "Dental Unit", id:12},
+  {clinic: "Scanning", id:13},
+  {clinic: "X-ray", id:14},
+  {clinic: "ENT", id:15},
+  {clinic:"KTCHMA", id:16},
+  {clinic: "N H I S", id:16},
+   {clinic:"ART Clinic", id:17}
+
+  ],
   gender:["Male", "Female"],
   },
   error:{
