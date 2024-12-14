@@ -25,6 +25,22 @@ export var createpatients = async (req:any,res:any) =>{
         res.status(403).json({ status: false, msg: error.message });
     }
 }
+//read all patients
+export async function getallpatients(req:Request, res:any){
+    try{
+        const queryresult = await readallpatient({});
+        res.status(200).json({
+            queryresult,
+            status:true
+          }); 
+
+    }
+    catch(e:any){
+        res.status(403).json({status: false, msg:e.message});
+
+    }
+
+}
 
 //update a patient
 //

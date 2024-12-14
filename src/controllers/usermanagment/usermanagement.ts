@@ -1,9 +1,9 @@
-import { AnyExpression } from "mongoose";
+
 import configuration from "../../config";
 import  {readall,updateuser,readone}  from "../../dao/users";
 
 //get all users
-export async function getallusers(req:Request, res:AnyExpression){
+export async function getallusers(req:Request, res:any){
     try{
         const queryresult = await readall({});
         res.status(200).json({
