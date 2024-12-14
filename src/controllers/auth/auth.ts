@@ -1,6 +1,6 @@
 import configuration from "../../config";
 import  {readone,createuser}  from "../../dao/users";
-import { isValidPassword, sendTokenResponse, mail } from "../../utils/otherservices";
+import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
 
 
 //sign in
@@ -49,12 +49,14 @@ export var signup = async (req:any,res:any) =>{
    
     try{
         //get token from header
-        const {email} = req.body;
+        const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = req.body;
+        validateinputfaulsyvalue({email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails});
         const foundUser =  await readone({email});
         if(foundUser){
             throw new Error(configuration.error.erroralreadyexit);
 
         }
+       
         req.body.password=configuration.defaultPassword;
         //other validations
          const queryresult=await createuser(req.body)

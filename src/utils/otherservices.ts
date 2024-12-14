@@ -65,3 +65,11 @@ export var mail= async function mail(to:any,subject:any,textmessage:any){
 export function generateRandomNumber(n:number) {
     return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
   }
+  export function validateinputfaulsyvalue(input:any){
+    for (const key in input) {
+   if (!input[key]) {
+     throw new Error(`${key} ${configuration.error.errorisrequired}`);
+     
+   }
+ }      
+ }

@@ -1,12 +1,14 @@
 import configuration from "../../config";
 import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../../dao/patientmanagement";
-import { mail, generateRandomNumber } from "../../utils/otherservices";
+import { mail, generateRandomNumber,validateinputfaulsyvalue } from "../../utils/otherservices";
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
    
     try{
         //get token from header
-        const {phoneNumber,email} = req.body;
+        const {phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover} = req.body;
+        //validation
+        validateinputfaulsyvalue({phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover});
         const foundUser =  await readonepatient({phoneNumber});
         if(foundUser){
             throw new Error(configuration.error.erroralreadyexit);

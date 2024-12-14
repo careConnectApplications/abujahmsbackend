@@ -107,7 +107,6 @@ const patientSchema = new Schema(
       type: String,
     },
     HMOPlan: {
-      required: true,
       type: String,
     },
     MRN: {

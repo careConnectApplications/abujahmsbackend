@@ -30,6 +30,8 @@ const configuration = {
   ],
   gender:["Male", "Female"],
   },
+  allowedfilesize: 500,
+  shelftemplate: "userslist",
   error:{
     erroruserread: "Error in reading user",
     errorusercreate: "Error in creating user",
@@ -41,7 +43,11 @@ const configuration = {
     errorpasswordmismatch:"Wrong Password Detected",
     erroralreadyexit: "User with this email or password already exist",
     errorencryptingpassword:"Error in encrypting Password",
-    errorvalidatingpassword:"Error in Validating Password"
+    errorvalidatingpassword:"Error in Validating Password",
+    errorfilextension: "File extension not allowed",
+    errorfilelarge: "File should not be greater than 500kb",
+    errorfileupload: "Error in uploading file",
+    errorisrequired: "is required",
 
   },
     environment: "test",
