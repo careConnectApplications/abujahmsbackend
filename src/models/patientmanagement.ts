@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import configuration from "../config";
+import bcrypt from "bcryptjs";
 export interface patientinterface {
   title: String;
   firstName: String;
@@ -127,6 +128,22 @@ const patientSchema = new Schema(
   },
   { timestamps: true }
 );
+
+patientSchema.pre("save", async function(next){
+  try{
+      //GENERATE A SALT
+      const salt = await bcrypt.genSalt(10);
+      //generate password hash
+      const passwordHash = await bcrypt.hash(this.password, salt);
+      //re-assign hashed version of original
+      this.password = passwordHash;
+      next();
+
+  }
+  catch(error:any){
+      next(error)
+  }
+});
 
 
 //create a model

@@ -1,6 +1,6 @@
 import configuration from "../../config";
 import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../../dao/patientmanagement";
-import { mail } from "../../utils/otherservices";
+import { mail, generateRandomNumber } from "../../utils/otherservices";
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
    
@@ -12,6 +12,7 @@ export var createpatients = async (req:any,res:any) =>{
             throw new Error(configuration.error.erroralreadyexit);
 
         }
+        req.body.MRN=`${generateRandomNumber(4)}-${req.body.phoneNumber}`;        
         req.body.password=configuration.defaultPassword;
         //other validations
          const queryresult=await createpatient(req.body)
