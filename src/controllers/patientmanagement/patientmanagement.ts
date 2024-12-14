@@ -43,4 +43,19 @@ export async function getallpatients(req:Request, res:any){
 }
 
 //update a patient
-//
+export async function updatepatients(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    var queryresult = await updatepatient(id, req.body);
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
