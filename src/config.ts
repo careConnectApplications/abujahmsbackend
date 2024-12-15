@@ -30,13 +30,19 @@ const configuration = {
   ],
   gender:["Male", "Female"],
   },
+  downloadtemplatetypes:[{
+    type:"userbulkdownloadtemplate", fileName:"usercreationtemplate.xlsx"
+
+  }],
   allowedfilesize: 500,
   usertemplate: "userslist",
   useruploadfilename:"usersload",
   useruploaddirectory:"uploads",
+  userdownloadsdirectory:"downloads",
   error:{
     erroruserread: "Error in reading user",
     errorusercreate: "Error in creating user",
+    errordownload:"Error downloading the file",
     errorinvalidcredentials: "Invalid credentials",
     erroruserupdate: "Error in updating users",
     errornoemailpassword:"Please Provide Email and Password",
