@@ -31,7 +31,9 @@ const configuration = {
   gender:["Male", "Female"],
   },
   allowedfilesize: 500,
-  shelftemplate: "userslist",
+  usertemplate: "userslist",
+  useruploadfilename:"usersload",
+  useruploaddirectory:"uploads",
   error:{
     erroruserread: "Error in reading user",
     errorusercreate: "Error in creating user",

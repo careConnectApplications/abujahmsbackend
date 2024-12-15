@@ -1,8 +1,7 @@
-
-import * as path from 'path';
-import exeltojson from 'convert-excel-to-json';
+import path from "path";
 import configuration from "../../config";
-import  {readall,updateuser,readone}  from "../../dao/users";
+import  {readall,updateuser,readone,createuser}  from "../../dao/users";
+import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
 
 
 //get all users
@@ -62,80 +61,68 @@ export async function updatestatus(req:any, res:any){
 
   //bulk upload users
   export async function bulkuploadusers(req:any, res:any){
-    try{       
-  const file = req.files.file;
-  const fileName = file.name;
-  const size = file.data.length/1024;
-  const extension = path.extname(fileName);
-  const renamedurl= `usersload${extension}`;
-  let allowedextension = ['.csv','.xlsx'];
-  if(!allowedextension.includes(extension))
-  {
-   throw new Error(configuration.error.errorfilextension);
-  }
-  if(size > configuration.allowedfilesize){
-   throw new Error(configuration.error.errorfilelarge);
-  }
- file.mv(`${process.cwd()}/uploads/${renamedurl}`,async (e:any)=>{
-    if(e){
-      //logger.error(e.message);
-      throw new Error(configuration.error.errorfileupload);
-    }
-    else{
-      let jsonresult = exeltojson({
-        sourceFile: `${process.cwd()}/uploads/${renamedurl}`,
-        sheets: [
-            {
-              // Excel Sheet Name
-              name: configuration.shelftemplate,
-    
-              // Header Row -> be skipped and will not be present at our result object.
-              header: {
-                rows: 1,
-              },
-              // Mapping columns to keys
-              columnToKey: {
-                A: "productname",
-                B: "store",
-                C: "shelfid",
-                D: "countedqty",
-                E: "countedqtyserviceable",
-                F: "countedqtyunserviceable",
-               
-              
-              },
-            },
-          ],
-       });
-
-       var {shelftemplate} = jsonresult;
-       /*
-       for (var i = 0; i < shelftemplate.length; i++) {
-        try{
-        //validation
-       var {shelfid,countedqty,countedqtyserviceable,countedqtyunserviceable} = shelftemplate[i];
-       //validateinputfaulsyvalue
-       validateinputfaulsyvalue({shelfid,countedqty,countedqtyserviceable,countedqtyunserviceable});
-       //check for number
-       validateinputfornumber({countedqty,countedqtyserviceable,countedqtyunserviceable});
-        const queryshelf:any =await readoneproductshelfwithoutpopulatingcategory({_id:shelfid});
-        //check for faulsy
-        await createstock({store:queryshelf.store,productname:queryshelf.productname,qty:queryshelf.qty,qtyserviceable:queryshelf.qtyserviceable,qtyunserviceable:queryshelf.qtyunserviceable,shelfid,countedqty,countedqtyserviceable,countedqtyunserviceable,status: configuration.stockapprovals[6]});
-    }
-    catch(e:any){
-        return res.json({status: false, msg:e.message});
-        //break;
-    }  
-    }
-    */
-       //res.json({status: true, queryresult: 'Bulk upload was successfull'});
-    }
-    
-  });
+  try{  
+    const file = req.files.file;
+    const filename= configuration.useruploadfilename;
+    let allowedextension = ['.csv','.xlsx'];
+    let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
+    var columnmapping={
+      A: "title",
+      B: "staffId",
+      C: "firstName",
+      D: "middleName",
+      E: "lastName",
+      F: "country",
+      G: "state",
+      H: "city",
+      I: "address",
+      J: "age",
+      K: "dateOfBirth",
+      L: "gender",
+      M: "licence",
+      N: "phoneNumber",
+      O: "email",
+      P: "role",
+      Q: "degree",
+      R: "profession",
+      S: "employmentStatus",
+      T: "nativeSpokenLanguage",
+      U: "otherLanguage",
+      V: "readWriteLanguage",
+      W: "clinic",
+      X: "zip",
+      Y: "specializationDetails",
+       
+    };
+  
+  await uploaddocument(file,filename,allowedextension,uploadpath);
+   //convert uploaded excel to json
+  var convert_to_json =await convertexceltojson(`${uploadpath}/${filename}${path.extname(file.name)}`, configuration.usertemplate, columnmapping);
+   //save to database
+  var {userslist} = convert_to_json;
+       if(userslist.length > 0){
+        for (var i = 0; i < userslist.length; i++) {        
+          const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = userslist[i];
+          validateinputfaulsyvalue({email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails});
+          const foundUser =  await readone({email});
+          if(foundUser){
+              throw new Error(`${email} ${configuration.error.erroralreadyexit}`);
+  
+          }
+          userslist[i].password=configuration.defaultPassword;
+          //other validations
+          await createuser(userslist[i]);
+     
+      }
+       }
+      
+       res.status(200).json({status: true, queryresult: 'Bulk upload was successfull'});
     }
     catch(e:any){
        //logger.error(e.message);
-        res.json({status: false, msg:e.message});
+       console.log("all",e);
+       res.status(403).json({status: false, msg:e.message});
 
     }
 }
+    

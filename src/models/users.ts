@@ -111,7 +111,7 @@ const userSchema = new Schema(
       type: String,
     },
     password: {
-      required: true,
+      required: [true, "Password is required"],
       type: String,
     },
     status:{

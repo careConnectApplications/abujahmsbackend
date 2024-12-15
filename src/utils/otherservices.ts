@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import  jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import configuration from "../config";
+import * as path from 'path';
+import exeltojson from 'convert-excel-to-json';
 export var encrypt = async function(password:any){
     try{
     //generate a salt
@@ -72,4 +74,47 @@ export function generateRandomNumber(n:number) {
      
    }
  }      
+ }
+
+ export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
+  const fileName = file.name;
+  const size = file.data.length/1024;
+  const extension = path.extname(fileName);
+  const renamedurl= `${filename}${extension}`;
+  if(!allowedextension.includes(extension))
+  {
+   throw new Error(configuration.error.errorfilextension);
+  }
+  if(size > configuration.allowedfilesize){
+   throw new Error(configuration.error.errorfilelarge);
+  }
+  //upload excel sheet
+ file.mv(`${uploadpath}/${renamedurl}`,async (e:any)=>{
+  if(e){
+    //logger.error(e.message);
+    throw new Error(configuration.error.errorfileupload);
+  }});
+
+ }
+ //convert excel to json
+ export function convertexceltojson(pathtoexcelsheet:any, nameofsheet:any, columnmapping:any){
+    var jsonresult =exeltojson({
+        sourceFile: `${pathtoexcelsheet}`,
+        sheets: [
+            {
+              // Excel Sheet Name
+              name: nameofsheet,
+    
+              // Header Row -> be skipped and will not be present at our result object.
+              header: {
+                rows: 1,
+              },
+              // Mapping columns to keys
+              columnToKey: columnmapping,
+            },
+          ],
+       });
+
+       return jsonresult;
+
  }

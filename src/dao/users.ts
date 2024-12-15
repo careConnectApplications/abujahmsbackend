@@ -2,6 +2,8 @@ import User from "../models/users";
 import {usersinterface} from '../models/users'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
+import { AnyArray } from "mongoose";
+
   //read all payment history
   export async function readall(query:any) {
     try {
@@ -62,7 +64,26 @@ import configuration from "../config";
 
   }
  
-  
+//insert many
+export async function createmanyuser(input:any){
+  try{
+    // this option prevents additional documents from being inserted if one fails
+    const options = { ordered: true };
+    return await User.insertMany(input,options);
+  }
+  catch(err:any){
+    var message:any;
+    if (err.name === "ValidationError") {       
+      message = Object.values(err.errors).map((value:any) => value.message);
+  }
+  else{
+    message=configuration.error.errorusercreate;
+  }
+  throw new Error(message[0]);
+
+  }
+}
+
   
   
 
