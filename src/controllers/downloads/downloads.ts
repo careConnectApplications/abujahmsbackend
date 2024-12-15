@@ -13,6 +13,7 @@ export async function downloadtemplates(req:any, res:any){
             // Send the file as an attachment to trigger download
             res.download(filePath, fileName, (err:any) => {
               if (err) {
+                console.log(err);
                 
                 return res.status(500).send(configuration.error.errordownload);
               }
