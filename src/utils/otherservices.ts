@@ -89,13 +89,21 @@ export function generateRandomNumber(n:number) {
    throw new Error(configuration.error.errorfilelarge);
   }
   //upload excel sheet
+  return new Promise((resolve, reject) => {
  file.mv(`${uploadpath}/${renamedurl}`,async (e:any)=>{
   if(e){
     //logger.error(e.message);
-    throw new Error(configuration.error.errorfileupload);
-  }});
+    reject(e);
+    //throw new Error(configuration.error.errorfileupload);
+  }
+  else{
+    resolve('completed'); 
+  }
+});
 
+  })
  }
+ 
  //convert excel to json
  export function convertexceltojson(pathtoexcelsheet:any, nameofsheet:any, columnmapping:any){
     var jsonresult =exeltojson({

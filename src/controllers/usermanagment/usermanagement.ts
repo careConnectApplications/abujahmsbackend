@@ -97,7 +97,7 @@ export async function updatestatus(req:any, res:any){
   
   await uploaddocument(file,filename,allowedextension,uploadpath);
    //convert uploaded excel to json
-  var convert_to_json =await convertexceltojson(`${uploadpath}/${filename}${path.extname(file.name)}`, configuration.usertemplate, columnmapping);
+   var convert_to_json = convertexceltojson(`${uploadpath}/${filename}${path.extname(file.name)}`, configuration.usertemplate, columnmapping);
    //save to database
   var {userslist} = convert_to_json;
        if(userslist.length > 0){
@@ -116,11 +116,11 @@ export async function updatestatus(req:any, res:any){
       }
        }
       
+      
        res.status(200).json({status: true, queryresult: 'Bulk upload was successfull'});
     }
     catch(e:any){
        //logger.error(e.message);
-       console.log("all",e);
        res.status(403).json({status: false, msg:e.message});
 
     }
