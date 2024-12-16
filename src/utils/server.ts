@@ -5,6 +5,7 @@ import auth from "../routes/auth";
 import users from "../routes/usermanagement";
 import patientsmanagement from '../routes/patientmanagement';
 import downloads from "../routes/downloads";
+import {protect} from "../utils/middleware";
 
 function createServer(){
     const app:Application=express();

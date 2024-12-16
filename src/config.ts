@@ -1,10 +1,13 @@
 const configuration = {
-  userstatus:["inactive", "active"],
+  userstatus:["inactive", "active","pending payment"],
   defaultPassword: "HMSB",
   settings:{
   roles:[
     {role: "Doctor", roleId:"1"},
-    {role: "Pharmacist", roleId:"2"}
+    {role: "Pharmacist", roleId:"2"},
+    {role: "Receptionist", roleId:3},
+    {role: "Nurse", roleId:"4"},
+    {role: "Cashier", roleId:"5"},
   ],
   clinics:[
   {clinic: "General Outpatient Clinic", id:1},
@@ -16,16 +19,16 @@ const configuration = {
    {clinic: "Gynae Emergency room", id:7},
    {clinic: "Emergency Pediatric Unit", id:8},
    {clinic: "Accident and Emergency", id:9},
-   {clinic: "Orthopedic Clinic", id:9},
-    {clinic: "Eye Care", id:10},
-	{clinic: "Dialysis Unit", id:11},
-  {clinic: "Dental Unit", id:12},
-  {clinic: "Scanning", id:13},
-  {clinic: "X-ray", id:14},
-  {clinic: "ENT", id:15},
-  {clinic:"KTCHMA", id:16},
-  {clinic: "N H I S", id:16},
-   {clinic:"ART Clinic", id:17}
+   {clinic: "Orthopedic Clinic", id:10},
+    {clinic: "Eye Care", id:11},
+	{clinic: "Dialysis Unit", id:12},
+  {clinic: "Dental Unit", id:13},
+  {clinic: "Scanning", id:14},
+  {clinic: "X-ray", id:15},
+  {clinic: "ENT", id:16},
+  {clinic:"KTCHMA", id:17},
+  {clinic: "N H I S", id:18},
+   {clinic:"ART Clinic", id:19}
 
   ],
   gender:["Male", "Female"],
@@ -56,6 +59,7 @@ const configuration = {
     errorfilelarge: "File should not be greater than 500kb",
     errorfileupload: "Error in uploading file",
     errorisrequired: "is required",
+    protectroutes: "Authorization error: You are not an authorise user in this application", 
 
   },
     environment: "test",
