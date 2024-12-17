@@ -4,6 +4,7 @@ import fileUpload from "express-fileupload";
 import auth from "../routes/auth";
 import users from "../routes/usermanagement";
 import patientsmanagement from '../routes/patientmanagement';
+import billingandpayment from '../routes/billingandpayment';
 import downloads from "../routes/downloads";
 import {protect} from "../utils/middleware";
 
@@ -29,6 +30,7 @@ function createServer(){
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
   app.use('/api/v1/users', users);
+  app.use('/api/v1/billing', billingandpayment);
   app.use('/api/v1/patientsmanagement', patientsmanagement);
     return app;
 

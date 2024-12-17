@@ -1,3 +1,4 @@
+import {readallpayment} from "../../dao/payment";
 //deactivate a user
 /*
 export async function confirmpayment(req:any, res:any){
@@ -21,4 +22,22 @@ export async function confirmpayment(req:any, res:any){
 }
     */
    //read particular patient payment history
+export async function readbillinghistoryforapatient(req:any, res:any){
+    try{
+    const { id } = req.params;
+    var query ={patient:id};
+   const queryresult = await readallpayment(query);
+
+   res.json({
+     queryresult,
+     status: true,
+   });
+}
+   catch(e:any){
+    console.log(e);
+  res.status(403).json({status: false, msg:e.message});
+
+}
+
+}
    
