@@ -126,14 +126,7 @@ const patientSchema = new Schema(
           ref: "Payment",
           default: true,
         },
-      ],
-     
-      status:{
-        required: true,
-        type: String,
-        default: configuration.userstatus[2],
-  
-      }
+      ]
     
   },
   { timestamps: true }
