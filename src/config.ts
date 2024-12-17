@@ -37,6 +37,7 @@ const configuration = {
     type:"userbulkdownloadtemplate", fileName:"usercreationtemplate.xlsx"
 
   }],
+  paymenttype:["patientregistration"],
   allowedfilesize: 500,
   usertemplate: "userslist",
   useruploadfilename:"usersload",

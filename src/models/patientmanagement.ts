@@ -109,6 +109,9 @@ const patientSchema = new Schema(
     HMOPlan: {
       type: String,
     },
+    passport: {
+      type: String,
+    },
     MRN: {
         required: true,
         type: String,
@@ -117,6 +120,14 @@ const patientSchema = new Schema(
         required: true,
         type: String,
       },
+      payment: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Payment",
+          default: true,
+        },
+      ],
+     
       status:{
         required: true,
         type: String,

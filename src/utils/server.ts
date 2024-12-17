@@ -14,6 +14,7 @@ function createServer(){
       origin: "*",
       }));
     app.use(express.static(__dirname + '/downloads'));
+    app.use(express.static(__dirname + '/uploads'));
     //middleware to process json
     app.use(express.json({limit: '50mb'}));
     /*
@@ -25,6 +26,7 @@ function createServer(){
     */
     app.use(fileUpload());
   app.use('/api/v1/downloads', downloads);
+  app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
   app.use('/api/v1/users', users);
   app.use('/api/v1/patientsmanagement', patientsmanagement);
