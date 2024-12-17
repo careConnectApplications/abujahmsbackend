@@ -7,7 +7,7 @@ import configuration from "../config";
   export async function readallpatient(query:any,selectquery:any,populatequery:any) {
     try {
       const patientdetails = await Patient.find(query).select(selectquery).populate(populatequery);
-      const totalpatientdetails = await Patient.countDocuments();
+      const totalpatientdetails = await Patient.find(query).countDocuments();
       return { patientdetails, totalpatientdetails };
     } catch (err) {
       console.log(err);

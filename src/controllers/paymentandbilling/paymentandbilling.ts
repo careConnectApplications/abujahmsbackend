@@ -26,7 +26,30 @@ export async function readbillinghistoryforapatient(req:any, res:any){
     try{
     const { id } = req.params;
     var query ={patient:id};
-   const queryresult = await readallpayment(query);
+    var populatequery ='patient';
+   const queryresult = await readallpayment(query,populatequery);
+
+   res.json({
+     queryresult,
+     status: true,
+   });
+}
+   catch(e:any){
+    console.log(e);
+  res.status(403).json({status: false, msg:e.message});
+
+}
+
+}
+   
+//get billing history for all patient
+   
+   export async function readbillinghistoryforallapatient(req:any, res:any){
+    try{
+    
+    var query ={};
+    var populatequery ='patient';
+   const queryresult = await readallpayment(query,populatequery);
 
    res.json({
      queryresult,

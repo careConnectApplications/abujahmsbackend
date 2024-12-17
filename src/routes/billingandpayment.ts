@@ -1,10 +1,12 @@
 import express from 'express';
-import {readbillinghistoryforapatient} from '../controllers/paymentandbilling/paymentandbilling';
+import {readbillinghistoryforapatient,readbillinghistoryforallapatient} from '../controllers/paymentandbilling/paymentandbilling';
 const router = express.Router();
 
 
 
 router.get('/getpatientbillinghistory/:id',readbillinghistoryforapatient);
+router.get('/getallpatientbillinghistory',readbillinghistoryforallapatient);
+//readbillinghistoryforallapatient
 
 
 

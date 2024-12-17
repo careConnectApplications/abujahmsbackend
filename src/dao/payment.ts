@@ -3,10 +3,10 @@ import {paymentinterface} from '../models/payment'
 import configuration from "../config";
 
   //read all payment history
-  export async function readallpayment(query:any) {
+  export async function readallpayment(query:any,populatequery:any) {
     try {
-      const paymentdetails = await Payment.find(query);
-      const totalpaymentdetails = await Payment.countDocuments();
+      const paymentdetails = await Payment.find(query).populate(populatequery);
+      const totalpaymentdetails = await Payment.find(query).countDocuments();
       return { paymentdetails, totalpaymentdetails };
     } catch (err) {
       console.log(err);
