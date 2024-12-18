@@ -2,6 +2,7 @@ const configuration = {
   status:["inactive", "active","pending payment"],
   defaultPassword: "HMSB",
   settings:{
+  servicecategory:["Registration", "Admission"],
   roles:[
     {role: "Doctor", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
