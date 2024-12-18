@@ -120,6 +120,13 @@ const patientSchema = new Schema(
         required: true,
         type: String,
       },
+      appointment: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Appointment",
+          default: true,
+        },
+      ],
       payment: [
         {
           type: Schema.Types.ObjectId,
