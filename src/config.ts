@@ -1,5 +1,5 @@
 const configuration = {
-  userstatus:["inactive", "active","pending payment"],
+  status:["inactive", "active","pending payment"],
   defaultPassword: "HMSB",
   settings:{
   roles:[

@@ -23,7 +23,7 @@ export var signin = async(req:any,res:any) =>{
 
         
         //chek if user is active
-        if(user.status === configuration.userstatus[0]){
+        if(user.status === configuration.status[0]){
           throw new Error(configuration.error.errordeactivate);
 
         }

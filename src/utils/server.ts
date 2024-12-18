@@ -5,6 +5,7 @@ import auth from "../routes/auth";
 import users from "../routes/usermanagement";
 import patientsmanagement from '../routes/patientmanagement';
 import billingandpayment from '../routes/billingandpayment';
+import settings from '../routes/setting';
 import downloads from "../routes/downloads";
 import {protect} from "../utils/middleware";
 
@@ -32,6 +33,8 @@ function createServer(){
   app.use('/api/v1/users', users);
   app.use('/api/v1/billing', billingandpayment);
   app.use('/api/v1/patientsmanagement', patientsmanagement);
+  app.use('/api/v1/settings', settings);
+  
     return app;
 
 }

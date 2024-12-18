@@ -26,7 +26,7 @@ const paymentSchema = new Schema(
     status:{
       required: true,
       type: String,
-      default: configuration.userstatus[2],
+      default: configuration.status[2],
 
     }
     

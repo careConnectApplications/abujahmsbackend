@@ -25,7 +25,7 @@ export async function updatestatus(req:any, res:any){
     const {id} = req.params;
     try{
         const response = await readone({_id:id});
-       const status= response?.status == configuration.userstatus[0]? configuration.userstatus[1]: configuration.userstatus[0];
+       const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
         const queryresult:any =await updateuser(id,{status});
         res.status(200).json({
             queryresult,

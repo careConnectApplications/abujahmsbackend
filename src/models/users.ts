@@ -117,7 +117,7 @@ const userSchema = new Schema(
     status:{
       required: true,
       type: String,
-      default: configuration.userstatus[1],
+      default: configuration.status[1],
 
     }
   },
