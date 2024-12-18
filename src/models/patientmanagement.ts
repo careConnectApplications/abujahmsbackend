@@ -71,7 +71,7 @@ const patientSchema = new Schema(
     
       type: String,
     },
-    nextOfKinRelatinship: {
+    nextOfKinRelationship: {
     
       type: String,
     },
