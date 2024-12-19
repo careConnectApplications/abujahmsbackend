@@ -2,13 +2,15 @@ import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../../dao/patientmanagement";
-import Appointment from "../../models/appointment";
+import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservices";
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
    
     try{
+      
+
         //get token from header
         const {phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover} = req.body;
         //validation
@@ -16,11 +18,17 @@ export var createpatients = async (req:any,res:any) =>{
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
         const foundUser =  await readonepatient({phoneNumber},selectquery,'');
-        console.log(foundUser);
         if(foundUser){
             throw new Error(configuration.error.erroralreadyexit);
 
         }
+        //validate if price is set for patient registration
+        var newRegistrationPrice = await readoneprice({servicecategory:configuration.settings.servicecategory[0]});
+        if(!newRegistrationPrice){
+          throw new Error(configuration.error.errornopriceset);
+
+      }
+       
         req.body.MRN=`${generateRandomNumber(4)}-${req.body.phoneNumber}`;        
         req.body.password=configuration.defaultPassword;
         //other validations
@@ -28,7 +36,7 @@ export var createpatients = async (req:any,res:any) =>{
          const createpatientqueryresult=await createpatient(req.body);
          
          //create payment
-         const createpaymentqueryresult =await createpayment({paymentype:configuration.paymenttype[0],patient:createpatientqueryresult._id})
+         const createpaymentqueryresult =await createpayment({paymentype:configuration.paymenttype[0],patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
          payment.push(createpaymentqueryresult._id);
          //update createpatientquery
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment});

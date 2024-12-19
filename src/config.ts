@@ -2,7 +2,8 @@ const configuration = {
   status:["inactive", "active","pending payment"],
   defaultPassword: "HMSB",
   settings:{
-  servicecategory:["Registration", "Admission"],
+  servicecategory:["Patient Registration", "Admission"],
+  
   roles:[
     {role: "Doctor", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
@@ -54,13 +55,15 @@ const configuration = {
     errorinvaliduser:"invalid credentials",
     errordeactivate:"You have been Deactivated",
     errorpasswordmismatch:"Wrong Password Detected",
-    erroralreadyexit: "User with this email or password already exist",
+    erroralreadyexit: "already exist",
     errorencryptingpassword:"Error in encrypting Password",
     errorvalidatingpassword:"Error in Validating Password",
     errorfilextension: "File extension not allowed",
     errorfilelarge: "File should not be greater than 500kb",
     errorfileupload: "Error in uploading file",
     errorisrequired: "is required",
+    errorservicecategory:"service category does not exist in the list of accepted categories",
+    errornopriceset:"No Price has been set for this service",
     protectroutes: "Authorization error: You are not an authorise user in this application", 
 
   },

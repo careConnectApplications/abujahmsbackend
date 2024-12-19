@@ -6,23 +6,31 @@ export interface appointinterface {
  
 }
 
-
 const appointmentSchema = new Schema({
-  /*
-  date: {
-    type: Date,
+  appointmentdate:
+  {
+    type: Date, 
     required: true
   },
-  */
-  patientName: {
+  patient: {
+    type: Schema.Types.ObjectId,
+    ref: "Patientsmanagement",
+    default: null,
+  },
+  appointmentfee: {
     type: String,
     required: true
   },
-  doctorName: {
+  clinic: {
     type: String,
     required: true
   },
-  // other fields...
+  status:{
+    required: true,
+    type: String,
+    default: configuration.status[2],
+
+  }
 });
 
 const Appointment = model('appointment', appointmentSchema);
