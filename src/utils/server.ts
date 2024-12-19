@@ -28,12 +28,12 @@ function createServer(){
     */
     app.use(fileUpload());
   app.use('/api/v1/downloads', downloads);
-  app.use('/api/v1/uploads', express.static('uploads'));
+  app.use('/api/v1/uploads',protect, express.static('uploads'));
   app.use('/api/v1/auth', auth);
-  app.use('/api/v1/users', users);
-  app.use('/api/v1/billing', billingandpayment);
-  app.use('/api/v1/patientsmanagement', patientsmanagement);
-  app.use('/api/v1/settings', settings);
+  app.use('/api/v1/users',protect, users);
+  app.use('/api/v1/billing',protect, billingandpayment);
+  app.use('/api/v1/patientsmanagement',protect, patientsmanagement);
+  app.use('/api/v1/settings',protect, settings);
   
     return app;
 

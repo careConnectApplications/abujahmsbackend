@@ -64,3 +64,4 @@ export async function readbillinghistoryforapatient(req:any, res:any){
 
 }
    
+//confirm payment
