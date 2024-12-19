@@ -6,7 +6,7 @@
     "teststart": "ts-node-dev --respawn src/index.ts",
     "testenv": "nodemon --exec ts-node src/index.ts",
     "start": "node build/index.js",
-    "build": "rimraf  build/ && tsc -f"
+    "build": "rimraf  build/ && tsc"
   },
   "keywords": [],
   "author": "",
