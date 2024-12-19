@@ -127,6 +127,12 @@ const patientSchema = new Schema(
           default: true,
         },
       ],
+      status:{
+        required: true,
+        type: String,
+        default: configuration.status[1],
+  
+      },
       payment: [
         {
           type: Schema.Types.ObjectId,

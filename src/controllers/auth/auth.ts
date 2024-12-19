@@ -60,8 +60,8 @@ export var signup = async (req:any,res:any) =>{
         req.body.password=configuration.defaultPassword;
         //other validations
          const queryresult=await createuser(req.body)
-        const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
-        await mail(email, "Account Registration Confrimation", message);
+        //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
+        //await mail(email, "Account Registration Confrimation", message);
         res.status(200).json({queryresult, status: true});
         
 

@@ -19,7 +19,12 @@ const paymentSchema = new Schema(
       required: true,
      
     },
-    
+    cashieremail:{
+      type: String
+    },
+    cashierid:{
+      type: String
+    },
     patient: {
       type: Schema.Types.ObjectId,
       ref: "Patientsmanagement",

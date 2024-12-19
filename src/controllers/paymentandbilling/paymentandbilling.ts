@@ -1,4 +1,5 @@
-import {readallpayment} from "../../dao/payment";
+import {readallpayment,readonepayment,updatepayment} from "../../dao/payment";
+import configuration from "../../config";
 //deactivate a user
 /*
 export async function confirmpayment(req:any, res:any){
@@ -65,3 +66,25 @@ export async function readbillinghistoryforapatient(req:any, res:any){
 }
    
 //confirm payment
+export async function confirmpayment(req:any, res:any){
+  console.log(req.user);
+  const {id} = req.params;
+  try{
+      const response = await readonepayment({_id:id});
+     const status= configuration.status[3];
+     const {email, staffId} = req.user;
+      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+

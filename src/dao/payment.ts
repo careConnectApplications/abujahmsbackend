@@ -41,14 +41,14 @@ import configuration from "../config";
   //update  users
   export async function updatepayment(id:any, reqbody:any){
     try{
-    const user = await Payment.findOneAndUpdate({ _id: id }, reqbody,{
+    const transaction = await Payment.findOneAndUpdate({ _id: id }, reqbody,{
       new: true
     });
-      if (!user) {
+      if (!transaction) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);
       }
-      return user;
+      return transaction;
     }catch(err){
       console.log(err);
       throw new Error(configuration.error.erroruserupdate);
