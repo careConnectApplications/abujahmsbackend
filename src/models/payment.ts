@@ -4,7 +4,8 @@ import bcrypt from "bcryptjs";
 export interface paymentinterface {
   paymentype: String;
   patient:any;
-  amount:Number
+  amount:Number,
+  paymentreference:String
   
 }
 //create schema
@@ -13,6 +14,11 @@ const paymentSchema = new Schema(
     paymentype: {
       required: true,
       type: String,
+    },
+    paymentreference:{
+      required: true,
+      type: String,
+
     },
     amount: {
       type: Number,
