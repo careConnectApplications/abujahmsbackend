@@ -67,13 +67,14 @@ export async function readbillinghistoryforapatient(req:any, res:any){
    
 //confirm payment
 export async function confirmpayment(req:any, res:any){
-  console.log(req.user);
+  //console.log(req.user);
   const {id} = req.params;
   try{
       const response = await readonepayment({_id:id});
      const status= configuration.status[3];
-     const {email, staffId} = req.user;
-      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+  //   const {email, staffId} = req.user;
+      //const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+      const queryresult:any =await updatepayment(id,{status});
       res.status(200).json({
           queryresult,
           status:true
