@@ -31,6 +31,10 @@ const paymentSchema = new Schema(
     cashierid:{
       type: String
     },
+    confirmationdate:{
+      type: Date
+
+    },
     patient: {
       type: Schema.Types.ObjectId,
       ref: "Patientsmanagement",

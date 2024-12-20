@@ -1,5 +1,5 @@
 const configuration = {
-  status:["inactive", "active","pending payment","paid"],
+  status:["inactive", "active","pending payment","paid","pending vitals"],
   defaultPassword: "HMSB",
   settings:{
   servicecategory:["Patient Registration", "Admission"],

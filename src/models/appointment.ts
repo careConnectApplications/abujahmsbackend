@@ -7,6 +7,16 @@ export interface appointinterface {
 }
 
 const appointmentSchema = new Schema({
+  appointmentid:
+  {
+    type: String, 
+    required: true
+  },
+  reason: String,
+  findings: String,  // Description of the examination findings
+  diagnosis: String, // Doctor's diagnosis based on the examination
+  prescriptions: [String],  // List of prescribed medications or treatments
+  notes: String, // Additional notes (if any)
   appointmentdate:
   {
     type: Date, 
@@ -15,6 +25,11 @@ const appointmentSchema = new Schema({
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
+    default: null,
+  },
+  doctor: {
+    type: Schema.Types.ObjectId,
+    ref: "Users",
     default: null,
   },
   appointmentfee: {
