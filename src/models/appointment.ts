@@ -3,6 +3,12 @@ import configuration from "../config";
 
 export interface appointinterface {
   appointmentid: String;
+  patient:any,
+  clinic:String,
+  reason:String,
+  appointmentdate:any,
+  appointmentcategory:String,
+  appointmenttype:String
  
 }
 
@@ -33,7 +39,17 @@ const appointmentSchema = new Schema({
     ref: "Users",
     default: null,
   },
-  appointmentfee: {
+  payment: {
+      type: Schema.Types.ObjectId,
+      ref: "Payment",
+      default: true,
+    },
+  
+  appointmentcategory: {
+    type: String,
+    required: true
+  },
+  appointmenttype: {
     type: String,
     required: true
   },

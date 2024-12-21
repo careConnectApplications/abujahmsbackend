@@ -2,7 +2,11 @@ const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals"],
   defaultPassword: "HMSB",
   settings:{
-  servicecategory:["Patient Registration", "Admission"],
+  servicecategory:[
+    {category: "Patient Registration", type:["Patient Registration"]}, 
+    {category: "Admission", type:["Patient Followup", "Consultation"]},
+    {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]}
+  ],
   
   roles:[
     {role: "Doctor", roleId:"1"},

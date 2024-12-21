@@ -14,7 +14,7 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
-  export async function createappointment(input:appointinterface){
+  export async function createappointment(input:any){
     try{
        const appointment = new Appointment(input);
         return await appointment.save();

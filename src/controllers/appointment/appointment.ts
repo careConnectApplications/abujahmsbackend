@@ -1,36 +1,56 @@
-const Examination = require('../models/examination');
-const Patient = require('../models/patient');
-const Doctor = require('../models/doctor');
+import {createappointment} from "../../dao/appointment";
+import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
+import {readoneprice} from "../../dao/price";
+import {createpayment} from "../../dao/payment";
+import { validateinputfaulsyvalue,generateRandomNumber } from "../../utils/otherservices";
+import configuration from "../../config";
 
 
-// Create a new examination record
-/*
-const createExamination = async (req, res) => {
-  const { patient_id, doctor_id, findings, diagnosis, prescriptions, notes } = req.body;
+
+// Create a new schedule
+export const scheduleappointment = async (req:any, res:any) => {
+
+  
 
   try {
-    const patient = await Patient.findById(patient_id);
-    const doctor = await Doctor.findById(doctor_id);
+    req.body.appointmentdate=new Date(req.body.appointmentdate);
+    console.log("///////////date//////////////",req.body.appointmentdate);
+    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
 
-    if (!patient || !doctor) {
-      return res.status(400).json({ message: 'Invalid patient or doctor ID' });
-    }
+  validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype});
+  const {id} = req.params;
+    //search patient if available and paid for registration
+     //validation
+     var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
+       "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
+     const patient =  await readonepatient({_id:id},selectquery,'');
+     if(!patient){
+         throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
-    const examination = new Examination({
-      patient_id,
-      doctor_id,
-      findings,
-      diagnosis,
-      prescriptions,
-      notes
-    });
+     }
 
-    await examination.save();
-    res.status(201).json(examination);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating examination', error });
+    //search for price if available
+    var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
+    if(!appointmentPrice){
+      throw new Error(configuration.error.errornopriceset);
+
+  }
+
+//create appointment
+//create payment
+const createpaymentqueryresult =await createpayment({paymentreference:patient.MRN,paymentype:appointmenttype,patient:id,amount:Number(appointmentPrice.amount)})
+const queryresult = await createappointment({appointmentid:generateRandomNumber(5),payment:createpaymentqueryresult._id ,patient:patient._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype});
+    var payment=[]; 
+    payment.push(createpaymentqueryresult._id);
+    //update patient
+    await updatepatient(id,{payment,appointment:queryresult._id});
+    res.status(200).json({queryresult, status: true});
+    
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
   }
 };
+/*
 
 // Get all examination records
 const getExaminations = async (req, res) => {
