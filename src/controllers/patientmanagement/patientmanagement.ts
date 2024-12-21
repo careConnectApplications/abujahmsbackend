@@ -105,6 +105,7 @@ export async function updatepatients(req:any, res:any){
     try{
     //get id
     const {id, status} = req.params;
+    //reject if status update
     if(status){
 
     }

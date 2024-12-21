@@ -1,4 +1,4 @@
-import {createappointment} from "../../dao/appointment";
+import {createappointment,readallappointment,updateappointment} from "../../dao/appointment";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
@@ -9,14 +9,9 @@ import configuration from "../../config";
 
 // Create a new schedule
 export const scheduleappointment = async (req:any, res:any) => {
-
-  
-
   try {
     req.body.appointmentdate=new Date(req.body.appointmentdate);
-    console.log("///////////date//////////////",req.body.appointmentdate);
     var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
-
   validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype});
   const {id} = req.params;
     //search patient if available and paid for registration
@@ -50,19 +45,59 @@ const queryresult = await createappointment({appointmentid:generateRandomNumber(
     res.status(403).json({ status: false, msg: error.message });
   }
 };
-/*
 
-// Get all examination records
-const getExaminations = async (req, res) => {
+
+// Get all schedueled records
+export const getAllSchedules = async (req:any, res:any) => {
   try {
-    const examinations = await Examination.find()
-      .populate('patient_id')
-      .populate('doctor_id');
-    res.status(200).json(examinations);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching examinations', error });
+    const queryresult = await readallappointment({},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
   }
 };
+//update appiontment
+export async function updateappointments(req:any, res:any){
+  try{
+  //get id
+  const {id, status} = req.params;
+  //reject if status
+  if(status){
+
+  }
+  var queryresult = await updateappointment(id, req.body);
+  res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  }catch(e:any){
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
+//get schedule by patient
+export const getAllSchedulesByPatient = async (req:any, res:any) => {
+  try {
+    const {id} = req.params;
+    const queryresult = await readallappointment({_id:id},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
+//get examination by clinic
+
+/*
 
 // Get examination by patient
 const getExaminationsByPatient = async (req, res) => {
