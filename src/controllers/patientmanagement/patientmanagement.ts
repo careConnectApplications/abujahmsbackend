@@ -23,7 +23,7 @@ export var createpatients = async (req:any,res:any) =>{
 
         }
         //validate if price is set for patient registration
-        var newRegistrationPrice = await readoneprice({servicecategory:configuration.settings.servicecategory[0]});
+        var newRegistrationPrice = await readoneprice({servicecategory:configuration.settings.servicecategory[0].category});
         if(!newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
@@ -36,7 +36,7 @@ export var createpatients = async (req:any,res:any) =>{
          const createpatientqueryresult=await createpatient(req.body);
          
          //create payment
-         const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
+         const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
          payment.push(createpaymentqueryresult._id);
          //update createpatientquery
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment});

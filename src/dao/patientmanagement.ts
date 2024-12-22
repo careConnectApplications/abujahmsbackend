@@ -39,7 +39,7 @@ import configuration from "../config";
   
  
   
-  //update  users
+  //update  patient by id
   export async function updatepatient(id:any, reqbody:any){
     try{
       if (reqbody.password) {
@@ -59,7 +59,29 @@ import configuration from "../config";
       console.log(err);
       throw new Error(configuration.error.erroruserupdate);
 
+
     }
 
   }
+
+    //update  patient by query
+    export async function updatepatientbyanyquery(query:any, reqbody:any){
+      try{
+        
+      const patient = await Patient.findOneAndUpdate(query, reqbody,{
+        new: true
+      });
+        if (!patient) {
+          //return json  false response
+          throw new Error(configuration.error.errorinvalidcredentials);
+        }
+        return patient;
+      }catch(err){
+        console.log(err);
+        throw new Error(configuration.error.erroruserupdate);
+        
+  
+      }
+  
+    }
   

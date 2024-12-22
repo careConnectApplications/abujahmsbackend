@@ -5,13 +5,18 @@ export interface paymentinterface {
   paymentype: String;
   patient:any;
   amount:Number,
-  paymentreference:String
+  paymentreference:String,
+  paymentcategory:String,
   
 }
 //create schema
 const paymentSchema = new Schema(
   {
     paymentype: {
+      required: true,
+      type: String,
+    },
+    paymentcategory: {
       required: true,
       type: String,
     },
