@@ -134,48 +134,34 @@ export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
   }
 };
 
+//queue
+//get all patient with paid schduled
+export const getAllPaidQueueSchedules = async (req:any, res:any) => {
+  try {
+      // Get today's date
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
+   // Get the start of tomorrow to set the range for "today"
+   const endOfDay = new Date(startOfDay);
+   endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
+    const {clinic} = (req.user).user;
+    const queryresult = await readallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
 
 
-//get examination by clinic
-
+//examine patient
 /*
-
-// Get examination by patient
-const getExaminationsByPatient = async (req, res) => {
-  const { patient_id } = req.params;
-
-  try {
-    const examinations = await Examination.find({ patient_id })
-      .populate('doctor_id');
-    if (!examinations) {
-      return res.status(404).json({ message: 'No examinations found for this patient' });
-    }
-    res.status(200).json(examinations);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching examinations', error });
-  }
-};
-
-// Get examination by doctor
-const getExaminationsByDoctor = async (req, res) => {
-  const { doctor_id } = req.params;
-
-  try {
-    const examinations = await Examination.find({ doctor_id })
-      .populate('patient_id');
-    if (!examinations) {
-      return res.status(404).json({ message: 'No examinations found for this doctor' });
-    }
-    res.status(200).json(examinations);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching examinations', error });
-  }
-};
-
-module.exports = {
-  createExamination,
-  getExaminations,
-  getExaminationsByPatient,
-  getExaminationsByDoctor
-};
+  findings: String,  // Description of the examination findings
+  diagnosis: String, // Doctor's diagnosis based on the examination
+  prescriptions: String,  // List of prescribed medications or treatments
+  requestforlabtest: String,
+  notes: String, // Additional notes (if any)
 */
+
