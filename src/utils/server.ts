@@ -34,7 +34,7 @@ function createServer(){
   app.use('/api/v1/users',users);
   app.use('/api/v1/billing',protect,billingandpayment);
   app.use('/api/v1/patientsmanagement',protect,patientsmanagement);
-  app.use('/api/v1/appointment',appointment);
+  app.use('/api/v1/appointment',protect, appointment);
   app.use('/api/v1/settings',settings);
   
     return app;

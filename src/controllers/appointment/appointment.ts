@@ -28,14 +28,15 @@ export const scheduleappointment = async (req:any, res:any) => {
       console.log("patient",patient);
       console.log("status",configuration.status[1]);
        const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},selectquery,'');
-     if(!patientrecord){
+  
+       if(!patientrecord){
          throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
      }
 
     //search for price if available
     var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
-    console.log("appointment",appointmentPrice );
+    
     if(!appointmentPrice){
       throw new Error(configuration.error.errornopriceset);
 
@@ -45,10 +46,8 @@ export const scheduleappointment = async (req:any, res:any) => {
 //create payment
 const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
 const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype});
-    var payment=[]; 
-    payment.push(createpaymentqueryresult._id);
     //update patient
-    await updatepatient(patient,{payment,appointment:queryresult._id});
+await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
     res.status(200).json({queryresult, status: true});
     
   } catch (error:any) {
@@ -60,6 +59,7 @@ const queryresult = await createappointment({appointmentid,payment:createpayment
 // Get all schedueled records
 export const getAllSchedules = async (req:any, res:any) => {
   try {
+   
     const queryresult = await readallappointment({},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
@@ -104,6 +104,37 @@ export const getAllSchedulesByPatient = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+//status:configuration.status[5]
+//get all patient with paid schduled
+export const getAllPaidSchedules = async (req:any, res:any) => {
+  try {
+    const {clinic} = (req.user).user;
+    const queryresult = await readallappointment({status:configuration.status[5],clinic},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
+//get schedule by single patient
+export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
+  try {
+    const {clinic} = (req.user).user;
+    const {id} = req.params;
+    const queryresult = await readallappointment({_id:id,status:configuration.status[5],clinic},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
+
 
 //get examination by clinic
 

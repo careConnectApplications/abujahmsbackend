@@ -124,7 +124,7 @@ const patientSchema = new Schema(
         {
           type: Schema.Types.ObjectId,
           ref: "Appointment",
-          default: true,
+          default: [],
         },
       ],
       status:{
@@ -137,7 +137,7 @@ const patientSchema = new Schema(
         {
           type: Schema.Types.ObjectId,
           ref: "Payment",
-          default: true,
+          default: [],
         },
       ]
     
