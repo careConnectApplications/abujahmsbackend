@@ -32,7 +32,7 @@ function createServer(){
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
   app.use('/api/v1/users',users);
-  app.use('/api/v1/billing',billingandpayment);
+  app.use('/api/v1/billing',protect,billingandpayment);
   app.use('/api/v1/patientsmanagement',patientsmanagement);
   app.use('/api/v1/appointment',appointment);
   app.use('/api/v1/settings',settings);
