@@ -58,7 +58,7 @@ export async function getallpatients(req:Request, res:any){
             "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
         var populatequery ={
             path: "payment",
-            match: { paymentype: { $eq: configuration.paymenttype[0] } },
+            match: { paymentype: { $eq: configuration.settings.servicecategory[0].category } },
             select: {
               status: 1,
               paymentype:1
