@@ -6,7 +6,7 @@ import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesBy
 const router = express.Router();
 
 
-router.post('/scheduleappointment/:id', scheduleappointment);
+router.post('/scheduleappointment', scheduleappointment);
 router.get('/getallschedules', getAllSchedules);
 router.get('/getallschedulesbypatient/:id', getAllSchedulesByPatient);
 router.put('/updateappointment/:id', updateappointments);

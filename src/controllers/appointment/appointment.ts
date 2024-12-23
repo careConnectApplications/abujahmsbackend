@@ -13,9 +13,9 @@ export const scheduleappointment = async (req:any, res:any) => {
     
     req.body.appointmentdate=new Date(req.body.appointmentdate);
     var appointmentid:any=String(Date.now());
-    const {id} = req.params;
-    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
-    validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype,id});
+    //const {id} = req.params;
+    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
+    validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype,patient});
  
 
    
@@ -25,14 +25,17 @@ export const scheduleappointment = async (req:any, res:any) => {
      var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       //search patient if available and paid for registration
-       const patient =  await readonepatient({_id:id,status:configuration.status[1]},selectquery,'');
-     if(!patient){
+      console.log("patient",patient);
+      console.log("status",configuration.status[1]);
+       const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},selectquery,'');
+     if(!patientrecord){
          throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
      }
 
     //search for price if available
     var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
+    console.log("appointment",appointmentPrice );
     if(!appointmentPrice){
       throw new Error(configuration.error.errornopriceset);
 
@@ -40,12 +43,12 @@ export const scheduleappointment = async (req:any, res:any) => {
 
 //create appointment
 //create payment
-const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:id,amount:Number(appointmentPrice.amount)})
-const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patient._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype});
+const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
+const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype});
     var payment=[]; 
     payment.push(createpaymentqueryresult._id);
     //update patient
-    await updatepatient(id,{payment,appointment:queryresult._id});
+    await updatepatient(patient,{payment,appointment:queryresult._id});
     res.status(200).json({queryresult, status: true});
     
   } catch (error:any) {
