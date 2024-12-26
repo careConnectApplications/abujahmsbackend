@@ -95,7 +95,7 @@ export async function updateappointments(req:any, res:any){
 export const getAllSchedulesByPatient = async (req:any, res:any) => {
   try {
     const {id} = req.params;
-    const queryresult = await readallappointment({_id:id},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({patient:id},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
