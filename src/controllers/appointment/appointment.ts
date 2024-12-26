@@ -124,7 +124,7 @@ export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
   try {
     const {clinic} = (req.user).user;
     const {id} = req.params;
-    const queryresult = await readallappointment({_id:id,status:configuration.status[5],clinic},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({patient:id,status:configuration.status[5],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -157,6 +157,21 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
 
 
 //examine patient
+export var examinepatient = async (req:any,res:any) =>{
+   
+  try{
+     const {id} = req.params;
+      const queryresult =  await updateappointment(id,req.body);
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+      
+
+  }catch(error:any){
+      res.status(403).json({ status: false, msg: error.message });
+  }
+}
 /*
   findings: String,  // Description of the examination findings
   diagnosis: String, // Doctor's diagnosis based on the examination
