@@ -1,20 +1,16 @@
 import { Schema, model } from "mongoose";
 import configuration from "../config";
 import bcrypt from "bcryptjs";
-export interface usersinterface {
+export interface patientinterface {
   title: String;
   firstName: String;
   middleName: String;
   lastName:String;
 }
 //create schema
-const userSchema = new Schema(
+const patientSchema = new Schema(
   {
     title: {
-      required: true,
-      type: String,
-    },
-    staffId: {
       required: true,
       type: String,
     },
@@ -34,11 +30,11 @@ const userSchema = new Schema(
       required: true,
       type: String,
     },
-    state: {
+    stateOfResidence: {
       required: true,
       type: String,
     },
-    city: {
+    LGA: {
       required: true,
       type: String,
     },
@@ -58,8 +54,7 @@ const userSchema = new Schema(
       required: true,
       type: String,
     },
-    licence: {
-      required: true,
+    nin: {
       type: String,
     },
     phoneNumber: {
@@ -67,64 +62,90 @@ const userSchema = new Schema(
       type: String,
     },
     email: {
+      type: String,
+    },
+    oldMRN: {
+      type: String,
+    },
+    nextOfKinName: {
+    
+      type: String,
+    },
+    nextOfKinRelationship: {
+    
+      type: String,
+    },
+    nextOfKinPhoneNumber: {
+        
+        type: String,
+      },
+      nextOfKinAddress: {
+       
+        type: String,
+      },
+    maritalStatus: {
+     
+      type: String,
+    },
+    disability: {
+      
+      type: String,
+    },
+    occupation: {
+    
+      type: String,
+    },
+    isHMOCover: {
       required: true,
       type: String,
     },
-    role: {
-      required: true,
+    HMOName: {
       type: String,
     },
-    degree: {
-      required: true,
+    HMOId: {
+      
       type: String,
     },
-    profession: {
-      required: true,
+    HMOPlan: {
       type: String,
     },
-    employmentStatus: {
-      required: true,
+    passport: {
       type: String,
     },
-    nativeSpokenLanguage: {
-      required: true,
-      type: String,
-    },
-    otherLanguage: {
-      required: true,
-      type: String,
-    },
-    readWriteLanguage: {
-      required: true,
-      type: String,
-    },
-    clinic: {
-      required: true,
-      type: String,
-    },
-    zip: {
-      required: true,
-      type: String,
-    },
-    specializationDetails: {
-      required: true,
-      type: String,
-    },
-    password: {
-      required: [true, "Password is required"],
-      type: String,
-    },
-    status:{
-      required: true,
-      type: String,
-      default: configuration.status[1],
-
-    }
+    MRN: {
+        required: true,
+        type: String,
+      },
+      password: {
+        required: true,
+        type: String,
+      },
+      appointment: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Appointment",
+          default: [],
+        },
+      ],
+      status:{
+        required: true,
+        type: String,
+        default: configuration.status[2],
+  
+      },
+      payment: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Payment",
+          default: [],
+        },
+      ]
+    
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function(next){
+patientSchema.pre("save", async function(next){
   try{
       //GENERATE A SALT
       const salt = await bcrypt.genSalt(10);
@@ -142,6 +163,6 @@ userSchema.pre("save", async function(next){
 
 
 //create a model
-const users = model("Users", userSchema);
+const patientsmanagement = model("Patientsmanagement", patientSchema);
 //export the model
-export default users;
+export default patientsmanagement;

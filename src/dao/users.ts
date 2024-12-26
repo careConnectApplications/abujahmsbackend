@@ -1,11 +1,13 @@
 import User from "../models/users";
-import bcrypt from "bcryptjs";
 import {usersinterface} from '../models/users'
+import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
+import { AnyArray } from "mongoose";
+
   //read all payment history
   export async function readall(query:any) {
     try {
-      const userdetails = await User.find(query);
+      const userdetails = await User.find(query).select({"_id":1,"title":1,"staffId":1, "firstName":1, "middleName":1, "lastName":1,"country":1,"state":1,"city":1, "address":1,"age":1,"dateOfBirth":1,"gender":1,"licence":1,"phoneNumber":1,"email":1,"role": 1,"degree":1,"profession": 1,"employmentStatus":1,"nativeSpokenLanguage": 1,"otherLanguage": 1,"readWriteLanguage": 1,"zip": 1,"specializationDetails": 1, "status":1,"clinic":1,"createdAt":1});
       const totaluserdetails = await User.countDocuments();
       return { userdetails, totaluserdetails };
     } catch (err) {
@@ -35,17 +37,14 @@ import configuration from "../config";
 
     }
   }
+  
  
   
   //update mobile users
   export async function updateuser(id:any, reqbody:any){
     try{
       if (reqbody.password) {
-        //generate a salt
-        const salt = await bcrypt.genSalt(10);
-        //generate password hash
-    
-        const passwordHash = await bcrypt.hash(reqbody.password, salt);
+        const passwordHash = await encrypt(reqbody.password);
         //re-assign hasshed version of original
         reqbody.password = passwordHash;
       }
@@ -64,20 +63,27 @@ import configuration from "../config";
     }
 
   }
-  export async function updateuseranyparam(query:any,update:any){
-    try{
-      
-    return await User.findOneAndUpdate(query, update,{
-      new: true
-    });
-     
-    }catch(err){
-      console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
-
-    }
+ 
+//insert many
+export async function createmanyuser(input:any){
+  try{
+    // this option prevents additional documents from being inserted if one fails
+    const options = { ordered: true };
+    return await User.insertMany(input,options);
+  }
+  catch(err:any){
+    var message:any;
+    if (err.name === "ValidationError") {       
+      message = Object.values(err.errors).map((value:any) => value.message);
+  }
+  else{
+    message=configuration.error.errorusercreate;
+  }
+  throw new Error(message[0]);
 
   }
+}
+
   
   
 

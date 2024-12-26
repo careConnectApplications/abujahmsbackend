@@ -1,20 +1,37 @@
 import bcrypt from "bcryptjs";
 import  jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import configuration from "../config";
+import * as path from 'path';
+import exeltojson from 'convert-excel-to-json';
+export var encrypt = async function(password:any){
+    try{
+    //generate a salt
+    const salt = await bcrypt.genSalt(10);
+        //generate password hash
+   return await bcrypt.hash(password, salt);
+    }
+    catch(error:any){
+        throw new Error(configuration.error.errorencryptingpassword);
+
+    }
+
+
+}
 export var isValidPassword = async function(newPassword:any, currentpassword:any){
     try{
         return await bcrypt.compare(newPassword, currentpassword);
   
     }
     catch(error){
-        console.log(error)
+        throw new Error(configuration.error.errorvalidatingpassword);
     }
   
   }
 
   export var sendTokenResponse= (user:any) =>{
-    const {firstName, lastName, role, staffId} =user;
-    const token= jwt.sign({user: {firstName, lastName, role, staffId}},process.env.KEYGEN as string,{expiresIn:"1d"});
+    const {firstName, lastName, role, staffId,email,clinic} =user;
+    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic}},process.env.KEYGEN as string,{expiresIn:"1d"});
    
     const options ={
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -47,3 +64,65 @@ export var mail= async function mail(to:any,subject:any,textmessage:any){
     });
 }
 
+export function generateRandomNumber(n:number) {
+    return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+  }
+  export function validateinputfaulsyvalue(input:any){
+    for (const key in input) {
+   if (!input[key]) {
+     throw new Error(`${key} ${configuration.error.errorisrequired}`);
+     
+   }
+ }      
+ }
+
+ export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
+  const fileName = file.name;
+  const size = file.data.length/1024;
+  const extension = path.extname(fileName);
+  const renamedurl= `${filename}${extension}`;
+  if(!allowedextension.includes(extension))
+  {
+   throw new Error(configuration.error.errorfilextension);
+  }
+  if(size > configuration.allowedfilesize){
+   throw new Error(configuration.error.errorfilelarge);
+  }
+  //upload excel sheet
+  return new Promise((resolve, reject) => {
+ file.mv(`${uploadpath}/${renamedurl}`,async (e:any)=>{
+  if(e){
+    //logger.error(e.message);
+    reject(e);
+    //throw new Error(configuration.error.errorfileupload);
+  }
+  else{
+    resolve('completed'); 
+  }
+});
+
+  })
+ }
+ 
+ //convert excel to json
+ export function convertexceltojson(pathtoexcelsheet:any, nameofsheet:any, columnmapping:any){
+    var jsonresult =exeltojson({
+        sourceFile: `${pathtoexcelsheet}`,
+        sheets: [
+            {
+              // Excel Sheet Name
+              name: nameofsheet,
+    
+              // Header Row -> be skipped and will not be present at our result object.
+              header: {
+                rows: 1,
+              },
+              // Mapping columns to keys
+              columnToKey: columnmapping,
+            },
+          ],
+       });
+
+       return jsonresult;
+
+ }

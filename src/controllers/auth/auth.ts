@@ -1,11 +1,7 @@
 import configuration from "../../config";
 import  {readone,createuser}  from "../../dao/users";
-import { isValidPassword, sendTokenResponse, mail } from "../../utils/otherservices";
-//const Webuser = require("../models/webusers");
-//const {v4 : uuidv4} = require('uuid');
-//const {mail} = require("../services");
-//const path = require('path');
-//const {sendTokenResponse} = require("../services");
+import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
+
 
 //sign in
 export var signin = async(req:any,res:any) =>{
@@ -27,7 +23,7 @@ export var signin = async(req:any,res:any) =>{
 
         
         //chek if user is active
-        if(user.status === configuration.userstatus[0]){
+        if(user.status === configuration.status[0]){
           throw new Error(configuration.error.errordeactivate);
 
         }
@@ -53,22 +49,42 @@ export var signup = async (req:any,res:any) =>{
    
     try{
         //get token from header
-        const {email} = req.body;
-        const foundUser =  await readone({email});
+        const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = req.body;
+        validateinputfaulsyvalue({email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails});
+        const foundUser =  await readone({$or:[{email},{phoneNumber}]});
         if(foundUser){
-            return res.status(403).json({status:false, msg:"User with this email or password already exist"});
+            throw new Error(`User with this email or phonenumber  ${configuration.error.erroralreadyexit}`);
 
         }
+       
+        req.body.password=configuration.defaultPassword;
         //other validations
          const queryresult=await createuser(req.body)
-        const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
-        await mail(email, "Account Registration Confrimation", message);
+        //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
+        //await mail(email, "Account Registration Confrimation", message);
         res.status(200).json({queryresult, status: true});
         
 
-    }catch(err){
-        return res.status(403).json({status: false, msg:"Authentication Server is Down Please Contact administrator"});
+    }catch(error:any){
+        res.status(403).json({ status: false, msg: error.message });
     }
+}
+
+//settings
+export async function settings(req:Request, res:any){
+    try{
+        
+        res.status(200).json({
+            ...configuration.settings,
+            status:true
+          }); 
+
+    }
+    catch(e:any){
+        res.json({status: false, msg:e.message});
+
+    }
+
 }
 
 
