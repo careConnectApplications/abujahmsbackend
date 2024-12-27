@@ -1,6 +1,7 @@
 import {readallpayment,readonepayment,updatepayment} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery} from "../../dao/patientmanagement";
+import {updatelabbyquery} from "../../dao/lab";
 import configuration from "../../config";
 //deactivate a user
 /*
@@ -94,6 +95,12 @@ export async function confirmpayment(req:any, res:any){
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
+      }
+      //for lab test
+      else if (paymentcategory == configuration.settings.servicecategory[3].category){
+        console.log("here")
+        //update lab test
+        await updatelabbyquery({payment:id},{status:configuration.status[3]})
       }
       
       

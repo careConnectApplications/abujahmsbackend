@@ -44,6 +44,13 @@ const appointmentSchema = new Schema({
       ref: "Payment",
       default: true,
     },
+    lab: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Lab",
+        default: [],
+      },
+    ],
   
   appointmentcategory: {
     type: String,

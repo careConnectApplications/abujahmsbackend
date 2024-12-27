@@ -5,7 +5,8 @@ const configuration = {
   servicecategory:[
     {category: "Patient Registration", type:["Patient Registration"]}, 
     {category: "Appointment", type:["Patient Followup", "Consultation"]},
-    {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]}
+    {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]},
+    {category: "Lab", type:["PCV", "ESR", "Clothing Profile"], department:"Hematology"}
   ],
   
   roles:[

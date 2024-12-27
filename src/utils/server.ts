@@ -8,6 +8,7 @@ import billingandpayment from '../routes/billingandpayment';
 import appointment from '../routes/appointment';
 import settings from '../routes/setting';
 import downloads from "../routes/downloads";
+import lab from '../routes/lab';
 import {protect} from "../utils/middleware";
 
 function createServer(){
@@ -35,6 +36,7 @@ function createServer(){
   app.use('/api/v1/billing',protect,billingandpayment);
   app.use('/api/v1/patientsmanagement',protect,patientsmanagement);
   app.use('/api/v1/appointment',protect, appointment);
+  app.use('/api/v1/lab', lab);
   app.use('/api/v1/settings',settings);
   
     return app;
