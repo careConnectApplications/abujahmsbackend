@@ -98,7 +98,6 @@ export async function confirmpayment(req:any, res:any){
       }
       //for lab test
       else if (paymentcategory == configuration.settings.servicecategory[3].category){
-        console.log("here")
         //update lab test
         await updatelabbyquery({payment:id},{status:configuration.status[3]})
       }
