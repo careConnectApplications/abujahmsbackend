@@ -11,8 +11,8 @@ import configuration from "../../config";
 // Create a new schedule
 export const scheduleappointment = async (req:any, res:any) => {
   try {
-    
-    req.body.appointmentdate=new Date(req.body.appointmentdate);
+    console.log('req',req.body);
+    //req.body.appointmentdate=new Date(req.body.appointmentdate);
     var appointmentid:any=String(Date.now());
     //const {id} = req.params;
     var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
