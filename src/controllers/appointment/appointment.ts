@@ -1,5 +1,6 @@
 import {createappointment,readallappointment,updateappointment,readoneappointment} from "../../dao/appointment";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
+import  {readone}  from "../../dao/users";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import {createlab} from "../../dao/lab";
@@ -110,7 +111,7 @@ export const getAllSchedulesByPatient = async (req:any, res:any) => {
 export const getAllPaidSchedules = async (req:any, res:any) => {
   try {
     const {clinic} = (req.user).user;
-    const queryresult = await readallappointment({status:configuration.status[5],clinic},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -125,7 +126,7 @@ export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
   try {
     const {clinic} = (req.user).user;
     const {id} = req.params;
-    const queryresult = await readallappointment({patient:id,status:configuration.status[5],clinic},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -162,6 +163,11 @@ export var examinepatient = async (req:any,res:any) =>{
    
   try{
      const {id} = req.params;
+     const {email, staffId} = req.user;
+     //find doctor and add doctor who examined
+     const user = await readone({email, staffId});
+     req.body.status = configuration.status[6];
+     req.body.doctor = user?._id;
       const queryresult =  await updateappointment(id,req.body);
       res.status(200).json({
           queryresult,
@@ -190,6 +196,8 @@ export var laborder= async (req:any, res:any) =>{
       throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
   }
+ 
+
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);

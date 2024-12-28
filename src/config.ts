@@ -1,14 +1,17 @@
 const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined"],
   defaultPassword: "HMSB",
   settings:{
   servicecategory:[
     {category: "Patient Registration", type:["Patient Registration"]}, 
     {category: "Appointment", type:["Patient Followup", "Consultation"]},
     {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]},
-    {category: "Lab", type:["PCV", "ESR", "Clothing Profile"], department:"Hematology"}
+    {category: "Lab", type:["PCV", "ESR", "Clothing Profile","Widal"], department:"Hematology"}
   ],
-  
+  testsubcomponent:[
+      {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]}
+  ],
+
   roles:[
     {role: "Doctor", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},

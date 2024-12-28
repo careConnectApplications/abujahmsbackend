@@ -6,6 +6,12 @@ export interface labinterface {
   patient:any,
 
 }
+const testresultSchema = new Schema({
+  subcomponent: String,
+  result: String,
+  nranges: String,
+  unit: String
+});
 
 const labSchema = new Schema({
   testname:
@@ -23,6 +29,8 @@ const labSchema = new Schema({
     type: String, 
     required: true
   },
+  testresult:[testresultSchema ],
+  
  
   patient: {
     type: Schema.Types.ObjectId,

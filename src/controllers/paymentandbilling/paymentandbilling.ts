@@ -78,9 +78,9 @@ export async function confirmpayment(req:any, res:any){
       const response = await readonepayment({_id:id});
       console.log(response);
      const status= configuration.status[3];
-  //   const {email, staffId} = req.user;
-      //const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
-      const queryresult:any =await updatepayment(id,{status});
+     const {email, staffId} = req.user;
+     const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+      //const queryresult:any =await updatepayment(id,{status});
       //confirm payment of the service paid for 
       const {paymentype,paymentcategory,paymentreference,patient} = queryresult;
       //for patient registration
