@@ -165,12 +165,11 @@ export var examinepatient = async (req:any,res:any) =>{
    
   try{
      const {id} = req.params;
-     const {email, staffId} = req.user;
-     console.log(email, staffId);
-
+     const {email, staffId} = (req.user).user;
+ 
      //find doctor and add doctor who examined
      const user = await readone({email, staffId});
-     console.log(user);
+    
      req.body.status = configuration.status[6];
      req.body.doctor = user?._id;
       const queryresult =  await updateappointment(id,req.body);
