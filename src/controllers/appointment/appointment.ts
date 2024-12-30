@@ -164,6 +164,7 @@ export var examinepatient = async (req:any,res:any) =>{
   try{
      const {id} = req.params;
      const {email, staffId} = req.user;
+     console.log(email, staffId);
 
      //find doctor and add doctor who examined
      const user = await readone({email, staffId});
