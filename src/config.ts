@@ -1,5 +1,5 @@
 const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined","processed"],
   defaultPassword: "HMSB",
   settings:{
   servicecategory:[
@@ -8,6 +8,7 @@ const configuration = {
     {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]},
     {category: "Lab", type:["PCV", "ESR", "Clothing Profile","Widal"], department:"Hematology"}
   ],
+  testnames:["PCV", "ESR", "Clothing Profile","Widal"],
   testsubcomponent:[
       {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]}
   ],
