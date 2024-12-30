@@ -13,10 +13,13 @@ export const protect = async(req:any,res:Response,next:NextFunction)=>{
     if(!token){
         throw new Error(configuration.error.protectroutes);
     }
+console.log(token);
 
   
         const decoded = jwt.verify(token, process.env.KEYGEN!);
+        console.log(decoded);
         req.user= decoded;
+        console.log('user', req.user);
         next();
     }
     catch(e:any){
