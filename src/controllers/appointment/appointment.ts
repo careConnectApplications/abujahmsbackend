@@ -166,10 +166,8 @@ export var examinepatient = async (req:any,res:any) =>{
   try{
      const {id} = req.params;
      const {email, staffId} = (req.user).user;
- 
      //find doctor and add doctor who examined
      const user = await readone({email, staffId});
-    
      req.body.status = configuration.status[6];
      req.body.doctor = user?._id;
       const queryresult =  await updateappointment(id,req.body);
@@ -193,7 +191,6 @@ export var laborder= async (req:any, res:any) =>{
     var testsid =[];
     var paymentids =[];
     validateinputfaulsyvalue({id, testname});
-    
     //find the record in appointment and validate
     var appointment = await readoneappointment({_id:id},{},'');
     if(!appointment){
@@ -206,10 +203,8 @@ export var laborder= async (req:any, res:any) =>{
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
       var testPrice:any = await readoneprice({servicetype:testname[i]});
-      
       if(!testPrice){
         throw new Error(configuration.error.errornopriceset);
-
     }
     //search testname in setting
     var testsetting = (configuration.settings.servicecategory).filter(item => (item.type).includes(testname[i]));
@@ -217,11 +212,8 @@ export var laborder= async (req:any, res:any) =>{
     var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
     //create testrecord
     var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
-
     testsid.push(testrecord._id);
     paymentids.push(createpaymentqueryresult._id);
- 
-
     }
     var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
     res.status(200).json({queryresult, status: true});

@@ -40,7 +40,7 @@ export const readalllabb = async (req:any, res:any) => {
   const {email, staffId} = (req.user).user;
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
-  validateinputfaulsyvalue({lab});
+  validateinputfaulsyvalue({lab,subcomponents});
   const user = await readone({email, staffId});
 
   //loop through array of subcomponent 
@@ -65,3 +65,21 @@ export const readalllabb = async (req:any, res:any) => {
   }
 
 }
+
+//view all schedule lab
+// Get all lab records
+export const readallscheduledlab = async (req:any, res:any) => {
+  try {
+      //const {clinic} = (req.user).user;
+    //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
+    const queryresult = await readalllab({status:configuration.status[5]},{},'patient','appointment','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+//5
+//lab reports

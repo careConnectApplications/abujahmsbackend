@@ -3,7 +3,6 @@ import {createprices,getallprices,updateprices,updatepricestatus} from '../contr
 const router = express.Router();
 
 
-
 router.post('/createprices',createprices);
 router.get('/getallprices',getallprices);
 router.put('/updateprices/:id',updateprices);
