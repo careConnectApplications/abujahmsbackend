@@ -14,6 +14,10 @@ const testresultSchema = new Schema({
 });
 
 const labSchema = new Schema({
+  processeddate:{
+    type: Date
+
+  },
   testname:
   {
     type: String, 

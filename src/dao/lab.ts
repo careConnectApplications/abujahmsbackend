@@ -75,3 +75,13 @@ import configuration from "../config";
 
   }
   
+
+  export async function readlabaggregate(input:any) {
+    try{
+    return await Lab.aggregate(input);
+    }
+    catch(e:any){
+      console.log(e);
+      throw new Error(configuration.error.erroruserupdate);
+    }
+    }

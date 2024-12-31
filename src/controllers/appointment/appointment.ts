@@ -12,7 +12,7 @@ import configuration from "../../config";
 // Create a new schedule
 export const scheduleappointment = async (req:any, res:any) => {
   try {
-    console.log('req',req.body);
+    
     //req.body.appointmentdate=new Date(req.body.appointmentdate);
     var appointmentid:any=String(Date.now());
     //const {id} = req.params;
@@ -27,8 +27,8 @@ export const scheduleappointment = async (req:any, res:any) => {
      var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       //search patient if available and paid for registration
-      console.log("patient",patient);
-      console.log("status",configuration.status[1]);
+  
+
        const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},selectquery,'');
   
        if(!patientrecord){
