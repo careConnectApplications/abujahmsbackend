@@ -36,20 +36,21 @@ export const readalllabb = async (req:any, res:any) => {
   try{
   //get id
   const {id} = req.params;
-  const {subcomponent} = req.body;
-  const {email, staffId} = req.user;
+  const {subcomponents} = req.body;
+  const {email, staffId} = (req.user).user;
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
   validateinputfaulsyvalue({lab});
   const user = await readone({email, staffId});
+
   //loop through array of subcomponent 
-  for(var i=0; i < subcomponent.length; i++){
+  for(var i=0; i < subcomponents.length; i++){
     //throw error if no subcomponent
-
-
+    const {subcomponent,result,nranges,unit} =subcomponents[i];
+    validateinputfaulsyvalue({subcomponent,result,nranges,unit})
   }
   //update test, lab technical name and test status
-  var queryresult=await updatelab({_id:id},{$push: {testresult:subcomponent},status:configuration.status[7],staffname:user?._id});
+  var queryresult=await updatelab({_id:id},{$push: {testresult:subcomponents},status:configuration.status[7],staffname:user?._id});
   //update status of appointment
  
   res.status(200).json({
