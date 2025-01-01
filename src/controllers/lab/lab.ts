@@ -166,12 +166,15 @@ export const printlabreport = async (req:any, res:any) => {
       select: {
         MRN: 1,
         firstName:1,
-        lastName:1
+        lastName:1,
+        age:1,
+        gender:1
+
         //_id:0
       },
     };
     const {id} = req.params;
-    const queryresult = await readalllab({appointment:id},{testname:1,testid:1,testresult:1,status:1,appointmentid:1,createdAt:1,processeddate:1},populatequery,patientpopulatequery,'');
+    const queryresult = await readalllab({appointment:id, testresult: { $exists: true, $not: { $size: 0 } }},{testname:1,testid:1,testresult:1,status:1,appointmentid:1,createdAt:1,processeddate:1},populatequery,patientpopulatequery,'');
     res.status(200).json({
       queryresult,
       status:true
