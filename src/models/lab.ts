@@ -70,7 +70,9 @@ const labSchema = new Schema({
     default: configuration.status[2],
 
   }
-});
+},
+{ timestamps: true }
+);
 
 const lab = model('Lab', labSchema);
 export default lab;
