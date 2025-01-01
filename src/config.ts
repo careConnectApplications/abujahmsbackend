@@ -10,7 +10,10 @@ const configuration = {
   ],
   testnames:["PCV", "ESR", "Clothing Profile","Widal"],
   testsubcomponent:[
-      {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]}
+      {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
+      {type:"PCV", subcomponent:["PCV%"]},
+      {type:"ESR", subcomponent:["ESR (mm/hr)"]},
+      {type:"Clothing Profile", subcomponent:["PT (Seconds)","APTT (Seconds)","INR"]}
   ],
 
   roles:[
