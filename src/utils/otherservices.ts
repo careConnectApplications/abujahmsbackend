@@ -81,13 +81,17 @@ export function generateRandomNumber(n:number) {
   const size = file.data.length/1024;
   const extension = path.extname(fileName);
   const renamedurl= `${filename}${extension}`;
+ 
   if(!allowedextension.includes(extension))
   {
    throw new Error(configuration.error.errorfilextension);
   }
+  
   if(size > configuration.allowedfilesize){
    throw new Error(configuration.error.errorfilelarge);
   }
+  
+
   //upload excel sheet
   return new Promise((resolve, reject) => {
  file.mv(`${uploadpath}/${renamedurl}`,async (e:any)=>{

@@ -17,7 +17,7 @@ export var createpatients = async (req:any,res:any) =>{
         validateinputfaulsyvalue({phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
-        const foundUser =  await readonepatient({phoneNumber},selectquery,'');
+        const foundUser =  await readonepatient({phoneNumber},selectquery,'','');
         if(foundUser){
             throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
 
@@ -87,7 +87,7 @@ export async function getonepatients(req:any, res:any){
     var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
       "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       var populatequery ='payment';
-      const queryresult = await readonepatient({_id:id},selectquery,populatequery);
+      const queryresult = await readonepatient({_id:id},selectquery,populatequery,'appointment');
       res.status(200).json({
           queryresult,
           status:true
@@ -135,8 +135,6 @@ export async function updatepatients(req:any, res:any){
         let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
         const extension = path.extname(fileName);
         const renamedurl= `${filename}${extension}`;
-        console.log(renamedurl);
-       
         //upload pix to upload folder
         await uploaddocument(file,filename,allowedextension,uploadpath);
         const {id} = req.params;
@@ -151,10 +149,11 @@ export async function updatepatients(req:any, res:any){
 
     }
     catch(e:any){
-        /*
-        logger.error(e.message);
+      
+        
+        //logger.error(e.message);
         res.json({status: false, msg:e.message});
-        */
+        
     }
 
 }
