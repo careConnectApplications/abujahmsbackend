@@ -192,7 +192,7 @@ export const listlabreportbypatient = async (req:any, res:any) => {
     const objectId = new ObjectId(id);
     // find related
     //const query = { patient._id:id};
-    const query = { patient: objectId};
+    const query = { patient: objectId,status:configuration.status[7]};
     const queryresult = await readlabaggregate([
       {
        
