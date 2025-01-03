@@ -23,6 +23,7 @@ const configuration = {
     {role: "Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
   ],
+  /*
   clinics:[
   {clinic: "General Outpatient Clinic", id:1},
   {clinic: "Pediatric Outpatient", id:2},
@@ -45,6 +46,7 @@ const configuration = {
    {clinic:"ART Clinic", id:19}
 
   ],
+  */
   gender:["Male", "Female"],
   },
   downloadtemplatetypes:[{

@@ -52,13 +52,15 @@ export async function getallclinic(req:Request, res:any){
     }
 
 }
-/*
+
 //update a price
-export async function updateprices(req:any, res:any){
+export async function updateclinics(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
-    var queryresult = await updateprice(id, req.body);
+    const {clinic} = req.body;
+    validateinputfaulsyvalue({clinic,id});
+    var queryresult = await updateclinic(id, {clinic});
     res.status(200).json({
         queryresult,
         status:true
@@ -71,7 +73,7 @@ export async function updateprices(req:any, res:any){
 
   }
   
-
+/*
   export async function updatepricestatus(req:any, res:any){
     const {id} = req.params;
     try{

@@ -46,6 +46,7 @@ import configuration from "../config";
     const clinic = await Clinic.findOneAndUpdate({ _id: id }, reqbody,{
       new: true
     });
+    
       if (!clinic) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);

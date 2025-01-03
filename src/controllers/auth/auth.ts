@@ -1,5 +1,6 @@
 import configuration from "../../config";
 import  {readone,createuser}  from "../../dao/users";
+import {readallclinics} from "../../dao/clinics";
 import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
 
 
@@ -73,9 +74,10 @@ export var signup = async (req:any,res:any) =>{
 //settings
 export async function settings(req:Request, res:any){
     try{
-        
+    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    console.log("clinic", clinicdetails);
         res.status(200).json({
-            ...configuration.settings,
+            ...configuration.settings,clinics: clinicdetails,
             status:true
           }); 
 
