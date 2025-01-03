@@ -39,6 +39,7 @@ function createServer(){
   app.use('/api/v1/lab',protect, lab);
   app.use('/api/v1/settings',settings);
   // Handle POST requests to /webhook
+  /*
 app.post('/api/v1/webhook', (req, res) => {
   // Log the incoming Event Grid event data
   console.log('Event received:', JSON.stringify(req.body, null, 2));
@@ -54,6 +55,7 @@ app.post('/api/v1/webhook', (req, res) => {
   // Send a 200 OK response back to acknowledge receipt of the event
   res.status(200).send('Event received');
 });
+*/
   
     return app;
 
