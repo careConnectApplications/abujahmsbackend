@@ -76,7 +76,7 @@ export async function confirmpayment(req:any, res:any){
     const {id} = req.params;
     //check for null of id
       const response = await readonepayment({_id:id});
-      console.log(response);
+    var settings =await  configuration.settings();
      const status= configuration.status[3];
      const {email, staffId} = req.user;
      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
@@ -84,20 +84,20 @@ export async function confirmpayment(req:any, res:any){
       //confirm payment of the service paid for 
       const {paymentype,paymentcategory,paymentreference,patient} = queryresult;
       //for patient registration
-      if(paymentcategory == configuration.settings.servicecategory[0].category){
+      if(paymentcategory == settings.servicecategory[0].category){
         //update patient registration status
         await updatepatientbyanyquery({_id:patient},{status:configuration.status[1]});
 
 
       }
       //for appointment
-      else if(paymentcategory == configuration.settings.servicecategory[1].category){
+      else if(paymentcategory == settings.servicecategory[1].category){
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
       }
       //for lab test
-      else if (paymentcategory == configuration.settings.servicecategory[3].category){
+      else if (paymentcategory == settings.servicecategory[3].category){
         //update lab test
         await updatelabbyquery({payment:id},{status:configuration.status[5]})
       }

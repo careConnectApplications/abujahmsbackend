@@ -11,8 +11,9 @@ export var createclinics = async (req:any,res:any) =>{
        var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
         //validate that category is in the list of accepted category
         //get token from header
-        if(req.body.servicecategory == configuration.settings.servicecategory[0]){
-          req.body.servicetype=configuration.settings.servicecategory[0]
+        var settings = await configuration.settings();
+        if(req.body.servicecategory == settings.servicecategory[0]){
+          req.body.servicetype=settings.servicecategory[0]
         }
         
         //validation

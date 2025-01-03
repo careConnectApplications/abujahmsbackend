@@ -74,10 +74,12 @@ export var signup = async (req:any,res:any) =>{
 //settings
 export async function settings(req:Request, res:any){
     try{
-    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
-    console.log("clinic", clinicdetails);
+    //const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    //console.log("clinic", clinicdetails);
+    var settings = await configuration.settings();
+    console.log(settings);
         res.status(200).json({
-            ...configuration.settings,clinics: clinicdetails,
+            ...settings,
             status:true
           }); 
 

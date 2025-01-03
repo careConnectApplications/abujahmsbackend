@@ -22,8 +22,9 @@ export var createpatients = async (req:any,res:any) =>{
             throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
 
         }
+        var settings =await configuration.settings();
         //validate if price is set for patient registration
-        var newRegistrationPrice = await readoneprice({servicecategory:configuration.settings.servicecategory[0].category});
+        var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
         if(!newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
@@ -54,13 +55,14 @@ export var createpatients = async (req:any,res:any) =>{
 //read all patients
 export async function getallpatients(req:Request, res:any){
     try{
+      var settings = await configuration.settings();
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
             "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
             //var populatequery="payment";
            
              var populatequery ={
             path: "payment",
-            match: { paymentcategory: { $eq: configuration.settings.servicecategory[0].category } },
+            match: { paymentcategory: { $eq: settings.servicecategory[0].category } },
             select: {
               status: 1,
               paymentype:1

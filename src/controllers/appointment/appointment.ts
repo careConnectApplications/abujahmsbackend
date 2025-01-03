@@ -206,8 +206,9 @@ export var laborder= async (req:any, res:any) =>{
       if(!testPrice){
         throw new Error(configuration.error.errornopriceset);
     }
+    var setting  = await configuration.settings();
     //search testname in setting
-    var testsetting = (configuration.settings.servicecategory).filter(item => (item.type).includes(testname[i]));
+    var testsetting = (setting.servicecategory).filter(item => (item.type).includes(testname[i]));
        //create payment
     var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
     //create testrecord

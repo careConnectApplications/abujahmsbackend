@@ -1,7 +1,13 @@
+  import {readallclinics} from "./dao/clinics";
+  
 const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined","processed"],
   defaultPassword: "HMSB",
-  settings:{
+
+  settings: async function(){
+    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    return (
+      {
   servicecategory:[
     {category: "Patient Registration", type:["Patient Registration"]}, 
     {category: "Appointment", type:["Patient Followup", "Consultation"]},
@@ -23,6 +29,7 @@ const configuration = {
     {role: "Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
   ],
+  clinics: clinicdetails,
   /*
   clinics:[
   {clinic: "General Outpatient Clinic", id:1},
@@ -48,7 +55,10 @@ const configuration = {
   ],
   */
   gender:["Male", "Female"],
+}
+)
   },
+
   downloadtemplatetypes:[{
     type:"userbulkdownloadtemplate", fileName:"usercreationtemplate.xlsx"
 
