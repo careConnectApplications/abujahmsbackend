@@ -3,8 +3,9 @@ import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readone}  from "../../dao/users";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
+//import {createvital} from "../../dao/vitals";
 import {createlab} from "../../dao/lab";
-import { validateinputfaulsyvalue,generateRandomNumber } from "../../utils/otherservices";
+import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber } from "../../utils/otherservices";
 import configuration from "../../config";
 
 
@@ -46,9 +47,12 @@ export const scheduleappointment = async (req:any, res:any) => {
 
 //create appointment
 //create payment
+
 const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
-const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype});
-    //update patient
+
+const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+console.log(queryresult);    
+//update patient
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
     res.status(200).json({queryresult, status: true});
     
@@ -228,6 +232,44 @@ export var laborder= async (req:any, res:any) =>{
   }
 
 }
+//create vitals
+//update a patient
+export async function addencounter(req:any, res:any){
+  try{
+  //
+
+  const {id} = req.params;
+  //validate id
+  //validate other input paramaters
+  //search appoint where appoint id = id
+  //extract vitals id
+  if(req.body.status == 1){
+    req.body.status = configuration.status[9];
+
+  }
+  else{
+    req.body.status = configuration.status[10];
+  }
+ 
+
+  const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi,painscore,rbs,gcs,status} = req.body;
+  validateinputfornumber({height, weight});
+  req.body.bmi = weight/(height * height);
+  const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,painscore,rbs,gcs,status:configuration.status[9]};
+  validateinputfaulsyvalue({...vitals});
+  var queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals},status});
+  res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  }catch(e:any){
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
 /*
   findings: String,  // Description of the examination findings
   diagnosis: String, // Doctor's diagnosis based on the examination

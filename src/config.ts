@@ -1,7 +1,7 @@
   import {readallclinics} from "./dao/clinics";
   
 const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined","processed"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined","processed","pending vital","complete","inprogress"],
   defaultPassword: "HMSB",
 
   settings: async function(){
@@ -89,6 +89,7 @@ const configuration = {
     errorservicecategory:"service category does not exist in the list of accepted categories",
     errornopriceset:"No Price has been set for this service",
     protectroutes: "Authorization error: You are not an authorise user in this application", 
+    errormustbenumber: "must be a number",
 
   },
     environment: "test",

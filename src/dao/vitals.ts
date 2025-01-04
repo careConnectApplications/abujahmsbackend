@@ -1,22 +1,22 @@
-import Clinic from "../models/clinics";
+/*import Vitals from "../models/vitals";
 import configuration from "../config";
 
   //read all patient history
-  export async function readallclinics(query:any,selectquery:any) {
+  export async function readallVitals(query:any,selectquery:any) {
     try {
-      const clinicdetails = await Clinic.find(query).select(selectquery);
-      const totalclinicdetails = await Clinic.find(query).countDocuments();
-      return { clinicdetails, totalclinicdetails };
+      const vitaldetails = await Vitals.find(query).select(selectquery);
+      const totalvitaldetails = await Vitals.find(query).countDocuments();
+      return { vitaldetails, totalvitaldetails };
     } catch (err) {
       console.log(err);
       throw new Error(configuration.error.erroruserread);
     }
   };
-  export async function createclinic(input:any){
+  export async function createvital(input:any){
     try{
       console.log('///////////',input);
-       const clinic = new Clinic(input);
-        return await clinic.save();
+       const vital = new Vitals(input);
+        return await vital.save();
     }
     catch(err){
       console.log(err);
@@ -25,9 +25,9 @@ import configuration from "../config";
     }
   }
   //find one
-  export async function readoneclinic(query:any,selectquery:any){
+  export async function readonevital(query:any,selectquery:any){
     try{
-    return await Clinic.findOne(query).select(selectquery);
+    return await Vitals.findOne(query).select(selectquery);
     }
     catch(err){
       console.log(err);
@@ -39,17 +39,17 @@ import configuration from "../config";
  
   
   //update  appointment by id
-  export async function updateclinic(id:any, reqbody:any){
+  export async function updatevital(id:any, reqbody:any){
     try{
-    const clinic = await Clinic.findOneAndUpdate({ _id: id }, reqbody,{
+    const vital = await Vitals.findOneAndUpdate({ _id: id }, reqbody,{
       new: true
     });
     
-      if (!clinic) {
+      if (!vital) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);
       }
-      return clinic;
+      return vital;
     }catch(err){
       console.log(err);
       throw new Error(configuration.error.erroruserupdate);
@@ -58,16 +58,16 @@ import configuration from "../config";
 
   }
   //update  appointment by query
-  export async function updateclinicyquery(query:any, reqbody:any){
+  export async function updatevitalquery(query:any, reqbody:any){
     try{
-    const clinic = await Clinic.findOneAndUpdate(query, reqbody,{
+    const vital = await Vitals.findOneAndUpdate(query, reqbody,{
       new: true
     });
-      if (!clinic) {
+      if (!vital) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);
       }
-      return clinic;
+      return vital;
     }catch(err){
       console.log(err);
       throw new Error(configuration.error.erroruserupdate);
@@ -75,4 +75,4 @@ import configuration from "../config";
     }
 
   }
-  
+  */

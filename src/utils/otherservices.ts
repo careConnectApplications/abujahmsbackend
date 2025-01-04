@@ -75,6 +75,14 @@ export function generateRandomNumber(n:number) {
    }
  }      
  }
+ export function validateinputfornumber(input:any){
+  for (const key in input) {
+ if (isNaN(input[key])) {
+   throw new Error(`${key} ${configuration.error.errormustbenumber}`);
+   
+ }
+}    
+}
 
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
   const fileName = file.name;

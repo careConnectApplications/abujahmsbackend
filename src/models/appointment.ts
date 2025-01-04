@@ -11,6 +11,71 @@ export interface appointinterface {
   appointmenttype:String
  
 }
+const assessmentSchema = new Schema({
+  assessmentdiagnosis: String
+
+})
+
+const vitalsSchema = new Schema({
+height:{
+  type: String
+
+},
+weight:
+{
+  type: String
+},
+temperature:
+{
+  type: String
+},
+heartbit:
+{
+  type: String, 
+ 
+},
+bloodpressuresystolic:
+{
+  type: String
+},
+bloodpressurediastolic:
+{
+  type: String
+},
+respiration:
+{
+  type: String
+},
+saturation:
+{
+  type: String
+},
+bmi:
+{
+  type: String
+},
+painscore:
+{
+  type: String
+},
+rbs:
+{
+  type: String
+},
+gcs:
+{
+  type: String
+},
+staffname: String,
+status:{
+ 
+  type: String,
+  default:configuration.status[9]
+
+
+}
+});
+
 
 const appointmentSchema = new Schema({
   appointmentid:
@@ -43,6 +108,10 @@ const appointmentSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Payment",
       default: true,
+    },
+    encounter:{ 
+      vitals: vitalsSchema,
+      assessmentdiagnosis: assessmentSchema
     },
     lab: [
       {
