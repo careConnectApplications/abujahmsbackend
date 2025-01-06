@@ -15,6 +15,53 @@ const assessmentSchema = new Schema({
   assessmentdiagnosis: String
 
 })
+const generalphysicalexaminationSchema = new Schema({
+  hair: String,
+  hairnote: String,
+  face: String,
+  facenote: String,
+  jaundice:String,
+  jaundicenote:String,
+  cyanosis: String,
+  cyanosisnote: String,
+  pallor: String,
+  pallornote: String,
+  oral: String,
+  oralnote: String,
+  lymphnodes: String,
+  lymphnodesnote: String,
+  ederma:String,
+  edermanote:String,
+  lastmenstrationperiod: String,
+  lastmenstrationperiodnote: String,
+  generalphysicalexamination: String,
+  paediatricsspecification:{
+    general:{
+    currentlengthheight: String,
+    currentlengthheightpercentage: String,
+    currentlengthheightenote: String,
+    currentweight: String,
+    currentweightnote: String,
+    percentageofweightexpected: String,
+    headcircumference: String,
+    anteriorfontanelle: String,
+    posteriorfontanelle: String,
+    chestcircumference: String,
+    limbexamination: String,
+    generalnote: String
+    },
+    neuro:{
+    reflexes: String,
+    rootingreflexes: String,
+    suckreflexes: String,
+    mororeflexes: String,
+    tonicneckreflexes: String,
+    graspreflexes: String,
+    steppingreflexes: String,
+    neuronote: String
+    }
+  }
+})
 
 const vitalsSchema = new Schema({
 height:{
@@ -111,7 +158,8 @@ const appointmentSchema = new Schema({
     },
     encounter:{ 
       vitals: vitalsSchema,
-      assessmentdiagnosis: assessmentSchema
+      assessmentdiagnosis: assessmentSchema,
+      generalphysicalexamination:generalphysicalexaminationSchema
     },
     lab: [
       {
