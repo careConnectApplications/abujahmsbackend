@@ -8,6 +8,52 @@ const configuration = {
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     return (
       {
+  generalphysicalexaminations:{main:[
+    
+{type:"hair", options:["normal","alopecia","fluffy"]},
+{type:"hairnote" },
+{type:"face",  options:["normal","acromegly","cushingnoid","down syndrome","marfanoid","myxedematous","thyrotoxic","parkinsonism","others"]},
+{type:"facenote"},
+{type:"jaundice", options:["yes", "no"]},
+{type:"jaundicenote"},
+{type: "cyanosis", options:["yes central","yes peripheral", "no"]},
+{type: "cyanosisnote"},
+{type: "pallor", options:["not pale","pale"]},
+{type: "pallornote"},
+{type: "oral", options:["normal","ulcers","erythematous","hypertrophied","pigmented"]},
+{type: "oralnote"},
+{type: "lymphnodes", options:["localized","generalized","normal"]},
+{type: "lymphnodesnote"},
+{type:"ederma", options:["absent",	"present unilateral non-pitting","present unilateral pitting","present bi-lateral non-pitting","present bi-lateral and pitting"]},
+{type:"edermanote"},
+{type: "lastmenstrationperiod"},
+{type: "lastmenstrationperiodnote"},
+{type: "generalphysicalexamination"}
+  ],
+  paediatricspecgeneral:[
+    {type:"currentlengthheight"},
+    {type: "currentlengthheightpercentage"},
+    {type: "currentlengthheightenote"},
+    {type: "currentweight"},
+    {type: "currentweightnote"},
+    {type: "percentageofweightexpected"},
+    {type: "headcircumference"},
+    {type: "anteriorfontanelle", options:["present","absent"]},
+    {type: "posteriorfontanelle", options:["present", "absent"]},
+    {type: "chestcircumference"},
+    {type: "limbexamination"},
+    {type: "generalnote"}
+  ],
+  paediatricspecneuro: [
+    {type: "reflexes", options:["normal", "abnormal"]},
+    {type: "rootingreflexes", options:["normal", "abnormal"]},
+    {type: "suckreflexes", options:["normal", "abnormal"]},
+    {type: "mororeflexes", options:["normal", "abnormal"]},
+    {type: "tonicneckreflexes",options:["normal", "abnormal"]},
+    {type: "graspreflexes", options:["normal", "abnormal"]},
+    {type: "steppingreflexes", options:["normal", "abnormal"]},
+    {type: "neuronote"}]
+},
   servicecategory:[
     {category: "Patient Registration", type:["Patient Registration"]}, 
     {category: "Appointment", type:["Patient Followup", "Consultation"]},
