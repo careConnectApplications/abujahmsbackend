@@ -8,8 +8,9 @@ const configuration = {
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     return (
       {
-  generalphysicalexaminations:{main:[
-    
+        //main
+  generalphysicalexaminations:{
+main:[
 {type:"hair", options:["normal","alopecia","fluffy"]},
 {type:"hairnote" },
 {type:"face",  options:["normal","acromegly","cushingnoid","down syndrome","marfanoid","myxedematous","thyrotoxic","parkinsonism","others"]},

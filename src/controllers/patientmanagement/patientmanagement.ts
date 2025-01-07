@@ -129,7 +129,7 @@ export async function updatepatients(req:any, res:any){
   //upload patients photo
   export var uploadpix = async (req:any, res:any)=>{
     try{
-      
+      console.log(req.files);
         const file = req.files.file;
         const fileName = file.name;
         const filename= "patientpassport" + uuidv4();
