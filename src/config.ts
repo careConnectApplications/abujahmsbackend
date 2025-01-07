@@ -1,7 +1,7 @@
   import {readallclinics} from "./dao/clinics";
   
 const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","examined","processed","pending vital","complete","inprogress"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress"],
   defaultPassword: "HMSB",
 
   settings: async function(){

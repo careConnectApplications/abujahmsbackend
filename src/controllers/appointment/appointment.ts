@@ -244,25 +244,29 @@ export async function addencounter(req:any, res:any){
   //search appoint where appoint id = id
   //extract vitals id
   if(req.body.status == 1){
-    req.body.status = configuration.status[9];
+    req.body.status = configuration.status[6];
+
+  }
+  else if(req.body.status == 2){
+    req.body.status = configuration.status[5];
 
   }
   else{
-    req.body.status = configuration.status[10];
+    req.body.status = configuration.status[9];
   }
  
 
-  const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,status} = req.body;
+  const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status} = req.body;
   const { hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination} = req.body;
 const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = req.body;
 const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = req.body;
  
   req.body.bmi = weight/(height * height);
   //vitals
-  const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,painscore,rbs,gcs,status:configuration.status[9]};
+  const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,status:configuration.status[6]};
   if(height || weight){
     validateinputfornumber({height, weight});
-    validateinputfaulsyvalue({...vitals});
+    //validateinputfaulsyvalue({...vitals});
     }
   //general physical examination
   const paediatricsspecificationgeneral={currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote};
@@ -289,6 +293,23 @@ queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'enc
   }
 
 }
+//get vitals per patient
+
+export const getAllVtalsByPatient = async (req:any, res:any) => {
+  try {
+    var selectquery ={'encounter.vitals':1};
+    const {clinic} = (req.user).user;
+    const {id} = req.params;
+    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},selectquery,'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
 
 /*
   findings: String,  // Description of the examination findings

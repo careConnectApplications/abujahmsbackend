@@ -2,7 +2,7 @@
 import express from 'express';
 import {protect} from "../utils/middleware";
 //import {registration,login,updatestatus,getallusers,getusertypes} from '../controllers/user';
-import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter} from '../controllers/appointment/appointment';
+import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient} from '../controllers/appointment/appointment';
 const router = express.Router();
 
 
@@ -19,6 +19,8 @@ router.put('/examinepatient/:id', examinepatient);
 router.post('/laborder/:id', laborder);
 //vitals
 router.post('/addencounter/:id', addencounter);
+router.get('/singlepatientvital/:id', getAllVtalsByPatient);
+//getAllVtalsByPatient
 //updatevitals
 
 

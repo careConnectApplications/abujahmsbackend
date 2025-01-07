@@ -101,6 +101,7 @@ bmi:
 {
   type: String
 },
+/*
 painscore:
 {
   type: String
@@ -113,6 +114,7 @@ gcs:
 {
   type: String
 },
+*/
 staffname: String,
 status:{
  
