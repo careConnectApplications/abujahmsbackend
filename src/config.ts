@@ -8,6 +8,75 @@ const configuration = {
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     return (
       {
+  assessment:[
+"Anxiety disorder of childhood or adolescence (disorder)",
+"Parathyroid structure (body structure)",
+"Ferrous (59-Fe) sulfate (substance)",
+"Chronic pharyngitis (disorder)",
+"Cyanocobalamin (57-Co)(substance)",
+"Current drinker of alcohol(finding)",
+"Acinetobacter johnsonil( organism)",
+"Female first cousin(person)",
+"Bone plate, device(physical object)",
+"Dementia associated with alcoholism (disorder)",
+"Structure of central axillary lymph node (body structure)",
+"Czech (ethnic group)",
+"Melnick-fraser syndrome (disorder)",
+"Acute myringitis (disorder)",
+"Skin structure of imbilicus (body structure)",
+"Reactive hypoglycemia (disorder )",
+"Occipital headache (finding)",
+"Altrioventricular bundle structure (body structure)",
+"Kemicterus fue to isoimmunization (disorder)",
+"Heart valve disorder (disorder)"
+
+  ],
+  diagonosis:[
+"Other amebic genitourinary infections",
+"Other amebic infections",
+"Amebiasis, unspecified",
+"Other protozoal intestinal diseases",
+"Balantidiasis",
+"Giarldiasis(lambliasis)",
+"Isosporiasis",
+"Cyclosporiasis",
+"Other specified protozoal intestinal diseases",
+"Accute gastroenteropathy due to other small round viruses",
+"Adenoviral enteritis",
+"Other viral enteritis",
+"Calcivirus enteritis",
+"Astrovirus enterirtis",
+"Other specified protozoal diseases",
+"Protozoal intestinal disease, unspecified",
+"Viral and other specified intestinal infections",
+"Rotaviral enteritis",
+"Acute gastroenteropathy due to Norwalk agent and other small round viruses",
+"Acute gastroenteropathy due to Norwalk agent"
+
+  ],
+  icpc2:[
+"Medical exam/eval complete",
+"Medical exam/health evaluation partial/pre op check",
+"Sensitivity test",
+"Microbiological/immunological test",
+"Blood test",
+"Urine test",
+"Feaces test",
+"Histological/exfoliative cytology",
+"Other laboratory test NEC",
+"Physical function test",
+"Diagnostic endoscopy",
+"Diagnostic Radiology/imaging",
+"Electrical tracings",
+"Other diagnostic procedures",
+"Preventive immunizations/medication",
+"Observe/educate/advice/diet",
+"Consult with primary care provider",
+"Consult with specialist",
+"Clarification/Discuss Patients’s RFE",
+"Other preventive procedure"
+
+  ],
         //main
   generalphysicalexaminations:{
 main:[

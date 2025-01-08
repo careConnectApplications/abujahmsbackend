@@ -257,9 +257,10 @@ export async function addencounter(req:any, res:any){
  
 
   const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status} = req.body;
+  const {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note} = req.body;
   const { hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination} = req.body;
-const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = req.body;
-const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = req.body;
+const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
+const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = (req.body).paediatricsspecific;
  
   req.body.bmi = weight/(height * height);
   //vitals
@@ -268,18 +269,19 @@ const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,gras
     validateinputfornumber({height, weight});
     //validateinputfaulsyvalue({...vitals});
     }
+    
   //general physical examination
   const paediatricsspecificationgeneral={currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote};
   const paediatricsspecificationneuro={reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote}
   const generalphysicalexaminations ={paediatricsspecification:{general:paediatricsspecificationgeneral, neuro:paediatricsspecificationneuro}, hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination};
-  
+  const  assessmentdiagnosis = {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note};
   //validateinputfaulsyvalue({...vitals});
   var queryresult
   if(height || weight ){
-queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations},status});
+queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis},status});
   }
   else{
-    queryresult = await updateappointment(id, {$set:{'encounter.generalphysicalexamination':generalphysicalexaminations},status});
+    queryresult = await updateappointment(id, {$set:{'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis},status});
 
   }
   res.status(200).json({
@@ -294,7 +296,6 @@ queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'enc
 
 }
 //get vitals per patient
-
 export const getAllVtalsByPatient = async (req:any, res:any) => {
   try {
     var selectquery ={'encounter.vitals':1};

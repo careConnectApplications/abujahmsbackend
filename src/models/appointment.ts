@@ -12,8 +12,12 @@ export interface appointinterface {
  
 }
 const assessmentSchema = new Schema({
-  assessmentdiagnosis: String
-
+  assessment: String,
+  assessmentnote: String,
+  diagosis: String,
+  diagosisnote: String,
+  icpc2: String,
+  icpc2note: String
 })
 const generalphysicalexaminationSchema = new Schema({
   hair: String,
