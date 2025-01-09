@@ -11,6 +11,50 @@ export interface appointinterface {
   appointmenttype:String
  
 }
+const physicalexaminationSchema = new Schema(({
+  cvs:{
+heartrate:String,
+bpsystolic:String,
+bpdiastolic:String,
+capillaryrefilltime:String,
+heartraterhythm:String,
+heartsound:String,
+heartmurmurgrade:String,
+heartmurmurquality:String,
+heartmurmurpitch:String,
+heartmurmurtiming:String,
+murmurlocationauscultation:String,
+murmurradiatingtobodylocation:String,
+jugularveindistention:String,
+jugularveindistentionheadup30degree:String,
+edema:String,
+temperatureextrmities:String,
+tissueperfusionassessmentimpression:String,
+remark:String
+
+  },
+  resp:{
+respiratoryrhthm:String,
+respiratoryrate:String,
+respiratoryeffort:String,
+breathsoundsauscultation:String,
+localizedbreathsounds:String,
+respiratoryassessmentimpression:String,
+remarks:String
+  },
+  gi:{
+bowelsoundauscultation:String,
+bowelsoundbyqualityauscultation:String,
+bsquadauscultation:String,
+physiologicfindingbypalpation:String,
+giassessmentimpression:String,
+remarks:String
+  },
+  //gu:"",
+  //neuro:"",
+  //msk:""
+
+}))
 const assessmentSchema = new Schema({
   assessment: String,
   assessmentnote: String,
@@ -165,7 +209,8 @@ const appointmentSchema = new Schema({
     encounter:{ 
       vitals: vitalsSchema,
       assessmentdiagnosis: assessmentSchema,
-      generalphysicalexamination:generalphysicalexaminationSchema
+      generalphysicalexamination:generalphysicalexaminationSchema,
+      physicalexamination: physicalexaminationSchema
     },
     lab: [
       {
