@@ -8,6 +8,345 @@ const configuration = {
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     return (
       {
+heartsound:[
+"Abnormal S1",
+"S4",
+"Abnormal S2",
+"S3",
+"Absent S2",
+"Split S1",
+"Normal heart Sounds",
+"Loud S1",
+"S1",
+"Normal S2",
+"Normal S3 in young person",
+"S3 gallop",
+"Reduced intensity S1",
+"Split S2"
+
+],
+heartmurmurgrade:
+[
+"Heart murmur grade I",
+"Heart murmur grade II",
+"Heart murmur grade III",
+"Heart murmur grade IV",
+"Heart murmur grade V",
+"Heart murmur grade VI"
+],
+heartmurmurpitch:[
+"Crescendo murmur",
+"Crescendo-desrescendo murmur",
+"Desrescendo murmur",
+"High- pitched",
+"low- pitched",
+"medium- pitched"
+],
+murmurlocationausculation:[  
+"Apical",
+"Base",
+"2nd intercoastal space",
+"3rd  intercoastal space",
+"4th  intercoastal space",
+"5th  intercoastal space",
+"Left midclavicular line",
+"Left sternal border",
+"Right  sternal border"
+],
+	jugularveindistention:[  
+"present",
+"Absent"
+  ]
+,
+heartmurmurquality:[ 
+"Musical",
+"Squeaking",
+"Blowing",
+"Harsh",
+"Rumbling"
+],
+heartmurmurtiming:[
+"Early diastolic",
+"Early systolic",
+"late diastolic",
+"late systolic",
+"mid diastolic",
+"mid systolic",
+"pansystolic/holosystolic"
+],
+murmurradiatingtobodylocation:[
+"Apex",
+"Left Axilla",
+"Neck"
+],
+temperatureextremities:[
+"Cold",
+"Hot",
+"Warm" 
+],
+
+tissueperfusionassessmentimpression:[
+"Within defined limits",
+"other"
+],
+respiratoryrhythm:[
+"Acidotic hyperventilation",
+"Air hunger",
+"Apneustic",
+"Blots",
+"Cheyne-strokes",
+"Cluster breathing",
+"Dyspnea",
+"Gasping for air",
+"Irregular breathing",
+"Sighing"
+],
+respiratoryeffort:[
+"Unlabored",
+"Labored",
+"Accessory muscle used",
+"Orthopnea",
+"Dyspnea"
+],
+breathingsoundausculation:[
+"Clear",
+"Rales/crackles",
+"Stridor",
+"Rhonchus",
+"Wheezes"
+],
+respiratoryassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+localizedbreathsounds:[
+"Left lung",
+"Right lung",
+"Bilateral lungs",
+"Right upper lobe",
+"Left upper lobe",
+"Right lower lobe",
+"Left lower lobe",
+"Right middle lobe",
+"Left lung base",
+"Right lung base",
+"Bilateral lung bases"
+],
+bowelsoundausculation:[
+"Bowel sound absent",
+"Hyperactive bowel sound",
+"Bowel sound loud",
+"Bowel sound quiet",
+"Hypoactive bowel sounds",
+"Normal bowel sounds",
+"Tympanic bowel sounds"
+],
+bsquadausculation:[
+"RLQ",
+"RUQ",
+"LLQ",
+"LUQ"
+],
+bowelsoundbyqualityausculation:[
+"Tinkling",
+"Borborgymi",
+"High pitched",
+"Low pitched"
+],
+physiologicfindingbypalpation:[
+"Guarding",
+"Mass",
+"Rigid",
+"Firm",
+"No guarding",
+"Tender",
+"Rebound tenderness",
+"Taut"
+],
+
+gIassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+urineturbidity:[
+"Clear",
+"cloudy"
+],
+voidingpattern:[
+"Anuria",
+"Hesitancy",
+"Dribbling",
+"Dysuria",
+"Put on hemodialysis",
+"Incontinence",
+"Condom catheter",
+"Increased urinary frequency",
+"Intermittent urinary incontinence",
+"Strains to void",
+"Nocturia",
+"Enuresis",
+"Voids spontaneously without difficulty",
+"Oliguria",
+"Patient on peritoneal dialysis",
+"Polyuria",
+"Suprapubic catheter",
+"Unable to void",
+"Urethra catheter",
+"Urgency",
+"Urostomy"
+],
+otherelementurine:[
+"Mucous threads",
+"Stones",
+"Sediments",
+"Clots"
+],
+
+urinecollectiondevice:[
+"Condom catherter",
+"Suprapubic catherter",
+"Urethral catherter",
+"Foley catherter",
+"Urostomy"
+],
+
+genitourinaryassessmentimpression:[
+"Within defined limits",
+"Others",
+],
+
+
+voidingpatterngu:[
+"Anuria",
+"Hesitancy",
+"Dribbling",
+"Dysuria",
+"Put on hemodialysis",
+"Incontinence",
+"Condom catheter",
+"Increased urinary frequency",
+"Intermittent urinary incontinence",
+"Strains to void",
+"Nocturia",
+"Enuresis",
+"Voids spontaneously without difficulty",
+"Oliguria"
+
+],
+levelofconsciousness:[
+"Confussed",
+"Lethargic",
+"Obtunded",
+"Stuporous",
+"Unresponsive",
+"Alert"
+],
+
+personalbar:[
+"Yes",
+"No"
+],
+time:[ 
+"Yes",
+"No"
+],
+
+arousal:[
+"Open eyes spontaneously",
+"Arouses to voices",
+"Arouses to touch/gentle shaking",
+"Arouses to repeated stimulation",
+"Arouses to vigorous stimulation",
+"Arouses to pain",
+"unresponsive"
+],
+
+place:[
+"Yes",
+"No"
+],
+
+orientationassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+
+speechclarity:[
+"Appropriate for age",
+"Coherent",
+"Slurred",
+"Rambling",
+"Limited enunciation",
+"incoherent"
+],
+
+patientmood:[
+"interested",
+"sad",
+"frightened",
+"alert",
+"excited",
+"Ashamed",
+"Upset",
+"Happy",
+"Strong",
+"Nervous",
+"Guilty",
+"Energetic",
+"Scared",
+"Calm"
+],
+
+patientmemory:[
+"Long term memory intact",
+"Long term memory poor",
+"Short term memory intact",
+"Short term memory poor"
+],
+
+abilitytoconcentration:[
+"No difficulty concentrating",
+"Poor concentration",
+"Difficulty concentrating",
+"Unable to concentrate"
+],
+
+attention:[
+"Difficulty directing attention",
+"Directs attention",
+"Does not direct attention",
+"Unable to direct attention"
+],
+
+cni:[
+"Pass", 
+"fail"
+],
+
+pupillaryresponse:[
+"Reactive to light",
+"Sluggishly reactive to light",
+"Not reactive to light",
+"Reactive to accommodation",
+"Not reactive to accommodation",
+"Other"
+],
+
+pupilshape:[
+"Dilated",
+"Cat eye",
+"Pinpoint",
+"Irregular",
+"Round",
+"Tear drop"
+],
+
+pupilneurologyassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+
+
   assessment:[
 "Anxiety disorder of childhood or adolescence (disorder)",
 "Parathyroid structure (body structure)",
