@@ -345,6 +345,63 @@ pupilneurologyassessmentimpression:[
 "Within defined limits",
 "Others"
 ],
+muscletone:[
+"Muscle tone assymetric",
+"Decreased muscle tone",
+"Flaccid muscle",
+"Fluctuating muscle tone",
+"Rigor"
+],
+
+musclestrength:[
+"Trace muscle activation",
+"Muscle activation with gravity eliminated",
+"Muscle activation against gravity, full range of motion",
+"Muscle activation against some resistance",
+"Muscle activation against examiner’s full resistance"
+],
+involuntarymovement:[
+"Coarse tremor",
+"Fine tremor",
+"Intention tremor",
+"Parkinsonian tremor",
+"Spasm/tic"
+],
+
+drt:[
+"None",
+"1+",
+"2+",
+"3+"
+],
+
+oculocephalic:[
+"Absent",
+"Present",
+"Indeterminate"
+],
+
+paralysistype:[
+"Hemiplegia",
+"Monoplegia",
+"Paraplegia",
+"Quadripelgia/tetrapelgia"
+],
+
+musculoskeletalassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+
+paresthesiatype:[
+"Burning",
+"Skin-crawling",
+"Itching",
+"Numbness and Tingling",
+"Pins and needles",
+"Pricking"
+],
+
 
 
   assessment:[
