@@ -7,7 +7,7 @@ const configuration = {
 
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
-    const {servicetypedetails} = await await readallservicetype({},{type:1,category:1,department:1,_id:0});
+    const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
     return (
       {
 heartsound:[
