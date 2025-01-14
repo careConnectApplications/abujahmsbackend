@@ -6,9 +6,11 @@ import users from "../routes/usermanagement";
 import patientsmanagement from '../routes/patientmanagement';
 import billingandpayment from '../routes/billingandpayment';
 import appointment from '../routes/appointment';
+import inventory from '../models/inventory';
 import settings from '../routes/setting';
 import downloads from "../routes/downloads";
 import lab from '../routes/lab';
+import pharmacy from '../routes/pharmacy';
 import {protect} from "../utils/middleware";
 
 function createServer(){
@@ -38,6 +40,7 @@ function createServer(){
   app.use('/api/v1/appointment',protect, appointment);
   app.use('/api/v1/lab',protect, lab);
   app.use('/api/v1/settings',settings);
+  app.use('/api/v1/pharmacy',pharmacy);
   // Handle POST requests to /webhook
   /*
 app.post('/api/v1/webhook', (req, res) => {

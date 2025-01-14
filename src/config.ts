@@ -1,4 +1,5 @@
   import {readallclinics} from "./dao/clinics";
+  import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress"],
@@ -6,6 +7,7 @@ const configuration = {
 
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    const {servicetypedetails} = await await readallservicetype({},{type:1,category:1,department:1,_id:0});
     return (
       {
 heartsound:[
@@ -520,12 +522,7 @@ main:[
     {type: "steppingreflexes", options:["normal", "abnormal"]},
     {type: "neuronote"}]
 },
-  servicecategory:[
-    {category: "Patient Registration", type:["Patient Registration"]}, 
-    {category: "Appointment", type:["Patient Followup", "Consultation"]},
-    {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]},
-    {category: "Lab", type:["PCV", "ESR", "Clothing Profile","Widal"], department:"Hematology"}
-  ],
+  servicecategory:servicetypedetails,
   testnames:["PCV", "ESR", "Clothing Profile","Widal"],
   testsubcomponent:[
       {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
@@ -579,6 +576,7 @@ main:[
   allowedfilesize: 500,
   usertemplate: "userslist",
   useruploadfilename:"usersload",
+  pharmacyuploadfilename:"pharmacyload",
   useruploaddirectory:"uploads",
   userdownloadsdirectory:"downloads",
   error:{
@@ -602,6 +600,7 @@ main:[
     errornopriceset:"No Price has been set for this service",
     protectroutes: "Authorization error: You are not an authorise user in this application", 
     errormustbenumber: "must be a number",
+    errornotfound:"not found",
 
   },
     environment: "test",

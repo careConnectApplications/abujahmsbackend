@@ -1,5 +1,5 @@
 import configuration from "../../config";
-import  {readallclinics,createclinic,readoneclinic,updateclinic}  from "../../dao//clinics";
+import  {readallclinics,createclinic,readoneclinic,updateclinic}  from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
 //add patiient
 export var createclinics = async (req:any,res:any) =>{
@@ -11,10 +11,12 @@ export var createclinics = async (req:any,res:any) =>{
        var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
         //validate that category is in the list of accepted category
         //get token from header
+        /*
         var settings = await configuration.settings();
         if(req.body.servicecategory == settings.servicecategory[0]){
           req.body.servicetype=settings.servicecategory[0]
         }
+          */
         
         //validation
         
