@@ -14,6 +14,17 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
+  export async function createmayprice(input:priceinterface){
+    try{
+      return Price.create(input);
+        
+    }
+    catch(err){
+      console.log(err);
+      throw new Error(configuration.error.errorusercreate);
+
+    }
+  }
   export async function createprice(input:priceinterface){
     try{
        const user = new Price(input);

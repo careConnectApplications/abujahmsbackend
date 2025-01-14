@@ -7,7 +7,7 @@ const router = express.Router();
 //router.get('/getallusers',getallusers);
 //router.put('/updateusers/:id', updateusers);
 //router.put('/updatestatus/:id', updatestatus);
-router.post('/bulkuploadinventory', bulkuploadinventory);
+router.post('/bulkstockupload', bulkuploadinventory);
 
 //updateusers
 
