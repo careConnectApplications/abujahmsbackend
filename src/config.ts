@@ -523,6 +523,7 @@ main:[
     {type: "neuronote"}]
 },
   servicecategory:servicetypedetails,
+  category:["Appointment","Pharmacy", "Lab"],
   testnames:["PCV", "ESR", "Clothing Profile","Widal"],
   testsubcomponent:[
       {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
