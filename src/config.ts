@@ -4,7 +4,7 @@
 const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacysss", "Lab"],
+  category:["Appointment","Pharmacy", "Lab"],
 
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
@@ -527,6 +527,7 @@ main:[
     {type: "neuronote"}]
 },
   servicecategory:servicetypedetails,
+  pharmacycategory:["Medication Inventory","Non Medication Inventory"],
   category:configuration.category,
   testnames:["PCV", "ESR", "Clothing Profile","Widal"],
   testsubcomponent:[
