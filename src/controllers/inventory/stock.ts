@@ -1,7 +1,7 @@
 import path from "path";
 import configuration from "../../config";
 import  {readall,updateuser,readone,createuser}  from "../../dao/users";
-import {createmayprice,readoneprice} from "../../dao/price";
+import {createmayprice,readoneprice,readallprices} from "../../dao/price";
 import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
 
 
@@ -60,3 +60,21 @@ export async function bulkuploadinventory(req:any, res:any){
   
       }
   }
+  //get all stock
+
+export async function getallpharmacystock(req:Request, res:any){
+  try{
+   
+      const queryresult = await readallprices({servicecategory:configuration.category[1]});
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}

@@ -23,6 +23,8 @@ export var createprices = async (req:any,res:any) =>{
         
         //validation
         validateinputfaulsyvalue({servicecategory,amount,servicetype});
+        //validate for pharmcy
+        //create record for pharmacy
         const foundPrice =  await readoneprice({servicecategory,servicetype});
         //update servicetype for New Patient Registration
        
