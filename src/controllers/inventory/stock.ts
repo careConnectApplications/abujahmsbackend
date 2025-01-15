@@ -1,7 +1,7 @@
 import path from "path";
 import configuration from "../../config";
 import  {readall,updateuser,readone,createuser}  from "../../dao/users";
-import {createmanyprice,readoneprice,readallprices,createprice} from "../../dao/price";
+import {createmanyprice,readoneprice,readallprices,createprice,updateprice} from "../../dao/price";
 import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
 
 
@@ -105,4 +105,31 @@ export var createstock = async (req:any,res:any) =>{
     console.log(error);
       res.status(403).json({ status: false, msg: error.message });
   }
+}
+//update stock
+export async function updatestocks(req:any, res:any){
+  try{
+  //get id
+  const {id} = req.params;
+  const foundPrice:any =  await readoneprice({_id:id});
+  console.log(foundPrice);
+  if(!foundPrice){
+      throw new Error(`servicetype ${configuration.error.errornotfound}`);
+
+  }
+  if(foundPrice.servicecategory !== configuration.category[1]){
+    throw new Error(`${foundPrice.servicecategory} ${configuration.error.erroralreadyexit}`);
+
+}
+  var queryresult = await updateprice(id, req.body);
+  res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  }catch(e:any){
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
 }
