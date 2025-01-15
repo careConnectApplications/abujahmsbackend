@@ -14,7 +14,7 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
-  export async function createmayprice(input:priceinterface){
+  export async function createmanyprice(input:any){
     try{
       return Price.create(input);
         
@@ -25,7 +25,7 @@ import configuration from "../config";
 
     }
   }
-  export async function createprice(input:priceinterface){
+  export async function createprice(input:any){
     try{
        const user = new Price(input);
         return await user.save();

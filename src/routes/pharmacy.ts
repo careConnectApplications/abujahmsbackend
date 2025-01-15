@@ -1,5 +1,5 @@
 import express from 'express';
-import {bulkuploadinventory,getallpharmacystock} from '../controllers/inventory/stock';
+import {bulkuploadinventory,getallpharmacystock,createstock} from '../controllers/inventory/stock';
 const router = express.Router();
 
 
@@ -9,6 +9,7 @@ const router = express.Router();
 //router.put('/updatestatus/:id', updatestatus);
 router.post('/bulkstockupload', bulkuploadinventory);
 router.get('/getallpharmacystock', getallpharmacystock);
+router.post('/createstock', createstock);
 
 //updateusers
 

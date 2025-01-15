@@ -1,7 +1,7 @@
 import path from "path";
 import configuration from "../../config";
 import  {readall,updateuser,readone,createuser}  from "../../dao/users";
-import {createmayprice,readoneprice,readallprices} from "../../dao/price";
+import {createmanyprice,readoneprice,readallprices,createprice} from "../../dao/price";
 import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
 
 
@@ -47,7 +47,7 @@ export async function bulkuploadinventory(req:any, res:any){
                 
        
         }
-        await createmayprice(stocklist);
+        await createmanyprice(stocklist);
          }
         
         
@@ -77,4 +77,32 @@ export async function getallpharmacystock(req:Request, res:any){
 
   }
 
+}
+//add a stock
+export var createstock = async (req:any,res:any) =>{
+   
+  try{
+    req.body.servicecategory = configuration.category[1];
+     const {servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate} = req.body;
+    //validations
+    validateinputfaulsyvalue({servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
+    //ensure record does not exit
+    
+    const foundPrice =  await readoneprice({servicecategory,servicetype});
+    if(foundPrice){
+        throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
+
+    }
+    if(servicecategory !== configuration.category[1]){
+      throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
+
+  }
+       const queryresult=await createprice({servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate} );
+      res.status(200).json({queryresult, status: true});
+      
+
+  }catch(error:any){
+    console.log(error);
+      res.status(403).json({ status: false, msg: error.message });
+  }
 }

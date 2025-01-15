@@ -7,6 +7,7 @@ export var createprices = async (req:any,res:any) =>{
     try{
      
        const {servicecategory,amount,servicetype} = req.body;
+       
         //validate that category is in the list of accepted category
         /*
         if(!((configuration.settings.servicecategory).includes(servicecategory))){
@@ -23,8 +24,6 @@ export var createprices = async (req:any,res:any) =>{
         
         //validation
         validateinputfaulsyvalue({servicecategory,amount,servicetype});
-        //validate for pharmcy
-        //create record for pharmacy
         const foundPrice =  await readoneprice({servicecategory,servicetype});
         //update servicetype for New Patient Registration
        
