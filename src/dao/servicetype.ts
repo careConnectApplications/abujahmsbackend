@@ -75,5 +75,22 @@ import configuration from "../config";
     }
 
   }
+
+  export async function createmanyservicetype(filterinput:any,input:any){
+    try{
+      console.log(input);
+      return await Servicetype.updateOne(
+        filterinput,
+        input,
+        { upsert: true }   );
+              
+        
+    }
+    catch(err){
+      console.log(err);
+      throw new Error(configuration.error.errorusercreate);
+
+    }
+  }
   
   

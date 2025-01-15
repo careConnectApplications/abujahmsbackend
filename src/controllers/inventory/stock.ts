@@ -2,7 +2,8 @@ import path from "path";
 import configuration from "../../config";
 import  {readall,updateuser,readone,createuser}  from "../../dao/users";
 import {createmanyprice,readoneprice,readallprices,createprice,updateprice} from "../../dao/price";
-import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
+import {createmanyservicetype} from "../../dao/servicetype";;
+import {uploaddocument,convertexceltojson,validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
 
 
 //bulk upload users
@@ -26,28 +27,38 @@ export async function bulkuploadinventory(req:any, res:any){
     await uploaddocument(file,filename,allowedextension,uploadpath);
      //convert uploaded excel to json
      var convert_to_json = convertexceltojson(`${uploadpath}/${filename}${path.extname(file.name)}`, configuration.stocktemplate, columnmapping);
-    console.log(convert_to_json);
+    //console.log(convert_to_json);
+   
      //save to database
     var {stocklist}:any = convert_to_json;
+
          if(stocklist.length > 0){
+          var type:any = stocklist.map((services:any) => {return services.servicetype});
           for (var i = 0; i < stocklist.length; i++) {        
             const {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount} = stocklist[i];
             validateinputfaulsyvalue({servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
             //ensure record does not exit
-            
+            /*
             const foundPrice =  await readoneprice({servicecategory,servicetype});
             if(foundPrice){
                 throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
     
             }
+            */
             if(servicecategory !== configuration.category[1]){
               throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
   
           }
-                
-       
+          var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
+        await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
+          createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
+            {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
+          )]);
+          
+
         }
-        await createmanyprice(stocklist);
+        
+       
          }
         
         
@@ -98,7 +109,8 @@ export var createstock = async (req:any,res:any) =>{
 
   }
        const queryresult=await createprice({servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate} );
-      res.status(200).json({queryresult, status: true});
+      // create service type
+       res.status(200).json({queryresult, status: true});
       
 
   }catch(error:any){
@@ -133,3 +145,5 @@ export async function updatestocks(req:any, res:any){
   }
 
 }
+//servicetype for pharmacy
+

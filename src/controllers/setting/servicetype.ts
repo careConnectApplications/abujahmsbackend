@@ -23,8 +23,6 @@ export var createservicetypes = async (req:any,res:any) =>{
         
         const foundservicetype =  await readoneservicetype({category:servicecategory},'');
         //update servicetype for New Patient Registration
-       
-        console.log('*******',foundservicetype);
       
         if(foundservicetype){
          
@@ -44,7 +42,7 @@ export var createservicetypes = async (req:any,res:any) =>{
     }
 }
 
-//read all patients
+//read all service type
 export async function getallservicetypes(req:Request, res:any){
     try{
        
@@ -99,6 +97,27 @@ export async function updateservicetypes(req:any, res:any){
     }
 
   }
+  //get pharmacy service type
+export async function getpharmacyservicetype(req:Request, res:any){
+  try{
+     
+      const queryresult = await readoneservicetype({category: configuration.category[1]},'');
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
+
+
+  
   
 /*
 if(foundservicetype){

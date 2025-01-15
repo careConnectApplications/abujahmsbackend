@@ -4,11 +4,14 @@
 const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab"],
+  category:["Appointment","Pharmacysss", "Lab"],
 
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+   
+
+    
     return (
       {
 heartsound:[

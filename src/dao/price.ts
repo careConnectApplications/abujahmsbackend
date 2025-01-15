@@ -14,9 +14,14 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
-  export async function createmanyprice(input:any){
+  export async function createmanyprice(filterinput:any,input:any){
     try{
-      return Price.create(input);
+      console.log(input);
+      return Price.updateOne(
+        filterinput,
+        input,
+        { upsert: true }   );
+              
         
     }
     catch(err){
