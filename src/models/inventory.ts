@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose";
 import configuration from "../config";
 
 export interface labinterface {
-    prescription: String;
     orderid:String,
     patient:any
 

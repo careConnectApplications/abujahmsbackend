@@ -40,7 +40,7 @@ function createServer(){
   app.use('/api/v1/appointment',protect, appointment);
   app.use('/api/v1/lab',protect, lab);
   app.use('/api/v1/settings',settings);
-  app.use('/api/v1/pharmacy',pharmacy);
+  app.use('/api/v1/pharmacy',protect, pharmacy);
   // Handle POST requests to /webhook
   /*
 app.post('/api/v1/webhook', (req, res) => {

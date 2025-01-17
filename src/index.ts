@@ -2,9 +2,11 @@ import dotenv from 'dotenv';
 import createServer from './utils/server';
 import configuration from './config';
 import databaseconnection from './utils/dbconnection';
+import moment from "moment";
 
 
-
+//const currentMilliseconds = moment().valueOf();
+//console.log(currentMilliseconds);
 
 dotenv.config();
 databaseconnection();

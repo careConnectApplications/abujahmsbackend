@@ -127,6 +127,13 @@ const patientSchema = new Schema(
           default: [],
         },
       ],
+      prescription: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Prescription",
+          default: [],
+        },
+      ],
     
       lab: [
         {

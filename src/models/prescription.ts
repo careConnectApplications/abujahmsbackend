@@ -1,20 +1,19 @@
 import { Schema, model } from "mongoose";
 import configuration from "../config";
 
-export interface labinterface {
-    prescription: String;
-    orderid:String,
-    patient:any
-
-}
 
 
-const pharmacyorderSchema = new Schema({
+
+const prescriptionSchema = new Schema({
   
   prescription:
   {
     type: String, 
     required: true
+  },
+  prescriptionnote:
+  {
+    type: String
   },
   orderid:
   {
@@ -30,18 +29,18 @@ const pharmacyorderSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Appointment",
-      default: [],
+      default: null,
     }
   ,
-  appointmentid:
+  prescribersname:
   {
     type: String, 
     required: true
   },
-  staffname: {
-    type: Schema.Types.ObjectId,
-    ref: "Users",
-    default: null,
+
+  pharmacistname:
+  {
+    type: String
   },
   payment: {
       type: Schema.Types.ObjectId,
@@ -49,18 +48,17 @@ const pharmacyorderSchema = new Schema({
       default: true,
     },
   
-  status:{
-    required: true,
+  dispensestatus:{
     type: String,
-    default: configuration.status[2],
+    default: configuration.status[11],
 
   }
 },
 { timestamps: true }
 );
 
-const pharmacyorder = model('Pharmacy', pharmacyorderSchema);
-export default pharmacyorder;
+const prescription= model('Prescription', prescriptionSchema);
+export default prescription;
 
 
 

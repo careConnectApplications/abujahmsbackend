@@ -313,7 +313,6 @@ const appointmentSchema = new Schema({
   reason: String,
   findings: String,  // Description of the examination findings
   diagnosis: String, // Doctor's diagnosis based on the examination
-  prescriptions: String,  // List of prescribed medications or treatments
   requestforlabtest: String,
   notes: String, // Additional notes (if any)
   appointmentdate:

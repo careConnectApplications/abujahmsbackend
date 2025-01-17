@@ -2,7 +2,7 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab"],
 
