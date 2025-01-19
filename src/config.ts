@@ -613,9 +613,12 @@ main:[
     errorisrequired: "is required",
     errorservicecategory:"service category does not exist in the list of accepted categories",
     errornopriceset:"No Price has been set for this service",
+    erroravailability:"Is out of stock",
     protectroutes: "Authorization error: You are not an authorise user in this application", 
     errormustbenumber: "must be a number",
     errornotfound:"not found",
+    errortasknotpending:"Task not pending on you",
+    errorpayment:"This service has not been paid for",
 
   },
     environment: "test",

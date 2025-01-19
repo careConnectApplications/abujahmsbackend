@@ -1,9 +1,9 @@
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import configuration from "../../config";
-import {readoneprice} from "../../dao/price";
+import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
-import {createpayment} from "../../dao/payment";
-import { createprescription,readallprescription } from "../../dao/prescription";
+import {createpayment,readonepayment} from "../../dao/payment";
+import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
 
 
 //pharmacy order
@@ -28,9 +28,13 @@ export var pharmacyorder= async (req:any, res:any) =>{
       for(var i =0; i < products.length; i++){
     //    console.log(testname[i]);
         var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1]});
-        console.log(orderPrice);
+        
         if(!orderPrice){
           throw new Error(configuration.error.errornopriceset);
+      }
+      if(orderPrice.qty <=0){
+        throw new Error(`${products[i]} ${configuration.error.erroravailability}`);
+
       }
       
       var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount:Number(orderPrice.amount)});
@@ -67,5 +71,45 @@ export var pharmacyorder= async (req:any, res:any) =>{
       }
     };
 
-    //dispense
+    //get all pharmacy order
+  export const dispense = async (req:any, res:any) => {
+    try {
+    const {id} = req.params;
+       //dispense
+    //search product in inventory
+    var response:any = await readoneprescription({_id:id},{},'','','');
+    console.log('response', response);
+    //check product status
+    if(response.dispensestatus !== configuration.status[10]){
+      throw new Error(`Dispense ${configuration.error.errortasknotpending}`);
+
+    }
+    //check payment status
+    var paymentrecord:any = await readonepayment({_id:response.payment});
+   
+    if(paymentrecord.status !== configuration.status[3]){
+      throw new Error(configuration.error.errorpayment);
+
+    }
+   // console.log(testname[i]);
+  var orderPrice:any = await readoneprice({servicetype:response.prescription, servicecategory: configuration.category[1]});  
+  if(!orderPrice){
+      throw new Error(configuration.error.errornopriceset);
+  }
+  if(orderPrice.qty <=0){
+    throw new Error(`${response.prescription} ${configuration.error.erroravailability}`);
+
+  }
+  //reduce the quantity
+await updateprice({_id:orderPrice._id},{qty:Number(orderPrice.qty) - 1});
+//change status 6
+var queryresult=await updateprescription({_id:response._id},{ dispensestatus: configuration.status[6]});
+res.status(200).json({queryresult, status: true});
+
     
+    } catch (error:any) {
+      res.status(403).json({ status: false, msg: error.message });
+    }
+  };
+
+   

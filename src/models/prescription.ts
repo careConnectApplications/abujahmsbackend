@@ -50,7 +50,8 @@ const prescriptionSchema = new Schema({
   
   dispensestatus:{
     type: String,
-    default: configuration.status[11],
+    default: configuration.status[10],
+    required: true
 
   }
 },
