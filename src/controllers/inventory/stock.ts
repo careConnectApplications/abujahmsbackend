@@ -36,7 +36,9 @@ export async function bulkuploadinventory(req:any, res:any){
           var type:any = stocklist.map((services:any) => {return services.servicetype});
           for (var i = 0; i < stocklist.length; i++) {   
             stocklist[i].servicecategory=configuration.category[1];      
-            const {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount} = stocklist[i];
+            var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount} = stocklist[i];
+            lowstocklevel = Number(lowstocklevel);
+            qty=Number(qty);
             validateinputfaulsyvalue({servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    

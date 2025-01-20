@@ -80,11 +80,11 @@ export async function confirmpayment(req:any, res:any){
       const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
   
       if(!patientrecord){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
 
-    var settings =await  configuration.settings();
+    //var settings =await  configuration.settings();
      const status= configuration.status[3];
      const {email, staffId} = req.user;
      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
@@ -92,23 +92,24 @@ export async function confirmpayment(req:any, res:any){
       //confirm payment of the service paid for 
       const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
-      if(paymentcategory == settings.servicecategory[0].category){
+      if(paymentcategory == configuration.category[3]){
         //update patient registration status
         await updatepatientbyanyquery({_id:patient},{status:configuration.status[1]});
 
 
       }
       //for appointment
-      else if(paymentcategory == settings.servicecategory[1].category){
+      else if(paymentcategory == configuration.category[0]){
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
       }
       //for lab test
-      else if (paymentcategory == settings.servicecategory[3].category){
+      else if (paymentcategory == configuration.category[2]){
         //update lab test
         await updatelabbyquery({payment:id},{status:configuration.status[5]})
       }
+      //update for pharmacy
       
       
 

@@ -21,7 +21,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       //search patient
       var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
       //loop through all test and create record in lab order
