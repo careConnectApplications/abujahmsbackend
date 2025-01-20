@@ -51,7 +51,7 @@ export var signup = async (req:any,res:any) =>{
     try{
         //get token from header
         const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = req.body;
-        validateinputfaulsyvalue({email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails});
+        validateinputfaulsyvalue({email,firstName,staffId,lastName,gender,role,clinic});
         const foundUser =  await readone({$or:[{email},{phoneNumber}]});
         if(foundUser){
             throw new Error(`User with this email or phonenumber  ${configuration.error.erroralreadyexit}`);

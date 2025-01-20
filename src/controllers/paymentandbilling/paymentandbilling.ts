@@ -1,6 +1,6 @@
 import {readallpayment,readonepayment,updatepayment} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
-import {updatepatientbyanyquery} from "../../dao/patientmanagement";
+import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
 import configuration from "../../config";
 //deactivate a user
@@ -75,14 +75,22 @@ export async function confirmpayment(req:any, res:any){
   try{
     const {id} = req.params;
     //check for null of id
-      const response = await readonepayment({_id:id});
+      const response:any = await readonepayment({_id:id});
+      const {patient} = response;
+      const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
+  
+      if(!patientrecord){
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+
+    }
+
     var settings =await  configuration.settings();
      const status= configuration.status[3];
      const {email, staffId} = req.user;
      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
       //const queryresult:any =await updatepayment(id,{status});
       //confirm payment of the service paid for 
-      const {paymentype,paymentcategory,paymentreference,patient} = queryresult;
+      const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
       if(paymentcategory == settings.servicecategory[0].category){
         //update patient registration status

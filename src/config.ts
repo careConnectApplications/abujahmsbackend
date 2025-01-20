@@ -4,7 +4,7 @@
 const configuration = {
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab"],
+  category:["Appointment","Pharmacy", "Lab","Patient Registration"],
 
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});

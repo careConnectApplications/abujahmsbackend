@@ -17,9 +17,9 @@ export var createprices = async (req:any,res:any) =>{
           */
 
         //get token from header
-        var settings =await configuration.settings();
-        if(req.body.servicecategory == settings.servicecategory[0]){
-          req.body.servicetype=settings.servicecategory[0]
+       // var settings =await configuration.settings();
+        if(req.body.servicecategory == configuration.category[3]){
+          req.body.servicetype=configuration.category[3]
         }
         
         //validation

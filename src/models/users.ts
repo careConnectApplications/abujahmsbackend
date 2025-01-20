@@ -11,8 +11,8 @@ export interface usersinterface {
 const userSchema = new Schema(
   {
     title: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     staffId: {
       required: true,
@@ -31,40 +31,40 @@ const userSchema = new Schema(
     },
 
     country: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     state: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     city: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     address: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     age: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     dateOfBirth: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     gender: {
       required: true,
       type: String,
     },
     licence: {
-      required: true,
-      type: String,
+   
+      type: String
     },
     phoneNumber: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     email: {
       required: true,
@@ -75,40 +75,40 @@ const userSchema = new Schema(
       type: String,
     },
     degree: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     profession: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     employmentStatus: {
-      required: true,
-      type: String,
+   
+      type: String
     },
     nativeSpokenLanguage: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     otherLanguage: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     readWriteLanguage: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     clinic: {
       required: true,
       type: String,
     },
     zip: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     specializationDetails: {
-      required: true,
-      type: String,
+    
+      type: String
     },
     password: {
       required: [true, "Password is required"],
