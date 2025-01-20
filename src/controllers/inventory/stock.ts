@@ -39,15 +39,18 @@ export async function bulkuploadinventory(req:any, res:any){
             var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount} = stocklist[i];
             lowstocklevel = Number(lowstocklevel);
             qty=Number(qty);
-            console.log(lowstocklevel);
-            console.log(qty);
             validateinputfaulsyvalue({servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
-        await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
-          createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
+        //await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
+          //createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
+            //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
+          //)]);
+
+          await createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}});
+          await  createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
             {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
-          )]);
+          );
           
 
         }
