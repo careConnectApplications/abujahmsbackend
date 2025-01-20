@@ -113,7 +113,35 @@ export const getAllSchedulesByPatient = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
-//status:configuration.status[5]
+//completed encounter
+export const getAllCompletedEncounter = async (req:any, res:any) => {
+  try {
+    const {id} = req.params;
+    const {clinic} = (req.user).user;
+    const queryresult = await readallappointment({status:configuration.status[6],clinic,patient:id},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+//inprogress encounter
+export const getAllInProgressEncounter = async (req:any, res:any) => {
+  try {
+    const {clinic} = (req.user).user;
+    const {id} = req.params;
+    const queryresult = await readallappointment({status:configuration.status[9],clinic,patient:id},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
 //get all patient with paid schduled
 export const getAllPaidSchedules = async (req:any, res:any) => {
   try {

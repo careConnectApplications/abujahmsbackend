@@ -17,6 +17,7 @@ export var signin = async(req:any,res:any) =>{
         //find user
         
         const user = await readone({email});
+      
         //check if user exit
         if(!user){
             throw new Error(configuration.error.errorinvaliduser);
