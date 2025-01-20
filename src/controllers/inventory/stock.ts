@@ -48,9 +48,12 @@ export async function bulkuploadinventory(req:any, res:any){
           //)]);
 
           await createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}});
-          await  createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
+          await  createmanyservicetype({ category:servicecategory },
             {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
           );
+          //await  createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
+            //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
+          //);
           
 
         }
