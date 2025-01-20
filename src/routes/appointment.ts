@@ -2,7 +2,7 @@
 import express from 'express';
 import {protect} from "../utils/middleware";
 //import {registration,login,updatestatus,getallusers,getusertypes} from '../controllers/user';
-import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient,getAllCompletedEncounter,getAllInProgressEncounter} from '../controllers/appointment/appointment';
+import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient,getAllCompletedEncounter,getAllInProgressEncounter,getAllPreviousEncounter} from '../controllers/appointment/appointment';
 const router = express.Router();
 
 
@@ -23,6 +23,8 @@ router.get('/singlepatientvital/:id', getAllVtalsByPatient);
 /////////////complete, inprogress encounter/////////////////
 router.get('/getallcompletedencounter/:id', getAllCompletedEncounter);
 router.get('/getallinprogressencounter/:id', getAllInProgressEncounter);
+router.get('/getallpreviousencounter/:id', getAllPreviousEncounter);
+//getAllPreviousEncounter
 
 
 

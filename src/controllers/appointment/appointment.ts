@@ -113,6 +113,21 @@ export const getAllSchedulesByPatient = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+//previous encounter
+export const getAllPreviousEncounter = async (req:any, res:any) => {
+  try {
+    const {id} = req.params;
+    const {clinic} = (req.user).user;
+    console.log(clinic);
+    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],clinic,patient:id},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
 //completed encounter
 export const getAllCompletedEncounter = async (req:any, res:any) => {
   try {
