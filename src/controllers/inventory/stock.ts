@@ -39,6 +39,8 @@ export async function bulkuploadinventory(req:any, res:any){
             var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount} = stocklist[i];
             lowstocklevel = Number(lowstocklevel);
             qty=Number(qty);
+            console.log(lowstocklevel);
+            console.log(qty);
             validateinputfaulsyvalue({servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
