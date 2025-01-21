@@ -12,7 +12,7 @@ export var createpatients = async (req:any,res:any) =>{
       
 
         //get token from header
-        const {phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover} = req.body;
+        const {phoneNumber,firstName,lastName,gender} = req.body;
         //validation
         validateinputfaulsyvalue({firstName,lastName,gender});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
