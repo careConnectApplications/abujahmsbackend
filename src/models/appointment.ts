@@ -181,7 +181,11 @@ paralysistype:String,
 paresthesiatype:String,
 physiologicfinding:String,
 musculoskeletalassessmentimpression:String,
-mskremark:String
+mskremark:String,
+passiverangeflexionkneel:String,
+passiverangeextensionkneel:String,
+passiverangeflexionkneer:String,
+passiverangeextensionkneer:String
   }
 
 }))
