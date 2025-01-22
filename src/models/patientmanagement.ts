@@ -93,7 +93,7 @@ const patientSchema = new Schema(
       type: String,
     },
     isHMOCover: {
-      required: true,
+  
       type: String,
       default: "No",
     },
