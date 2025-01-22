@@ -280,6 +280,10 @@ export async function addencounter(req:any, res:any){
   //
 
   const {id} = req.params;
+  const {email, staffId} = (req.user).user;
+  //find doctor and add doctor who examined
+  const user = await readone({email, staffId});
+ 
   //validate id
   //validate other input paramaters
   //search appoint where appoint id = id
@@ -334,10 +338,10 @@ const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,gras
  //validateinputfaulsyvalue({...vitals});
   var queryresult
   if(height || weight ){
-queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status});
+queryresult = await updateappointment(id, {$set:{'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
   }
   else{
-    queryresult = await updateappointment(id, {$set:{'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status});
+    queryresult = await updateappointment(id, {$set:{'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
 
   }
   res.status(200).json({
