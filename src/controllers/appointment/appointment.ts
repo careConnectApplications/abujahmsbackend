@@ -19,9 +19,6 @@ export const scheduleappointment = async (req:any, res:any) => {
     //const {id} = req.params;
     var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
     validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype,patient});
- 
-
-   
     //pending
 
      //validation
@@ -306,7 +303,7 @@ export async function addencounter(req:any, res:any){
 const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
 const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = (req.body).paediatricsspecific;
  
-  req.body.bmi = weight/(height * height);
+  req.body.bmi = weight/((height/100) * (height/100));
   //vitals
   const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,status:configuration.status[6]};
   if(height || weight){
