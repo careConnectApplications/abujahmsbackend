@@ -14,9 +14,12 @@ export const protect = async(req:any,res:Response,next:NextFunction)=>{
         throw new Error(configuration.error.protectroutes);
     }
 
+
   
         const decoded = jwt.verify(token, process.env.KEYGEN!);
+      
         req.user= decoded;
+       
         next();
     }
     catch(e:any){

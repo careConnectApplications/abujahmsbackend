@@ -1,13 +1,542 @@
-const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled"],
-  defaultPassword: "HMSB",
-  settings:{
-  servicecategory:[
-    {category: "Patient Registration", type:["Patient Registration"]}, 
-    {category: "Appointment", type:["Patient Followup", "Consultation"]},
-    {category: "Teleconsultation", type:["Free evisit", "Teleconsultation"]}
-  ],
+  import {readallclinics} from "./dao/clinics";
+  import  {readallservicetype}  from "./dao/servicetype";
   
+const configuration = {
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
+  defaultPassword: "HMSB",
+  category:["Appointment","Pharmacy", "Lab","Patient Registration"],
+
+  settings: async function(){
+    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+   
+
+    
+    return (
+      {
+heartsound:[
+"Abnormal S1",
+"S4",
+"Abnormal S2",
+"S3",
+"Absent S2",
+"Split S1",
+"Normal heart Sounds",
+"Loud S1",
+"S1",
+"Normal S2",
+"Normal S3 in young person",
+"S3 gallop",
+"Reduced intensity S1",
+"Split S2"
+
+],
+heartmurmurgrade:
+[
+"Heart murmur grade I",
+"Heart murmur grade II",
+"Heart murmur grade III",
+"Heart murmur grade IV",
+"Heart murmur grade V",
+"Heart murmur grade VI"
+],
+heartmurmurpitch:[
+"Crescendo murmur",
+"Crescendo-desrescendo murmur",
+"Desrescendo murmur",
+"High- pitched",
+"low- pitched",
+"medium- pitched"
+],
+murmurlocationausculation:[  
+"Apical",
+"Base",
+"2nd intercoastal space",
+"3rd  intercoastal space",
+"4th  intercoastal space",
+"5th  intercoastal space",
+"Left midclavicular line",
+"Left sternal border",
+"Right  sternal border"
+],
+	jugularveindistention:[  
+"present",
+"Absent"
+  ]
+,
+heartmurmurquality:[ 
+"Musical",
+"Squeaking",
+"Blowing",
+"Harsh",
+"Rumbling"
+],
+heartmurmurtiming:[
+"Early diastolic",
+"Early systolic",
+"late diastolic",
+"late systolic",
+"mid diastolic",
+"mid systolic",
+"pansystolic/holosystolic"
+],
+murmurradiatingtobodylocation:[
+"Apex",
+"Left Axilla",
+"Neck"
+],
+temperatureextremities:[
+"Cold",
+"Hot",
+"Warm" 
+],
+
+tissueperfusionassessmentimpression:[
+"Within defined limits",
+"other"
+],
+respiratoryrhythm:[
+"Acidotic hyperventilation",
+"Air hunger",
+"Apneustic",
+"Blots",
+"Cheyne-strokes",
+"Cluster breathing",
+"Dyspnea",
+"Gasping for air",
+"Irregular breathing",
+"Sighing"
+],
+respiratoryeffort:[
+"Unlabored",
+"Labored",
+"Accessory muscle used",
+"Orthopnea",
+"Dyspnea"
+],
+breathingsoundausculation:[
+"Clear",
+"Rales/crackles",
+"Stridor",
+"Rhonchus",
+"Wheezes"
+],
+respiratoryassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+localizedbreathsounds:[
+"Left lung",
+"Right lung",
+"Bilateral lungs",
+"Right upper lobe",
+"Left upper lobe",
+"Right lower lobe",
+"Left lower lobe",
+"Right middle lobe",
+"Left lung base",
+"Right lung base",
+"Bilateral lung bases"
+],
+bowelsoundausculation:[
+"Bowel sound absent",
+"Hyperactive bowel sound",
+"Bowel sound loud",
+"Bowel sound quiet",
+"Hypoactive bowel sounds",
+"Normal bowel sounds",
+"Tympanic bowel sounds"
+],
+bsquadausculation:[
+"RLQ",
+"RUQ",
+"LLQ",
+"LUQ"
+],
+bowelsoundbyqualityausculation:[
+"Tinkling",
+"Borborgymi",
+"High pitched",
+"Low pitched"
+],
+physiologicfindingbypalpation:[
+"Guarding",
+"Mass",
+"Rigid",
+"Firm",
+"No guarding",
+"Tender",
+"Rebound tenderness",
+"Taut"
+],
+
+gIassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+urineturbidity:[
+"Clear",
+"cloudy"
+],
+voidingpattern:[
+"Anuria",
+"Hesitancy",
+"Dribbling",
+"Dysuria",
+"Put on hemodialysis",
+"Incontinence",
+"Condom catheter",
+"Increased urinary frequency",
+"Intermittent urinary incontinence",
+"Strains to void",
+"Nocturia",
+"Enuresis",
+"Voids spontaneously without difficulty",
+"Oliguria",
+"Patient on peritoneal dialysis",
+"Polyuria",
+"Suprapubic catheter",
+"Unable to void",
+"Urethra catheter",
+"Urgency",
+"Urostomy"
+],
+otherelementurine:[
+"Mucous threads",
+"Stones",
+"Sediments",
+"Clots"
+],
+
+urinecollectiondevice:[
+"Condom catherter",
+"Suprapubic catherter",
+"Urethral catherter",
+"Foley catherter",
+"Urostomy"
+],
+
+genitourinaryassessmentimpression:[
+"Within defined limits",
+"Others",
+],
+
+
+voidingpatterngu:[
+"Anuria",
+"Hesitancy",
+"Dribbling",
+"Dysuria",
+"Put on hemodialysis",
+"Incontinence",
+"Condom catheter",
+"Increased urinary frequency",
+"Intermittent urinary incontinence",
+"Strains to void",
+"Nocturia",
+"Enuresis",
+"Voids spontaneously without difficulty",
+"Oliguria"
+
+],
+levelofconsciousness:[
+"Confussed",
+"Lethargic",
+"Obtunded",
+"Stuporous",
+"Unresponsive",
+"Alert"
+],
+
+personalbar:[
+"Yes",
+"No"
+],
+time:[ 
+"Yes",
+"No"
+],
+
+arousal:[
+"Open eyes spontaneously",
+"Arouses to voices",
+"Arouses to touch/gentle shaking",
+"Arouses to repeated stimulation",
+"Arouses to vigorous stimulation",
+"Arouses to pain",
+"unresponsive"
+],
+
+place:[
+"Yes",
+"No"
+],
+
+orientationassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+
+speechclarity:[
+"Appropriate for age",
+"Coherent",
+"Slurred",
+"Rambling",
+"Limited enunciation",
+"incoherent"
+],
+
+patientmood:[
+"interested",
+"sad",
+"frightened",
+"alert",
+"excited",
+"Ashamed",
+"Upset",
+"Happy",
+"Strong",
+"Nervous",
+"Guilty",
+"Energetic",
+"Scared",
+"Calm"
+],
+
+patientmemory:[
+"Long term memory intact",
+"Long term memory poor",
+"Short term memory intact",
+"Short term memory poor"
+],
+
+abilitytoconcentration:[
+"No difficulty concentrating",
+"Poor concentration",
+"Difficulty concentrating",
+"Unable to concentrate"
+],
+
+attention:[
+"Difficulty directing attention",
+"Directs attention",
+"Does not direct attention",
+"Unable to direct attention"
+],
+
+cni:[
+"Pass", 
+"fail"
+],
+
+pupillaryresponse:[
+"Reactive to light",
+"Sluggishly reactive to light",
+"Not reactive to light",
+"Reactive to accommodation",
+"Not reactive to accommodation",
+"Other"
+],
+
+pupilshape:[
+"Dilated",
+"Cat eye",
+"Pinpoint",
+"Irregular",
+"Round",
+"Tear drop"
+],
+
+pupilneurologyassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+muscletone:[
+"Muscle tone assymetric",
+"Decreased muscle tone",
+"Flaccid muscle",
+"Fluctuating muscle tone",
+"Rigor"
+],
+
+musclestrength:[
+"Trace muscle activation",
+"Muscle activation with gravity eliminated",
+"Muscle activation against gravity, full range of motion",
+"Muscle activation against some resistance",
+"Muscle activation against examiner’s full resistance"
+],
+involuntarymovement:[
+"Coarse tremor",
+"Fine tremor",
+"Intention tremor",
+"Parkinsonian tremor",
+"Spasm/tic"
+],
+
+drt:[
+"None",
+"1+",
+"2+",
+"3+"
+],
+
+oculocephalic:[
+"Absent",
+"Present",
+"Indeterminate"
+],
+
+paralysistype:[
+"Hemiplegia",
+"Monoplegia",
+"Paraplegia",
+"Quadripelgia/tetrapelgia"
+],
+
+musculoskeletalassessmentimpression:[
+"Within defined limits",
+"Others"
+],
+
+paresthesiatype:[
+"Burning",
+"Skin-crawling",
+"Itching",
+"Numbness and Tingling",
+"Pins and needles",
+"Pricking"
+],
+
+
+
+  assessment:[
+"Anxiety disorder of childhood or adolescence (disorder)",
+"Parathyroid structure (body structure)",
+"Ferrous (59-Fe) sulfate (substance)",
+"Chronic pharyngitis (disorder)",
+"Cyanocobalamin (57-Co)(substance)",
+"Current drinker of alcohol(finding)",
+"Acinetobacter johnsonil( organism)",
+"Female first cousin(person)",
+"Bone plate, device(physical object)",
+"Dementia associated with alcoholism (disorder)",
+"Structure of central axillary lymph node (body structure)",
+"Czech (ethnic group)",
+"Melnick-fraser syndrome (disorder)",
+"Acute myringitis (disorder)",
+"Skin structure of imbilicus (body structure)",
+"Reactive hypoglycemia (disorder )",
+"Occipital headache (finding)",
+"Altrioventricular bundle structure (body structure)",
+"Kemicterus fue to isoimmunization (disorder)",
+"Heart valve disorder (disorder)"
+
+  ],
+  diagonosis:[
+"Other amebic genitourinary infections",
+"Other amebic infections",
+"Amebiasis, unspecified",
+"Other protozoal intestinal diseases",
+"Balantidiasis",
+"Giarldiasis(lambliasis)",
+"Isosporiasis",
+"Cyclosporiasis",
+"Other specified protozoal intestinal diseases",
+"Accute gastroenteropathy due to other small round viruses",
+"Adenoviral enteritis",
+"Other viral enteritis",
+"Calcivirus enteritis",
+"Astrovirus enterirtis",
+"Other specified protozoal diseases",
+"Protozoal intestinal disease, unspecified",
+"Viral and other specified intestinal infections",
+"Rotaviral enteritis",
+"Acute gastroenteropathy due to Norwalk agent and other small round viruses",
+"Acute gastroenteropathy due to Norwalk agent"
+
+  ],
+  icpc2:[
+"Medical exam/eval complete",
+"Medical exam/health evaluation partial/pre op check",
+"Sensitivity test",
+"Microbiological/immunological test",
+"Blood test",
+"Urine test",
+"Feaces test",
+"Histological/exfoliative cytology",
+"Other laboratory test NEC",
+"Physical function test",
+"Diagnostic endoscopy",
+"Diagnostic Radiology/imaging",
+"Electrical tracings",
+"Other diagnostic procedures",
+"Preventive immunizations/medication",
+"Observe/educate/advice/diet",
+"Consult with primary care provider",
+"Consult with specialist",
+"Clarification/Discuss Patients’s RFE",
+"Other preventive procedure"
+
+  ],
+        //main
+  generalphysicalexaminations:{
+main:[
+{type:"hair", options:["normal","alopecia","fluffy"]},
+{type:"hairnote" },
+{type:"face",  options:["normal","acromegly","cushingnoid","down syndrome","marfanoid","myxedematous","thyrotoxic","parkinsonism","others"]},
+{type:"facenote"},
+{type:"jaundice", options:["yes", "no"]},
+{type:"jaundicenote"},
+{type: "cyanosis", options:["yes central","yes peripheral", "no"]},
+{type: "cyanosisnote"},
+{type: "pallor", options:["not pale","pale"]},
+{type: "pallornote"},
+{type: "oral", options:["normal","ulcers","erythematous","hypertrophied","pigmented"]},
+{type: "oralnote"},
+{type: "lymphnodes", options:["localized","generalized","normal"]},
+{type: "lymphnodesnote"},
+{type:"ederma", options:["absent",	"present unilateral non-pitting","present unilateral pitting","present bi-lateral non-pitting","present bi-lateral and pitting"]},
+{type:"edermanote"},
+{type: "lastmenstrationperiod"},
+{type: "lastmenstrationperiodnote"},
+{type: "generalphysicalexamination"}
+  ],
+  paediatricspecgeneral:[
+    {type:"currentlengthheight"},
+    {type: "currentlengthheightpercentage"},
+    {type: "currentlengthheightenote"},
+    {type: "currentweight"},
+    {type: "currentweightnote"},
+    {type: "percentageofweightexpected"},
+    {type: "headcircumference"},
+    {type: "anteriorfontanelle", options:["present","absent"]},
+    {type: "posteriorfontanelle", options:["present", "absent"]},
+    {type: "chestcircumference"},
+    {type: "limbexamination"},
+    {type: "generalnote"}
+  ],
+  paediatricspecneuro: [
+    {type: "reflexes", options:["normal", "abnormal"]},
+    {type: "rootingreflexes", options:["normal", "abnormal"]},
+    {type: "suckreflexes", options:["normal", "abnormal"]},
+    {type: "mororeflexes", options:["normal", "abnormal"]},
+    {type: "tonicneckreflexes",options:["normal", "abnormal"]},
+    {type: "graspreflexes", options:["normal", "abnormal"]},
+    {type: "steppingreflexes", options:["normal", "abnormal"]},
+    {type: "neuronote"}]
+},
+  servicecategory:servicetypedetails,
+  pharmacycategory:["Medication Inventory","Non Medication Inventory"],
+  category:configuration.category,
+  testnames:["PCV", "ESR", "Clothing Profile","Widal"],
+  testsubcomponent:[
+      {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
+      {type:"PCV", subcomponent:["PCV%"]},
+      {type:"ESR", subcomponent:["ESR (mm/hr)"]},
+      {type:"Clothing Profile", subcomponent:["PT (Seconds)","APTT (Seconds)","INR"]}
+  ],
+
   roles:[
     {role: "Doctor", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
@@ -15,6 +544,8 @@ const configuration = {
     {role: "Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
   ],
+  clinics: clinicdetails,
+  /*
   clinics:[
   {clinic: "General Outpatient Clinic", id:1},
   {clinic: "Pediatric Outpatient", id:2},
@@ -37,16 +568,30 @@ const configuration = {
    {clinic:"ART Clinic", id:19}
 
   ],
+  */
   gender:["Male", "Female"],
+}
+)
   },
+
   downloadtemplatetypes:[{
     type:"userbulkdownloadtemplate", fileName:"usercreationtemplate.xlsx"
+   
 
-  }],
+  },
+  {
+   
+    type:"stockbulkdownloadtemplate", fileName:"inventory.xlsx"
+
+  }
+],
+
   paymenttype:["patientregistration"],
   allowedfilesize: 500,
   usertemplate: "userslist",
+  stocktemplate: "stocklist",
   useruploadfilename:"usersload",
+  pharmacyuploadfilename:"pharmacyload",
   useruploaddirectory:"uploads",
   userdownloadsdirectory:"downloads",
   error:{
@@ -68,7 +613,12 @@ const configuration = {
     errorisrequired: "is required",
     errorservicecategory:"service category does not exist in the list of accepted categories",
     errornopriceset:"No Price has been set for this service",
+    erroravailability:"Is out of stock",
     protectroutes: "Authorization error: You are not an authorise user in this application", 
+    errormustbenumber: "must be a number",
+    errornotfound:"not found",
+    errortasknotpending:"Task not pending on you",
+    errorpayment:"This service has not been paid for",
 
   },
     environment: "test",

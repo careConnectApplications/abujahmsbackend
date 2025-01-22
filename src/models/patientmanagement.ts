@@ -11,8 +11,8 @@ export interface patientinterface {
 const patientSchema = new Schema(
   {
     title: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     firstName: {
       required: true,
@@ -27,28 +27,26 @@ const patientSchema = new Schema(
     },
 
     country: {
-      required: true,
-      type: String,
+     
+      type: String
     },
     stateOfResidence: {
-      required: true,
+ 
       type: String,
     },
     LGA: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     address: {
-      required: true,
-      type: String,
+      
+      type: String
     },
     age: {
-      required: true,
-      type: String,
+      type: String
     },
     dateOfBirth: {
-      required: true,
-      type: String,
+      type: String
     },
     gender: {
       required: true,
@@ -58,7 +56,6 @@ const patientSchema = new Schema(
       type: String,
     },
     phoneNumber: {
-      required: true,
       type: String,
     },
     email: {
@@ -96,8 +93,9 @@ const patientSchema = new Schema(
       type: String,
     },
     isHMOCover: {
-      required: true,
+  
       type: String,
+      default: "No",
     },
     HMOName: {
       type: String,
@@ -124,6 +122,21 @@ const patientSchema = new Schema(
         {
           type: Schema.Types.ObjectId,
           ref: "Appointment",
+          default: [],
+        },
+      ],
+      prescription: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Prescription",
+          default: [],
+        },
+      ],
+    
+      lab: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Lab",
           default: [],
         },
       ],

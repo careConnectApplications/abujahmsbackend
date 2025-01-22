@@ -30,8 +30,8 @@ export var isValidPassword = async function(newPassword:any, currentpassword:any
   }
 
   export var sendTokenResponse= (user:any) =>{
-    const {firstName, lastName, role, staffId,email,clinic} =user;
-    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic}},process.env.KEYGEN as string,{expiresIn:"1d"});
+    const {firstName, lastName, role, staffId,email,clinic,_id} =user;
+    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic,_id}},process.env.KEYGEN as string,{expiresIn:"1d"});
    
     const options ={
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -75,19 +75,31 @@ export function generateRandomNumber(n:number) {
    }
  }      
  }
+ export function validateinputfornumber(input:any){
+  for (const key in input) {
+ if (isNaN(input[key])) {
+   throw new Error(`${key} ${configuration.error.errormustbenumber}`);
+   
+ }
+}    
+}
 
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
   const fileName = file.name;
   const size = file.data.length/1024;
   const extension = path.extname(fileName);
   const renamedurl= `${filename}${extension}`;
+ 
   if(!allowedextension.includes(extension))
   {
    throw new Error(configuration.error.errorfilextension);
   }
+  
   if(size > configuration.allowedfilesize){
    throw new Error(configuration.error.errorfilelarge);
   }
+  
+
   //upload excel sheet
   return new Promise((resolve, reject) => {
  file.mv(`${uploadpath}/${renamedurl}`,async (e:any)=>{

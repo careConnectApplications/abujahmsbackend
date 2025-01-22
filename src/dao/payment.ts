@@ -5,7 +5,7 @@ import configuration from "../config";
   //read all payment history
   export async function readallpayment(query:any,populatequery:any) {
     try {
-      const paymentdetails = await Payment.find(query).populate(populatequery);
+      const paymentdetails = await Payment.find(query).populate(populatequery).sort({ createdAt: -1 });;
       const totalpaymentdetails = await Payment.find(query).countDocuments();
       return { paymentdetails, totalpaymentdetails };
     } catch (err) {

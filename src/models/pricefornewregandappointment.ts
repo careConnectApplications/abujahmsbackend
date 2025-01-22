@@ -24,6 +24,25 @@ const priceappointmentnewregistrationSchema = new Schema({
     type: String,
     required: true
   },
+  category:
+  {
+    type: String
+  },
+  
+  qty:
+  {
+    type: Number
+  },
+  lowstocklevel: {
+    type: Number
+  
+  },
+  expirationdate: {
+      type: Date
+    },
+ lastrestockdate: {
+        type: Date
+      },
   status:{
     required: true,
     type: String,

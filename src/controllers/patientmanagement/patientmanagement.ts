@@ -12,18 +12,21 @@ export var createpatients = async (req:any,res:any) =>{
       
 
         //get token from header
-        const {phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover} = req.body;
+        const {phoneNumber,firstName,lastName,gender} = req.body;
         //validation
-        validateinputfaulsyvalue({phoneNumber,email,title,firstName,lastName,country,stateOfResidence,LGA,age,dateOfBirth,gender,isHMOCover});
+        validateinputfaulsyvalue({firstName,lastName,gender});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
-        const foundUser =  await readonepatient({phoneNumber},selectquery,'');
+        const foundUser =  await readonepatient({phoneNumber},selectquery,'','');
+        //category
         if(foundUser){
             throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
 
         }
+        //var settings =await configuration.settings();
         //validate if price is set for patient registration
-        var newRegistrationPrice = await readoneprice({servicecategory:configuration.settings.servicecategory[0].category});
+        //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
+        var newRegistrationPrice = await readoneprice({servicecategory:configuration.category[3]});
         if(!newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
@@ -54,13 +57,15 @@ export var createpatients = async (req:any,res:any) =>{
 //read all patients
 export async function getallpatients(req:Request, res:any){
     try{
+      //var settings = await configuration.settings();
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
             "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
             //var populatequery="payment";
            
              var populatequery ={
             path: "payment",
-            match: { paymentcategory: { $eq: configuration.settings.servicecategory[0].category } },
+           // match: { paymentcategory: { $eq: settings.servicecategory[0].category } },
+           match: { paymentcategory: { $eq: configuration.category[3] } },
             select: {
               status: 1,
               paymentype:1
@@ -87,7 +92,7 @@ export async function getonepatients(req:any, res:any){
     var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
       "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       var populatequery ='payment';
-      const queryresult = await readonepatient({_id:id},selectquery,populatequery);
+      const queryresult = await readonepatient({_id:id},selectquery,populatequery,'appointment');
       res.status(200).json({
           queryresult,
           status:true
@@ -127,7 +132,7 @@ export async function updatepatients(req:any, res:any){
   //upload patients photo
   export var uploadpix = async (req:any, res:any)=>{
     try{
-      
+      console.log(req.files);
         const file = req.files.file;
         const fileName = file.name;
         const filename= "patientpassport" + uuidv4();
@@ -135,8 +140,6 @@ export async function updatepatients(req:any, res:any){
         let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
         const extension = path.extname(fileName);
         const renamedurl= `${filename}${extension}`;
-        console.log(renamedurl);
-       
         //upload pix to upload folder
         await uploaddocument(file,filename,allowedextension,uploadpath);
         const {id} = req.params;
@@ -151,10 +154,11 @@ export async function updatepatients(req:any, res:any){
 
     }
     catch(e:any){
-        /*
-        logger.error(e.message);
+      
+        
+        //logger.error(e.message);
         res.json({status: false, msg:e.message});
-        */
+        
     }
 
 }

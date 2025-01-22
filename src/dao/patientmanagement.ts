@@ -26,9 +26,9 @@ import configuration from "../config";
     }
   }
   //find one
-  export async function readonepatient(query:any,selectquery:any,populatequery:any){
+  export async function readonepatient(query:any,selectquery:any,populatequery:any,appoitmentpopulatequery:any){
     try{
-    return await Patient.findOne(query).select(selectquery).populate(populatequery);
+    return await Patient.findOne(query).select(selectquery).populate(populatequery).populate(appoitmentpopulatequery);
     }
     catch(err){
       console.log(err);

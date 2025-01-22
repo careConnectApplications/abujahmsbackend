@@ -16,6 +16,7 @@ import configuration from "../config";
   };
   export async function createappointment(input:any){
     try{
+   
        const appointment = new Appointment(input);
         return await appointment.save();
     }

@@ -1,38 +1,34 @@
 import configuration from "../../config";
-import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
-import { validateinputfaulsyvalue} from "../../utils/otherservices";
+import  {readallclinics,createclinic,readoneclinic,updateclinic}  from "../../dao/clinics";
+import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
 //add patiient
-export var createprices = async (req:any,res:any) =>{
+export var createclinics = async (req:any,res:any) =>{
    
     try{
      
-       const {servicecategory,amount,servicetype} = req.body;
-       
+       const {clinic} = req.body;
+       validateinputfaulsyvalue({clinic});
+       var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
         //validate that category is in the list of accepted category
+        //get token from header
         /*
-        if(!((configuration.settings.servicecategory).includes(servicecategory))){
-          throw new Error(configuration.error.errorservicecategory);
-
+        var settings = await configuration.settings();
+        if(req.body.servicecategory == settings.servicecategory[0]){
+          req.body.servicetype=settings.servicecategory[0]
         }
           */
-
-        //get token from header
-       // var settings =await configuration.settings();
-        if(req.body.servicecategory == configuration.category[3]){
-          req.body.servicetype=configuration.category[3]
-        }
         
         //validation
-        validateinputfaulsyvalue({servicecategory,amount,servicetype});
-        const foundPrice =  await readoneprice({servicecategory,servicetype});
+        
+        const foundClinic =  await readoneclinic({clinic},'');
         //update servicetype for New Patient Registration
        
-        console.log(foundPrice);
-        if(foundPrice){
-            throw new Error(`service category and type ${configuration.error.erroralreadyexit}`);
+        console.log(foundClinic);
+        if(foundClinic){
+            throw new Error(`clinic ${configuration.error.erroralreadyexit}`);
 
         }
-         const queryresult=await createprice(req.body);
+         const queryresult=await createclinic({clinic, id});
         res.status(200).json({queryresult, status: true});
         
 
@@ -41,11 +37,12 @@ export var createprices = async (req:any,res:any) =>{
         res.status(403).json({ status: false, msg: error.message });
     }
 }
+
 //read all patients
-export async function getallprices(req:Request, res:any){
+export async function getallclinic(req:Request, res:any){
     try{
        
-        const queryresult = await readallprices({});
+        const queryresult = await readallclinics({},'');
         res.status(200).json({
             queryresult,
             status:true
@@ -60,11 +57,13 @@ export async function getallprices(req:Request, res:any){
 }
 
 //update a price
-export async function updateprices(req:any, res:any){
+export async function updateclinics(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
-    var queryresult = await updateprice(id, req.body);
+    const {clinic} = req.body;
+    validateinputfaulsyvalue({clinic,id});
+    var queryresult = await updateclinic(id, {clinic});
     res.status(200).json({
         queryresult,
         status:true
@@ -77,7 +76,7 @@ export async function updateprices(req:any, res:any){
 
   }
   
-
+/*
   export async function updatepricestatus(req:any, res:any){
     const {id} = req.params;
     try{
@@ -97,4 +96,4 @@ export async function updateprices(req:any, res:any){
     }
 
 }
-
+*/

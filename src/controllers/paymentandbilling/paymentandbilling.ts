@@ -1,6 +1,7 @@
 import {readallpayment,readonepayment,updatepayment} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
-import {updatepatientbyanyquery} from "../../dao/patientmanagement";
+import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
+import {updatelabbyquery} from "../../dao/lab";
 import configuration from "../../config";
 //deactivate a user
 /*
@@ -74,27 +75,41 @@ export async function confirmpayment(req:any, res:any){
   try{
     const {id} = req.params;
     //check for null of id
-      const response = await readonepayment({_id:id});
-      console.log(response);
+      const response:any = await readonepayment({_id:id});
+      const {patient} = response;
+      const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
+  
+      if(!patientrecord){
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+
+    }
+
+    //var settings =await  configuration.settings();
      const status= configuration.status[3];
-  //   const {email, staffId} = req.user;
-      //const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
-      const queryresult:any =await updatepayment(id,{status});
+     const {email, staffId} = req.user;
+     const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+      //const queryresult:any =await updatepayment(id,{status});
       //confirm payment of the service paid for 
-      const {paymentype,paymentcategory,paymentreference,patient} = queryresult;
+      const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
-      if(paymentcategory == configuration.settings.servicecategory[0].category){
+      if(paymentcategory == configuration.category[3]){
         //update patient registration status
         await updatepatientbyanyquery({_id:patient},{status:configuration.status[1]});
 
 
       }
       //for appointment
-      else if(paymentcategory == configuration.settings.servicecategory[1].category){
+      else if(paymentcategory == configuration.category[0]){
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
       }
+      //for lab test
+      else if (paymentcategory == configuration.category[2]){
+        //update lab test
+        await updatelabbyquery({payment:id},{status:configuration.status[5]})
+      }
+      //update for pharmacy
       
       
 
