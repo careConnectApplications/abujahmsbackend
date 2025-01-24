@@ -11,7 +11,70 @@ export interface appointinterface {
   appointmenttype:String
  
 }
-const physicalexaminationSchema = new Schema(({
+const paediatrics = new Schema({
+  medicalhistory:{
+attentiondeficitdisorderhyperactivitydisorder:String,
+attentiondeficitdisorderhyperactivitydisordernote:String,
+constipation:String,
+constipationnote:String,
+fatigue:String,
+fatiguenote:String,
+
+orthopedicconditions: String,
+orthopedicconditionsnote:String,
+allergies:String,
+allergiesnote:String,
+diabetes:String,
+diabetesnote:String,
+headaches:String,
+headachesnote:String,
+scoliosis:String,
+scoliosisnote:String,
+asthma:String,
+asthmanote:String,
+
+digestiveproblems:String,
+digestiveproblemsnote:String,
+hearingdifficulties:String,
+hearingdifficultiesnote:String,
+seizures:String,
+seizuresnote:String,
+
+blooddisorder:String,
+blooddisordernote:String,
+depressionanxiety:String,
+depressionanxietynote:String,
+heartproblems:String,
+heartproblemsnote:String,
+
+sleepdisturbances:String,
+sleepdisturbancesnote:String,
+chroniccolds:String,
+chroniccoldsnote:String,
+dyslexia:String,
+dyslexianote:String,
+
+kidneydisorders:String,
+kidneydisordersnote:String,
+torticollis:String,
+torticollisnote:String,
+colic:String,
+colicnote:String,
+
+earinfections:String,
+earinfectionsnote:String,
+lymphdisorders:String,
+lymphdisordersnote:String,
+visiondifficulties:String,
+visiondifficultiesnote:String,
+
+autism:String,
+autismnote:String,
+sensoryprocessingchallenges:String,
+sensoryprocessingchallengesnote:String
+  }
+});
+const physicalexaminationSchema = new Schema({
   cvs:{
 heartrate:String,
 bpsystolic:String,
@@ -188,7 +251,7 @@ passiverangeflexionkneer:String,
 passiverangeextensionkneer:String
   }
 
-}))
+})
 const assessmentSchema = new Schema({
   assessment: String,
   assessmentnote: String,
@@ -343,7 +406,8 @@ const appointmentSchema = new Schema({
       vitals: vitalsSchema,
       assessmentdiagnosis: assessmentSchema,
       generalphysicalexamination:generalphysicalexaminationSchema,
-      physicalexamination: physicalexaminationSchema
+      physicalexamination: physicalexaminationSchema,
+      paediatrics:paediatrics
     },
     lab: [
       {
