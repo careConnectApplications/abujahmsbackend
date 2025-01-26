@@ -138,3 +138,15 @@ export function generateRandomNumber(n:number) {
        return jsonresult;
 
  }
+
+
+ export const isObjectAvailable = (objectName:any) => {
+if(!objectName || objectName.constructor !== Object ){
+  return false;
+
+}
+  //console.log(objectName.constructor === Object)
+  //return Object.keys(objectName).length === 0;
+  return Object.keys(objectName).length >= 0 && objectName.constructor === Object;
+  
+}

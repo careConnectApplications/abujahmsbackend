@@ -5,7 +5,7 @@ import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 //import {createvital} from "../../dao/vitals";
 import {createlab} from "../../dao/lab";
-import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber } from "../../utils/otherservices";
+import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber,isObjectAvailable } from "../../utils/otherservices";
 import configuration from "../../config";
 
 
@@ -279,6 +279,7 @@ export async function addencounter(req:any, res:any){
   try{
   //
 
+
   const {id} = req.params;
   const {email, staffId} = (req.user).user;
   //find doctor and add doctor who examined
@@ -300,29 +301,26 @@ export async function addencounter(req:any, res:any){
     req.body.status = configuration.status[9];
   }
  
-//vitals
+ //validate empty object and initialize
+
+ if(!(isObjectAvailable(req.body.medicalhistory))) req.body.medicalhistory={};
+ if(!(isObjectAvailable(req.body.paediatricsspecific))) req.body.paediatricsspecific={};
+ if(!(isObjectAvailable(req.body.cvs))) req.body.cvs={};
+ if(!(isObjectAvailable(req.body.resp))) req.body.resp={};
+ if(!(isObjectAvailable(req.body.gi))) req.body.gi={};
+ if(!(isObjectAvailable(req.body.gu))) req.body.gu={};
+ if(!(isObjectAvailable(req.body.neuro))) req.body.neuro={};
+ if(!(isObjectAvailable(req.body.msk))) req.body.msk={};
+ if(!(isObjectAvailable(req.body.medicalhistory))) req.body.medicalhistory={};
+ if(!(isObjectAvailable(req.body.immunizationhistory))) req.body.immunizationhistory={};
+ if(!(isObjectAvailable(req.body.developmentmilestonehistorydetails))) req.body.developmentmilestonehistorydetails={};
+ if(!(isObjectAvailable(req.body.prepostnatalhistory))) req.body.prepostnatalhistory={};
   const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status} = req.body;
   const {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note} = req.body;
   const { hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination} = req.body;
 const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
 const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = (req.body).paediatricsspecific;
- 
-  req.body.bmi = weight/((height/100) * (height/100));
-  //vitals
-  const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,status:configuration.status[6]};
-  if(height || weight){
-    validateinputfornumber({height, weight});
-    //validateinputfaulsyvalue({...vitals});
-    }
-    
-  //general physical examination
-  const paediatricsspecificationgeneral={currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote};
-  const paediatricsspecificationneuro={reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote}
-  const generalphysicalexaminations ={paediatricsspecification:{general:paediatricsspecificationgeneral, neuro:paediatricsspecificationneuro}, hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination};
-  //assessmentdiagnosis
-  const  assessmentdiagnosis = {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note};
-  //physical exaamination
-  const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,heartsound,heartmurmurgrade,heartmurmurquality,heartmurmurpitch,heartmurmurtiming,murmurlocationauscultation,murmurradiatingtobodylocation,jugularveindistention,jugularveindistentionheadup30degree,edema,temperatureextrmities,tissueperfusionassessmentimpression,cvsremark} = (req.body).cvs;
+const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,heartsound,heartmurmurgrade,heartmurmurquality,heartmurmurpitch,heartmurmurtiming,murmurlocationauscultation,murmurradiatingtobodylocation,jugularveindistention,jugularveindistentionheadup30degree,edema,temperatureextrmities,tissueperfusionassessmentimpression,cvsremark} = (req.body).cvs;
   const {respiratoryrhthm,respiratoryrate,respiratoryeffort,breathsoundsauscultation,localizedbreathsounds,respiratoryassessmentimpression,respremarks} = (req.body).resp;
   const {bowelsoundauscultation,bowelsoundbyqualityauscultation,bsquadauscultation,physiologicfindingbypalpation,giassessmentimpression,giremarks} = (req.body).gi;
   const {urinecolor,urineodor,urineturbidity,urinecollectiondevice,voidingpattern,appearanceurine,otherurine,genitourinaryassessmentimpression,numbervoids,incontinentvoidsurinary,diapercount,perinealpadscount,colorurine,voidingpatterngu,bloodlossvolume,genitouringassessmentimpressions,guremark} =(req.body).gu;
@@ -330,21 +328,42 @@ const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,gras
   const {muscletone,musclestrength,involuntarymovements,activerangeflexionshoulderl,activerangeextensionshoulderl,activerangeexternalrotationshoulderl,activerangeinternalrotationshoulderl,activerangeabductionshoulderl,activerangeadductionshoulderl,activerangeflexionshoulderr,activerangeextensionshoulderr,activerangeexternalrotationshoulderr,activerangeinternalrotationshoulderr,activerangeabductionshoulderr,activerangeadductionshoulderr,activerangeflexionelbowl,activerangeextensionelbowl,activerangeflexionelbowr,activerangeextensionelbowr,activerangeflexionhipl,activerangeextensionhipl,activerangeexternalrotationhipl,activerangeinternalrotationhipl,activerangeabductionhipl,activerangeadductionhipl,activerangeflexionhipr,activerangeextensionhipr,activerangeexternalrotationhipr,activerangeinternalrotationhipr,activerangeabductionhipr,activerangeadductionhipr,activerangeflexionkneel,activerangeextensionkneel,activerangeflexionkneer,activerangeextensionkneer,passiverangeflexionshoulderl,passiverangeextensionshoulderl,passiverangeexternalrotationshoulderl,passiverangeinternalrotationshoulderl,passiverangeabductionshoulderl,passiverangeadductionshoulderl,passiverangeflexionshoulderr,passiverangeextensionshoulderr,passiverangeexternalrotationshoulderr,passiverangeinternalrotationshoulderr,passiverangeabductionshoulderr,passiverangeadductionshoulderr,passiverangeflexionelbowl,passiverangeextensionelbowl,passiverangeflexionelbowr,passiverangeextensionelbowr,passiverangeflexionhipl,passiverangeextensionhipl,passiverangeexternalrotationhipl,passiverangeinternalrotationhipl,passiverangeabductionhipl,passiverangeadductionhipl,passiverangeflexionhipr,passiverangeextensionhipr,passiverangeexternalrotationhipr,passiverangeinternalrotationhipr,passiverangeabductionhipr,passiverangeadductionhipr,dtrachilles,dtrbiceps,dtrbrachioradialis,dtrpatellar,dtrtriceps,babinskisreflex,oculocephalic,paralysistype,paresthesiatype,physiologicfinding,musculoskeletalassessmentimpression,mskremark,passiverangeflexionkneel,passiverangeextensionkneel,passiverangeflexionkneer,passiverangeextensionkneer} =(req.body).msk;
   const {attentiondeficitdisorderhyperactivitydisorder,attentiondeficitdisorderhyperactivitydisordernote,constipation,constipationnote,fatigue,fatiguenote,orthopedicconditions,orthopedicconditionsnote,allergies,allergiesnote,diabetes,diabetesnote,headaches,headachesnote,scoliosis,scoliosisnote,asthma,asthmanote,digestiveproblems,digestiveproblemsnote,hearingdifficulties,hearingdifficultiesnote,seizures,seizuresnote,blooddisorder,blooddisordernote,depressionanxiety,depressionanxietynote,heartproblems,heartproblemsnote,sleepdisturbances,sleepdisturbancesnote,chroniccolds,chroniccoldsnote,dyslexia,dyslexianote,kidneydisorders,kidneydisordersnote,torticollis,torticollisnote,colic,colicnote,earinfections,earinfectionsnote,lymphdisorders,lymphdisordersnote,visiondifficulties,visiondifficultiesnote,autism,autismnote,sensoryprocessingchallenges,sensoryprocessingchallengesnote} = (req.body).medicalhistory;
   const {stressors,stressorsnote,pregnancymedication,pregnancymedicationnote,cigarettealcoholuse,cigarettealcoholusenote,delivery,deliverynote,deliverytype,deliverytypenote,emergencydelivery,emergencydeliverynote,labourinduction,labourinductionnote,birthhistorymedication,birthhistorymedicationnote,assisteddelivery,assisteddeliverynote,typeofassisteddelivery,typeofassisteddeliverynote,complicationsduringdelivery,complicationsduringdeliverynote,apgarscoreafteroneminute,apgarscoreafterfiveminutes,birthweight,birthlengthheight,useofoxygenafterbirth,feedingofthechild,feedingofthechildnote,difficultyinlatchingsucking,difficultyinlatchingsuckingnote} = (req.body).prepostnatalhistory;
-  const {agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness}=(req.body).developmentmilestonehistorydetails;
+  const {agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness,anyfoodallergiesnote,contacttypesportnote,historyofcaraccidentnote,everbeenseenonemergencynote,otherhistoryoftraumanote,historyoffrequentfallsnote,anysignofmuscleweaknessnote}=(req.body).developmentmilestonehistorydetails;
+  const {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin}=(req.body).immunizationhistory
   
-  
+ 
+
+  //vitals
+  const vitals = {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi:req.body.bmi,status:configuration.status[6]};
+  if(height || weight){
+    validateinputfornumber({height, weight});
+    req.body.bmi = weight/((height/100) * (height/100));
+    //validateinputfaulsyvalue({...vitals});
+    }
+ 
+ 
+    
+  //general physical examination
+  const paediatricsspecificationgeneral={currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote};
+  const paediatricsspecificationneuro={reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote}
+  const generalphysicalexaminations ={paediatricsspecification:{general:paediatricsspecificationgeneral, neuro:paediatricsspecificationneuro}, hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination};
+  //assessmentdiagnosis
+  const  assessmentdiagnosis = {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note};
+  //physical exaamination  
   const  cvs ={heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,heartsound,heartmurmurgrade,heartmurmurquality,heartmurmurpitch,heartmurmurtiming,murmurlocationauscultation,murmurradiatingtobodylocation,jugularveindistention,jugularveindistentionheadup30degree,edema,temperatureextrmities,tissueperfusionassessmentimpression,cvsremark};
   const resp ={respiratoryrhthm,respiratoryrate,respiratoryeffort,breathsoundsauscultation,localizedbreathsounds,respiratoryassessmentimpression,respremarks};
   const gi= {bowelsoundauscultation,bowelsoundbyqualityauscultation,bsquadauscultation,physiologicfindingbypalpation,giassessmentimpression,giremarks};
   const gu={urinecolor,urineodor,urineturbidity,urinecollectiondevice,voidingpattern,appearanceurine,otherurine,genitourinaryassessmentimpression,numbervoids,incontinentvoidsurinary,diapercount,perinealpadscount,colorurine,voidingpatterngu,bloodlossvolume,genitouringassessmentimpressions,guremark};
   const neuro={levelofconsciousness,person,place,time,orientationassessmentimpression,levelofarousal,speechclarity,patientmood,patientmemory,abilitytoconcentrate,abilitytodirectattention,cniexam,cniiexam,cniiiexam,cnivexam,cnvexam,cnviexam,cniviiexam,cniviiiexam,cnixexam,cnxexam,cnxiexam,cnxiiexam,pupildiametereyer,pupildiametereyel,pupillaryresponsepupilr,pupillaryresponsepupill,pupilshaperightpupil,pupilshapeleftpupil,pupilassessmentimpression,physiologicfindingopticlens,glasgowcomascale,neurologyassessmentimpression,nueroremarks};
   const msk={muscletone,musclestrength,involuntarymovements,activerangeflexionshoulderl,activerangeextensionshoulderl,activerangeexternalrotationshoulderl,activerangeinternalrotationshoulderl,activerangeabductionshoulderl,activerangeadductionshoulderl,activerangeflexionshoulderr,activerangeextensionshoulderr,activerangeexternalrotationshoulderr,activerangeinternalrotationshoulderr,activerangeabductionshoulderr,activerangeadductionshoulderr,activerangeflexionelbowl,activerangeextensionelbowl,activerangeflexionelbowr,activerangeextensionelbowr,activerangeflexionhipl,activerangeextensionhipl,activerangeexternalrotationhipl,activerangeinternalrotationhipl,activerangeabductionhipl,activerangeadductionhipl,activerangeflexionhipr,activerangeextensionhipr,activerangeexternalrotationhipr,activerangeinternalrotationhipr,activerangeabductionhipr,activerangeadductionhipr,activerangeflexionkneel,activerangeextensionkneel,activerangeflexionkneer,activerangeextensionkneer,passiverangeflexionshoulderl,passiverangeextensionshoulderl,passiverangeexternalrotationshoulderl,passiverangeinternalrotationshoulderl,passiverangeabductionshoulderl,passiverangeadductionshoulderl,passiverangeflexionshoulderr,passiverangeextensionshoulderr,passiverangeexternalrotationshoulderr,passiverangeinternalrotationshoulderr,passiverangeabductionshoulderr,passiverangeadductionshoulderr,passiverangeflexionelbowl,passiverangeextensionelbowl,passiverangeflexionelbowr,passiverangeextensionelbowr,passiverangeflexionhipl,passiverangeextensionhipl,passiverangeexternalrotationhipl,passiverangeinternalrotationhipl,passiverangeabductionhipl,passiverangeadductionhipl,passiverangeflexionhipr,passiverangeextensionhipr,passiverangeexternalrotationhipr,passiverangeinternalrotationhipr,passiverangeabductionhipr,passiverangeadductionhipr,dtrachilles,dtrbiceps,dtrbrachioradialis,dtrpatellar,dtrtriceps,babinskisreflex,oculocephalic,paralysistype,paresthesiatype,physiologicfinding,musculoskeletalassessmentimpression,mskremark,passiverangeflexionkneel,passiverangeextensionkneel,passiverangeflexionkneer,passiverangeextensionkneer};
-  const medicalhistory ={attentiondeficitdisorderhyperactivitydisorder,attentiondeficitdisorderhyperactivitydisordernote,constipation,constipationnote,fatigue,fatiguenote,orthopedicconditions,orthopedicconditionsnote,allergies,allergiesnote,diabetes,diabetesnote,headaches,headachesnote,scoliosis,scoliosisnote,asthma,asthmanote,digestiveproblems,digestiveproblemsnote,hearingdifficulties,hearingdifficultiesnote,seizures,seizuresnote,blooddisorder,blooddisordernote,depressionanxiety,depressionanxietynote,heartproblems,heartproblemsnote,sleepdisturbances,sleepdisturbancesnote,chroniccolds,chroniccoldsnote,dyslexia,dyslexianote,kidneydisorders,kidneydisordersnote,torticollis,torticollisnote,colic,colicnote,earinfections,earinfectionsnote,lymphdisorders,lymphdisordersnote,visiondifficulties,visiondifficultiesnote,autism,autismnote,sensoryprocessingchallenges,sensoryprocessingchallengesnote};
-  const prepostnatalhistory = {stressors,stressorsnote,pregnancymedication,pregnancymedicationnote,cigarettealcoholuse,cigarettealcoholusenote,delivery,deliverynote,deliverytype,deliverytypenote,emergencydelivery,emergencydeliverynote,labourinduction,labourinductionnote,birthhistorymedication,birthhistorymedicationnote,assisteddelivery,assisteddeliverynote,typeofassisteddelivery,typeofassisteddeliverynote,complicationsduringdelivery,complicationsduringdeliverynote,apgarscoreafteroneminute,apgarscoreafterfiveminutes,birthweight,birthlengthheight,useofoxygenafterbirth,feedingofthechild,feedingofthechildnote,difficultyinlatchingsucking,difficultyinlatchingsuckingnote};
- const developmentmilestonehistorydetails ={agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness};
- 
   const physicalexamination={cvs,resp,gi,gu,neuro,msk}; 
- const paediatrics ={medicalhistory,prepostnatalhistory,developmentmilestonehistorydetails};
+   //paediatrics
+   const medicalhistory ={attentiondeficitdisorderhyperactivitydisorder,attentiondeficitdisorderhyperactivitydisordernote,constipation,constipationnote,fatigue,fatiguenote,orthopedicconditions,orthopedicconditionsnote,allergies,allergiesnote,diabetes,diabetesnote,headaches,headachesnote,scoliosis,scoliosisnote,asthma,asthmanote,digestiveproblems,digestiveproblemsnote,hearingdifficulties,hearingdifficultiesnote,seizures,seizuresnote,blooddisorder,blooddisordernote,depressionanxiety,depressionanxietynote,heartproblems,heartproblemsnote,sleepdisturbances,sleepdisturbancesnote,chroniccolds,chroniccoldsnote,dyslexia,dyslexianote,kidneydisorders,kidneydisordersnote,torticollis,torticollisnote,colic,colicnote,earinfections,earinfectionsnote,lymphdisorders,lymphdisordersnote,visiondifficulties,visiondifficultiesnote,autism,autismnote,sensoryprocessingchallenges,sensoryprocessingchallengesnote};
+   const prepostnatalhistory = {stressors,stressorsnote,pregnancymedication,pregnancymedicationnote,cigarettealcoholuse,cigarettealcoholusenote,delivery,deliverynote,deliverytype,deliverytypenote,emergencydelivery,emergencydeliverynote,labourinduction,labourinductionnote,birthhistorymedication,birthhistorymedicationnote,assisteddelivery,assisteddeliverynote,typeofassisteddelivery,typeofassisteddeliverynote,complicationsduringdelivery,complicationsduringdeliverynote,apgarscoreafteroneminute,apgarscoreafterfiveminutes,birthweight,birthlengthheight,useofoxygenafterbirth,feedingofthechild,feedingofthechildnote,difficultyinlatchingsucking,difficultyinlatchingsuckingnote};
+   const developmentmilestonehistorydetails ={anyfoodallergiesnote,contacttypesportnote,historyofcaraccidentnote,everbeenseenonemergencynote,otherhistoryoftraumanote,historyoffrequentfallsnote,anysignofmuscleweaknessnote,agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness};
+   const immunizationhistory = {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin};
+  
+   const paediatrics ={medicalhistory,prepostnatalhistory,developmentmilestonehistorydetails,immunizationhistory};
  //validateinputfaulsyvalue({...vitals});
   var queryresult
   if(height || weight ){

@@ -14,6 +14,12 @@ const configuration = {
     
     return (
       {
+apgarscoreafteroneminute:["1","2","3","4","5","6","7","8","9","10"],
+deliverytype:["Vagina Delivery","Caesarean Scetion"],
+delivery:["Pre-term","Term"],
+typeofassisteddelivery:["Vacuum Assisted", "Forceps"],
+feedingofthechild:["Exclusive Breastfeeding","Bottle Feeding","Both"],
+immunization:["Fully Immunized","Ongoing Immunization","Not Fully Immunized"],
 heartsound:[
 "Abnormal S1",
 "S4",
