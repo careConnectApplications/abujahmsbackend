@@ -158,7 +158,7 @@ export const getAllInProgressEncounter = async (req:any, res:any) => {
 export const getAllPaidSchedules = async (req:any, res:any) => {
   try {
     const {clinic} = (req.user).user;
-    const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -329,7 +329,8 @@ const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,hear
   const {attentiondeficitdisorderhyperactivitydisorder,attentiondeficitdisorderhyperactivitydisordernote,constipation,constipationnote,fatigue,fatiguenote,orthopedicconditions,orthopedicconditionsnote,allergies,allergiesnote,diabetes,diabetesnote,headaches,headachesnote,scoliosis,scoliosisnote,asthma,asthmanote,digestiveproblems,digestiveproblemsnote,hearingdifficulties,hearingdifficultiesnote,seizures,seizuresnote,blooddisorder,blooddisordernote,depressionanxiety,depressionanxietynote,heartproblems,heartproblemsnote,sleepdisturbances,sleepdisturbancesnote,chroniccolds,chroniccoldsnote,dyslexia,dyslexianote,kidneydisorders,kidneydisordersnote,torticollis,torticollisnote,colic,colicnote,earinfections,earinfectionsnote,lymphdisorders,lymphdisordersnote,visiondifficulties,visiondifficultiesnote,autism,autismnote,sensoryprocessingchallenges,sensoryprocessingchallengesnote} = (req.body).medicalhistory;
   const {stressors,stressorsnote,pregnancymedication,pregnancymedicationnote,cigarettealcoholuse,cigarettealcoholusenote,delivery,deliverynote,deliverytype,deliverytypenote,emergencydelivery,emergencydeliverynote,labourinduction,labourinductionnote,birthhistorymedication,birthhistorymedicationnote,assisteddelivery,assisteddeliverynote,typeofassisteddelivery,typeofassisteddeliverynote,complicationsduringdelivery,complicationsduringdeliverynote,apgarscoreafteroneminute,apgarscoreafterfiveminutes,birthweight,birthlengthheight,useofoxygenafterbirth,feedingofthechild,feedingofthechildnote,difficultyinlatchingsucking,difficultyinlatchingsuckingnote} = (req.body).prepostnatalhistory;
   const {agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness,anyfoodallergiesnote,contacttypesportnote,historyofcaraccidentnote,everbeenseenonemergencynote,otherhistoryoftraumanote,historyoffrequentfallsnote,anysignofmuscleweaknessnote}=(req.body).developmentmilestonehistorydetails;
-  const {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin}=(req.body).immunizationhistory
+  const {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin}=(req.body).immunizationhistory;
+  const {presentingcomplaints,presentingcompalintcode,pastmedicalhistory,drugandallergyhistory,familyandsocialhistory,nutritionhistory,spirituality} = req.body;
   
  
 
