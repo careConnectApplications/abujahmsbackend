@@ -23,17 +23,17 @@ cvs:{
 cvsassessmentimpression:String,
 historyofcvsdisorder:String,
 historyofcvssurgicalprocedures:String,
-cvsremark:String
+historycvsremark:String
 },
 resp:{
 historyofrespiratorydisorders:String,
-remark:String
+respremark:String
 
 },
 gi:{
 nausea:String,
 typeofdiet:String,
-boweleliminationpattern:String,
+giboweleliminationpattern:String,
 bmfrequency:String,
 bmusualtimeoftheday:String,
 bmregularity:String,
@@ -52,20 +52,20 @@ historyofgenitourinarydisorders:String,
 historyofsrgicalprocedureforgusyetm:String,
 numberstools:String,
 fluidoutputemesis:String,
-boweleliminationpattern:String,
+guboweleliminationpattern:String,
 consistencystool:String,
-remark:String
+historyguremark:String
 
 },
 neuro:{
 historyofneurologicdisorders:String,
 historyofsurgicalproceduresofnervoussystem:String,
-remark:String
+historyneuroremark:String
 },
 msk:{
 historyofmusculoskeletaldisorders:String,
 historyofsurgicalproceduresofmsksystem:String,
-remarks:String,
+historymskremarks:String,
 
 }
 });
@@ -547,7 +547,8 @@ const appointmentSchema = new Schema({
       assessmentdiagnosis: assessmentSchema,
       generalphysicalexamination:generalphysicalexaminationSchema,
       physicalexamination: physicalexaminationSchema,
-      paediatrics:paediatrics
+      paediatrics:paediatrics,
+      history:history
     },
     lab: [
       {

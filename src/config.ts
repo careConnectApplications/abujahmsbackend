@@ -14,6 +14,150 @@ const configuration = {
     
     return (
       {
+        nausea:
+        [
+        "None",
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Resolved"
+        ],
+        
+        typeofdiet:
+        [
+        "Regular",
+        "Diabetic",
+        "Mechanical Soft",
+        "Liquid",
+        "Clear Liquid",
+        "Sips",
+        "Formula",
+        "NPO"
+        ],
+        
+        giboweleliminationpattern:
+        [
+        "Constipation",
+        "Diarrhea",
+        "Flatulence",
+        "Impaction",
+        "Incontinent of bowels",
+        "Normal bowel pattern for Patient"
+        ],
+        
+        bmfrequency:
+        [
+        "Weekly",
+        "Every 3 days",
+        "Every other day",
+        "1-3 times per day",
+        "Greater than 3 times per day"
+        ],
+        
+        bmusualtimeoftheday:
+        [
+        "Morning",
+        "Morning and night",
+        "Afternoon",
+        "Night"
+        ],
+        
+        bmregularity:[
+        "Irregular",
+        "Regular"
+        ],
+        
+        usualconsistency:[
+        "Dry",
+        "Normal",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Soft"
+        ],
+        
+        consistency:[
+        "Normal",
+        "Soft",
+        "Clots Present",
+        "Creamy",
+        "Dry",
+        "Frothy",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Mucoid",
+        "Seedy",
+        "Tarry"
+        ],
+        
+        color:
+        [
+        "Clay colored",
+        "Black tarry",
+        "Blood tinged",
+        "Blood frank",
+        "Bright red stool",
+        "Dark red stool",
+        "Brown",
+        "Green",
+        "Yellow",
+        "Orange stool",
+        "Red streaked stool"
+        ],
+        amount:[
+        "Negative",
+        "Small",
+        "Moderate",
+        "Large"
+        ],
+        
+        appearance:
+        [
+        "Irregular contour",
+        "Distended",
+        "Mass",
+        "rigid",
+        "Distended abdominal vein",
+        "Cullen's sign",
+        "Distinct protrusions",
+        "Rash",
+        "Firm",
+       "Flat",
+        "Inguinal Hernia",
+        "Symmetrical contour",
+        "Obese",
+        "Pendulous"
+        ],
+        
+        guboweleleiminationpattern:
+        [
+        "Constipation",
+        "Diarrhea",
+        "Flatulence",
+        "Impaction",
+        "Incontinent of bowels",
+        "Normal bowel pattern for Patient"
+        ],
+        
+        consistencystool:
+        [
+        "Normal",
+        "Soft",
+        "Clots present",
+        "Creamy",
+        "Dry",
+        "Frothy",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Mucoid",
+        "Seedy",
+        "Tarry"
+      ],
+
+
+
 apgarscoreafteroneminute:["1","2","3","4","5","6","7","8","9","10"],
 deliverytype:["Vagina Delivery","Caesarean Scetion"],
 delivery:["Pre-term","Term"],

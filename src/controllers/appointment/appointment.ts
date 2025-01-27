@@ -315,12 +315,19 @@ export async function addencounter(req:any, res:any){
  if(!(isObjectAvailable(req.body.immunizationhistory))) req.body.immunizationhistory={};
  if(!(isObjectAvailable(req.body.developmentmilestonehistorydetails))) req.body.developmentmilestonehistorydetails={};
  if(!(isObjectAvailable(req.body.prepostnatalhistory))) req.body.prepostnatalhistory={};
+ if(!(isObjectAvailable(req.body.historycvs))) req.body.historycvs={};
+ if(!(isObjectAvailable(req.body.historyresp))) req.body.historyresp={};
+ if(!(isObjectAvailable(req.body.historygi))) req.body.historygi={};
+ if(!(isObjectAvailable(req.body.historygu))) req.body.historygu={};
+ if(!(isObjectAvailable(req.body.historyneuro))) req.body.historyneuro={};
+ if(!(isObjectAvailable(req.body.historymsk))) req.body.historymsk={};
+
   const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status} = req.body;
   const {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note} = req.body;
   const { hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination} = req.body;
-const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
-const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = (req.body).paediatricsspecific;
-const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,heartsound,heartmurmurgrade,heartmurmurquality,heartmurmurpitch,heartmurmurtiming,murmurlocationauscultation,murmurradiatingtobodylocation,jugularveindistention,jugularveindistentionheadup30degree,edema,temperatureextrmities,tissueperfusionassessmentimpression,cvsremark} = (req.body).cvs;
+  const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
+  const {reflexes,rootingreflexes,suckreflexes,mororeflexes,tonicneckreflexes,graspreflexes,steppingreflexes,neuronote} = (req.body).paediatricsspecific;
+  const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,heartsound,heartmurmurgrade,heartmurmurquality,heartmurmurpitch,heartmurmurtiming,murmurlocationauscultation,murmurradiatingtobodylocation,jugularveindistention,jugularveindistentionheadup30degree,edema,temperatureextrmities,tissueperfusionassessmentimpression,cvsremark} = (req.body).cvs;
   const {respiratoryrhthm,respiratoryrate,respiratoryeffort,breathsoundsauscultation,localizedbreathsounds,respiratoryassessmentimpression,respremarks} = (req.body).resp;
   const {bowelsoundauscultation,bowelsoundbyqualityauscultation,bsquadauscultation,physiologicfindingbypalpation,giassessmentimpression,giremarks} = (req.body).gi;
   const {urinecolor,urineodor,urineturbidity,urinecollectiondevice,voidingpattern,appearanceurine,otherurine,genitourinaryassessmentimpression,numbervoids,incontinentvoidsurinary,diapercount,perinealpadscount,colorurine,voidingpatterngu,bloodlossvolume,genitouringassessmentimpressions,guremark} =(req.body).gu;
@@ -331,7 +338,12 @@ const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,hear
   const {agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness,anyfoodallergiesnote,contacttypesportnote,historyofcaraccidentnote,everbeenseenonemergencynote,otherhistoryoftraumanote,historyoffrequentfallsnote,anysignofmuscleweaknessnote}=(req.body).developmentmilestonehistorydetails;
   const {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin}=(req.body).immunizationhistory;
   const {presentingcomplaints,presentingcompalintcode,pastmedicalhistory,drugandallergyhistory,familyandsocialhistory,nutritionhistory,spirituality} = req.body;
-  
+  const {cvsassessmentimpression,historyofcvsdisorder,historyofcvssurgicalprocedures,historycvsremark} = (req.body).historycvs
+  const {historyofrespiratorydisorders,respremark }=(req.body).historyresp
+  const {nausea,typeofdiet,giboweleliminationpattern,bmfrequency,bmusualtimeoftheday,bmregularity,usualconsistency,dateoflastbm,consistency,color,amount,appearance,historyofgidisorders,historyofsurgicalprocedureofgisystem}=(req.body).historygi;
+  const {historyofgenitourinarydisorders,historyofsrgicalprocedureforgusyetm,numberstools,fluidoutputemesis,guboweleliminationpattern,consistencystool,historyguremark} = (req.body).historygu;
+  const {historyofneurologicdisorders,historyofsurgicalproceduresofnervoussystem,historyneuroremark}= (req.body).historyneuro;
+  const {historyofmusculoskeletaldisorders,historyofsurgicalproceduresofmsksystem,historymskremarks}= (req.body).historymsk;
  
 
   //vitals
@@ -363,15 +375,22 @@ const {heartrate,bpsystolic,bpdiastolic,capillaryrefilltime,heartraterhythm,hear
    const prepostnatalhistory = {stressors,stressorsnote,pregnancymedication,pregnancymedicationnote,cigarettealcoholuse,cigarettealcoholusenote,delivery,deliverynote,deliverytype,deliverytypenote,emergencydelivery,emergencydeliverynote,labourinduction,labourinductionnote,birthhistorymedication,birthhistorymedicationnote,assisteddelivery,assisteddeliverynote,typeofassisteddelivery,typeofassisteddeliverynote,complicationsduringdelivery,complicationsduringdeliverynote,apgarscoreafteroneminute,apgarscoreafterfiveminutes,birthweight,birthlengthheight,useofoxygenafterbirth,feedingofthechild,feedingofthechildnote,difficultyinlatchingsucking,difficultyinlatchingsuckingnote};
    const developmentmilestonehistorydetails ={anyfoodallergiesnote,contacttypesportnote,historyofcaraccidentnote,everbeenseenonemergencynote,otherhistoryoftraumanote,historyoffrequentfallsnote,anysignofmuscleweaknessnote,agewhenrolledover,satupunsupported,crawled,walked,spokefirstword,spokeinsentences,totaltrianed,anyfoodallergies,contacttypesport,historyofcaraccident,everbeenseenonemergency,otherhistoryoftrauma,historyoffrequentfalls,anysignofmuscleweakness};
    const immunizationhistory = {immunization,hepb0,opv0,bcg,opv1,penta1,pcv1,rota1,opv2,pcv2,rota2,opv3,penta3,pcv3,rota3,ipv,vitamina1,vitamina2,measles,yellowfever,mena,measles2,hpv914,llin};
-  
    const paediatrics ={medicalhistory,prepostnatalhistory,developmentmilestonehistorydetails,immunizationhistory};
- //validateinputfaulsyvalue({...vitals});
+   //history
+   const historycvs ={cvsassessmentimpression,historyofcvsdisorder,historyofcvssurgicalprocedures,historycvsremark};
+   const historyresp ={historyofrespiratorydisorders,respremark };
+   const historygi={nausea,typeofdiet,giboweleliminationpattern,bmfrequency,bmusualtimeoftheday,bmregularity,usualconsistency,dateoflastbm,consistency,color,amount,appearance,historyofgidisorders,historyofsurgicalprocedureofgisystem};
+   const historygu ={historyofgenitourinarydisorders,historyofsrgicalprocedureforgusyetm,numberstools,fluidoutputemesis,guboweleliminationpattern,consistencystool,historyguremark};
+   const historyneuro ={historyofneurologicdisorders,historyofsurgicalproceduresofnervoussystem,historyneuroremark};
+   const historymsk ={historyofmusculoskeletaldisorders,historyofsurgicalproceduresofmsksystem,historymskremarks};
+   const history={cvs:historycvs,resp:historyresp,gi:historygi,gu:historygu,neuro:historyneuro,msk:historymsk,presentingcomplaints,presentingcompalintcode,pastmedicalhistory,drugandallergyhistory,familyandsocialhistory,nutritionhistory,spirituality};
+   //validateinputfaulsyvalue({...vitals});
   var queryresult
   if(height || weight ){
-queryresult = await updateappointment(id, {$set:{'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
+queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
   }
   else{
-    queryresult = await updateappointment(id, {$set:{'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
+    queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
 
   }
   res.status(200).json({
