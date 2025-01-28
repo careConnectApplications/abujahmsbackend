@@ -13,7 +13,7 @@ export interface appointinterface {
 }
 const history = new Schema({
 presentingcomplaints:String,
-presentingcompalintcode:String,
+presentingcompalintcode:[],
 pastmedicalhistory:String,
 drugandallergyhistory:String,
 familyandsocialhistory:String,

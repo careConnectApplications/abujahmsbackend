@@ -14,6 +14,29 @@ const configuration = {
     
     return (
       {
+        presentingcompalintcode:
+        [
+"518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",
+"543378014 Anosmia",
+"517930010 Black Faeces [Symptom] Or C/O Melaena",
+"271717401 C/O - A Black Symptom",
+"664514017 C/O - A Head Symptom",
+"664505010 C/O - A Headache",
+"664483015 C/O - A Neck Symptom",
+"2546333013 C/O - Akathisia",
+"664489016 C/O - Ankle Symptom",
+"664506011 C/O - Anosmia",
+"2547486015 C/O - Bizarre Dreams",
+"543047018 C/O Catarrh",
+"664518019 C/O Cough",
+"664515016 C/O - Debility Malaise",
+"2546406013 C/O - Dreams",
+"664509016 C/O - Excess Tears",
+"664498018 C/O - Feeling Depressed",
+"664502013 C/O - Feeling Unhappy",
+"664490013 C/O Foot Symptom",
+"2547153013 C/O - Illusions Seen"
+        ],
         nausea:
         [
         "None",
