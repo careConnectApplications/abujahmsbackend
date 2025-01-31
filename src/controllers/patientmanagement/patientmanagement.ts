@@ -5,19 +5,19 @@ import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../..
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservices";
+import {createappointment} from "../../dao/appointment";
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
    
     try{
-      
-
-        //get token from header
-        const {phoneNumber,firstName,lastName,gender} = req.body;
+        var appointmentid:any=String(Date.now());
+        //get token from header and extract clinic
+        const {phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype} = req.body;
         //validation
-        validateinputfaulsyvalue({firstName,lastName,gender});
+        validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
-        const foundUser =  await readonepatient({phoneNumber},selectquery,'','');
+        const foundUser:any =  await readonepatient({phoneNumber},selectquery,'','');
         //category
         if(foundUser){
             throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
@@ -26,8 +26,11 @@ export var createpatients = async (req:any,res:any) =>{
         //var settings =await configuration.settings();
         //validate if price is set for patient registration
         //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
+        var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
+        console.log('appointmentprice', appointmentPrice);
         var newRegistrationPrice = await readoneprice({servicecategory:configuration.category[3]});
-        if(!newRegistrationPrice){
+        console.log('newRegistrationPrice', newRegistrationPrice);
+        if(!newRegistrationPrice || !appointmentPrice){
           throw new Error(configuration.error.errornopriceset);
 
       }
@@ -37,18 +40,15 @@ export var createpatients = async (req:any,res:any) =>{
         //other validations
         var payment=[];
          const createpatientqueryresult=await createpatient(req.body);
-         
          //create payment
          const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
+         const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
          payment.push(createpaymentqueryresult._id);
+         payment.push(createappointmentpaymentqueryresult._id);
          //update createpatientquery
-         const queryresult =await updatepatient(createpatientqueryresult._id,{payment});
-
-       // const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
-        //await mail(email, "Account Registration Confrimation", message);
+         const queryappointmentresult = await createappointment({appointmentid,payment:createappointmentpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+         const queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
         res.status(200).json({queryresult, status: true});
-        
-
     }catch(error:any){
       console.log(error);
         res.status(403).json({ status: false, msg: error.message });
