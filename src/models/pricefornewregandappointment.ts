@@ -28,6 +28,11 @@ const priceappointmentnewregistrationSchema = new Schema({
   {
     type: String
   },
+  pharmacy:
+  {
+    type: String,
+    required: true
+  },
   
   qty:
   {

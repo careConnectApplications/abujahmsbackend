@@ -13,11 +13,11 @@ export var pharmacyorder= async (req:any, res:any) =>{
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
-      const {products,prescriptionnote} = req.body;
+      const {products,prescriptionnote, pharmacy} = req.body;
       var orderid:any=String(Date.now());
       var pharcyorderid =[];
       var paymentids =[];
-      validateinputfaulsyvalue({id, products});
+      validateinputfaulsyvalue({id, products,pharmacy});
       //search patient
       var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       if(!patient){
@@ -27,7 +27,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
     //    console.log(testname[i]);
-        var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1]});
+        var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
         
         if(!orderPrice){
           throw new Error(configuration.error.errornopriceset);
@@ -41,7 +41,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       
       //create 
       
-      var prescriptionrecord:any = await createprescription({prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote});
+      var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote});
       pharcyorderid.push(prescriptionrecord ._id);
       paymentids.push(createpaymentqueryresult._id);
       }
@@ -61,7 +61,9 @@ export var pharmacyorder= async (req:any, res:any) =>{
   //get all pharmacy order
   export const readallpharmacytransaction = async (req:any, res:any) => {
       try {
-        const queryresult = await readallprescription({},{},'patient','appointment','payment');
+       //extract staff department
+       const { clinic} = (req.user).user;
+        const queryresult = await readallprescription({pharmacy:clinic},{},'patient','appointment','payment');
         res.status(200).json({
           queryresult,
           status:true
