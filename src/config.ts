@@ -2,6 +2,7 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
+  defaultphonenumber:"1111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration"],

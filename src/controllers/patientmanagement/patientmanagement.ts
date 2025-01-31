@@ -19,7 +19,7 @@ export var createpatients = async (req:any,res:any) =>{
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
         const foundUser:any =  await readonepatient({phoneNumber},selectquery,'','');
         //category
-        if(foundUser){
+        if(foundUser && phoneNumber !== configuration.defaultphonenumber){
             throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
 
         }
