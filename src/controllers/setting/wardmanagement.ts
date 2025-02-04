@@ -79,14 +79,6 @@ export async function updateward(req:any, res:any){
 
     }
     const vacantbed = totalbed - occupiedbed;
-    //validate specialization
-    const foundSpecilization =  await readoneclinic({clinic:bedspecialization},'');
-    if(!foundSpecilization){
-        throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
-
-    }
- 
-
     var queryresult = await updatewardmanagement(id, {bedspecialization,vacantbed,totalbed,occupiedbed});
     res.status(200).json({
         queryresult,

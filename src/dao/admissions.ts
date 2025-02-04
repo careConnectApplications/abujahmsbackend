@@ -4,9 +4,9 @@ import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 
   //read all patient history
-  export async function readalladmission(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
+  export async function readalladmission(query:any,selectquery:any,populatequery:any) {
     try {
-      const admissiondetails = await Admission.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
+      const admissiondetails = await Admission.find(query).select(selectquery).populate(populatequery);
       const totaladmissiondetails = await Admission.find(query).countDocuments();
       return { admissiondetails, totaladmissiondetails };
     } catch (err) {

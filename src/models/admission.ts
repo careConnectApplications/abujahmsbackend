@@ -12,8 +12,15 @@ const admissionSchema = new Schema({
   }],
   referedward:
   {
-    type: String, 
-    required: true
+    type: Schema.Types.ObjectId,
+    ref: "Wardmanagement",
+    default: null,
+  },
+  totransferedward:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Wardmanagement",
+    default: null,
   },
   admittospecialization:
   {

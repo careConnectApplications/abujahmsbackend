@@ -4,7 +4,7 @@
 const configuration = {
   defaultphonenumber:"1111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
-  admissionstatus:["toadmit"],
+  admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration"],
 
@@ -16,6 +16,7 @@ const configuration = {
     
     return (
       {
+        admissionstatus:["admited","totransfer","transfered","todischarge", "discharged"],
         presentingcompalintcode:
         [
 "518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",
