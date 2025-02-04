@@ -11,6 +11,7 @@ import settings from '../routes/setting';
 import downloads from "../routes/downloads";
 import lab from '../routes/lab';
 import pharmacy from '../routes/pharmacy';
+import admission from '../routes/admission';
 import {protect} from "../utils/middleware";
 
 function createServer(){
@@ -34,13 +35,14 @@ function createServer(){
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
-  app.use('/api/v1/users',users);
+  app.use('/api/v1/users',protect,users);
   app.use('/api/v1/billing',protect,billingandpayment);
   app.use('/api/v1/patientsmanagement',protect,patientsmanagement);
   app.use('/api/v1/appointment',protect, appointment);
   app.use('/api/v1/lab',protect, lab);
-  app.use('/api/v1/settings',settings);
+  app.use('/api/v1/settings',protect, settings);
   app.use('/api/v1/pharmacy',protect, pharmacy);
+  app.use('/api/v1/admission',protect, admission);
   // Handle POST requests to /webhook
   /*
 app.post('/api/v1/webhook', (req, res) => {

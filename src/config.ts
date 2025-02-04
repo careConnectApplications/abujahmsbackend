@@ -4,6 +4,7 @@
 const configuration = {
   defaultphonenumber:"1111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
+  admissionstatus:["toadmit"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration"],
 
@@ -793,6 +794,7 @@ main:[
     errornotfound:"not found",
     errortasknotpending:"Task not pending on you",
     errorpayment:"This service has not been paid for",
+    errorgreaterthan:"Cannot be greater"
 
   },
     environment: "test",

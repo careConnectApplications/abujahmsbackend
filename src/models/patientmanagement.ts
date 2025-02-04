@@ -125,6 +125,14 @@ const patientSchema = new Schema(
           default: [],
         },
       ],
+      admission:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Admission",
+          default: [],
+        },
+
+      ],
       prescription: [
         {
           type: Schema.Types.ObjectId,
