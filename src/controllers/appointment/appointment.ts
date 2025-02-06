@@ -256,9 +256,10 @@ for(var i =0; i <= (servicetypedetail.servicetypedetails).length; i++){
  console.log("tem", tem);
  console.log("tem", typeof tem);
  service.push(...tem);
+ console.log(service);
 
 };
-console.log(service);
+
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
