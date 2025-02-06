@@ -244,6 +244,7 @@ export var laborder= async (req:any, res:any) =>{
   }
  
 
+  
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
@@ -268,6 +269,7 @@ export var laborder= async (req:any, res:any) =>{
 
   }
   catch(error:any){
+    console.log("error", error);
     res.status(403).json({ status: false, msg: error.message });
 
   }
