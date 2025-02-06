@@ -14,6 +14,7 @@ const configuration = {
 
    
 const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category == "Lab");
+console.log('service', servicetypedetail);
 var service:any=[];
 for(var i =0; i < servicetypedetail.length ; i++){
  // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
