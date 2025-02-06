@@ -247,7 +247,7 @@ export var laborder= async (req:any, res:any) =>{
 
   //console.log(testname);
 
-const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+const {servicetypedetails} = await readallservicetype({category: configuration.category[2]},{type:1,category:1,department:1,_id:0});
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
@@ -255,7 +255,7 @@ const {servicetypedetails} = await readallservicetype({},{type:1,category:1,depa
       if(!testPrice){
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
     }
-    var setting  = await configuration.settings();
+    //var setting  = await configuration.settings();
     //search testname in setting
     var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
        //create payment
