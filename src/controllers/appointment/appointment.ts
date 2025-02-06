@@ -257,7 +257,6 @@ const {servicetypedetails} = await readallservicetype({},{type:1,category:1,depa
     }
     var setting  = await configuration.settings();
     //search testname in setting
-    console.log('testname',testname[i]);
     var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
        //create payment
     var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
