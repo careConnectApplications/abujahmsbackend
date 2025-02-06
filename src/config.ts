@@ -11,7 +11,16 @@ const configuration = {
   settings: async function(){
     const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
     const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+
    
+const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category = "Lab");
+var service:any=[];
+for(var i =0; i < servicetypedetail.length ; i++){
+ // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
+ var tem =servicetypedetail[i].type;
+ service.push(...tem);
+
+};
 
     
     return (
@@ -705,7 +714,8 @@ main:[
   servicecategory:servicetypedetails,
   pharmacycategory:["Medication Inventory","Non Medication Inventory"],
   category:configuration.category,
-  testnames:["PCV", "ESR", "Clothing Profile","Widal"],
+  //testnames:["PCV", "ESR", "Clothing Profile","Widal"],
+  testnames:service,
   testsubcomponent:[
       {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
       {type:"PCV", subcomponent:["PCV%"]},
