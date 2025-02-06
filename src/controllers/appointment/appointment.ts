@@ -246,17 +246,17 @@ export var laborder= async (req:any, res:any) =>{
  
 
   //console.log(testname);
-var types:any=[];
+var service:any=[];
 const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
 const servicetypedetail = await readallservicetype({category:"Lab"},{type:1,category:1,department:1,_id:0});
 
 for(var i =0; i <= (servicetypedetail.servicetypedetails).length; i++){
  // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
  console.log('test',(servicetypedetail.servicetypedetails)[i].type);
-  types=[...types,...(servicetypedetail.servicetypedetails)[i].type];
+ service.push(...(servicetypedetail.servicetypedetails)[i].type);
 
 };
-console.log(types);
+console.log(service);
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
