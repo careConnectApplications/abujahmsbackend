@@ -25,8 +25,7 @@ export const scheduleappointment = async (req:any, res:any) => {
      //validation
      var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
-      //search patient if available and paid for registration
-  
+      //search patient if available and por
 
        const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},selectquery,'','');
       // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
@@ -239,7 +238,7 @@ export var laborder= async (req:any, res:any) =>{
     validateinputfaulsyvalue({id, testname});
     //find the record in appointment and validate
     var appointment:any;
-    if(notfromappointment == "true"){
+    if(notfromappointment == true){
       //validate patient
       const foundPatient:any =  await readonepatient({_id:id},{},'','');
         //category

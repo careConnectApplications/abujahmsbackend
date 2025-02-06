@@ -20,6 +20,17 @@ const prescriptionSchema = new Schema({
   {
     type: String
   },
+  appointment:{
+    type: Schema.Types.ObjectId,
+    ref: "Appointment",
+    default: [],
+  },
+  appointmentid:
+  {
+    type: String, 
+    required: true
+  },
+  
   orderid:
   {
     type: String, 
@@ -30,13 +41,7 @@ const prescriptionSchema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
-  appointment: 
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Appointment",
-      default: null,
-    }
-  ,
+ 
   prescribersname:
   {
     type: String, 

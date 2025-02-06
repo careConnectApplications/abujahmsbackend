@@ -4,7 +4,7 @@ import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
-
+import {readoneappointment} from "../../dao/appointment";
 
 //pharmacy order
 export var pharmacyorder= async (req:any, res:any) =>{
@@ -13,7 +13,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
-      const {products,prescriptionnote, pharmacy} = req.body;
+      const {products,prescriptionnote, pharmacy,fromappointment} = req.body;
       var orderid:any=String(Date.now());
       var pharcyorderid =[];
       var paymentids =[];
@@ -24,6 +24,17 @@ export var pharmacyorder= async (req:any, res:any) =>{
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
+      var appointment:any;
+    if(fromappointment == true){
+      appointment = await readoneappointment({_id:id},{},'');
+            if(!appointment){
+              //create an appointment
+              throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+
+          }
+
+
+    }
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
     //    console.log(testname[i]);
@@ -41,7 +52,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       
       //create 
       
-      var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote});
+      var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       pharcyorderid.push(prescriptionrecord ._id);
       paymentids.push(createpaymentqueryresult._id);
       }
