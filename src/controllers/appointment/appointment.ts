@@ -246,13 +246,15 @@ export var laborder= async (req:any, res:any) =>{
  
 
   //console.log(testname);
-var service:any=[];
-const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
-const servicetypedetail = await readallservicetype({category:"Lab"},{type:1,category:1,department:1,_id:0});
 
-for(var i =0; i < (servicetypedetail.servicetypedetails).length ; i++){
+const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category = "Lab");
+console.log('l', servicetypedetail);
+//await readallservicetype({category:"Lab"},{type:1,category:1,department:1,_id:0});
+var service:any=[];
+for(var i =0; i < servicetypedetail.length ; i++){
  // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
- var tem =(servicetypedetail.servicetypedetails)[i].type;
+ var tem =servicetypedetail[i].type;
  service.push(...tem);
 
 };
