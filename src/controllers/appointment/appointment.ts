@@ -232,17 +232,31 @@ export var laborder= async (req:any, res:any) =>{
   try{
     //accept _id from request
     const {id} = req.params;
-    const {testname} = req.body;
+    const {testname,notfromappointment} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
     var paymentids =[];
     validateinputfaulsyvalue({id, testname});
     //find the record in appointment and validate
-    var appointment = await readoneappointment({_id:id},{},'');
-    if(!appointment){
-      throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+    var appointment:any;
+    if(notfromappointment == "true"){
+      //validate patient
+      appointment={
+        patient:id,
+        appointmentid:"noneappoinment"
+      }
 
-  }
+    }
+    else{
+    appointment = await readoneappointment({_id:id},{},'');
+            if(!appointment){
+              //create an appointment
+              throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+
+          }
+    }
+    
+   
  
 
   //console.log(testname);
