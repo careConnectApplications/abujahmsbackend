@@ -253,7 +253,7 @@ const {servicetypedetails} = await readallservicetype({},{type:1,category:1,depa
   //    console.log(testname[i]);
       var testPrice:any = await readoneprice({servicetype:testname[i]});
       if(!testPrice){
-        throw new Error(`${configuration.error.errornopriceset} ${testname[i]}`);
+        throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
     }
     var setting  = await configuration.settings();
     //search testname in setting
