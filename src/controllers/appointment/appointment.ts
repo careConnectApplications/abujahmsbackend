@@ -252,8 +252,10 @@ const servicetypedetail = await readallservicetype({category:"Lab"},{type:1,cate
 
 for(var i =0; i <= (servicetypedetail.servicetypedetails).length; i++){
  // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
- console.log('test',(servicetypedetail.servicetypedetails)[i].type);
- service.push(...(servicetypedetail.servicetypedetails)[i].type);
+ var tem =(servicetypedetail.servicetypedetails)[i].type;
+ console.log("tem", tem);
+ console.log("tem", typeof tem);
+ service.push(...tem);
 
 };
 console.log(service);
