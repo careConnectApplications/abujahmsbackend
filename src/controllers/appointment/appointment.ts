@@ -1,5 +1,6 @@
 import {createappointment,readallappointment,updateappointment,readoneappointment} from "../../dao/appointment";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
+import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
@@ -244,7 +245,9 @@ export var laborder= async (req:any, res:any) =>{
   }
  
 
-  
+  console.log(testname);
+const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+console.log(servicetypedetails);
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
@@ -254,6 +257,7 @@ export var laborder= async (req:any, res:any) =>{
     }
     var setting  = await configuration.settings();
     //search testname in setting
+    console.log('testname',testname[i]);
     var testsetting = (setting.servicecategory).filter(item => (item.type).includes(testname[i]));
        //create payment
     var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
