@@ -241,6 +241,13 @@ export var laborder= async (req:any, res:any) =>{
     var appointment:any;
     if(notfromappointment == "true"){
       //validate patient
+      const foundPatient:any =  await readonepatient({_id:id},{},'','');
+        //category
+        if(!foundPatient){
+            throw new Error(`Patient dont ${configuration.error.erroralreadyexit}`);
+
+        }
+
       appointment={
         patient:id,
         appointmentid:"noneappoinment"
