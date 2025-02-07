@@ -76,10 +76,11 @@ export async function confirmpayment(req:any, res:any){
     const {id} = req.params;
     //check for null of id
       const response:any = await readonepayment({_id:id});
+
       const {patient} = response;
       const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
-  
-      if(!patientrecord){
+      
+      if(!patientrecord && response.status !== configuration.category[3] ){
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
@@ -98,12 +99,14 @@ export async function confirmpayment(req:any, res:any){
 
 
       }
+      
       //for appointment
       else if(paymentcategory == configuration.category[0]){
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
       }
+      
       //for lab test
       else if (paymentcategory == configuration.category[2]){
         //update lab test
