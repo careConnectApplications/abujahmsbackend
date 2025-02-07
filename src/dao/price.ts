@@ -6,7 +6,7 @@ import configuration from "../config";
   //read all payment history
   export async function readallprices(query:any) {
     try {
-      const pricedetails = await Price.find(query);
+      const pricedetails = await Price.find(query).sort({ createdAt: -1 });
       const totalpricedetails = await Price.find(query).countDocuments();
       return { pricedetails, totalpricedetails };
     } catch (err) {

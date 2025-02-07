@@ -6,7 +6,7 @@ import configuration from "../config";
   //read all patient history
   export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      const appointmentdetails = await Appointment.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
+      const appointmentdetails = await Appointment.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
       const totalappointmentdetails = await Appointment.find(query).countDocuments();
       return { appointmentdetails, totalappointmentdetails };
     } catch (err) {

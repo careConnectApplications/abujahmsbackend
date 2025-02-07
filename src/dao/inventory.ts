@@ -4,7 +4,7 @@ import configuration from "../config";
   //read all patient history
   export async function readallinventory(query:any,selectquery:any) {
     try {
-      const inventorydetails = await Inventory.find(query).select(selectquery);
+      const inventorydetails = await Inventory.find(query).select(selectquery).sort({ createdAt: -1 });
       const totalinventorydetails = await Inventory.find(query).countDocuments();
       return { inventorydetails, totalinventorydetails };
     } catch (err) {

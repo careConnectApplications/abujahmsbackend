@@ -4,7 +4,7 @@ import configuration from "../config";
   //read all patient history
   export async function readallwardmanagement(query:any,selectquery:any) {
     try {
-      const wardmanagementdetails = await Wardmanagement.find(query).select(selectquery);
+      const wardmanagementdetails = await Wardmanagement.find(query).select(selectquery).sort({ createdAt: -1 });
       const totalwardmanagementdetails = await Wardmanagement.find(query).countDocuments();
       return { wardmanagementdetails, totalwardmanagementdetails };
     } catch (err) {
