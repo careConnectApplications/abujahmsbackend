@@ -1,3 +1,4 @@
+import  mongoose from 'mongoose';
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import configuration from "../../config";
 import {readoneprice,updateprice} from "../../dao/price";
@@ -5,6 +6,7 @@ import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
 import {readoneappointment} from "../../dao/appointment";
+const { ObjectId } = mongoose.Types;
 
 //pharmacy order
 export var pharmacyorder= async (req:any, res:any) =>{
@@ -13,20 +15,22 @@ export var pharmacyorder= async (req:any, res:any) =>{
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
-      const {products,prescriptionnote, pharmacy,fromappointment} = req.body;
+      var {products,prescriptionnote, pharmacy,appointmentid} = req.body;
       var orderid:any=String(Date.now());
       var pharcyorderid =[];
       var paymentids =[];
       validateinputfaulsyvalue({id, products,pharmacy});
       //search patient
-      var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
+      var patient = await readonepatient({_id:id},{},'','');
+      //status:configuration.status[1]
       if(!patient){
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
       var appointment:any;
-    if(fromappointment == true){
-      appointment = await readoneappointment({_id:id},{},'');
+    if(appointmentid){
+      appointmentid = new ObjectId(appointmentid);
+      appointment = await readoneappointment({_id:appointmentid},{},'');
             if(!appointment){
               //create an appointment
               throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
@@ -35,6 +39,14 @@ export var pharmacyorder= async (req:any, res:any) =>{
 
 
     }
+    else{
+      appointment={
+        _id:id,
+        appointmentid:"noneappoinment"
+        
+      }
+    }
+    
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
     //    console.log(testname[i]);
@@ -51,11 +63,13 @@ export var pharmacyorder= async (req:any, res:any) =>{
       var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount:Number(orderPrice.amount)});
       
       //create 
-      
+      console.log("got here");
       var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+      console.log(prescriptionrecord);
       pharcyorderid.push(prescriptionrecord ._id);
       paymentids.push(createpaymentqueryresult._id);
       }
+      
       
       
       var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
