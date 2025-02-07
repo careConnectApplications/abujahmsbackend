@@ -21,8 +21,8 @@ export var pharmacyorder= async (req:any, res:any) =>{
       var paymentids =[];
       validateinputfaulsyvalue({id, products,pharmacy});
       //search patient
-      var patient = await readonepatient({_id:id},{},'','');
-      //status:configuration.status[1]
+      var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
+      
       if(!patient){
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
