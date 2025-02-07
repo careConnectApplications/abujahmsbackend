@@ -57,7 +57,7 @@ res.status(200).json({queryresult:admissionrecord, status: true});
 export async function getallreferedforadmission(req:Request, res:any){
     try{
        
-        const queryresult = await readalladmission({},{},'referedward');
+        const queryresult = await readalladmission({},{},'referedward','patient');
         res.status(200).json({
             queryresult,
             status:true
