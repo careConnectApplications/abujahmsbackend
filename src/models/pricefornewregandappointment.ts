@@ -24,6 +24,10 @@ const priceappointmentnewregistrationSchema = new Schema({
     type: String,
     required: true
   },
+  isHMOCover: {
+    type: String,
+    default: "No",
+  },
   category:
   {
     type: String

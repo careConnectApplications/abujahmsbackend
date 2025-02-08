@@ -6,7 +6,7 @@ export var createprices = async (req:any,res:any) =>{
    
     try{
      
-       const {servicecategory,amount,servicetype} = req.body;
+       const {servicecategory,amount,servicetype,isHMOCover} = req.body;
        
         //validate that category is in the list of accepted category
         /*
@@ -24,7 +24,7 @@ export var createprices = async (req:any,res:any) =>{
         
         //validation
         validateinputfaulsyvalue({servicecategory,amount,servicetype});
-        const foundPrice =  await readoneprice({servicecategory,servicetype});
+        const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        
         console.log(foundPrice);
