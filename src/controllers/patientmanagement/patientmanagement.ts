@@ -1,5 +1,6 @@
 import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
+import moment from "moment";
 import * as path from 'path';
 import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
@@ -12,7 +13,11 @@ export var createpatients = async (req:any,res:any) =>{
     try{
         var appointmentid:any=String(Date.now());
         //get token from header and extract clinic
-        const {phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype} = req.body;
+        const {dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype} = req.body;
+        //var birthdate = moment(dateOfBirth);
+        //var currentDate = moment();
+        if(dateOfBirth) req.body.age= moment().diff(moment(dateOfBirth), 'years');
+        console.log(req.body);
         //validation
         validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
