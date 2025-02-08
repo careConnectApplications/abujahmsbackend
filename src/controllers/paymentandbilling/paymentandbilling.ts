@@ -77,7 +77,7 @@ export async function confirmpayment(req:any, res:any){
       const response:any = await readonepayment({_id:id});
       const {patient} = response;
       const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
-      if(!patientrecord && response.status !== configuration.category[3] ){
+      if(!patientrecord && response.paymentcategory !== configuration.category[3] ){
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
