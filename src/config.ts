@@ -792,6 +792,7 @@ main:[
     errordeactivate:"You have been Deactivated",
     errorpasswordmismatch:"Wrong Password Detected",
     erroralreadyexit: "already exist",
+    errorvacantspace:"has no vancant bed",
     errorencryptingpassword:"Error in encrypting Password",
     errorvalidatingpassword:"Error in Validating Password",
     errorfilextension: "File extension not allowed",

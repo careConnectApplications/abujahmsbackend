@@ -82,16 +82,27 @@ export async function updateadmissionstatus(req:any, res:any){
     //if status = discharge
     
       const response = await readoneadmission({_id:id},{},'');
+      // check for availability of bed spaces in ward
+      var ward:any = await readonewardmanagement({_id:response?.referedward},{});
+      if(ward.vacantbed <= 1){
+        throw new Error(`${ward.wardname}  ${configuration.error.errorvacantspace}`);
+
+      }
+      
       //validate if permitted base on status
      //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
       const queryresult:any =await updateadmission(id,{status});
       //if status is equal to admit reduce  ward count
-      if(status == configuration.admissionstatus[1]){
+      if(status == configuration.admissionstatus[1]){        
         await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:1,vacantbed:-1}});
-
       }
       // status is equal to  transfer reduce target ward and increase source ward
       else if(status == configuration.admissionstatus[3]){
+
+      }
+      //if status is equal to discharge, increase ward by one
+      if(status == configuration.admissionstatus[5]){
+        await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:1,vacantbed:1}});
 
       }
 

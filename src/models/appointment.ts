@@ -527,6 +527,7 @@ const appointmentSchema = new Schema({
     type: Date, 
     required: true
   },
+  additionalnote:String,
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",

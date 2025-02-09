@@ -347,7 +347,7 @@ export async function addencounter(req:any, res:any){
  if(!(isObjectAvailable(req.body.historyneuro))) req.body.historyneuro={};
  if(!(isObjectAvailable(req.body.historymsk))) req.body.historymsk={};
 
-  const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status} = req.body;
+  const {height,weight,temperature, bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,status,additionalnote} = req.body;
   const {assessment,assessmentnote,diagosis,diagosisnote,icpc2,icpc2note} = req.body;
   const { hair,hairnote,face,facenote,jaundice,jaundicenote,cyanosis,cyanosisnote,pallor,pallornote,oral,oralnote,lymphnodes,lymphnodesnote,ederma,edermanote,lastmenstrationperiod,lastmenstrationperiodnote,generalphysicalexamination} = req.body;
   const {currentlengthheight,currentlengthheightpercentage,currentlengthheightenote,currentweight,currentweightnote,percentageofweightexpected,headcircumference,anteriorfontanelle,posteriorfontanelle,chestcircumference,limbexamination,generalnote} = (req.body).paediatricsspecific;
@@ -412,10 +412,10 @@ export async function addencounter(req:any, res:any){
    //validateinputfaulsyvalue({...vitals});
   var queryresult
   if(height || weight ){
-queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
+queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
   }
   else{
-    queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status, doctor:user?._id});
+    queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
 
   }
   res.status(200).json({
