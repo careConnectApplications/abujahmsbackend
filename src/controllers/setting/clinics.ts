@@ -6,8 +6,8 @@ export var createclinics = async (req:any,res:any) =>{
    
     try{
      
-       const {clinic} = req.body;
-       validateinputfaulsyvalue({clinic});
+       const {clinic,type} = req.body;
+       validateinputfaulsyvalue({clinic,type});
        var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
         //validate that category is in the list of accepted category
         //get token from header

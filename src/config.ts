@@ -27,6 +27,7 @@ for(var i =0; i < servicetypedetail.length ; i++){
     return (
       {
         admissionstatus:["admited","totransfer","transfered","todischarge", "discharged"],
+        clinictype: ["department","clinic","pharmacy"],
         presentingcompalintcode:
         [
 "518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",

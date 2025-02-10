@@ -40,6 +40,12 @@ export var referadmission= async (req:any, res:any) =>{
       throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
   }
+  //check that patient have not been admitted
+  var  findAdmission = await readoneadmission({patient:appointment.patient, status:configuration.admissionstatus[5]},{},'');
+  if(!findAdmission){
+    throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+
+}
 //create admission
 var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:appointment.patient});
 //update patient 
