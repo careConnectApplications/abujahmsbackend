@@ -62,7 +62,7 @@ export async function updateclinics(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
-    const {clinic} = req.body;
+    const {clinic,type} = req.body;
     validateinputfaulsyvalue({clinic,id, type});
     var queryresult = await updateclinic(id, {clinic, type});
     res.status(200).json({
