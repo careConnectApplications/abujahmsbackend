@@ -13,7 +13,7 @@ router.put('/updateappointment/:id', updateappointments);
 //////////doctors end ///////////////////
 //getAllPaidSchedules
 router.get('/getallmedicalhistory/:clinic', getAllPaidSchedules);
-router.get('/singlepatientmedicalhistory/:id/:clinic', getAllPaidSchedulesByPatient);
+router.get('/singlepatientmedicalhistory/:id', getAllPaidSchedulesByPatient);
 router.get('/queue/:clinic', getAllPaidQueueSchedules);
 router.put('/examinepatient/:id', examinepatient);
 router.post('/laborder/:id', laborder);
@@ -24,7 +24,7 @@ router.get('/singlepatientvital/:id', getAllVtalsByPatient);
 router.get('/getallcompletedencounter/:id', getAllCompletedEncounter);
 router.get('/getallinprogressencounter/:id', getAllInProgressEncounter);
 router.get('/getallpreviousencounter/:id', getAllPreviousEncounter);
-//getAllPreviousEncounter
+
 
 
 

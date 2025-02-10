@@ -174,8 +174,8 @@ export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
   try {
    // const {clinic} = (req.user).user;
    
-    const {id,clinic} = req.params;
-    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},{},'patient','doctor','payment');
+    const {id} = req.params;
+    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}]},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
