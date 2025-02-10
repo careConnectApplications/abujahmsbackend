@@ -2,6 +2,7 @@ import { types } from "util";
 import configuration from "../../config";
 import  {readallclinics,createclinic,readoneclinic,updateclinic}  from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
+import clinic from "../../models/clinics";
 //add patiient
 export var createclinics = async (req:any,res:any) =>{
    
@@ -56,6 +57,25 @@ export async function getallclinic(req:Request, res:any){
     }
 
 }
+//get only clinics
+//read all patients
+export async function getonlyclinic(req:Request, res:any){
+  try{
+     
+      const queryresult = await readallclinics({type:configuration.clinictype[1]},'');
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
 
 //update a price
 export async function updateclinics(req:any, res:any){

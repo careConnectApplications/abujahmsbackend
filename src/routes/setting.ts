@@ -1,6 +1,6 @@
 import express from 'express';
 import {createprices,getallprices,updateprices,updatepricestatus} from '../controllers/setting/pricesetting';
-import {createclinics,getallclinic,updateclinics} from '../controllers/setting/clinics';
+import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
 const router = express.Router();
@@ -11,6 +11,8 @@ router.get('/getallprices',getallprices);
 
 router.post('/createclinics',createclinics);
 router.get('/getallclinic',getallclinic);
+router.get('/getonlyclinic',getonlyclinic);
+//getonlyclinic
 router.put('/updateclinics/:id', updateclinics);
 
 router.put('/updateprices/:id',updateprices);

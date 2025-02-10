@@ -5,6 +5,7 @@ const configuration = {
   defaultphonenumber:"1111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
+  clinictype: ["department","clinic","pharmacy"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration"],
 
