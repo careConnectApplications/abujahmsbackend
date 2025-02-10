@@ -114,9 +114,9 @@ export const getAllSchedulesByPatient = async (req:any, res:any) => {
 export const getAllPreviousEncounter = async (req:any, res:any) => {
   try {
     const {id} = req.params;
-    const {clinic} = (req.user).user;
-    console.log(clinic);
-    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],clinic,patient:id},{},'patient','doctor','payment');
+    //const {clinic} = (req.user).user;
+    //console.log(clinic);
+    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],patient:id},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -129,8 +129,8 @@ export const getAllPreviousEncounter = async (req:any, res:any) => {
 export const getAllCompletedEncounter = async (req:any, res:any) => {
   try {
     const {id} = req.params;
-    const {clinic} = (req.user).user;
-    const queryresult = await readallappointment({status:configuration.status[6],clinic,patient:id},{},'patient','doctor','payment');
+    //const {clinic} = (req.user).user;
+    const queryresult = await readallappointment({status:configuration.status[6],patient:id},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -142,9 +142,9 @@ export const getAllCompletedEncounter = async (req:any, res:any) => {
 //inprogress encounter
 export const getAllInProgressEncounter = async (req:any, res:any) => {
   try {
-    const {clinic} = (req.user).user;
+   // const {clinic} = (req.user).user;
     const {id} = req.params;
-    const queryresult = await readallappointment({status:configuration.status[9],clinic,patient:id},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({status:configuration.status[9],patient:id},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -157,7 +157,8 @@ export const getAllInProgressEncounter = async (req:any, res:any) => {
 //get all patient with paid schduled
 export const getAllPaidSchedules = async (req:any, res:any) => {
   try {
-    const {clinic} = (req.user).user;
+    //const {clinic} = (req.user).user;
+    const {clinic} = req.params
     const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
@@ -171,8 +172,9 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
 //get schedule by single patient
 export const getAllPaidSchedulesByPatient = async (req:any, res:any) => {
   try {
-    const {clinic} = (req.user).user;
-    const {id} = req.params;
+   // const {clinic} = (req.user).user;
+   
+    const {id,clinic} = req.params;
     const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
@@ -193,7 +195,8 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
    // Get the start of tomorrow to set the range for "today"
    const endOfDay = new Date(startOfDay);
    endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
-    const {clinic} = (req.user).user;
+    //const {clinic} = (req.user).user;
+    const {clinic} = req.params;
     const queryresult = await readallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
@@ -433,9 +436,9 @@ queryresult = await updateappointment(id, {$set:{'encounter.history':history,'en
 export const getAllVtalsByPatient = async (req:any, res:any) => {
   try {
     var selectquery ={'encounter.vitals':1};
-    const {clinic} = (req.user).user;
+    //const {clinic} = (req.user).user;
     const {id} = req.params;
-    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}],clinic},selectquery,'patient','doctor','payment');
+    const queryresult = await readallappointment({patient:id,$or:[{status:configuration.status[5]},{status:configuration.status[6]}]},selectquery,'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
