@@ -60,10 +60,11 @@ res.status(200).json({queryresult:admissionrecord, status: true});
   
   }
 // get all admission patient
-export async function getallreferedforadmission(req:Request, res:any){
+export async function getallreferedforadmission(req:any, res:any){
     try{
-       
-        const queryresult = await readalladmission({},{},'referedward','patient');
+       const {ward} = req.params;
+       const referedward = new ObjectId(ward);
+        const queryresult = await readalladmission({referedward},{},'referedward','patient');
         res.status(200).json({
             queryresult,
             status:true

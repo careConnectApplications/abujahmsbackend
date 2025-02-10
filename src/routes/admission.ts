@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.post('/referadmission/:id', referadmission);
-router.get('/getallreferedforadmission', getallreferedforadmission);
+router.get('/getallreferedforadmission/:ward', getallreferedforadmission);
 router.put('/updateadmissionstatus/:id', updateadmissionstatus);
 
 
