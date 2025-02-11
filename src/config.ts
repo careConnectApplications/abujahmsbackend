@@ -28,6 +28,8 @@ for(var i =0; i < servicetypedetail.length ; i++){
     return (
       {
         admissionstatus:["admited","totransfer","transfered","todischarge", "discharged"],
+        medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
+        medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube"],
         clinictype: ["department","clinic","pharmacy"],
         presentingcompalintcode:
         [

@@ -1,4 +1,4 @@
-import {readallvitalcharts, createvitalcharts} from "../../dao/vitalcharts";
+import {readallmedicationcharts, createmedicationcharts} from "../../dao/medication";
 import {readoneadmission} from "../../dao/admissions";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import  mongoose from 'mongoose';
@@ -7,10 +7,10 @@ import  {readone}  from "../../dao/users";
 import configuration from "../../config";
 
 // Get all lab records
-export const readallvitalchartByAdmission = async (req:any, res:any) => {
+export const readallmedicationchartByAdmission = async (req:any, res:any) => {
     try {
      const {admission} = req.params;
-      const queryresult = await readallvitalcharts({admission},{},'patient','admission');
+      const queryresult = await readallmedicationcharts({admission},{},'patient','admission');
       res.status(200).json({
         queryresult,
         status:true
@@ -20,12 +20,12 @@ export const readallvitalchartByAdmission = async (req:any, res:any) => {
     }
   };
   //get lab order by patient
-  export const readAllvitalsByPatient = async (req:any, res:any) => {
+  export const readAllmedicationByPatient = async (req:any, res:any) => {
     try {
       //const {clinic} = (req.user).user;
       const {patient} = req.params;
       //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-      const queryresult = await readallvitalcharts({patient},{},'patient','admission');
+      const queryresult = await readallmedicationcharts({patient},{},'patient','admission');
       res.status(200).json({
         queryresult,
         status:true
@@ -37,7 +37,7 @@ export const readallvitalchartByAdmission = async (req:any, res:any) => {
 
   //create vital charts
   // Create a new schedule
-export const createvitalchart = async (req:any, res:any) => {
+export const createmedicationchart = async (req:any, res:any) => {
     try {
         
        // admission,patient,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi,painscore,rbs,gcs,wardname,staffname,
@@ -46,17 +46,21 @@ export const createvitalchart = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
-      var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
-      validateinputfaulsyvalue({height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
-      var bmi = weight/((height/100) * (height/100));
+    
+   
+      
+        
+      var { drug,note,dose,frequency,route,staffname} = req.body;
+      validateinputfaulsyvalue({drug,note,dose,frequency,route,staffname});
+  
       
       const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
-      console.log(admissionrecord);   
+      //console.log(admissionrecord);   
       if(!admissionrecord){
            throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
   
        }
-    const queryresult=await createvitalcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
+    const queryresult=await createmedicationcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,drug,note,dose,frequency,route,staffname});
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
