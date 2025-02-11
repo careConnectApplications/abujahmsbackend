@@ -1,4 +1,4 @@
-import {readallvitalcharts, createvitalcharts} from "../../dao/vitalcharts";
+import {readallvitalcharts, createvitalcharts,updatevitalcharts} from "../../dao/vitalcharts";
 import {readoneadmission} from "../../dao/admissions";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import  mongoose from 'mongoose';
@@ -64,6 +64,29 @@ export const createvitalchart = async (req:any, res:any) => {
 
     }
 }
+//update vitalcharts
+export async function updatevitalchart(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    const { firstName,lastName} = (req.user).user;
+    req.body.staffname = `${firstName} ${lastName}`;
+    var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
+    validateinputfaulsyvalue({height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
+    var bmi = weight/((height/100) * (height/100));
+    var queryresult = await updatevitalcharts(id, {bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
+
   
       
   

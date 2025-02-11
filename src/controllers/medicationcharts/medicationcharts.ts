@@ -1,4 +1,4 @@
-import {readallmedicationcharts, createmedicationcharts} from "../../dao/medication";
+import {readallmedicationcharts, createmedicationcharts,updatemedicationcharts} from "../../dao/medicationcharts";
 import {readoneadmission} from "../../dao/admissions";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import  mongoose from 'mongoose';
@@ -52,7 +52,8 @@ export const createmedicationchart = async (req:any, res:any) => {
         
       var { drug,note,dose,frequency,route,staffname} = req.body;
       validateinputfaulsyvalue({drug,note,dose,frequency,route,staffname});
-  
+       //frequency must inlcude
+       //route must contain allowed options
       
       const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
       //console.log(admissionrecord);   
@@ -68,6 +69,32 @@ export const createmedicationchart = async (req:any, res:any) => {
 
     }
 }
+
+
+//update medical charts
+
+export async function updatemedicalchart(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    const { firstName,lastName} = (req.user).user;
+    req.body.staffname = `${firstName} ${lastName}`;
+    var { drug,note,dose,frequency,route,staffname} = req.body;
+    validateinputfaulsyvalue({drug,note,dose,frequency,route,staffname});
+    
+    var queryresult = await updatemedicationcharts(id, {drug,note,dose,frequency,route,staffname});
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
+
   
       
   
