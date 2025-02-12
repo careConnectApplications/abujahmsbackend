@@ -5,6 +5,7 @@ import {createmedicationchart,readAllmedicationByPatient,readallmedicationchartB
 import {createprogressreport,readAllprogressreportByPatient,readallprogressreportByAdmission,updateprogressreport} from '../controllers/progressreport/progressreport';
 import {createinsulin,readAllinsulinByPatient,readallinsulinByAdmission,updateinsulin} from '../controllers/insulin/insulin';
 import {createtubefeedingchart,readAlltubefeedingchartByPatient,readalltubefeedingchartByAdmission,updatetubefeedingchart} from '../controllers/tubefeedingchart/tubefeedingchart';
+import {createfluidbalance,readAllfluidbalanceByPatient,readallfluidbalanceByAdmission,updatefluidbalance} from '../controllers/fluidbalance/fluidbalance';
 const router = express.Router();
 
 router.post('/createvitalchart/:id', createvitalchart);
@@ -37,7 +38,11 @@ router.get('/readalltubefeedingchartbyadmission/:admission', readalltubefeedingc
 router.get('/readAlltubefeedingchartbypatient/:patient', readAlltubefeedingchartByPatient);
 router.put('/updatetubefeedingchart/:id', updatetubefeedingchart);
 
-
+//fluidbalance
+router.post('/createfluidbalance/:id', createfluidbalance);
+router.get('/readallfluidbalancebyadmission/:admission', readallfluidbalanceByAdmission);
+router.get('/readAllfluidbalancebypatient/:patient', readAllfluidbalanceByPatient);
+router.put('/updatefluidbalance/:id', updatefluidbalance);
 
 export default router;
 
