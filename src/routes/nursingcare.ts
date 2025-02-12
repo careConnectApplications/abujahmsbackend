@@ -4,6 +4,7 @@ import {createvitalchart,readAllvitalsByPatient,readallvitalchartByAdmission,upd
 import {createmedicationchart,readAllmedicationByPatient,readallmedicationchartByAdmission,updatemedicalchart} from '../controllers/medicationcharts/medicationcharts';
 import {createprogressreport,readAllprogressreportByPatient,readallprogressreportByAdmission,updateprogressreport} from '../controllers/progressreport/progressreport';
 import {createinsulin,readAllinsulinByPatient,readallinsulinByAdmission,updateinsulin} from '../controllers/insulin/insulin';
+import {createtubefeedingchart,readAlltubefeedingchartByPatient,readalltubefeedingchartByAdmission,updatetubefeedingchart} from '../controllers/tubefeedingchart/tubefeedingchart';
 const router = express.Router();
 
 router.post('/createvitalchart/:id', createvitalchart);
@@ -30,7 +31,11 @@ router.get('/readallinsulinByAdmission/:admission', readallinsulinByAdmission);
 router.get('/readAllinsulinByPatient/:patient', readAllinsulinByPatient);
 router.put('/updateinsulin/:id', updateinsulin);
 
-
+//tubefeedingchart
+router.post('/createtubefeedingchart/:id', createtubefeedingchart);
+router.get('/readalltubefeedingchartbyadmission/:admission', readalltubefeedingchartByAdmission);
+router.get('/readAlltubefeedingchartbypatient/:patient', readAlltubefeedingchartByPatient);
+router.put('/updatetubefeedingchart/:id', updatetubefeedingchart);
 
 
 
