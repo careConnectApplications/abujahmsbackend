@@ -16,7 +16,7 @@ const admissionSchema = new Schema({
     ref: "Wardmanagement",
     default: null,
   },
-  totransferedward:
+  previousward:
   {
     type: Schema.Types.ObjectId,
     ref: "Wardmanagement",
