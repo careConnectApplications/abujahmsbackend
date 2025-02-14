@@ -13,6 +13,7 @@ import lab from '../routes/lab';
 import pharmacy from '../routes/pharmacy';
 import admission from '../routes/admission';
 import nursingcare from '../routes/nursingcare';
+import immunization from '../routes/immunization';
 import {protect} from "../utils/middleware";
 
 function createServer(){
@@ -45,6 +46,8 @@ function createServer(){
   app.use('/api/v1/pharmacy',protect, pharmacy);
   app.use('/api/v1/admission',protect, admission);
   app.use('/api/v1/nursingcare',protect, nursingcare);
+  app.use('/api/v1/immunization',protect, immunization);
+
   // Handle POST requests to /webhook
   /*
 app.post('/api/v1/webhook', (req, res) => {

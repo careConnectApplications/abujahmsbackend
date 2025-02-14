@@ -31,6 +31,11 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        administrationroute:["Oral(PO)","Intravenous(IV)","intramuscular(IM)","Subcutaneous(SC or SQ)","Intradermal (ID)","Topical","Transdermal","Inhalation","Nasal","Rectal","Vaginal","Ophathalmic","Otic","Buccal","Sublingual","Intrathecal","Epidural","Intra-arterial","Intraosseous(IO)","intraperitoneal","Intracardiac","Intraocular","Intra-articular","Intravesical","Intrapleural","Intralymphatic","Intrauterine","Intracavernous","Urethral","Intrasynovial","Intralesional","Enteral(via feeding tube)","Intracerebral","Intracerebroventricular(ICV)","Percutaneous","Nasogastric","Nasoduodenal/Nasojejunal"],
+        vaccinetype:["Live-Attenuated","Inactivated","Subunit,Recombinant,Polysaccharide,and conjugate", "Toxoid","mRNA","Protein Subunit","DNA","Virus-Like Particle(VLP)","Whole-cell","Autogenous","Cancer"],
+        consent:["Full consent", "Partial consent","No consent","Emergency consent","Proxy or Substitute consent","Presumed","Research or Study consent","Assent and Dissent","Cultural or Community Consent"],
+        immunizationstatus:["Completed","Partially completed","Not Administered"],
+        reporter:["Patient reported","Provider reported","public health registry"],
         oralfluids:["Water","Beverages","Soups"],
         medication:["IV", "Oral"],
         drainage:["Chest Tubes", "Surgical Drains"],
