@@ -148,6 +148,13 @@ const patientSchema = new Schema(
           default: [],
         },
       ],
+      radiology: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Radiology",
+          default: [],
+        },
+      ],
       status:{
         required: true,
         type: String,

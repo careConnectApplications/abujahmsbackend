@@ -5,8 +5,12 @@ import { validateinputfaulsyvalue} from "../../utils/otherservices";
 export var createprices = async (req:any,res:any) =>{
    
     try{
-     
-       const {servicecategory,amount,servicetype,isHMOCover} = req.body;
+    
+       var {servicecategory,amount,servicetype,isHMOCover} = req.body;
+      if(!isHMOCover){
+        isHMOCover =configuration.ishmo[0];
+      }
+
        
         //validate that category is in the list of accepted category
         /*
@@ -21,13 +25,13 @@ export var createprices = async (req:any,res:any) =>{
         if(req.body.servicecategory == configuration.category[3]){
           req.body.servicetype=configuration.category[3]
         }
-        
+       
         //validation
         validateinputfaulsyvalue({servicecategory,amount,servicetype});
         const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        
-        console.log(foundPrice);
+       
         if(foundPrice){
             throw new Error(`service category and type ${configuration.error.erroralreadyexit}`);
 

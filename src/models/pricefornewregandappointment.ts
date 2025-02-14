@@ -26,7 +26,7 @@ const priceappointmentnewregistrationSchema = new Schema({
   },
   isHMOCover: {
     type: String,
-    default: "No",
+    default: configuration.ishmo[0],
   },
   category:
   {

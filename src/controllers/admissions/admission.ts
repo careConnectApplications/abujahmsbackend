@@ -1,5 +1,4 @@
 import  mongoose from 'mongoose';
-
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
 import {readoneappointment,} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
