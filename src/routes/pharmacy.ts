@@ -1,6 +1,6 @@
 import express from 'express';
 import {bulkuploadinventory,getallpharmacystock,createstock,updatestocks} from '../controllers/inventory/stock';
-import {pharmacyorder,readallpharmacytransaction,dispense} from '../controllers/pharmacy/pharmacy';
+import {pharmacyorder,readallpharmacytransaction,dispense,readallpharmacytransactionbypartient} from '../controllers/pharmacy/pharmacy';
 const router = express.Router();
 
 
@@ -16,6 +16,10 @@ router.put('/updatestocks/:id', updatestocks);
 router.post('/pharmacyorder/:id', pharmacyorder);
 router.get('/readallpharmacytransaction', readallpharmacytransaction);
 router.put('/dispense/:id', dispense);
+
+
+//readallpharmacytransactionbypartient
+router.get('/readallpharmacytransactionbypartient/:patient', readallpharmacytransactionbypartient);
 
 
 

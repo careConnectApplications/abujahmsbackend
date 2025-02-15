@@ -1,6 +1,7 @@
 import express from 'express';
 import {protect} from "../utils/middleware";
 import {createvitalchart,readAllvitalsByPatient,readallvitalchartByAdmission,updatevitalchart} from '../controllers/vitalcharts/vitalcharts';
+import {createbloodmonitorings,readAllbloodmonitoringByPatient,readallbloodmonitoringByAdmission,updatebloodmonitorings} from '../controllers/bloodmonitoring/bloodmonitoringchart';
 import {createmedicationchart,readAllmedicationByPatient,readallmedicationchartByAdmission,updatemedicalchart} from '../controllers/medicationcharts/medicationcharts';
 import {createprogressreport,readAllprogressreportByPatient,readallprogressreportByAdmission,updateprogressreport} from '../controllers/progressreport/progressreport';
 import {createinsulin,readAllinsulinByPatient,readallinsulinByAdmission,updateinsulin} from '../controllers/insulin/insulin';
@@ -43,6 +44,12 @@ router.post('/createfluidbalance/:id', createfluidbalance);
 router.get('/readallfluidbalancebyadmission/:admission', readallfluidbalanceByAdmission);
 router.get('/readAllfluidbalancebypatient/:patient', readAllfluidbalanceByPatient);
 router.put('/updatefluidbalance/:id', updatefluidbalance);
+
+//blood monntoring
+router.post('/createbloodmonitoring/:id', createbloodmonitorings);
+router.get('/readallbloodmonitoringbyadmission/:admission', readallbloodmonitoringByAdmission);
+router.get('/readallbloodmonitoringbypatient/:patient', readAllbloodmonitoringByPatient);
+router.put('/updatebloodmonitoring/:id', updatebloodmonitorings);
 
 export default router;
 

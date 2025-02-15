@@ -97,6 +97,20 @@ export var pharmacyorder= async (req:any, res:any) =>{
         res.status(403).json({ status: false, msg: error.message });
       }
     };
+ //get all pharmacy order
+ export const readallpharmacytransactionbypartient = async (req:any, res:any) => {
+  try {
+
+   const {patient} = req.params;
+    const queryresult = await readallprescription({patient},{},'patient','appointment','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
 
     //get all pharmacy order
   export const dispense = async (req:any, res:any) => {
