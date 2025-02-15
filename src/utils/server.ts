@@ -15,6 +15,7 @@ import admission from '../routes/admission';
 import nursingcare from '../routes/nursingcare';
 import immunization from '../routes/immunization';
 import radiology from '../routes/radiology';
+import pathogragh from '../routes/pathograph';
 import {protect} from "../utils/middleware";
 
 function createServer(){
@@ -48,6 +49,7 @@ function createServer(){
   app.use('/api/v1/admission',protect, admission);
   app.use('/api/v1/nursingcare',protect, nursingcare);
   app.use('/api/v1/immunization',protect, immunization);
+  app.use('/api/v1/pathogragh', protect,pathogragh)
   app.use('/api/v1/radiology',protect, radiology);
 
   // Handle POST requests to /webhook
