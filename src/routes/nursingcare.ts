@@ -7,6 +7,7 @@ import {createprogressreport,readAllprogressreportByPatient,readallprogressrepor
 import {createinsulin,readAllinsulinByPatient,readallinsulinByAdmission,updateinsulin} from '../controllers/insulin/insulin';
 import {createtubefeedingchart,readAlltubefeedingchartByPatient,readalltubefeedingchartByAdmission,updatetubefeedingchart} from '../controllers/tubefeedingchart/tubefeedingchart';
 import {createfluidbalance,readAllfluidbalanceByPatient,readallfluidbalanceByAdmission,updatefluidbalance} from '../controllers/fluidbalance/fluidbalance';
+import {readAllnursingcareplanByPatient,readallnursingcareByAdmission, updatenursingcareplans, createnursingcareplans} from '../controllers/nursingcareplan/nursingcareplan';
 const router = express.Router();
 
 router.post('/createvitalchart/:id', createvitalchart);
@@ -50,6 +51,15 @@ router.post('/createbloodmonitoring/:id', createbloodmonitorings);
 router.get('/readallbloodmonitoringbyadmission/:admission', readallbloodmonitoringByAdmission);
 router.get('/readallbloodmonitoringbypatient/:patient', readAllbloodmonitoringByPatient);
 router.put('/updatebloodmonitoring/:id', updatebloodmonitorings);
+
+//nursing care plan
+router.post('/createnursingcareplans/:id', createnursingcareplans);
+router.put('/updatenursingcareplans/:id', updatenursingcareplans);
+router.get('/readallnursingcareplanbypatient/:patient', readAllnursingcareplanByPatient);
+router.get('/readallnursingcarebyadmission/:admission', readallnursingcareByAdmission);
+
+
+
 
 export default router;
 

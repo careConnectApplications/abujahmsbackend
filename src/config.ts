@@ -32,6 +32,7 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        nursingdiagnosis: ["Acute Confusion","Acute Substance Withdrawal","Adult Pressure Injury","Anxiety","Autonomic Dysreflexia",""],
         familyplanningyesnooption: ["Yes","No"],
         typeoffamilyplanningclient: ["Post Abortion Care (PAC)","Post-Partum Family Planning(PPFP)","Routine"],
         nameofinjectable: ["Depo medroxyprogrsterone ","Noristerat(NOR)","Others"],
