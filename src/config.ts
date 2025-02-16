@@ -830,6 +830,7 @@ main:[
     errorfilelarge: "File should not be greater than 500kb",
     errorfileupload: "Error in uploading file",
     errorisrequired: "is required",
+    erroroption: "value selected is not part of the available options",
     errorservicecategory:"service category does not exist in the list of accepted categories",
     errornopriceset:"No Price has been set for this service",
     erroravailability:"Is out of stock",

@@ -75,6 +75,14 @@ export function generateRandomNumber(n:number) {
    }
  }      
  }
+ export function validateinputyesno(input:any){
+  for (const key in input) {
+ if (!(configuration.ishmo).includes(input[key])) {
+   throw new Error(`${key} ${configuration.error.erroroption}`);
+   
+ }
+}      
+}
  export function validateinputfornumber(input:any){
   for (const key in input) {
  if (isNaN(input[key])) {
