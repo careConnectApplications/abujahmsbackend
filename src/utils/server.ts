@@ -16,7 +16,9 @@ import nursingcare from '../routes/nursingcare';
 import immunization from '../routes/immunization';
 import radiology from '../routes/radiology';
 import pathogragh from '../routes/pathograph';
+import familyplanning from '../routes/familyplanning';
 import {protect} from "../utils/middleware";
+
 
 function createServer(){
     const app:Application=express();
@@ -51,6 +53,8 @@ function createServer(){
   app.use('/api/v1/immunization',protect, immunization);
   app.use('/api/v1/pathogragh', protect,pathogragh)
   app.use('/api/v1/radiology',protect, radiology);
+  app.use('/api/v1/familyplanning',protect, familyplanning);
+  //familyplanning
 
   // Handle POST requests to /webhook
   /*

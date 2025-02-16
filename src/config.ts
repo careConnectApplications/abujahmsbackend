@@ -32,6 +32,10 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        familyplanningyesnooption: ["Yes","No"],
+        typeoffamilyplanningclient: ["Post Abortion Care (PAC)","Post-Partum Family Planning(PPFP)","Routine"],
+        nameofinjectable: ["Depo medroxyprogrsterone ","Noristerat(NOR)","Others"],
+        typeofbarriermethods: ["Internal Condom","External Condom","Spermicide","Sponge","Diaphragm","Cervical Cap"],
         liquor:["0","+1","+2","+3"],
         moulding:["0","+1","+2","+3"],
         cervicaldilationb:["3.0","4.0","5.0","5.5","6.0","6.5","7.0","7.5","8.0","8.5","9.0","9.5","10.0"],

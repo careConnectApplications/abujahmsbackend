@@ -40,22 +40,3 @@ export default pathograph;
 
 
 
-
-
-
-/*
-selectdate
-temperature
-pulse
-bloodpressuresystolic
-bloodpressurediastolic
-respiratoryrate
-foetalheartrate
-liquor
-moulding
-cervicaldilationb
-descentofhead
-contraction
-doseofoxytocinadministered
-status
-*/
