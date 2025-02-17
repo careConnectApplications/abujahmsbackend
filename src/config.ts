@@ -32,6 +32,9 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        voluntorysterilization:["Male","Female"],
+        typeofiud:["Hormonal", "Copper"],
+        typeofimplants:["Implanon(IMP)","Jadelle(JD)","Others"],
         nursingdiagnosis: ["Acute Confusion","Acute Substance Withdrawal","Adult Pressure Injury","Anxiety","Autonomic Dysreflexia",""],
         familyplanningyesnooption: ["Yes","No"],
         typeoffamilyplanningclient: ["Post Abortion Care (PAC)","Post-Partum Family Planning(PPFP)","Routine"],
