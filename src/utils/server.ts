@@ -17,6 +17,8 @@ import immunization from '../routes/immunization';
 import radiology from '../routes/radiology';
 import pathogragh from '../routes/pathograph';
 import familyplanning from '../routes/familyplanning';
+import referrer from '../routes/referrer';
+
 import {protect} from "../utils/middleware";
 
 
@@ -54,6 +56,7 @@ function createServer(){
   app.use('/api/v1/pathogragh', protect,pathogragh)
   app.use('/api/v1/radiology',protect, radiology);
   app.use('/api/v1/familyplanning',protect, familyplanning);
+  app.use('/api/v1/referrer',protect, referrer);
   //familyplanning
 
   // Handle POST requests to /webhook

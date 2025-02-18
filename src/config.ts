@@ -7,7 +7,7 @@ const configuration = {
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
   defaultphonenumber:"1111111111",
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
   clinictype: ["department","clinic","pharmacy","radiology"],
   defaultPassword: "HMSB",
@@ -32,6 +32,9 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        priority:["Urgent", "Routine","Non-Urgent"],
+        presentingcomplaints:["Ankle/Foot Symptom Or C/O Lower Limb Symptom","Anosmia","Black Faeces Or C/O Melaena","A Back Symptom","A Head Symptom"],
+        diagnosis:["A04.9 Bacterial intestinal infection, unspecified","A05 Other bacterial foodborne intoxications, not elsewhere classified","A05.1 Botulism food poisoning"],
         voluntorysterilization:["Male","Female"],
         typeofiud:["Hormonal", "Copper"],
         typeofimplants:["Implanon(IMP)","Jadelle(JD)","Others"],
@@ -843,7 +846,9 @@ main:[
     errornotfound:"not found",
     errortasknotpending:"Task not pending on you",
     errorpayment:"This service has not been paid for",
-    errorgreaterthan:"Cannot be greater"
+    errorreferrer: "You are not the preferred consultant for this referrer",
+    errorgreaterthan:"Cannot be greater",
+    errorservicetray: "This service no more exist in your service tray"
 
   },
     environment: "test",
