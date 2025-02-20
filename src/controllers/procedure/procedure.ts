@@ -43,6 +43,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       
       //search testname in setting
       console.log(servicetypedetails);
+      
       var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
       
       if(!testsetting || testsetting.length < 1){

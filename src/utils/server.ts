@@ -19,6 +19,7 @@ import pathogragh from '../routes/pathograph';
 import familyplanning from '../routes/familyplanning';
 import referrer from '../routes/referrer';
 import deliverynote from '../routes/deliverynote';
+import procedure from '../routes/procedure';
 
 import {protect} from "../utils/middleware";
 
@@ -59,8 +60,8 @@ function createServer(){
   app.use('/api/v1/familyplanning',protect, familyplanning);
   app.use('/api/v1/referrer',protect, referrer);
   app.use('/api/v1/deliverynote', protect, deliverynote);
-
-  //familyplanning
+  app.use('/api/v1/procedure', protect, procedure);
+  
 
   // Handle POST requests to /webhook
   /*

@@ -14,7 +14,7 @@ const procedureSchema = new Schema({
     required: true
   },
     indicationdiagnosisprocedure:String,
-    procedure:[],
+    procedure: String,
     appointmentdate:String,
     cptcodes:[],
     dxcodes:[],
