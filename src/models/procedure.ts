@@ -8,6 +8,11 @@ export interface labinterface {
 }
 const procedureSchema = new Schema({
     clinic:String,
+    procedureid:
+  {
+    type: String, 
+    required: true
+  },
     indicationdiagnosisprocedure:String,
     procedure:[],
     appointmentdate:String,
@@ -18,6 +23,7 @@ const procedureSchema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
+  procedureresult:[],
   raiseby: {
     type: String,
    
@@ -34,7 +40,7 @@ const procedureSchema = new Schema({
   status:{
     required: true,
     type: String,
-    default: configuration.status[2],
+    default: configuration.status[9],
 
   }
 },

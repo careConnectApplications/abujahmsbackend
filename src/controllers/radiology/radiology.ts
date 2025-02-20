@@ -14,6 +14,7 @@ import configuration from "../../config";
 //lab order
 export var radiologyorder= async (req:any, res:any) =>{
     try{
+      console.log('reqbody', req.body);
       //accept _id from request
       const {id} = req.params;
       const {testname,note} = req.body;
@@ -32,8 +33,10 @@ export var radiologyorder= async (req:any, res:any) =>{
       }
            
   const {servicetypedetails} = await readallservicetype({category: configuration.category[4]},{type:1,category:1,department:1,_id:0});
-      //loop through all test and create record in lab order
+  console.log("servicetypedata", servicetypedetails);    
+  //loop through all test and create record in lab order
       for(var i =0; i < testname.length; i++){
+        console.log('testname',testname[i]);
     //search for price of test name
         var testPrice:any = await readoneprice({servicetype:testname[i]});
         if(!testPrice){
@@ -128,6 +131,8 @@ export var radiologyorder= async (req:any, res:any) =>{
     //upload patients photo
   export var uploadradiologyresult = async (req:any, res:any)=>{
     try{
+      const { firstName,lastName} = (req.user).user;
+      const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
         const fileName = file.name;
         const filename= "radiology" + uuidv4();
@@ -140,7 +145,7 @@ export var radiologyorder= async (req:any, res:any) =>{
         const {id} = req.params;
       
         //update pix name in patient
-        const queryresult =await updateradiology(id,{$push:{testresult:renamedurl}, status:configuration.status[7]});
+        const queryresult =await updateradiology(id,{$push:{testresult:renamedurl}, status:configuration.status[7],processby});
         res.json({
             queryresult,
             status:true
