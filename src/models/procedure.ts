@@ -6,31 +6,13 @@ export interface labinterface {
   patient:any,
 
 }
-const radiologySchema = new Schema({
-  processeddate:{
-    type: Date
-
-  },
-  note:
-  {
-    type: String
-  },
-  testname:
-  {
-    type: String, 
-    required: true
-  },
-  testid:
-  {
-    type: String, 
-    required: true
-  },
-  department:
-  {
-    type: String, 
-    required: true
-  },
-  testresult:[],
+const procedureSchema = new Schema({
+    clinic:String,
+    indicationdiagnosisprocedure:String,
+    procedure:[],
+    appointmentdate:String,
+    cptcodes:[],
+    dxcodes:[],
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
@@ -52,14 +34,25 @@ const radiologySchema = new Schema({
   status:{
     required: true,
     type: String,
-    default: configuration.status[9],
+    default: configuration.status[2],
 
   }
 },
 { timestamps: true }
 );
 
-const radiology = model('Radiology', radiologySchema);
-export default radiology;
+const procedure = model('Procedure', procedureSchema);
+export default procedure;
 
 
+
+/*
+
+clinic
+indicationdiagnosisprocedure
+procedure:[]
+appointmentdate
+cptcodes:[]
+dxcodes:[]
+
+*/

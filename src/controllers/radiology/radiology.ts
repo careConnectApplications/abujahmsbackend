@@ -105,7 +105,7 @@ export var radiologyorder= async (req:any, res:any) =>{
  
         //check that the status is not complete
     var myradiologystatus:any = await readoneradiology({_id:id},{},'');
-    if(myradiologystatus.status !== configuration.status[2]){
+    if(myradiologystatus.status !== configuration.status[9]){
         throw new Error(`${configuration.error.errortasknotpending} `);
     }
 
@@ -140,7 +140,7 @@ export var radiologyorder= async (req:any, res:any) =>{
         const {id} = req.params;
       
         //update pix name in patient
-        const queryresult =await updateradiology(id,{$push:{testresult:renamedurl}});
+        const queryresult =await updateradiology(id,{$push:{testresult:renamedurl}, status:configuration.status[7]});
         res.json({
             queryresult,
             status:true
