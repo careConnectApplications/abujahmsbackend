@@ -13,6 +13,7 @@ const procedureSchema = new Schema({
     type: String, 
     required: true
   },
+  procedureoutcome:String,
     indicationdiagnosisprocedure:String,
     procedure: String,
     appointmentdate:String,

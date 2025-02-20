@@ -133,6 +133,8 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
         const { firstName,lastName} = (req.user).user;
         const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
+        const {procedureoutcome} = req.body;
+        //procedureoutcome
         const fileName = file.name;
         const filename= "procedure" + uuidv4();
         let allowedextension = ['.jpg','.png','.jpeg','.pdf'];
@@ -144,7 +146,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
         const {id} = req.params;
       
         //update pix name in patient
-        const queryresult =await updateprocedure(id,{$push:{procedureresult:renamedurl}, status:configuration.status[7],processby});
+        const queryresult =await updateprocedure(id,{$push:{procedureresult:renamedurl}, status:configuration.status[7],processby,procedureoutcome});
         res.json({
             queryresult,
             status:true
