@@ -62,10 +62,10 @@ export async function updatereferrers(req:any, res:any){
     const {id} = req.params;
     const { firstName,lastName} = (req.user).user;
     req.body.referredby = `${firstName} ${lastName}`;
-    var { diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby} = req.body;
-    validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
+    var { diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby} = req.body;
+    validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
     preferredconsultant = new ObjectId(preferredconsultant);
-    var queryresult = await updatereferrer(id, {diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
+    var queryresult = await updatereferrer(id, {diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
     res.status(200).json({
         queryresult,
         status:true
@@ -141,7 +141,7 @@ export const scheduleappointment = async (req:any, res:any) => {
       
       //req.body.appointmentdate=new Date(req.body.appointmentdate);
       var appointmentid:any=String(Date.now());
-      const {patient,referredclinic} =searchrecord;
+      const {patient,receivingclinic} =searchrecord;
       //const {id} = req.params;
       var { reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
       validateinputfaulsyvalue({ reason, appointmentdate, appointmentcategory, appointmenttype,patient});
@@ -155,7 +155,7 @@ export const scheduleappointment = async (req:any, res:any) => {
   
   const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
   
-  const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient,clinic:referredclinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+  const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient,clinic:receivingclinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
   console.log(queryresult);    
   //update patient
   await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});

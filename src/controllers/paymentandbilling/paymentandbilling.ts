@@ -99,6 +99,7 @@ export async function confirmpayment(req:any, res:any){
       
       //for appointment
       else if(paymentcategory == configuration.category[0]){
+        //schedule the patient
         //payment
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 

@@ -9,9 +9,9 @@ const configuration = {
   defaultphonenumber:"1111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
-  clinictype: ["department","clinic","pharmacy","radiology"],
+  clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology"],
+  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],
   ishmo:["No","Yes"],
 
   settings: async function(){
