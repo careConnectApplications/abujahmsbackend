@@ -2,8 +2,6 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
-  cptcodes:["Anesthesia for Procedure ans Services on the head","Anesthesia for Procedure ans Services on the neck"],
-  dxcodes:["other amebic genitourinary infections","Other amebic infections"],
   medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
@@ -33,6 +31,8 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        cptcodes:["Anesthesia for Procedure ans Services on the head","Anesthesia for Procedure ans Services on the neck"],
+        dxcodes:["other amebic genitourinary infections","Other amebic infections"],
         priority:["Urgent", "Routine","Non-Urgent"],
         presentingcomplaints:["Ankle/Foot Symptom Or C/O Lower Limb Symptom","Anosmia","Black Faeces Or C/O Melaena","A Back Symptom","A Head Symptom"],
         diagnosis:["A04.9 Bacterial intestinal infection, unspecified","A05 Other bacterial foodborne intoxications, not elsewhere classified","A05.1 Botulism food poisoning"],
@@ -65,7 +65,7 @@ for(var i =0; i < servicetypedetail.length ; i++){
         medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
         medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
         "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
-        clinictype: ["department","clinic","pharmacy","radiology"],
+        clinictype: ["department","clinic","pharmacy","radiology","procedure"],
         presentingcompalintcode:
         [
 "518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",
