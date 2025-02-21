@@ -764,11 +764,24 @@ main:[
   ],
 
   roles:[
-    {role: "Doctor", roleId:"1"},
+    {role: "Medical Director", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
-    {role: "Receptionist", roleId:3},
-    {role: "Nurse", roleId:"4"},
+    {role: "HOD Cashier", roleId:3},
+    {role: "General Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
+    {role: "Medical Doctor", roleId:"6"},
+    {role: "Nurse/Midwife", roleId:"7"},
+    {role: "Theatre Nurse", roleId:"8"},
+    {role: "Radiologist", roleId:"9"},
+    {role: "Lab technician", roleId:"10"},
+    {role: "Pharmacy Technician", roleId:"11"},
+    {role: "Accountant", roleId:"12"},
+    {role: "Record Officers", roleId:"13"},
+    {role: "HOD Records", roleId:"14"},
+    {role: "Dental Technician", roleId:"15"},
+    {role: "Dental Therapist", roleId:"16"},
+    {role: "ENT Nurse", roleId:"17"},
+    {role: "Physiotheraphy", roleId:"18"}
   ],
   clinics: clinicdetails,
   /*
