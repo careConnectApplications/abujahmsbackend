@@ -5,7 +5,7 @@ const configuration = {
   medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
-  defaultphonenumber:"1111111111",
+  defaultphonenumber:"00000000000",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
@@ -781,7 +781,8 @@ main:[
     {role: "Dental Technician", roleId:"15"},
     {role: "Dental Therapist", roleId:"16"},
     {role: "ENT Nurse", roleId:"17"},
-    {role: "Physiotheraphy", roleId:"18"}
+    {role: "Physiotheraphy", roleId:"18"},
+    {role: "Admin", roleId:"19"}
   ],
   clinics: clinicdetails,
   /*
@@ -834,6 +835,7 @@ main:[
   useruploaddirectory:"uploads",
   userdownloadsdirectory:"downloads",
   error:{
+    errorelevendigit:"Phone must be 11 digit",
     erroruserread: "Error in reading user",
     errorusercreate: "Error in creating user",
     errordownload:"Error downloading the file",

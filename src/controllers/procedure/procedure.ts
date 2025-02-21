@@ -86,6 +86,20 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
         res.status(403).json({ status: false, msg: error.message });
       }
     };
+    //get lab order by clinic
+    export const readAllprocedureByClinic = async (req:any, res:any) => {
+      try {
+     
+        const {clinic} = req.params;
+        const queryresult = await readallprocedure({clinic},{},'patient','payment');
+        res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+      } catch (error:any) {
+        res.status(403).json({ status: false, msg: error.message });
+      }
+    };
 
     //update radiology
     export async function updateprocedures(req:any, res:any){

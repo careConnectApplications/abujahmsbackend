@@ -12,14 +12,25 @@ export var createpatients = async (req:any,res:any) =>{
    
     try{
         var appointmentid:any=String(Date.now());
+        if(!(req.body.isHMOCover)){
+          req.body.isHMOCover = configuration.ishmo[0]
+
+        }
         //get token from header and extract clinic
-        const {dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype} = req.body;
-        //var birthdate = moment(dateOfBirth);
-        //var currentDate = moment();
+        var {dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+        //check for 11 digit
+        if(phoneNumber.length !== 11){
+          throw new Error(configuration.error.errorelevendigit);
+
+        }
+
+       
         if(dateOfBirth) req.body.age= moment().diff(moment(dateOfBirth), 'years');
+        //if not dateObirth but age calculate date of birth
+        if(!dateOfBirth && req.body.age ) req.body.dateOfBirth = moment().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
         console.log(req.body);
         //validation
-        validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype});
+        validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype});
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
         const foundUser:any =  await readonepatient({phoneNumber},selectquery,'','');
@@ -31,27 +42,28 @@ export var createpatients = async (req:any,res:any) =>{
         //var settings =await configuration.settings();
         //validate if price is set for patient registration
         //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
-        var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
-        console.log('appointmentprice', appointmentPrice);
-        var newRegistrationPrice = await readoneprice({servicecategory:configuration.category[3]});
-        console.log('newRegistrationPrice', newRegistrationPrice);
-        if(!newRegistrationPrice || !appointmentPrice){
+       // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
+        //console.log('appointmentprice', appointmentPrice);
+      
+
+        var newRegistrationPrice = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
+        if(!newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
       }
-       
-        req.body.MRN=`${generateRandomNumber(4)}-${req.body.phoneNumber}`;        
+       // chaorten the MRN to alphanumeric 
+        req.body.MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;        
         req.body.password=configuration.defaultPassword;
         //other validations
         var payment=[];
          const createpatientqueryresult=await createpatient(req.body);
          //create payment
          const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
-         const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
+        // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
          payment.push(createpaymentqueryresult._id);
-         payment.push(createappointmentpaymentqueryresult._id);
+         //payment.push(createappointmentpaymentqueryresult._id);
          //update createpatientquery
-         const queryappointmentresult = await createappointment({appointmentid,payment:createappointmentpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+         const queryappointmentresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
         res.status(200).json({queryresult, status: true});
     }catch(error:any){
