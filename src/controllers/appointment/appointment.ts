@@ -316,6 +316,7 @@ export var examinepatient = async (req:any,res:any) =>{
 //lab order
 export var laborder= async (req:any, res:any) =>{
   try{
+    console.log(id);
     //accept _id from request
     const {id} = req.params;
     const {testname} = req.body;
