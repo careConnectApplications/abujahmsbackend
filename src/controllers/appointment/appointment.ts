@@ -5,11 +5,14 @@ import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
+import  mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
 import {createlab} from "../../dao/lab";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber,isObjectAvailable } from "../../utils/otherservices";
 import configuration from "../../config";
 import { Aggregate } from "mongoose";
+const { ObjectId } = mongoose.Types;
+
 
 
 
@@ -317,9 +320,8 @@ export var examinepatient = async (req:any,res:any) =>{
 export var laborder= async (req:any, res:any) =>{
   try{
     
-    //accept _id from request
+    //accept _id from request.
     const {id} = req.params;
-    console.log(id);
     const {testname} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
@@ -328,11 +330,15 @@ export var laborder= async (req:any, res:any) =>{
     //find the record in appointment and validate
     //find patient
     const foundPatient:any =  await readonepatient({_id:id},{},'','');
+    
+
+// Create a new ObjectId
     var appointment:any;
     if(foundPatient){
       appointment={
         patient:id,
-        appointmentid:"noneappoinment"
+        appointmentid:String(Date.now()),
+        _id:new ObjectId()
       }
 
     }
