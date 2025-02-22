@@ -17,7 +17,7 @@ export var createpatients = async (req:any,res:any) =>{
 
         }
         //get token from header and extract clinic
-        var {dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+        var {policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
         //check for 11 digit
         if(phoneNumber.length !== 11){
           throw new Error(configuration.error.errorelevendigit);
@@ -64,7 +64,7 @@ export var createpatients = async (req:any,res:any) =>{
          //payment.push(createappointmentpaymentqueryresult._id);
          //update createpatientquery
 
-         const queryappointmentresult = await createappointment({status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
+         const queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
         res.status(200).json({queryresult, status: true});
     }catch(error:any){

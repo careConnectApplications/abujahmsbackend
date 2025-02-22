@@ -571,10 +571,17 @@ const appointmentSchema = new Schema({
     type: String,
     required: true
   },
+  policecase: Boolean,
+  physicalassault:Boolean,
+  sexualassault: Boolean,
+  policaename: String,
+  servicenumber: String,
+  policephonenumber: String,
+  division:String,
   status:{
     required: true,
     type: String,
-    default: configuration.status[2],
+    default: configuration.status[5],
 
   }
 });

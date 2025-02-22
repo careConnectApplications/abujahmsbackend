@@ -19,8 +19,9 @@ export const scheduleappointment = async (req:any, res:any) => {
     //req.body.appointmentdate=new Date(req.body.appointmentdate);
     var appointmentid:any=String(Date.now());
     //const {id} = req.params;
-    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
-    validateinputfaulsyvalue({clinic, reason, appointmentdate, appointmentcategory, appointmenttype,patient});
+    
+    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division } = req.body;
+    validateinputfaulsyvalue({clinic,  appointmentdate, appointmentcategory, appointmenttype,patient});
     //pending
 
      //validation
@@ -37,7 +38,7 @@ export const scheduleappointment = async (req:any, res:any) => {
      }
 
     //search for price if available
-    var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
+    var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype, isHMOCover:patientrecord.isHMOCover});
     
     if(!appointmentPrice){
       throw new Error(configuration.error.errornopriceset);
@@ -48,8 +49,8 @@ export const scheduleappointment = async (req:any, res:any) => {
 //create payment
 
 const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
-
-const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+//cater for phamarcy, lab ,radiology and procedure
+const queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
 console.log(queryresult);    
 //update patient
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
