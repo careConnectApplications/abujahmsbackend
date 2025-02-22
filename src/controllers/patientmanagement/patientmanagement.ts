@@ -45,7 +45,7 @@ export var createpatients = async (req:any,res:any) =>{
        // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
         //console.log('appointmentprice', appointmentPrice);
       
-
+      
         var newRegistrationPrice = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
         if(!newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
@@ -63,7 +63,8 @@ export var createpatients = async (req:any,res:any) =>{
          payment.push(createpaymentqueryresult._id);
          //payment.push(createappointmentpaymentqueryresult._id);
          //update createpatientquery
-         const queryappointmentresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
+
+         const queryappointmentresult = await createappointment({status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
         res.status(200).json({queryresult, status: true});
     }catch(error:any){
