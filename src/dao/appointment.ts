@@ -57,14 +57,19 @@ catch(err:any){
   
   //update  appointment by id
   export async function updateappointment(id:any, reqbody:any){
+    console.log(reqbody);
+    console.log(id);
     try{
     const appointment = await Appointment.findOneAndUpdate({ _id: id }, reqbody,{
       new: true
     });
+    
+    
       if (!appointment) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);
       }
+        
       return appointment;
     }catch(err){
       console.log(err);
