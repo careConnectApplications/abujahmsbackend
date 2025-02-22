@@ -52,6 +52,9 @@ export var signup = async (req:any,res:any) =>{
     try{
         //get token from header
         const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = req.body;
+        //get role id
+        var roleId = (configuration.roles).filter((e) => e.role == role )[0].roleId;
+        req.body.roleId = roleId;
         validateinputfaulsyvalue({email,firstName,staffId,lastName,gender,role,clinic});
         const foundUser =  await readone({$or:[{email},{phoneNumber}]});
         if(foundUser){

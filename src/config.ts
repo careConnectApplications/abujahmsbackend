@@ -2,6 +2,27 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
+  roles:[
+    {role: "Medical Director", roleId:"1"},
+    {role: "Pharmacist", roleId:"2"},
+    {role: "HOD Cashier", roleId:3},
+    {role: "General Nurse", roleId:"4"},
+    {role: "Cashier", roleId:"5"},
+    {role: "Medical Doctor", roleId:"6"},
+    {role: "Nurse/Midwife", roleId:"7"},
+    {role: "Theatre Nurse", roleId:"8"},
+    {role: "Radiologist", roleId:"9"},
+    {role: "Lab technician", roleId:"10"},
+    {role: "Pharmacy Technician", roleId:"11"},
+    {role: "Accountant", roleId:"12"},
+    {role: "Record Officers", roleId:"13"},
+    {role: "HOD Records", roleId:"14"},
+    {role: "Dental Technician", roleId:"15"},
+    {role: "Dental Therapist", roleId:"16"},
+    {role: "ENT Nurse", roleId:"17"},
+    {role: "Physiotheraphy", roleId:"18"},
+    {role: "Admin", roleId:"19"}
+  ],
   medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],

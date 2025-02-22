@@ -30,8 +30,8 @@ export var isValidPassword = async function(newPassword:any, currentpassword:any
   }
 
   export var sendTokenResponse= (user:any) =>{
-    const {firstName, lastName, role, staffId,email,clinic,_id} =user;
-    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic,_id}},process.env.KEYGEN as string,{expiresIn:"1d"});
+    const {firstName, lastName, role, staffId,email,clinic,_id,roleId} =user;
+    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic,_id,roleId}},process.env.KEYGEN as string,{expiresIn:"1d"});
    
     const options ={
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
