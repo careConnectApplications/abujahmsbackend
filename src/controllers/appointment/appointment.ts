@@ -165,10 +165,10 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
     let aggregatequery = 
     [ {
       $lookup: {
-        from: 'payments',        // The name of the "profiles" collection
-        localField: 'payment',    // The field in the "users" collection that holds the profile ObjectId
-        foreignField: '_id',      // The field in the "profiles" collection that holds the profile _id
-        as: 'payment'      // Alias for the populated data
+        from: 'payments',       
+        localField: 'payment',    
+        foreignField: '_id',     
+        as: 'payment'     
       }
     },
     {
@@ -239,7 +239,47 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
    endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
     //const {clinic} = (req.user).user;
     const {clinic} = req.params;
-    const queryresult = await readallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},{},'patient','doctor','payment');
+
+    let aggregatequery = 
+    [ {
+      $lookup: {
+        from: 'payments',       
+        localField: 'payment',    
+        foreignField: '_id',     
+        as: 'payment'     
+      }
+    },
+    {
+      $lookup: {
+        from: 'patientsmanagements',        
+        localField: 'patient',    
+        foreignField: '_id',      
+        as: 'patient'      
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',        
+        localField: 'doctor',    
+        foreignField: '_id',      
+        as: 'doctor'     
+      }
+    },
+    {
+      $unwind: '$payment'  // Deconstruct the payment array (from the lookup)
+    },
+    {
+      $unwind: '$patient'  // Deconstruct the patient array (from the lookup)
+    },
+   
+    {
+      $match: { 'payment.status': configuration.status[3], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+    }
+  ]; 
+    const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
+   
+
+    //const queryresult = await readallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
