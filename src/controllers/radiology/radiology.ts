@@ -14,7 +14,7 @@ import configuration from "../../config";
 //lab order
 export var radiologyorder= async (req:any, res:any) =>{
     try{
-      console.log('reqbody', req.body);
+      
       //accept _id from request
       const {id} = req.params;
       const {testname,note} = req.body;
@@ -79,6 +79,18 @@ export var radiologyorder= async (req:any, res:any) =>{
      
         const {id} = req.params;
         const queryresult = await readallradiology({patient:id},{},'patient','payment');
+        res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+      } catch (error:any) {
+        res.status(403).json({ status: false, msg: error.message });
+      }
+    };
+     //get lab order 
+     export const readAllRadiology = async (req:any, res:any) => {
+      try {
+        const queryresult = await readallradiology({},{},'patient','payment');
         res.status(200).json({
           queryresult,
           status:true
