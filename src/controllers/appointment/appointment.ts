@@ -1,4 +1,5 @@
 import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment} from "../../dao/appointment";
+import {readoneadmission} from "../../dao/admissions";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
@@ -496,13 +497,28 @@ export async function addencounter(req:any, res:any){
    const historymsk ={historyofmusculoskeletaldisorders,historyofsurgicalproceduresofmsksystem,historymskremarks};
    const history={cvs:historycvs,resp:historyresp,gi:historygi,gu:historygu,neuro:historyneuro,msk:historymsk,presentingcomplaints,presentingcompalintcode,pastmedicalhistory,drugandallergyhistory,familyandsocialhistory,nutritionhistory,spirituality};
    //validateinputfaulsyvalue({...vitals});
-  var queryresult
+  var queryresult;
+  
+  //find id 
+  var checkadimmison = await readoneadmission({_id:id},{},'');
+  
+  //if not found create 
+  //else update
   if(height || weight ){
-queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
-  }
+      if(checkadimmison){
+        queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient});
+      }else{
+      queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
+      }  
+}
   else{
-    queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
-
+      if(checkadimmison){
+         queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient});
+      }
+      else{
+          queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
+      }
+  
   }
   res.status(200).json({
       queryresult,

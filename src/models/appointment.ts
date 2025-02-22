@@ -533,6 +533,12 @@ const appointmentSchema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
+  admission: 
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Admission",
+    default: null,
+  },
   doctor: {
     type: Schema.Types.ObjectId,
     ref: "Users",
@@ -541,7 +547,7 @@ const appointmentSchema = new Schema({
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
     encounter:{ 
       vitals: vitalsSchema,
