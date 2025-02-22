@@ -1,4 +1,4 @@
-import {createappointment,readallappointment,updateappointment,readoneappointment} from "../../dao/appointment";
+import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment} from "../../dao/appointment";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
@@ -8,6 +8,7 @@ import {createpayment} from "../../dao/payment";
 import {createlab} from "../../dao/lab";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber,isObjectAvailable } from "../../utils/otherservices";
 import configuration from "../../config";
+import { Aggregate } from "mongoose";
 
 
 
@@ -161,7 +162,45 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
     const {clinic} = req.params
     //
     // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
-    const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
+    let aggregatequery = 
+    [ {
+      $lookup: {
+        from: 'payments',        // The name of the "profiles" collection
+        localField: 'payment',    // The field in the "users" collection that holds the profile ObjectId
+        foreignField: '_id',      // The field in the "profiles" collection that holds the profile _id
+        as: 'payment'      // Alias for the populated data
+      }
+    },
+    {
+      $lookup: {
+        from: 'patientsmanagements',        
+        localField: 'patient',    
+        foreignField: '_id',      
+        as: 'patient'      
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',        
+        localField: 'doctor',    
+        foreignField: '_id',      
+        as: 'doctor'     
+      }
+    },
+    {
+      $unwind: '$payment'  // Deconstruct the payment array (from the lookup)
+    },
+    {
+      $unwind: '$patient'  // Deconstruct the patient array (from the lookup)
+    },
+   
+    {
+      $match: { 'payment.status': configuration.status[3] }  // Filter payment
+    }
+  ]; 
+    const queryresult = await modifiedreadallappointment({clinic},aggregatequery);
+    
+    //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
     //'payment.status':configuration.status[3]
     res.status(200).json({
       queryresult,

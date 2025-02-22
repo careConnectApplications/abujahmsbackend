@@ -2,7 +2,22 @@ import Appointment from "../models/appointment";
 import {appointinterface} from '../models/appointment'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
+export async function modifiedreadallappointment(query:any, aggregatequery:any){
 
+try{
+ var appointmentdetails = await Appointment.aggregate(aggregatequery);
+const totalappointmentdetails = await Appointment.find(query).countDocuments();
+return { appointmentdetails, totalappointmentdetails };
+
+}
+catch(err:any){
+  console.log(err);
+      throw new Error(configuration.error.erroruserread);
+
+}
+
+
+}
   //read all patient history
   export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
