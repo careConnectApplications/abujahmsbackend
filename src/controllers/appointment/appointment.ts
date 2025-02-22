@@ -195,7 +195,7 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
     },
    
     {
-      $match: { 'payment.status': configuration.status[3] }  // Filter payment
+      $match: { 'payment.status': configuration.status[3], clinic }  // Filter payment
     }
   ]; 
     const queryresult = await modifiedreadallappointment({clinic},aggregatequery);
