@@ -1,6 +1,7 @@
 import {readallvitalcharts, createvitalcharts,updatevitalcharts} from "../../dao/vitalcharts";
 import {readoneadmission} from "../../dao/admissions";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
+import  {readonepatient}  from "../../dao/patientmanagement";
 import  mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 import  {readone}  from "../../dao/users";
@@ -50,13 +51,25 @@ export const createvitalchart = async (req:any, res:any) => {
       var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
       validateinputfaulsyvalue({height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
       var bmi = weight/((height/100) * (height/100));
-      
-      const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
-      console.log(admissionrecord);   
+      const foundPatient:any =  await readonepatient({_id:id},{},'','');
+      var admissionrecord:any;
+    if(foundPatient){
+      admissionrecord={
+        patient:id,
+        referedward:new ObjectId(),
+        _id:new ObjectId(),
+        
+      }
+    }
+      else{
+        admissionrecord =  await readoneadmission({_id:id},{},'');    
       if(!admissionrecord){
            throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
   
        }
+
+      }
+      
     const queryresult=await createvitalcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
     res.status(200).json({queryresult, status: true});
     }
