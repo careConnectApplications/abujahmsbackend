@@ -3,7 +3,7 @@ import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readallservicetype}  from "../../dao/servicetype";
 import {createradiology, readallradiology,updateradiology,readoneradiology} from "../../dao/radiology";
 import {readoneprice} from "../../dao/price";
-import {createpayment,updatepayment} from "../../dao/payment";
+import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 
@@ -144,6 +144,16 @@ export var radiologyorder= async (req:any, res:any) =>{
   export var uploadradiologyresult = async (req:any, res:any)=>{
     try{
       const { firstName,lastName} = (req.user).user;
+      const {id} = req.params;
+      var response:any = await readoneradiology({_id:id},{},'');
+      //validate payment
+      var paymentrecord:any = await readonepayment({_id:response.payment});
+   
+    if(paymentrecord.status !== configuration.status[3]){
+      throw new Error(configuration.error.errorpayment);
+
+    }
+
       const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
         const fileName = file.name;
@@ -154,7 +164,7 @@ export var radiologyorder= async (req:any, res:any) =>{
         const renamedurl= `${filename}${extension}`;
         //upload pix to upload folder
         await uploaddocument(file,filename,allowedextension,uploadpath);
-        const {id} = req.params;
+       
       
         //update pix name in patient
         const queryresult =await updateradiology(id,{$push:{testresult:renamedurl}, status:configuration.status[7],processby});
