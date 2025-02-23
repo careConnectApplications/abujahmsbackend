@@ -26,6 +26,7 @@ export var radiologyorder= async (req:any, res:any) =>{
       validateinputfaulsyvalue({id, testname,note});
       //find the record in appointment and validate
       const foundPatient:any =  await readonepatient({_id:id},{},'','');
+      const {isHMOCover} = foundPatient;
       //category
       if(!foundPatient){
           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
@@ -33,12 +34,12 @@ export var radiologyorder= async (req:any, res:any) =>{
       }
            
   const {servicetypedetails} = await readallservicetype({category: configuration.category[4]},{type:1,category:1,department:1,_id:0});
-  console.log("servicetypedata", servicetypedetails);    
+   console.log(isHMOCover);
   //loop through all test and create record in lab order
       for(var i =0; i < testname.length; i++){
-        console.log('testname',testname[i]);
+      
     //search for price of test name
-        var testPrice:any = await readoneprice({servicetype:testname[i]});
+        var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover});
         if(!testPrice){
           throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
