@@ -15,6 +15,7 @@ export var referadmission= async (req:any, res:any) =>{
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
+      console.log('id', id);
       //doctorname,patient,appointment
       const {alldiagnosis,referedward,admittospecialization, referddate} = req.body;
       validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate});
