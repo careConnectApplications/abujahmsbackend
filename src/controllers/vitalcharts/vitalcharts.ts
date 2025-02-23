@@ -44,6 +44,7 @@ export const createvitalchart = async (req:any, res:any) => {
       
      
       const {id} = req.params;
+      console.log(id)
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
