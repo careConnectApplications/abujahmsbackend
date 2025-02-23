@@ -2,7 +2,7 @@ import  mongoose from 'mongoose';
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
 import {readoneappointment,} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
-import  {updatepatient}  from "../../dao/patientmanagement";
+import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import configuration from "../../config";
@@ -34,22 +34,25 @@ export var referadmission= async (req:any, res:any) =>{
       
           }
 
-     //find the record in appointment and validate
-    var appointment = await readoneappointment({_id:id},{},'');
-    if(!appointment){
-      throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+     //find the record in patient and validate
+    
+    var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
+      
+      if(!patient){
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
-  }
+      }
+   
   //check that patient have not been admitted
-  var  findAdmission = await readoneadmission({patient:appointment.patient, status:configuration.admissionstatus[5]},{},'');
-  if(!findAdmission){
-    throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    throw new Error(`Patient Admission ${configuration.error.erroralreadyexit}`);
 
 }
 //create admission
-var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:appointment.patient});
+var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id});
 //update patient 
-var queryresult=await updatepatient(appointment.patient,{$push: {admission:admissionrecord._id}});
+var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
 res.status(200).json({queryresult:admissionrecord, status: true});
     }
     
@@ -113,7 +116,7 @@ export async function updateadmissionstatus(req:any, res:any){
       const response = await readoneadmission({_id:id},{},'');
       // check for availability of bed spaces in ward only for admitted
       if(!response){
-          throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
       }
       var ward:any = await readonewardmanagement({_id:response?.referedward},{});
       if(!ward){
