@@ -1,5 +1,6 @@
 import {readallmedicationcharts, createmedicationcharts,updatemedicationcharts} from "../../dao/medicationcharts";
 import {readoneadmission} from "../../dao/admissions";
+import  {readonepatient}  from "../../dao/patientmanagement";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import  mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
@@ -46,21 +47,29 @@ export const createmedicationchart = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
-    
-   
-      
-        
       var { drug,note,dose,frequency,route,staffname} = req.body;
       validateinputfaulsyvalue({drug,note,dose,frequency,route,staffname});
        //frequency must inlcude
        //route must contain allowed options
-      
-      const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
-      //console.log(admissionrecord);   
-      if(!admissionrecord){
+        const foundPatient:any =  await readonepatient({_id:id},{},'','');
+       var admissionrecord:any;
+       if(foundPatient){
+         admissionrecord={
+           patient:id,
+           referedward:new ObjectId(),
+           _id:new ObjectId(),
+           
+         }
+       }
+       else{
+        admissionrecord=  await readoneadmission({_id:id},{},'');       
+          if(!admissionrecord){
            throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
   
+          }
+
        }
+      
     const queryresult=await createmedicationcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,drug,note,dose,frequency,route,staffname});
     res.status(200).json({queryresult, status: true});
     }
