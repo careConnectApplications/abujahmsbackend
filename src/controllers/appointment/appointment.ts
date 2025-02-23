@@ -330,7 +330,8 @@ export var laborder= async (req:any, res:any) =>{
     //find the record in appointment and validate
     //find patient
     const foundPatient:any =  await readonepatient({_id:id},{},'','');
-    
+// check is patient is under inssurance
+var isHMOCover;
 
 // Create a new ObjectId
     var appointment:any;
@@ -340,15 +341,17 @@ export var laborder= async (req:any, res:any) =>{
         appointmentid:String(Date.now()),
         _id:new ObjectId()
       }
+      isHMOCover = foundPatient.isHMOCover;
 
     }
     else{
-    appointment = await readoneappointment({_id:id},{},'');
+    appointment = await readoneappointment({_id:id},{},'patient');
             if(!appointment){
               //create an appointment
               throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
           }
+          isHMOCover = appointment.patient.isHMOCover;
     }
     
    
@@ -360,7 +363,8 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
-      var testPrice:any = await readoneprice({servicetype:testname[i]});
+  console.log(isHMOCover);
+      var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover});
       if(!testPrice){
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
     }
@@ -369,7 +373,9 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
        //create payment
     var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-    //create testrecord
+   //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
+   
+   //create testrecord
     var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
     testsid.push(testrecord._id);
     paymentids.push(createpaymentqueryresult._id);

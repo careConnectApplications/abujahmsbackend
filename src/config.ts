@@ -2,10 +2,11 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
+  hmodrugpayment: 0.1,
   roles:[
     {role: "Medical Director", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
-    {role: "HOD Cashier", roleId:3},
+    {role: "HOD Cashier", roleId:"3"},
     {role: "General Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
     {role: "Medical Doctor", roleId:"6"},

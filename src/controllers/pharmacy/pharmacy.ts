@@ -42,7 +42,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
     else{
       appointment={
         _id:id,
-        appointmentid:"noneappoinment"
+        appointmentid:String(Date.now())
         
       }
     }
@@ -53,14 +53,14 @@ export var pharmacyorder= async (req:any, res:any) =>{
         var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
         
         if(!orderPrice){
-          throw new Error(configuration.error.errornopriceset);
+          throw new Error(`${configuration.error.errornopriceset} ${products[i]}`);
       }
       if(orderPrice.qty <=0){
         throw new Error(`${products[i]} ${configuration.error.erroravailability}`);
 
       }
-      
-      var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount:Number(orderPrice.amount)});
+      var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
+      var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
       
       //create 
       console.log("got here");
