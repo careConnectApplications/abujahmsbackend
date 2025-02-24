@@ -2,9 +2,9 @@ name: Deploy Node.js App with Docker via SSH
 
 on:
   push:
-    branches: [main]  # Trigger on push to main
+    branches: [main]  # Trigger on push to the main branch
   pull_request:
-    branches: [main]  # Trigger on pull request to main
+    branches: [main]  # Trigger on pull request to the main branch
 
 jobs:
   deploy:
@@ -15,27 +15,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # Step 2: Set up SSH key using GitHub secret
-    - name: Set up SSH key
+    # Step 2: Set up SSH key using GitHub secret (for SSH access to private repo)
+    - name: Set up SSH key for GitHub access
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.ACCESS_TOKEN }}  # Add SSH private key from secrets
 
     # Step 3: Build Docker Image & Deploy to Remote Server
     - name: Build and deploy Docker container to remote server
       env:
-        SSH_USERNAME: ${{ secrets.SSH_USERNAME_LIVE }}
-        SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME_LIVE }}  # SSH username for remote server
+        SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}  # IP address of the remote server
       run: |
         # Set up SSH connection using the SSH key
         ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
-          # Navigate to the directory where the Docker files are stored
+          # Navigate to the directory where your Docker files are stored
           cd /home/azureuser/apps/hmsbackend
 
-          # Pull the latest code from the repository (if needed)
-          git pull origin main
+          # Make sure your private repository is cloned (if it's not already)
+          git pull origin main  # Pull the latest changes from the private repository
 
-          # Install dependencies and build the app
+          # Install dependencies and build the app (only if needed)
           npm install
           npm run build
 
