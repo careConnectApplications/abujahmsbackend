@@ -28,7 +28,7 @@ jobs:
         SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
       run: |
         # Set up SSH connection using the SSH key
-        ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
+        ssh -o StrictHostKeyChecking=no "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE" << 'EOF'
           # Navigate to the directory where your Docker files are stored
           cd /home/azureuser/apps/hmsbackend
 
