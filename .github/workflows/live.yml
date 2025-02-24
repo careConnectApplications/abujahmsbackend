@@ -2,37 +2,43 @@ name: Deploy Node.js App with Docker via SSH
 
 on:
   push:
-    branches: [main]
+    branches: [main]  # Trigger on push to main
   pull_request:
-    branches: [main]
+    branches: [main]  # Trigger on pull request to main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the code
+    # Step 1: Checkout the code from GitHub repository
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # Step 2: Set up SSH key using GitHub secret
-    - name: Set up SSH key for GitHub access
+    # Step 2: Set up SSH key using GitHub secret (for SSH access to the remote server)
+    - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub secret containing your SSH private key
 
-    # Step 3: Build Docker Image & Deploy to Remote Server
-    - name: Build and deploy Docker container to remote server
-      env:
-        SSH_USERNAME: ${{ secrets.SSH_USERNAME_LIVE }}
-        SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
+    # Step 3: Add remote host to known hosts (to avoid SSH fingerprint verification issues)
+    - name: Add remote host to known hosts
       run: |
-        # Set up SSH connection using the SSH key
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_IP_LIVE }} >> ~/.ssh/known_hosts
+
+    # Step 4: Set up SSH connection and run remote commands
+    - name: Set up SSH connection using SSH key
+      env:
+        SSH_USERNAME_LIVE: ${{ secrets.SSH_USERNAME_LIVE }}  # SSH username for remote server
+        SERVER_IP_LIVE: ${{ secrets.SERVER_IP_LIVE }}  # IP address of the remote server
+      run: |
+        # SSH into the remote server and execute commands
         ssh -o StrictHostKeyChecking=no "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE" << 'EOF'
           # Navigate to the directory where your Docker files are stored
           cd /home/azureuser/apps/hmsbackend
 
-          # Pull the latest code from the private repository
+          # Pull the latest code from the repository (if needed)
           git pull origin main
 
           # Install dependencies and build the app
