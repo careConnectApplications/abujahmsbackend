@@ -889,8 +889,8 @@ main:[
     errorservicetray: "This service no more exist in your service tray"
 
   },
-    environment: "test",
-  //environment: "prod",
+    //environment: "test",
+  environment: "prod",
 
 }
 export default configuration;
