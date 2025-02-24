@@ -16,7 +16,7 @@ services:
       - 5003:5000
     environment:
         PORT: 5000
-        DOCKERDATABASE: mongodb://mongo_db:27017/ims
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
         KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
         
     volumes: 
@@ -35,7 +35,7 @@ services:
       - 5001:5000
     environment:
         PORT: 5000
-        DOCKERDATABASE: mongodb://mongo_db:27017/ims
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
         KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
 
     volumes: 
@@ -54,7 +54,7 @@ services:
       - 5002:5000
     environment:
         PORT: 5000
-        DOCKERDATABASE: mongodb://mongo_db:27017/ims
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
         KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
 
 
