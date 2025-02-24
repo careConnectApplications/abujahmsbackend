@@ -30,7 +30,7 @@ jobs:
         # Set up SSH connection using the SSH key
         ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
           # Navigate to the directory where you store your Docker files (adjust as needed)
-          cd /home/azureuser/apps
+          cd /home/azureuser/apps/hmsbackend
 
           # Pull the latest code from the repository (or update the app as needed)
           git pull origin main
