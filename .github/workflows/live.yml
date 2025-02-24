@@ -51,16 +51,17 @@ jobs:
           sudo apt-get install -y sshpass
 
           # Deploy build to the server using SCP
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src ./package.json ./tsconfig.json "$SSH_USERNAME"@"$SERVER_IP":/home/hms/hmsbackend
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src ./package.json ./tsconfig.json "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE":/home/hms/hmsbackend
 
           # Optionally restart your app after copying the build
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE" << 'EOF'
             # Stop any existing server (optional)
             pm2 stop 1
             # server commands (or your app, depending on your setup)
             cd /home/hms/hmsbackend
             npm install
             npm run build
-            pm2 start /home/hms/hmsbackend/build/index.js
+            sudo docker-compose build
+            sudo docker-compose up -d
 
           EOF
