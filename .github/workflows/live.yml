@@ -19,7 +19,7 @@ jobs:
     - name: Set up SSH key for GitHub access
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.ACCESS_KEY }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     # Step 3: Build Docker Image & Deploy to Remote Server
     - name: Build and deploy Docker container to remote server
