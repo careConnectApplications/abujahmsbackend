@@ -3,8 +3,6 @@ name: Deploy Node.js App with Docker via SSH
 on:
   push:
     branches: [main]  # Trigger on push to main
-  pull_request:
-    branches: [main]  # Trigger on pull request to main
 
 jobs:
   deploy:
@@ -16,16 +14,16 @@ jobs:
       uses: actions/checkout@v2
 
     # Step 2: Set up SSH key using GitHub secret (for SSH access to the remote server)
-    - name: Set up SSH key
+    - name: Set up SSH key for GitHub
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub secret containing your SSH private key
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub secret containing your private SSH key
 
     # Step 3: Add remote host to known hosts (to avoid SSH fingerprint verification issues)
-    - name: Add remote host to known hosts
+    - name: Add GitHub to known hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SERVER_IP_LIVE }} >> ~/.ssh/known_hosts
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
 
     # Step 4: Set up SSH connection and run remote commands
     - name: Set up SSH connection using SSH key
@@ -38,7 +36,10 @@ jobs:
           # Navigate to the directory where your Docker files are stored
           cd /home/azureuser/apps/hmsbackend
 
-          # Pull the latest code from the repository (if needed)
+          # Ensure you're using SSH for GitHub repository URL
+          git remote set-url origin git@github.com:Malachi-Egbugha/hmsbackend.git
+
+          # Pull the latest code from the repository using SSH
           git pull origin main
 
           # Install dependencies and build the app
