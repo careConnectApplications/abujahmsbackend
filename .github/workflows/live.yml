@@ -51,10 +51,10 @@ jobs:
           sudo apt-get install -y sshpass
 
           # Deploy build to the server using SCP
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src ./package.json ./tsconfig.json "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE":/home/hms/hmsbackend
+          sshpass -p "$SSH_PASSWORD_LIVE" scp -o StrictHostKeyChecking=no -r ./src ./package.json ./tsconfig.json "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE":/home/hms/hmsbackend
 
           # Optionally restart your app after copying the build
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE" << 'EOF'
+          sshpass -p "$SSH_PASSWORD_LIVE" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME_LIVE"@"$SERVER_IP_LIVE" << 'EOF'
             # Stop any existing server (optional)
             #pm2 stop 1
             # server commands (or your app, depending on your setup)
