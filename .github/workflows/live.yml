@@ -23,7 +23,7 @@ jobs:
     - name: Add GitHub to known hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SERVER_IP_LIVE }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.PRIVATE_KE_REPO }} >> ~/.ssh/known_hosts
 
     # Step 4: Set up SSH connection and run remote commands
     - name: Set up SSH connection using SSH key
