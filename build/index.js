@@ -7,6 +7,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const server_1 = __importDefault(require("./utils/server"));
 const config_1 = __importDefault(require("./config"));
 const dbconnection_1 = __importDefault(require("./utils/dbconnection"));
+//const currentMilliseconds = moment().valueOf();
+//console.log(currentMilliseconds);
 dotenv_1.default.config();
 (0, dbconnection_1.default)();
 const app = (0, server_1.default)();

@@ -1,0 +1,129 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.readbillinghistoryforapatient = readbillinghistoryforapatient;
+exports.readbillinghistoryforallapatient = readbillinghistoryforallapatient;
+exports.confirmpayment = confirmpayment;
+const payment_1 = require("../../dao/payment");
+const appointment_1 = require("../../dao/appointment");
+const patientmanagement_1 = require("../../dao/patientmanagement");
+const lab_1 = require("../../dao/lab");
+const config_1 = __importDefault(require("../../config"));
+//deactivate a user
+/*
+export async function confirmpayment(req:any, res:any){
+    const {id} = req.params;
+    try{
+        const response = await readone({_id:id});
+       const status= response?.status == configuration.userstatus[0]? configuration.userstatus[1]: configuration.userstatus[0];
+        const queryresult:any =await updateuser(id,{status});
+        res.status(200).json({
+            queryresult,
+            status:true
+          });
+
+    }
+    catch(e:any){
+        console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+}
+    */
+//read particular patient payment history
+function readbillinghistoryforapatient(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { id } = req.params;
+            var query = { patient: id };
+            var populatequery = 'patient';
+            const queryresult = yield (0, payment_1.readallpayment)(query, populatequery);
+            res.json({
+                queryresult,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//get billing history for all patient
+function readbillinghistoryforallapatient(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            var query = {};
+            var populatequery = 'patient';
+            const queryresult = yield (0, payment_1.readallpayment)(query, populatequery);
+            res.json({
+                queryresult,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//confirm payment
+function confirmpayment(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        //console.log(req.user);
+        try {
+            const { id } = req.params;
+            //check for null of id
+            const response = yield (0, payment_1.readonepayment)({ _id: id });
+            const { patient } = response;
+            const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
+            if (!patientrecord && response.paymentcategory !== config_1.default.category[3]) {
+                throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            }
+            //var settings =await  configuration.settings();
+            const status = config_1.default.status[3];
+            const { email, staffId } = req.user;
+            const queryresult = yield (0, payment_1.updatepayment)(id, { status, cashieremail: email, cashierid: staffId });
+            //const queryresult:any =await updatepayment(id,{status});
+            //confirm payment of the service paid for 
+            const { paymentype, paymentcategory, paymentreference } = queryresult;
+            //for patient registration
+            if (paymentcategory == config_1.default.category[3]) {
+                //update patient registration status
+                yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1] });
+            }
+            //for appointment
+            else if (paymentcategory == config_1.default.category[0]) {
+                //schedule the patient
+                //payment
+                yield (0, appointment_1.updateappointmentbyquery)({ payment: id }, { status: config_1.default.status[5] });
+            }
+            //for lab test
+            else if (paymentcategory == config_1.default.category[2]) {
+                //update lab test
+                yield (0, lab_1.updatelabbyquery)({ payment: id }, { status: config_1.default.status[5] });
+            }
+            //update for pharmacy
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
