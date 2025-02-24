@@ -2,9 +2,9 @@ name: Deploy Node.js App with Docker via SSH
 
 on:
   push:
-    branches: [main] #trigger for push to staging
+    branches: [main]  # Trigger on push to main
   pull_request:
-    branches: [main] # trigger for pull request to staging
+    branches: [main]  # Trigger on pull request to main
 
 jobs:
   deploy:
@@ -29,21 +29,19 @@ jobs:
       run: |
         # Set up SSH connection using the SSH key
         ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
-          # Navigate to the directory where you store your Docker files (adjust as needed)
+          # Navigate to the directory where the Docker files are stored
           cd /home/azureuser/apps/hmsbackend
 
-          # Pull the latest code from the repository (or update the app as needed)
+          # Pull the latest code from the repository (if needed)
           git pull origin main
 
-          # Build the Docker image
+          # Install dependencies and build the app
           npm install
           npm run build
-          sudo docker-compose -build 
 
-          # Run Container
+          # Build the Docker image using docker-compose
+          sudo docker-compose build
+
+          # Run the container in detached mode
           sudo docker-compose up -d
-       
-
-         
-
         EOF
