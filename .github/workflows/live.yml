@@ -1,0 +1,49 @@
+name: Deploy Node.js App with Docker via SSH
+
+on:
+  push:
+    branches: [main] #trigger for push to staging
+  pull_request:
+    branches: [main] # trigger for pull request to staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up SSH key using GitHub secret
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    # Step 3: Build Docker Image & Deploy to Remote Server
+    - name: Build and deploy Docker container to remote server
+      env:
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME_LIVE }}
+        SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
+      run: |
+        # Set up SSH connection using the SSH key
+        ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
+          # Navigate to the directory where you store your Docker files (adjust as needed)
+          cd /home/azureuser/apps
+
+          # Pull the latest code from the repository (or update the app as needed)
+          git pull origin main
+
+          # Build the Docker image
+          npm install
+          npm run build
+          sudo docker-compose -build 
+
+          # Run Container
+          sudo docker-compose up -d
+          docker rm my-node-container || true
+
+         
+
+        EOF
