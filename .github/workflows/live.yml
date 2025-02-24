@@ -42,7 +42,7 @@ jobs:
 
           # Run Container
           sudo docker-compose up -d
-          docker rm my-node-container || true
+       
 
          
 
