@@ -20,6 +20,7 @@ import familyplanning from '../routes/familyplanning';
 import referrer from '../routes/referrer';
 import deliverynote from '../routes/deliverynote';
 import procedure from '../routes/procedure';
+import dashboard  from '../routes/dashboard';
 
 import {protect} from "../utils/middleware";
 
@@ -61,6 +62,7 @@ function createServer(){
   app.use('/api/v1/referrer',protect, referrer);
   app.use('/api/v1/deliverynote', protect, deliverynote);
   app.use('/api/v1/procedure', protect, procedure);
+  app.use('/api/v1/dashboard', protect, dashboard);
   
 
   // Handle POST requests to /webhook

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.modifiedreadallappointment = modifiedreadallappointment;
+exports.readallappointmentfirstfive = readallappointmentfirstfive;
 exports.readallappointment = readallappointment;
 exports.createappointment = createappointment;
 exports.readoneappointment = readoneappointment;
@@ -33,6 +34,18 @@ function modifiedreadallappointment(query, aggregatequery) {
         }
     });
 }
+function readallappointmentfirstfive(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield appointment_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 }).limit(5);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 //read all patient history
 function readallappointment(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {

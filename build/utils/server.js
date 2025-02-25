@@ -24,6 +24,7 @@ const familyplanning_1 = __importDefault(require("../routes/familyplanning"));
 const referrer_1 = __importDefault(require("../routes/referrer"));
 const deliverynote_1 = __importDefault(require("../routes/deliverynote"));
 const procedure_1 = __importDefault(require("../routes/procedure"));
+const dashboard_1 = __importDefault(require("../routes/dashboard"));
 const middleware_1 = require("../utils/middleware");
 function createServer() {
     const app = (0, express_1.default)();
@@ -62,6 +63,7 @@ function createServer() {
     app.use('/api/v1/referrer', middleware_1.protect, referrer_1.default);
     app.use('/api/v1/deliverynote', middleware_1.protect, deliverynote_1.default);
     app.use('/api/v1/procedure', middleware_1.protect, procedure_1.default);
+    app.use('/api/v1/dashboard', middleware_1.protect, dashboard_1.default);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {

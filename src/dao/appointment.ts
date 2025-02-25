@@ -18,6 +18,18 @@ catch(err:any){
 
 
 }
+
+export async function readallappointmentfirstfive(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
+  try {
+    return await Appointment.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({createdAt: -1}).limit(5);
+    
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+
   //read all patient history
   export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
