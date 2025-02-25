@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countappointment = countappointment;
 exports.modifiedreadallappointment = modifiedreadallappointment;
 exports.readallappointmentfirstfive = readallappointmentfirstfive;
 exports.readallappointment = readallappointment;
@@ -21,6 +22,18 @@ exports.updateappointment = updateappointment;
 exports.updateappointmentbyquery = updateappointmentbyquery;
 const appointment_1 = __importDefault(require("../models/appointment"));
 const config_1 = __importDefault(require("../config"));
+function countappointment(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield appointment_1.default.find(query).countDocuments();
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 function modifiedreadallappointment(query, aggregatequery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

@@ -135,8 +135,10 @@ const listlabreport = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     firstName: { $first: { $first: "$patient.firstName" } },
                     lastName: { $first: { $first: "$patient.lastName" } },
                     phoneNumber: { $first: { $first: "$patient.phoneNumber" } },
-                    appointmentid: { $first: { $first: "$appointments.appointmentid" } },
-                    appointmentdate: { $first: { $first: "$appointments.appointmentdate" } }
+                    appointmentid: { $first: "$appointmentid" },
+                    //appointmentid: {$first: {$first:"$appointments.appointmentid"}},
+                    appointmentdate: { $first: { $first: "$appointments.appointmentdate" } },
+                    createdAt: { $first: "$createdAt" }
                 },
             },
             { $sort: { createdAt: -1 } },

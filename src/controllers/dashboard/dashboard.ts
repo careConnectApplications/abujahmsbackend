@@ -1,7 +1,9 @@
 import path from "path";
 import configuration from "../../config";
 import  {readone}  from "../../dao/users";
-import {readallappointmentfirstfive,modifiedreadallappointment} from "../../dao/appointment";
+import {readallappointmentfirstfive,countappointment} from "../../dao/appointment";
+import {readalllablimitfive} from "../../dao/lab";
+
 
 
 
@@ -10,26 +12,14 @@ export async function dashboard(req:any, res:any){
     try{
       const { _id } = (req.user).user;
         const user = await readone({_id});
-        const appointment = await readallappointmentfirstfive({status:configuration.status[9],doctor:_id},{},'patient','doctor','payment');
-   
-    let aggregatequery = 
-    [ {
-      $lookup: {
-        from: 'labs',       
-        localField: 'lab',    
-        foreignField: '_id',     
-        as: 'lab'     
-      }
-    },
-    
-    {
-      $match: { doctor:_id }  // Filter payment
-    }
-    
-  ]; 
-    const lab = await modifiedreadallappointment({},aggregatequery);
+        const firstfiveinprocressappointment = await readallappointmentfirstfive({status:configuration.status[9],doctor:_id},{},'patient','doctor','payment');
+        const firstfivescheduledlab =  await readalllablimitfive({status:configuration.status[5]},{},'patient','appointment','payment');
+        //attended appoitment
+        const totalattendedappointment = await countappointment({$or:[{status:configuration.status[9]},{status:configuration.status[6]}]});
+        //uplcomming appointment
+        const totalschedulesappointment = await countappointment({status:configuration.status[5]});
         res.status(200).json({
-            queryresult:{user,appointment,lab},
+            queryresult:{user,firstfiveinprocressappointment,firstfivescheduledlab,totalattendedappointment,totalschedulesappointment},
             status:true
           }); 
 

@@ -16,28 +16,21 @@ exports.dashboard = dashboard;
 const config_1 = __importDefault(require("../../config"));
 const users_1 = require("../../dao/users");
 const appointment_1 = require("../../dao/appointment");
+const lab_1 = require("../../dao/lab");
 //get all users
 function dashboard(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { _id } = (req.user).user;
             const user = yield (0, users_1.readone)({ _id });
-            const appointment = yield (0, appointment_1.readallappointmentfirstfive)({ status: config_1.default.status[9], doctor: _id }, {}, 'patient', 'doctor', 'payment');
-            let aggregatequery = [{
-                    $lookup: {
-                        from: 'labs',
-                        localField: 'lab',
-                        foreignField: '_id',
-                        as: 'lab'
-                    }
-                },
-                {
-                    $match: { doctor: _id } // Filter payment
-                }
-            ];
-            const lab = yield (0, appointment_1.modifiedreadallappointment)({}, aggregatequery);
+            const firstfiveinprocressappointment = yield (0, appointment_1.readallappointmentfirstfive)({ status: config_1.default.status[9], doctor: _id }, {}, 'patient', 'doctor', 'payment');
+            const firstfivescheduledlab = yield (0, lab_1.readalllablimitfive)({ status: config_1.default.status[5] }, {}, 'patient', 'appointment', 'payment');
+            //attended appoitment
+            const totalattendedappointment = yield (0, appointment_1.countappointment)({ $or: [{ status: config_1.default.status[9] }, { status: config_1.default.status[6] }] });
+            //uplcomming appointment
+            const totalschedulesappointment = yield (0, appointment_1.countappointment)({ status: config_1.default.status[5] });
             res.status(200).json({
-                queryresult: { user, appointment, lab },
+                queryresult: { user, firstfiveinprocressappointment, firstfivescheduledlab, totalattendedappointment, totalschedulesappointment },
                 status: true
             });
         }

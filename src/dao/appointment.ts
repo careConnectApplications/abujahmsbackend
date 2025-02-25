@@ -2,6 +2,17 @@ import Appointment from "../models/appointment";
 import {appointinterface} from '../models/appointment'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
+
+export async function countappointment(query:any) {
+  try {
+    
+    return await Appointment.find(query).countDocuments();
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
 export async function modifiedreadallappointment(query:any, aggregatequery:any){
 
 try{

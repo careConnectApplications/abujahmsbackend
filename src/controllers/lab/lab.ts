@@ -122,8 +122,11 @@ export const listlabreport = async (req:any, res:any) => {
           firstName:{$first: {$first:"$patient.firstName"}},
           lastName:{$first: {$first:"$patient.lastName"}},
           phoneNumber:{$first: {$first:"$patient.phoneNumber"}},
-          appointmentid: {$first: {$first:"$appointments.appointmentid"}},
-          appointmentdate: {$first: {$first: "$appointments.appointmentdate"}}
+          appointmentid: {$first:"$appointmentid"},
+          //appointmentid: {$first: {$first:"$appointments.appointmentid"}},
+          appointmentdate: {$first: {$first: "$appointments.appointmentdate"}},
+          createdAt: {$first:"$createdAt"}
+         
           
         },
         

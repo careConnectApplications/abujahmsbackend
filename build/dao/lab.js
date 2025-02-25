@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.readalllablimitfive = readalllablimitfive;
 exports.readalllab = readalllab;
 exports.createlab = createlab;
 exports.readonelab = readonelab;
@@ -21,6 +22,19 @@ exports.readlabaggregate = readlabaggregate;
 const lab_1 = __importDefault(require("../models/lab"));
 const config_1 = __importDefault(require("../config"));
 //read all lab history
+//sort({createdAt: -1}).limit(5)
+function readalllablimitfive(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 }).limit(5);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 function readalllab(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
