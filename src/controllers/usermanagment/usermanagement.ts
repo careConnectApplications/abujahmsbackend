@@ -20,6 +20,23 @@ export async function getallusers(req:Request, res:any){
     }
 
 }
+export async function passwordreset(req:any, res:any){
+  const {id} = req.params;
+  try{
+      const queryresult:any =await updateuser(id,{password: configuration.defaultPassword});
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
 //deactivate a user
 export async function updatestatus(req:any, res:any){
     const {id} = req.params;
