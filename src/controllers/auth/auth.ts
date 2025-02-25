@@ -1,5 +1,6 @@
 import configuration from "../../config";
-import  {readone,createuser}  from "../../dao/users";
+import bcrypt from "bcryptjs";
+import  {readone,createuser,updateuser}  from "../../dao/users";
 import {readallclinics} from "../../dao/clinics";
 import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
 
@@ -9,6 +10,15 @@ export var signin = async(req:any,res:any) =>{
     try{
         //destructure email and password
         const {email, password} = req.body;
+        var requirepasswordchange;
+        if(password == configuration.defaultPassword){
+            requirepasswordchange = true;
+
+        }
+        else{
+            requirepasswordchange=false;
+
+        }
    
         //validate email and password
         if(!email || !password){
@@ -37,7 +47,7 @@ export var signin = async(req:any,res:any) =>{
         }
 //respond with token
 var queryresult = sendTokenResponse(user);
-res.status(200).json({queryresult, status: true});
+res.status(200).json({queryresult, status: true,requirepasswordchange});
     }
     catch(error:any){
         res.status(403).json({ status: false, msg: error.message });
