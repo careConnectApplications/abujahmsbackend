@@ -1,7 +1,8 @@
 import path from "path";
 import configuration from "../../config";
+import bcrypt from "bcryptjs";
 import  {readall,updateuser,readone,createuser}  from "../../dao/users";
-import {uploaddocument,convertexceltojson,validateinputfaulsyvalue} from "../../utils/otherservices";
+import {uploaddocument,convertexceltojson,validateinputfaulsyvalue,encrypt} from "../../utils/otherservices";
 
 
 //get all users
@@ -20,6 +21,34 @@ export async function getallusers(req:Request, res:any){
     }
 
 }
+//update a user password
+  export async function updatepassword(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    var {currentpassword, newpassword} = req.body;
+    validateinputfaulsyvalue({currentpassword, newpassword});
+    //read user 
+    var user:any = await readone({_id:id});
+    const {password} = user;
+    const isMatch = await bcrypt.compare(currentpassword, password);
+    if(!isMatch){
+      //return error
+      throw new Error(configuration.error.errorinvalidcredentials);
+    }
+    //change password
+    var queryresult = await updateuser(id, {password: newpassword});
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
 export async function passwordreset(req:any, res:any){
   const {id} = req.params;
   try{
