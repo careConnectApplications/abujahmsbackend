@@ -11,6 +11,8 @@ export var signin = async(req:any,res:any) =>{
         //destructure email and password
         const {email, password} = req.body;
         var requirepasswordchange;
+        console.log(password);
+        console.log(configuration.defaultPassword);
         if(password == configuration.defaultPassword){
             requirepasswordchange = true;
 
@@ -19,6 +21,7 @@ export var signin = async(req:any,res:any) =>{
             requirepasswordchange=false;
 
         }
+        console.log(requirepasswordchange);
    
         //validate email and password
         if(!email || !password){
@@ -46,7 +49,15 @@ export var signin = async(req:any,res:any) =>{
             throw new Error(configuration.error.errorpasswordmismatch);
         }
 //respond with token
-var queryresult = sendTokenResponse(user);
+var queryresult;
+console.log(requirepasswordchange);
+if(requirepasswordchange == true){
+    queryresult={};
+
+}
+else{
+queryresult = sendTokenResponse(user);
+}
 res.status(200).json({queryresult, status: true,requirepasswordchange});
     }
     catch(error:any){

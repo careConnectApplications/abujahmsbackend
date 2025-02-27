@@ -398,8 +398,6 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
 export async function addencounter(req:any, res:any){
   try{
   //
-
-
   const {id} = req.params;
   const {email, staffId} = (req.user).user;
   //find doctor and add doctor who examined
