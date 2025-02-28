@@ -178,7 +178,7 @@ export const createancs = async (req:any, res:any) => {
        const ipt= {iptfirstdose,iptfirstdosedate,iptseconddose,iptseconddosedate,iptthirddose,iptthirddosedate,iptfourthdose,iptfourthdosedate,iptfifthdose,iptfifthdosedate,iptsixthdose,iptsixthdosedate};
        const ironfolategiven ={prescription,tablets,ironfolategivendate};
        const {obstetrichistory} = req.body;
-       console.log(obstetrichistory);
+       
     
        //frequency must inlcude
        //route must contain allowed options
@@ -212,7 +212,6 @@ export async function updateancs(req:any, res:any){
    //validate empty object and initialize
   
    if(!(isObjectAvailable(req.body.pregnancysummary))) req.body.pregnancysummary={};
-   if(!(isObjectAvailable(req.body.obstetrichistory))) req.body.obstetrichistory=[];
    if(!(isObjectAvailable(req.body.medicalobsterichistory))) req.body.medicalobsterichistory={};
    if(!(isObjectAvailable(req.body.currenthistory))) req.body.currenthistory={};
    if(!(isObjectAvailable(req.body.generalmedicalhistory))) req.body.generalmedicalhistory={};
@@ -237,6 +236,7 @@ export async function updateancs(req:any, res:any){
  const {iptfirstdose,iptfirstdosedate,iptseconddose,iptseconddosedate,iptthirddose,iptthirddosedate,iptfourthdose,iptfourthdosedate,iptfifthdose,iptfifthdosedate,iptsixthdose,iptsixthdosedate,}=(req.body).ipt
  const {prescription,tablets,ironfolategivendate} = (req.body).ironfolategiven
  
+ 
    
    
       
@@ -251,8 +251,9 @@ export async function updateancs(req:any, res:any){
     const tetanustoxod = {tetanusfirstdose,tetanusfirstdosedate,tetanusseconddose,tetatusseonddosedate,tetanusthirddose,tetanusthirddosedate,tetatusfourthdose,tetanusfourthdosedate,tetanusfifthdose,tetanusfifthdosedate};
     const ipt= {iptfirstdose,iptfirstdosedate,iptseconddose,iptseconddosedate,iptthirddose,iptthirddosedate,iptfourthdose,iptfourthdosedate,iptfifthdose,iptfifthdosedate,iptsixthdose,iptsixthdosedate};
     const ironfolategiven ={prescription,tablets,ironfolategivendate};
+    const {obstetrichistory} = req.body;
     //validateinputfaulsyvalue({...vitals});
-    var queryresult= await updateanc(id, {pregnancysummary,medicalobsterichistory,currenthistory,generalmedicalhistory,physicalexamination,laboratory,healtheducationtopicscovered,tetanustoxod,ironfolategiven,ipt,currentmedication,allergies,staffname});
+    var queryresult= await updateanc(id, {pregnancysummary,obstetrichistory,medicalobsterichistory,currenthistory,generalmedicalhistory,physicalexamination,laboratory,healtheducationtopicscovered,tetanustoxod,ironfolategiven,ipt,currentmedication,allergies,staffname});
     res.status(200).json({
         queryresult,
         status:true
