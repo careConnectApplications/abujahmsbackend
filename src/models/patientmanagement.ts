@@ -158,7 +158,7 @@ const patientSchema = new Schema(
       prcedure:[
         {
           type: Schema.Types.ObjectId,
-          ref: "Radiology",
+          ref: "Procedure",
           default: [],
         },
       ],

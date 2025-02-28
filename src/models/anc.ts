@@ -132,7 +132,14 @@ iptsixthdosedate:Date
 ironfolategiven:{
 prescription:Boolean,
 tablets:Boolean,
-ironfolategivendate:Date
+ironfolategivendate:Date,
+ancfollowup: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Ancfollowup",
+      default: [],
+    },
+  ],
 }
 
 })

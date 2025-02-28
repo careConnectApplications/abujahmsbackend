@@ -1,8 +1,76 @@
-import {updateanc, createanc,readallanc} from "../../dao/anc";
-import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber,isObjectAvailable } from "../../utils/otherservices";
+import {updateanc, createanc,readallanc, readoneanc} from "../../dao/anc";
+import {readallancfollowup,updateancfollowup,createancfollowup} from "../../dao/ancfollowup";
+import { validateinputfaulsyvalue,isObjectAvailable } from "../../utils/otherservices";
 import {readonepatient} from "../../dao/patientmanagement";
 import configuration from "../../config";
 //get lab order by patient
+///////////////////////////anc followup/////////////////////////
+export const readAllancfollowupByAnc = async (req:any, res:any) => {
+    try {
+      const {anc} = req.params;
+      const queryresult = await readallancfollowup({anc},{},'');
+      res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    } catch (error:any) {
+      res.status(403).json({ status: false, msg: error.message });
+    }
+  };
+
+ 
+export const createancfollowups = async (req:any, res:any) => {
+    try {
+      const {anc} = req.params;
+      const { firstName,lastName} = (req.user).user;
+      req.body.staffname = `${firstName} ${lastName}`;    
+      var {ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname} = req.body;
+      validateinputfaulsyvalue({ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname});
+       //frequency must inlcude
+       //route must contain allowed options
+      
+      const ancrecord:any =  await readoneanc({_id:anc},{},'');    
+      //console.log(admissionrecord);   
+      if(!ancrecord){
+           throw new Error(`ANC donot ${configuration.error.erroralreadyexit}`);
+  
+       }
+    const queryresult=await createancfollowup({anc:ancrecord._id,ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname});
+    res.status(200).json({queryresult, status: true});
+    }
+    catch(e:any){
+        res.status(403).json({status: false, msg:e.message});
+
+    }
+}
+
+
+//insulin
+
+export async function updateancfollowups(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    const { firstName,lastName} = (req.user).user;
+    req.body.staffname = `${firstName} ${lastName}`;
+    var {ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname} = req.body;
+    validateinputfaulsyvalue({ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname});
+    var queryresult = await updateancfollowup(id, {ga,sfh,wf,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname});
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
+
+
+
+////////////////////////////////anc////////////////////////////
   export const readAllancByPatient = async (req:any, res:any) => {
     try {
       //const {clinic} = (req.user).user;
@@ -17,122 +85,7 @@ import configuration from "../../config";
       res.status(403).json({ status: false, msg: error.message });
     }
   };
-/*
-currentmedication:String,
-allergies:String,
-lmp:Date,
-cycle: String,
-edd:Date,
-gravida:String,
-term:String,
-preterm:String,
-abortions:String, 
-ectopic:String, 
-stillbirths:String,
-noliving:String,
-obstetrichistory:[
-    obstetrichistoryschema
-],
 
-medicalobsterichistory:{
-previousstillbirthornewbornloss:Boolean,
-historyofthreeormoreconsecutivespontaneousabortions: Boolean,
-birthweightoflastbabylessthan450: Boolean,
-birthweightoflastbabygreaterthan450:Boolean,
-lastpregnancyhospitaladmissionforpeteclampsia: Boolean,
-previoussurgeryonreproductivetract:Boolean,
-},
-currenthistory:{
-diagnosedsuspectedmultipleprenancy: Boolean,
-agelessthan16: Boolean,
-agemorethan40:Boolean,
-rhesusnegative:Boolean,
-vaginalbleeding:Boolean,
-pelvicmass:Boolean,
-diastolicbpgreaterthan90: Boolean,
-},
-generalmedicalhistory:{
-diabetesmellitus:Boolean,
-renaldisease:Boolean,
-cardiacdisease:Boolean,
-sicklecelldisease:Boolean,
-hivpositive:Boolean,
-anyotherseveremedicaldeseaseorconditionspecify:String
-},
-physicalexamination:{
-weight:String,
-bloodpressure:String,
-pulse:String,
-headteetheyesnosethroat:Boolean,
-thyroid:Boolean,
-chest:Boolean,
-breasts:Boolean,
-cardiovascular:Boolean,
-abdomen:Boolean,
-varicoseveins:Boolean,
-neurologicalexam:Boolean,
-externalgenitalia:Boolean,
-cervixvigina:Boolean,
-uterus:Boolean,
-adnexa:Boolean,
-anythingabnormal:String,
-additionalcomment:String
-},
-laboratory:{
-haemoglobinhaematocrit:String,
-urinalysisprotientsugar:String,
-vdrlorrprotientsugar:String,
-boodgroupandrhesusstatus:String,
-hivtest:String,
-urinnemicroscopic:String,
-haemoglobin:String,
-others:String
-
-},
-healtheducationtopicscovered:{
-nutrition:String,
-restandexercise:String,
-malariainpregnancy:String,
-safersexinpregnancy:String,
-vctforpreventionofmotertochildtrnsmissionofhiv:String,
-brthandemergencyreadnessplanning:String,
-alcohotobaccoorotherdrugsysed:String,
-familyplanningbirthspacing:String,
-infantfeedingoptions:String
-},
-
-tetanustoxod:{
-tetanusfirstdose:Boolean,
-tetanusfirstdosedate:Date,
-tetanusseconddose:Boolean,
-tetatusseonddosedate:Date,
-tetanusthirddose:Boolean,
-tetanusthirddosedate:Date,
-tetatusfourthdose:Boolean,
-tetanusfourthdosedate:Date,
-tetanusfifthdose:Boolean,
-tetanusfifthdosedate:Date
-},
-ipt:{
-iptfirstdose:Boolean,
-iptfirstdosedate:Date,
-iptseconddose:Boolean,
-iptseconddosedate:Date,
-iptthirddose:Boolean,
-iptthirddosedate:Date,
-iptfourthdose:Boolean,
-iptfourthdosedate:Date,
-iptfifthdose:Boolean,
-iptfifthdosedate:Date,
-iptsixthdose:Boolean,
-iptsixthdosedate:Date
-},
-ironfolategiven:{
-prescription:Boolean,
-tablets:Boolean,
-ironfolategiven:Date
-}
-*/
 export const createancs = async (req:any, res:any) => {
     try {
       const {id} = req.params;
