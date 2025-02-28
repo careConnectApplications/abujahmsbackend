@@ -7,9 +7,9 @@ import configuration from "../config";
 
 
   //read all patient history
-  export async function readallanc(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
+  export async function readallanc(query:any,selectquery:any,populatequery:any) {
     try {
-      const ancdetails = await ANC.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+      const ancdetails = await ANC.find(query).select(selectquery).populate(populatequery).sort({ createdAt: -1 });
       const totalancdetails = await ANC.find(query).countDocuments();
       return { ancdetails, totalancdetails };
     } catch (err) {

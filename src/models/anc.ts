@@ -13,9 +13,14 @@ const obstetrichistoryschema = new Schema({
 })
 // Define the Clinic Schema
 const ancSchema = new Schema({
-
+    patient: {
+        type: Schema.Types.ObjectId,
+        ref: "Patientsmanagement",
+        default: null,
+        },
 currentmedication:String,
 allergies:String,
+pregnancysummary:{
 lmp:Date,
 cycle: String,
 edd:Date,
@@ -26,11 +31,12 @@ abortions:String,
 ectopic:String, 
 stillbirths:String,
 noliving:String,
+},
 obstetrichistory:[
     obstetrichistoryschema
 ],
 
-obsterichistory:{
+medicalobsterichistory:{
 previousstillbirthornewbornloss:Boolean,
 historyofthreeormoreconsecutivespontaneousabortions: Boolean,
 birthweightoflastbabylessthan450: Boolean,
@@ -91,7 +97,7 @@ restandexercise:String,
 malariainpregnancy:String,
 safersexinpregnancy:String,
 vctforpreventionofmotertochildtrnsmissionofhiv:String,
-brthandemergencyreadnessplanning:String,
+birthandemergencyreadnessplanning:String,
 alcohotobaccoorotherdrugsysed:String,
 familyplanningbirthspacing:String,
 infantfeedingoptions:String
@@ -126,7 +132,7 @@ iptsixthdosedate:Date
 ironfolategiven:{
 prescription:Boolean,
 tablets:Boolean,
-ironfolategiven:Date
+ironfolategivendate:Date
 }
 
 })
