@@ -45,7 +45,7 @@ const labSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Appointment",
-      default: [],
+      default: null,
     }
   ,
   appointmentid:
@@ -61,13 +61,14 @@ const labSchema = new Schema({
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
+    amount: Number,
   
   status:{
     required: true,
     type: String,
-    default: configuration.status[2],
+    default: configuration.status[9],
 
   }
 },

@@ -325,7 +325,7 @@ export var laborder= async (req:any, res:any) =>{
     const {testname} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
-    var paymentids =[];
+    //var paymentids =[];
     validateinputfaulsyvalue({id, testname});
     //find the record in appointment and validate
     //find patient
@@ -372,15 +372,17 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     //search testname in setting
     var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
        //create payment
-    var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
    
    //create testrecord
-    var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
+    //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
+    var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department,amount:Number(testPrice.amount)});
     testsid.push(testrecord._id);
-    paymentids.push(createpaymentqueryresult._id);
+    //paymentids.push(createpaymentqueryresult._id);
     }
-    var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
+    //var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
+    var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid}});
     res.status(200).json({queryresult, status: true});
     
    

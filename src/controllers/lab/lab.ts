@@ -1,5 +1,7 @@
 import {readalllab,updatelab,readonelab,readlabaggregate} from "../../dao/lab";
+import  {updatepatient}  from "../../dao/patientmanagement";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
+import {createpayment} from "../../dao/payment";
 import  mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 import  {readone}  from "../../dao/users";
@@ -75,7 +77,7 @@ export const readallscheduledlab = async (req:any, res:any) => {
   try {
       //const {clinic} = (req.user).user;
     //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readalllab({status:configuration.status[5]},{},'patient','appointment','payment');
+    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[2]}]},{},'patient','appointment','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -256,5 +258,42 @@ export const listlabreportbypatient = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+//this endpoint is use to accept or reject lab order
+export const confirmlaborder = async (req:any, res:any) =>{
+  try{
+    //extract option
+    const {option} = req.body;
+    const {id} = req.params;
+  //search for the lab request
+  var lab:any =await readonelab({_id:id},{},'');
+  const {testname, appointment,patient,amount} = lab;
+  //validate the status
+  let queryresult;
+  if(option == true){
+    var createpaymentqueryresult =await createpayment({paymentreference:appointment,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
+  queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id});
+    await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
+    
+  }
+  else{
+    queryresult= await updatelab({_id:id},{status:configuration.status[13]});
+
+  }
+  res.status(200).json({queryresult, status: true});
+    //if accept
+//accept or reject lab order
+//var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+//paymentids.push(createpaymentqueryresult._id);
+//var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+//var testrecord = await createlab({payment:createpaymentqueryresult._id});
+//change status to 2 or  13 for reject
+
+  }
+  catch(e:any){
+    console.log("error", e);
+    res.status(403).json({ status: false, msg: e.message });
+
+  }
+}
 
 
