@@ -68,7 +68,7 @@ const labSchema = new Schema({
   status:{
     required: true,
     type: String,
-    default: configuration.status[9],
+    default: configuration.status[14],
 
   }
 },

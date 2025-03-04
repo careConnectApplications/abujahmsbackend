@@ -28,7 +28,7 @@ const configuration = {
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
   defaultphonenumber:"00000000000",
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
