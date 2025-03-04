@@ -262,7 +262,7 @@ export const listlabreportbypatient = async (req:any, res:any) => {
 export const confirmlaborder = async (req:any, res:any) =>{
   try{
     //extract option
-    const {option} = req.body;
+    const {option,remark} = req.body;
     const {id} = req.params;
   //search for the lab request
   var lab:any =await readonelab({_id:id},{},'');
@@ -271,12 +271,12 @@ export const confirmlaborder = async (req:any, res:any) =>{
   let queryresult;
   if(option == true){
     var createpaymentqueryresult =await createpayment({paymentreference:appointment,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
-  queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id});
+  queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     
   }
   else{
-    queryresult= await updatelab({_id:id},{status:configuration.status[13]});
+    queryresult= await updatelab({_id:id},{status:configuration.status[13],remark});
 
   }
   res.status(200).json({queryresult, status: true});

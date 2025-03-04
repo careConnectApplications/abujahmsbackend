@@ -15,6 +15,10 @@ const radiologySchema = new Schema({
   {
     type: String
   },
+  remark:
+  {
+    type: String
+  },
   testname:
   {
     type: String, 
@@ -40,19 +44,25 @@ const radiologySchema = new Schema({
     type: String,
    
   },
+  amount: Number,
+  paymentreference:
+  {
+    type: String, 
+    required: true
+  },
   processby: {
     type: String
   },
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
   
   status:{
     required: true,
     type: String,
-    default: configuration.status[9],
+    default: configuration.status[14],
 
   }
 },

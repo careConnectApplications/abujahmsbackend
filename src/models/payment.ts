@@ -30,6 +30,11 @@ const paymentSchema = new Schema(
       required: true,
      
     },
+    qty: {
+      type: Number,
+      default: 1,
+     
+    },
     cashieremail:{
       type: String
     },

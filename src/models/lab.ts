@@ -48,6 +48,10 @@ const labSchema = new Schema({
       default: null,
     }
   ,
+  remark:
+  {
+    type: String
+  },
   appointmentid:
   {
     type: String, 
