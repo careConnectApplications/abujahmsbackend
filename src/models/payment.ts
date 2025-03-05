@@ -5,6 +5,7 @@ export interface paymentinterface {
   paymentype: String;
   patient:any;
   amount:Number,
+  qty:Number,
   paymentreference:String,
   paymentcategory:String,
   

@@ -67,6 +67,7 @@ dosageform:String,
         let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote} = products[i];
     //    console.log(testname[i]);
         //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+        /*
         var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
         
         if(!orderPrice){
@@ -76,6 +77,7 @@ dosageform:String,
         throw new Error(`${products[i]} ${configuration.error.erroravailability}`);
 
       }
+        */
       /*
       var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
       var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
@@ -132,6 +134,62 @@ dosageform:String,
   }
 };
 
+export const confirmpharmacyorder = async (req:any, res:any) =>{
+  try{
+    //extract option
+    const {option,remark, qty} = req.body;
+    validateinputfaulsyvalue({qty});
+    const {id} = req.params;
+  //search for the lab request
+  var prescriptionresponse:any = await readoneprescription({_id:id},{},'patient','','');
+  const {prescription, orderid,patient,pharmacy} = prescriptionresponse;
+  console.log('//////', patient._id);
+  //get amount 
+  var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});
+        
+  if(!orderPrice){
+    throw new Error(`${configuration.error.errornopriceset} ${prescription}`);
+}
+if(orderPrice.qty <=0){
+  throw new Error(`${prescription} ${configuration.error.erroravailability}`);
+
+}
+
+
+
+var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+  //validate the status
+  
+  let queryresult;
+  if(option == true){
+    var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:prescription,paymentcategory:configuration.category[1],patient:patient._id,amount,qty});
+  queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+    await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+    
+  }
+  else{
+    queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
+
+  }
+  res.status(200).json({queryresult, status: true});
+    //if accept
+//accept or reject lab order
+//var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+//paymentids.push(createpaymentqueryresult._id);
+//var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+//var testrecord = await createlab({payment:createpaymentqueryresult._id});
+//change status to 2 or  13 for reject
+
+  }
+  catch(e:any){
+    console.log("error", e);
+    res.status(403).json({ status: false, msg: e.message });
+
+  }
+    
+}
+
+
     //get all pharmacy order
   export const dispense = async (req:any, res:any) => {
     try {
@@ -154,17 +212,18 @@ dosageform:String,
     }
    // console.log(testname[i]);
   var orderPrice:any = await readoneprice({servicetype:response.prescription, servicecategory: configuration.category[1]});  
+  console.log('orderprice', orderPrice);
   if(!orderPrice){
       throw new Error(configuration.error.errornopriceset);
   }
-  if(orderPrice.qty <=0){
-    throw new Error(`${response.prescription} ${configuration.error.erroravailability}`);
+  if(!orderPrice.qty || orderPrice.qty <=0){
+    throw new Error(`${response.prescription} ${configuration.error.erroravailability} or qty not defined in inventory`);
 
   }
   //reduce the quantity
-await updateprice({_id:orderPrice._id},{qty:Number(orderPrice.qty) - 1});
+await updateprice({_id:orderPrice._id},{qty:Number(orderPrice.qty) - Number(response.qty)});
 //change status 6
-var queryresult=await updateprescription({_id:response._id},{ dispensestatus: configuration.status[6]});
+var queryresult=await updateprescription(response._id,{ dispensestatus: configuration.status[6]});
 res.status(200).json({queryresult, status: true});
 
     

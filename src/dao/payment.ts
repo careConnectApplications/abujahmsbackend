@@ -13,7 +13,7 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
-  export async function createpayment(input:paymentinterface){
+  export async function createpayment(input:any){
     try{
        const user = new Payment(input);
         return await user.save();

@@ -57,6 +57,14 @@ const prescriptionSchema = new Schema({
   dosage:String,
   frequency:String,
   route:String,
+  qty:
+  {
+    type: Number
+  },
+  remark:
+  {
+    type: String
+  },
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
@@ -65,7 +73,7 @@ const prescriptionSchema = new Schema({
   
   dispensestatus:{
     type: String,
-    default: configuration.status[10],
+    default: configuration.status[14],
     required: true
 
   }
