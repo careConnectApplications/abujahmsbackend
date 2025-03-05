@@ -91,7 +91,7 @@ export const createancs = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       const staffname = `${firstName} ${lastName}`;
-      if(!(isObjectAvailable(req.body.pregnancysummary))) req.body.pregnancysummary={};
+      //if(!(isObjectAvailable(req.body.pregnancysummary))) req.body.pregnancysummary={};
       if(!(isObjectAvailable(req.body.medicalobsterichistory))) req.body.medicalobsterichistory={};
       if(!(isObjectAvailable(req.body.currenthistory))) req.body.currenthistory={};
       if(!(isObjectAvailable(req.body.generalmedicalhistory))) req.body.generalmedicalhistory={};
@@ -105,7 +105,7 @@ export const createancs = async (req:any, res:any) => {
       
      
        const {currentmedication,allergies} = req.body;
-       const {lmp,cycle,edd,gravida,term,preterm,abortions,ectopic,stillbirths,noliving} = (req.body).pregnancysummary;
+       const {lmp,cycle,edd,gravida,term,preterm,abortions,ectopic,stillbirths,noliving} = req.body;
        const {previousstillbirthornewbornloss,historyofthreeormoreconsecutivespontaneousabortions,birthweightoflastbabylessthan450,birthweightoflastbabygreaterthan450,lastpregnancyhospitaladmissionforpeteclampsia,previoussurgeryonreproductivetract} = (req.body).medicalobsterichistory;
        const {diagnosedsuspectedmultipleprenancy,agelessthan16,agemorethan40,rhesusnegative,vaginalbleeding,pelvicmass,diastolicbpgreaterthan90} = (req.body).currenthistory;
       const {diabetesmellitus,renaldisease,cardiacdisease,sicklecelldisease,hivpositive,anyotherseveremedicaldeseaseorconditionspecify}=(req.body).generalmedicalhistory;

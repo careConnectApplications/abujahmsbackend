@@ -52,10 +52,15 @@ const prescriptionSchema = new Schema({
   {
     type: String
   },
+  dosageform:String,
+  strength:String,
+  dosage:String,
+  frequency:String,
+  route:String,
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
   
   dispensestatus:{

@@ -11,15 +11,30 @@ const { ObjectId } = mongoose.Types;
 //pharmacy order
 export var pharmacyorder= async (req:any, res:any) =>{
     try{
+      //add more options  dosageform,strength,dosage,frequency
+      //remove  payment from this 
+      //add qty to the data base
+
+/*
+
+dosageform:String,
+  strength:String,
+  dosage:String,
+  frequency:String,
+  route:String,
+*/
+      
+
       console.log(req.user);
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
-      var {products,prescriptionnote, pharmacy,appointmentid} = req.body;
+      var {products, appointmentid} = req.body;
       var orderid:any=String(Date.now());
       var pharcyorderid =[];
-      var paymentids =[];
-      validateinputfaulsyvalue({id, products,pharmacy});
+      //var paymentids =[];
+     // validateinputfaulsyvalue({id, products,pharmacy});
+        validateinputfaulsyvalue({id, products});
       //search patient
       var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       
@@ -49,8 +64,10 @@ export var pharmacyorder= async (req:any, res:any) =>{
     
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
+        let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote} = products[i];
     //    console.log(testname[i]);
-        var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+        //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+        var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
         
         if(!orderPrice){
           throw new Error(`${configuration.error.errornopriceset} ${products[i]}`);
@@ -59,21 +76,24 @@ export var pharmacyorder= async (req:any, res:any) =>{
         throw new Error(`${products[i]} ${configuration.error.erroravailability}`);
 
       }
+      /*
       var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
       var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
-      
+      */
       //create 
       console.log("got here");
-      var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+      //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+      var prescriptionrecord:any = await createprescription({pharmacy,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       console.log(prescriptionrecord);
       pharcyorderid.push(prescriptionrecord ._id);
-      paymentids.push(createpaymentqueryresult._id);
+      //paymentids.push(createpaymentqueryresult._id);
       }
       
       
       
-      var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
-      res.status(200).json({queryresult:prescriptionrecord, status: true});
+      //var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
+      var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid}});
+      res.status(200).json({queryresult, status: true});
     }
     
     catch(error:any){
