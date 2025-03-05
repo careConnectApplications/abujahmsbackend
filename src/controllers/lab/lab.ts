@@ -266,11 +266,11 @@ export const confirmlaborder = async (req:any, res:any) =>{
     const {id} = req.params;
   //search for the lab request
   var lab:any =await readonelab({_id:id},{},'');
-  const {testname, appointment,patient,amount} = lab;
+  const {testname, testid,patient,amount} = lab;
   //validate the status
   let queryresult;
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference:appointment,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
+    var createpaymentqueryresult =await createpayment({paymentreference:testid,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
   queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     

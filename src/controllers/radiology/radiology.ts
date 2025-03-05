@@ -16,7 +16,6 @@ export var radiologyorder= async (req:any, res:any) =>{
     try{
       
       //accept _id from request
-      var paymentreference:any=String(Date.now());
       const {id} = req.params;
       const {testname,note} = req.body;
       const { firstName,lastName} = (req.user).user;
@@ -57,7 +56,7 @@ export var radiologyorder= async (req:any, res:any) =>{
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
      
       //create testrecordn 
-      var testrecord = await createradiology({note,testname:testname[i],patient:id,paymentreference,testid,department:testsetting[0].department,raiseby,amount:Number(testPrice.amount)});
+      var testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby,amount:Number(testPrice.amount)});
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
@@ -106,8 +105,14 @@ export var radiologyorder= async (req:any, res:any) =>{
     //update radiology
     export async function updateradiologys(req:any, res:any){
         try{
+   
         //get id
         const {id} = req.params;
+                  //check that the status is not complete
+        var myradiologystatus:any = await readoneradiology({_id:id},{},'patient');
+        if(myradiologystatus.status !== configuration.status[13]){
+          throw new Error(`${configuration.error.errortasknotpending} `);
+      }
         var { testname,note} = req.body;
         validateinputfaulsyvalue({testname,note});
         var testPrice:any = await readoneprice({servicetype:testname});
@@ -121,13 +126,10 @@ export var radiologyorder= async (req:any, res:any) =>{
         throw new Error(`${testname} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
  
-        //check that the status is not complete
-    var myradiologystatus:any = await readoneradiology({_id:id},{},'');
-    if(myradiologystatus.status !== configuration.status[9]){
-        throw new Error(`${configuration.error.errortasknotpending} `);
-    }
+   
+    
 
-    await updatepayment({_id:myradiologystatus.payment},{paymentype:testname,amount:Number(testPrice.amount)});
+   // await updatepayment({_id:myradiologystatus.payment},{paymentype:testname,amount:Number(testPrice.amount)});
     var queryresult = await updateradiology(id, {testname,note});
         //update price
 
@@ -197,11 +199,11 @@ export const confirmradiologyorder = async (req:any, res:any) =>{
     const {id} = req.params;
   //search for the lab request
   var radiology:any =await readoneradiology({_id:id},{},'');
-  const {testname, paymentreference,patient,amount} = radiology;
+  const {testname, testid,patient,amount} = radiology;
   //validate the status
   let queryresult;
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
+    var createpaymentqueryresult =await createpayment({paymentreference:testid,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
   queryresult= await updateradiology({_id:id},{status:configuration.status[9],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     

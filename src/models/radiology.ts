@@ -45,11 +45,6 @@ const radiologySchema = new Schema({
    
   },
   amount: Number,
-  paymentreference:
-  {
-    type: String, 
-    required: true
-  },
   processby: {
     type: String
   },

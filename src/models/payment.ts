@@ -35,6 +35,11 @@ const paymentSchema = new Schema(
       default: 1,
      
     },
+    numberoftimesprinted: {
+      type: Number,
+      default: 0,
+     
+    },
     cashieremail:{
       type: String
     },

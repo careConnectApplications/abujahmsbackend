@@ -68,7 +68,6 @@ const labSchema = new Schema({
       default: null,
     },
     amount: Number,
-  
   status:{
     required: true,
     type: String,

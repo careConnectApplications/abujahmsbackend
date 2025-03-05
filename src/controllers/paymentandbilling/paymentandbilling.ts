@@ -1,4 +1,4 @@
-import {readallpayment,readonepayment,updatepayment} from "../../dao/payment";
+import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
@@ -128,3 +128,24 @@ export async function confirmpayment(req:any, res:any){
 
 }
 
+//print receipt
+export async function printreceipt(req:any, res:any){
+  try{
+  const { paymentmentreference } = req.params;
+  var query ={paymentmentreference, status:configuration.status[3]};
+  var populatequery ='patient';
+ let queryresult:any = await readallpayment(query,populatequery);  
+ //update numberoftimesprinted
+ await updatepaymentbyquery(query,{$inc:{numberoftimesprinted: 1}});
+ res.json({
+   queryresult,
+   status: true,
+ });
+}
+ catch(e:any){
+  console.log(e);
+res.status(403).json({status: false, msg:e.message});
+
+}
+
+}
