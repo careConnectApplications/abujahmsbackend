@@ -557,6 +557,14 @@ const appointmentSchema = new Schema({
       paediatrics:paediatrics,
       history:history
     },
+    clinicalencounter:{
+      diagnosisnote: String,
+      diagnosisicd10: String,
+      assessmentnote:String,
+      clinicalnote:String
+
+    },
+
     lab: [
       {
         type: Schema.Types.ObjectId,
@@ -584,6 +592,11 @@ const appointmentSchema = new Schema({
   servicenumber: String,
   policephonenumber: String,
   division:String,
+  fromclinicalencounter:{
+    type: Boolean,
+    default: false,
+
+  },
   status:{
     required: true,
     type: String,

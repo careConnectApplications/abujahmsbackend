@@ -50,7 +50,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
         throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
          //create payment
-      var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+      var createpaymentqueryresult =await createpayment({paymentreference:procedureid,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
      
       //create testrecordn 
       var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});

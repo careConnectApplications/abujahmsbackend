@@ -26,6 +26,10 @@ const admissionSchema = new Schema({
   {
     type: String
   },
+  admissionid:
+  {
+    type: String
+  },
   referddate:
   {
     type: Date, 

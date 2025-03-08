@@ -13,6 +13,7 @@ export var referadmission= async (req:any, res:any) =>{
     try{
       
       const { firstName,lastName} = (req.user).user;
+      var admissionid:any=String(Date.now());
       //accept _id from request
       const {id} = req.params;
       console.log('id', id);
@@ -50,7 +51,7 @@ export var referadmission= async (req:any, res:any) =>{
 
 }
 //create admission
-var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id});
+var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid});
 //update patient 
 var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
 res.status(200).json({queryresult:admissionrecord, status: true});

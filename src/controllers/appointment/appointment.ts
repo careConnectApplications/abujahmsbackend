@@ -10,7 +10,6 @@ import  mongoose from 'mongoose';
 import {createlab} from "../../dao/lab";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber,isObjectAvailable } from "../../utils/otherservices";
 import configuration from "../../config";
-import { Aggregate } from "mongoose";
 const { ObjectId } = mongoose.Types;
 
 
@@ -122,7 +121,7 @@ export const getAllPreviousEncounter = async (req:any, res:any) => {
     const {id} = req.params;
     //const {clinic} = (req.user).user;
     //console.log(clinic);
-    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],patient:id},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],patient:id,fromclinicalencounter:false},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -131,12 +130,41 @@ export const getAllPreviousEncounter = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+export const getAllPreviousClininicalEncounter = async (req:any, res:any) => {
+  try {
+    const {id} = req.params;
+    //const {clinic} = (req.user).user;
+    //console.log(clinic);
+    const queryresult = await readallappointment({$or:[{status:configuration.status[6]},{status:configuration.status[9]}],patient:id,fromclinicalencounter:true},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+//get all completed clinical encounter
+export const getAllCompletedClinicalEncounter = async (req:any, res:any) => {
+  try {
+    const {id} = req.params;
+    //const {clinic} = (req.user).user;
+    const queryresult = await readallappointment({status:configuration.status[6],patient:id,fromclinicalencounter:true},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+
 //completed encounter
 export const getAllCompletedEncounter = async (req:any, res:any) => {
   try {
     const {id} = req.params;
     //const {clinic} = (req.user).user;
-    const queryresult = await readallappointment({status:configuration.status[6],patient:id},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({status:configuration.status[6],patient:id,fromclinicalencounter:false},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -150,7 +178,20 @@ export const getAllInProgressEncounter = async (req:any, res:any) => {
   try {
    // const {clinic} = (req.user).user;
     const {id} = req.params;
-    const queryresult = await readallappointment({status:configuration.status[9],patient:id},{},'patient','doctor','payment');
+    const queryresult = await readallappointment({status:configuration.status[9],patient:id,fromclinicalencounter:false},{},'patient','doctor','payment');
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+export const getAllInProgressClinicalEncounter = async (req:any, res:any) => {
+  try {
+   // const {clinic} = (req.user).user;
+    const {id} = req.params;
+    const queryresult = await readallappointment({status:configuration.status[9],patient:id,fromclinicalencounter:true},{},'patient','doctor','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -395,6 +436,53 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
   }
 
 }
+export async function addclinicalencounter(req:any, res:any){
+  try{
+    const {id} = req.params;
+  const {email, staffId} = (req.user).user;
+
+  //find doctor and add doctor who examined
+  const user = await readone({email, staffId});
+   
+  //validate id
+  //validate other input paramaters
+  //search appoint where appoint id = id
+  //extract vitals id
+  if(req.body.status == 1){
+    req.body.status = configuration.status[6];
+
+  }
+  else if(req.body.status == 2){
+    req.body.status = configuration.status[5];
+
+  }
+  else{
+    req.body.status = configuration.status[9];
+  }
+  var {diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,status} = req.body;
+  validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote});
+  const clinicalencounter ={diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote};
+  var queryresult;
+  
+  //find id 
+  var checkadimmison = await readoneadmission({_id:id},{},'');
+  if(checkadimmison){
+    queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
+  }else{
+  queryresult = await updateappointment(id, {clinicalencounter,statusdoctor:user?._id,fromclinicalencounter:true});
+  }  
+  res.status(200).json({
+    queryresult,
+    status:true
+  }); 
+
+  }
+  catch(e:any){
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
 //create vitals
 //update a patient
 export async function addencounter(req:any, res:any){
@@ -402,6 +490,7 @@ export async function addencounter(req:any, res:any){
   //
   const {id} = req.params;
   const {email, staffId} = (req.user).user;
+  
   //find doctor and add doctor who examined
   const user = await readone({email, staffId});
  
@@ -420,6 +509,7 @@ export async function addencounter(req:any, res:any){
   else{
     req.body.status = configuration.status[9];
   }
+  //fromclinicalencounter
  
  //validate empty object and initialize
 
@@ -514,17 +604,17 @@ export async function addencounter(req:any, res:any){
   //else update
   if(height || weight ){
       if(checkadimmison){
-        queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient});
+        queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:false});
       }else{
-      queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
+      queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,fromclinicalencounter:false});
       }  
 }
   else{
       if(checkadimmison){
-         queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient});
+         queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:false});
       }
       else{
-          queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id});
+          queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,fromclinicalencounter:false});
       }
   
   }
