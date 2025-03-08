@@ -126,7 +126,7 @@ export const getAllPreviousEncounter = async (req:any, res:any) => {
       queryresult,
       status:true
     }); 
-  } catch (error:any) {
+  } catch (error:any) {6
     res.status(403).json({ status: false, msg: error.message });
   }
 };

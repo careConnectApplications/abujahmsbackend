@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.get('/getpatientbillinghistory/:id',readbillinghistoryforapatient);
-router.get('/printreceipt/:paymentmentreference',printreceipt);
+router.get('/printreceipt/:paymentreference',printreceipt);
 router.get('/getallpatientbillinghistory',readbillinghistoryforallapatient);
 router.put('/confirmpayment/:id',confirmpayment);
 //readbillinghistoryforallapatient

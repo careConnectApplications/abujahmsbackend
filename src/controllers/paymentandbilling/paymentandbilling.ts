@@ -131,10 +131,11 @@ export async function confirmpayment(req:any, res:any){
 //print receipt
 export async function printreceipt(req:any, res:any){
   try{
-  const { paymentmentreference } = req.params;
-  var query ={paymentmentreference, status:configuration.status[3]};
-  var populatequery ='patient';
- let queryresult:any = await readallpayment(query,populatequery);  
+  const { paymentreference } = req.params;
+//paymentreference
+  var query ={paymentreference, status:configuration.status[3]};
+  var populatequery ='';
+ let queryresult:any = await readallpayment({paymentreference, status:configuration.status[3]},populatequery);  
  //update numberoftimesprinted
  await updatepaymentbyquery(query,{$inc:{numberoftimesprinted: 1}});
  res.json({
