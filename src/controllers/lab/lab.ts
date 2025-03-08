@@ -77,7 +77,7 @@ export const readallscheduledlab = async (req:any, res:any) => {
   try {
       //const {clinic} = (req.user).user;
     //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[14]}]},{},'patient','appointment','payment');
+    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[13]},{status:configuration.status[14]}]},{},'patient','appointment','payment');
     res.status(200).json({
       queryresult,
       status:true

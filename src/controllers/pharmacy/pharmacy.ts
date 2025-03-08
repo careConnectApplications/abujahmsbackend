@@ -138,7 +138,9 @@ export const confirmpharmacyorder = async (req:any, res:any) =>{
   try{
     //extract option
     const {option,remark, qty} = req.body;
+    if(option == true){
     validateinputfaulsyvalue({qty});
+    }
     const {id} = req.params;
   //search for the lab request
   var prescriptionresponse:any = await readoneprescription({_id:id},{},'patient','','');
