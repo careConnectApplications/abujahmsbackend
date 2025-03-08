@@ -103,6 +103,7 @@ export async function readallappointmentfirstfive(query:any,selectquery:any,popu
   export async function updateappointmentbyquery(query:any, reqbody:any){
     try{
     const appointment = await Appointment.findOneAndUpdate(query, reqbody,{
+      upsert: true,
       new: true
     });
       if (!appointment) {
