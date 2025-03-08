@@ -90,6 +90,22 @@ export async function getallpharmacystock(req:any, res:any){
   }
 
 }
+export async function getallpharmacystockbyphamarcy(req:any, res:any){
+  try{
+      const { clinic} = req.params;
+      const queryresult = await readallprices({servicecategory:configuration.category[1], pharmacy:clinic});
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
 //add a stock
 export var createstock = async (req:any,res:any) =>{
    
