@@ -6,6 +6,7 @@ import {readoneprice} from "../../dao/price";
 import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import {readoneadmission} from  "../../dao/admissions";
 
 
 
@@ -202,8 +203,18 @@ export const confirmradiologyorder = async (req:any, res:any) =>{
   const {testname, testid,patient,amount} = radiology;
   //validate the status
   let queryresult;
+  let paymentreference;
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+
+}
+else{
+  paymentreference = testid;
+}
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference:testid,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
   queryresult= await updateradiology({_id:id},{status:configuration.status[9],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     

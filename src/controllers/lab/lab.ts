@@ -6,6 +6,8 @@ import  mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 import  {readone}  from "../../dao/users";
 import configuration from "../../config";
+import {readoneadmission} from  "../../dao/admissions";
+
 
 // Get all lab records
 export const readalllabb = async (req:any, res:any) => {
@@ -269,8 +271,20 @@ export const confirmlaborder = async (req:any, res:any) =>{
   const {testname, testid,patient,amount} = lab;
   //validate the status
   let queryresult;
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  let paymentreference; 
+//validate the status
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+
+}
+else{
+  paymentreference = testid;
+}
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference:testid,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
   queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     

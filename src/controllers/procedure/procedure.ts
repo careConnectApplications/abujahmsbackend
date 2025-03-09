@@ -6,6 +6,8 @@ import {readoneprice} from "../../dao/price";
 import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import {readoneadmission} from  "../../dao/admissions";
+
 
 
 
@@ -49,8 +51,18 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       if(!testsetting || testsetting.length < 1){
         throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
+    let paymentreference;
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient:id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+
+}
+else{
+  paymentreference = procedureid;
+}
          //create payment
-      var createpaymentqueryresult =await createpayment({paymentreference:procedureid,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+      var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
      
       //create testrecordn 
       var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});

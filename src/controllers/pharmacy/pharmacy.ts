@@ -6,6 +6,8 @@ import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
 import {readoneappointment} from "../../dao/appointment";
+import {readoneadmission} from  "../../dao/admissions";
+
 const { ObjectId } = mongoose.Types;
 
 //pharmacy order
@@ -145,7 +147,7 @@ export const confirmpharmacyorder = async (req:any, res:any) =>{
   //search for the lab request
   var prescriptionresponse:any = await readoneprescription({_id:id},{},'patient','','');
   const {prescription, orderid,patient,pharmacy} = prescriptionresponse;
-  console.log('//////', patient._id);
+  
   //get amount 
   var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});
         
@@ -160,11 +162,20 @@ if(orderPrice.qty <=0){
 
 
 var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
-  //validate the status
-  
+let paymentreference; 
+//validate the status
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+
+}
+else{
+  paymentreference = orderid;
+}
   let queryresult;
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:prescription,paymentcategory:configuration.category[1],patient:patient._id,amount,qty});
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:configuration.category[1],patient:patient._id,amount,qty});
   queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     
