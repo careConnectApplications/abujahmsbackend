@@ -1,4 +1,4 @@
-import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery} from "../../dao/payment";
+import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
@@ -136,10 +136,32 @@ export async function printreceipt(req:any, res:any){
   var query ={paymentreference, status:configuration.status[3]};
   var populatequery ='patient';
  let queryresult:any = await readallpayment({paymentreference, status:configuration.status[3]},populatequery);  
+ //get total sum
+ // Aggregation to calculate sum and add it as a new field
+ let totalAmount = await readallpaymentaggregate([
+  {
+    $match: query
+  },
+  {
+    $group: {
+      _id: null, // null means no grouping, we just want the total sum for the entire collection
+      totalAmount: { $sum: "$amount" } // Sum of the itemPrice for all documents
+    }
+  },
+  {
+    $project:{
+      totalAmount:1,
+      _id:0
+    }
+  }
+
+ ]);
+
  //update numberoftimesprinted
  await updatepaymentbyquery(query,{$inc:{numberoftimesprinted: 1}});
  res.json({
    queryresult,
+   totalAmount,
    status: true,
  });
 }

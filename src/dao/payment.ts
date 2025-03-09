@@ -14,6 +14,15 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
+  export async function readallpaymentaggregate(input:any) {
+    try{
+    return await Payment.aggregate(input);
+    }
+    catch(e:any){
+      throw new Error(configuration.error.erroruserread);
+    
+    }
+    }
   export async function createpayment(input:any){
     try{
        const user = new Payment(input);

@@ -53,7 +53,8 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
-       
+
+        bookingstatus:["booked","unbooked"],
         cptcodes:["Anesthesia for Procedure ans Services on the head","Anesthesia for Procedure ans Services on the neck"],
         dxcodes:["other amebic genitourinary infections","Other amebic infections"],
         priority:["Urgent", "Routine","Non-Urgent"],
