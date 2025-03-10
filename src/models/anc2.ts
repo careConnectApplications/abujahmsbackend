@@ -4,9 +4,12 @@ const obstetrichistoryschema = new Schema({
     sexofchild:String,
     gestage:String,
     birthweight:String,
-    lengthoflabour:String,
-    placeoflabour:String,
+    problemsduringpregancy:String, 
+    problemsduringdelivery:String, 
+    problemsafterdelivery:String,
+    placeofbirth:String,
     modeofdelivery:String,
+    typeofbirth:String,
     comment:String
 
 
