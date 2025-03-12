@@ -465,7 +465,7 @@ export async function addclinicalencounter(req:any, res:any){
   var queryresult;
   
   //find id 
-  var checkadimmison = await readoneadmission({_id:id},{},'');
+  var checkadimmison = await readoneadmission({_id:new ObjectId(id)},{},'');
   if(checkadimmison){
     queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
   }else{
