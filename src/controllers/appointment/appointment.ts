@@ -469,7 +469,7 @@ export async function addclinicalencounter(req:any, res:any){
   if(checkadimmison){
     queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
   }else{
-  queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
+  queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
   }  
   res.status(200).json({
     queryresult,
