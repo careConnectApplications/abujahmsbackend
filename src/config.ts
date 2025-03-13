@@ -2,6 +2,9 @@
   import  {readallservicetype}  from "./dao/servicetype";
   
 const configuration = {
+  reports:[
+    {querytype:"Financial Report",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
+  ],
   hmodrugpayment: 0.1,
   roles:[
     {role: "Medical Director", roleId:"1"},

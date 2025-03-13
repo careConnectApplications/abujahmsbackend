@@ -1,13 +1,13 @@
 
+import configuration from "../../config";
 export const financialreportreport = async (req:any, res:any) => {
 try{
-  /*
+  
   //paymentcategory
   //cashieremail
 var { querygroup, querytype, startdate, enddate }: any = req.params;
-const temstore = configuration.allstorevalues;
-if (!querygroup || !temstore.includes(querygroup)) {
-  throw new Error(configuration.error.errorwrongshelf);
+if (!querygroup) {
+  throw new Error(`querygroup ${configuration.error.errorisrequired}`);
 }
 if (!startdate || !enddate) {
   var todaydate = new Date();
@@ -21,21 +21,83 @@ if (!startdate || !enddate) {
   startdate = new Date(startdate);
   enddate = new Date(enddate);
 }
-/*
-const reportbystore = [
+
+const reportbyfinancialreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
     {   
-            $match:{$and:[{store: querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+            $match:{$and:[{paymentcategory: querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
     }
     
 ];
-*/
+//admission
+//referedward
+//status
+
+//appointment
+//clinic
+
 /*
-const reportbystore = [
+patient: {
+      type: Schema.Types.ObjectId,
+      ref: "Patientsmanagement",
+      default: null,
+    },
+
+    referedward:
   {
-    $match: { store: querygroup },
+    type: Schema.Types.ObjectId,
+    ref: "Wardmanagement",
+    default: null,
+  },
+*/
+
+const reportbyadmissionreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $lookup: {
+      from: "wardmanagements",
+      localField: "referedward",
+      foreignField: "_id",
+      as: "referedward",
+    },
+  },
+  {
+    $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+  },
+  {
+    $match:{$and:[{"referedward.wardname": querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]} 
+  },
+];
+
+const reportbyappointmentreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $match:{$and:[{clinic: querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
 //for scn and sra
+/*
 const reportbystorescnsra = [
   {
     $lookup: {
@@ -127,22 +189,16 @@ const reportbystorestransfer = [
     },
   },
 ];
+*/
 var queryresult: any;
-if (querytype == configuration.querytype[0]) {
-  queryresult = await readshelfaggregate(reportbystore);
-} else if (querytype == configuration.querytype[1]) {
-  queryresult = await readscnaggregate(reportbystorescnsra);
-} else if (querytype == configuration.querytype[2]) {
-  queryresult = await readsraaggregate(reportbystoresra);
-} else if (querytype == configuration.querytype[3]) {
-  queryresult = await readrequestaggregate(reportbystoresrequest);
-} else if (querytype == configuration.querytype[4]) {
-  queryresult = await readtransferaggregate(reportbystorestransfer);
-} else {
-  throw new Error(configuration.error.errorwrongquerygroup);
+//Financial report
+if (querytype == configuration.reports[0].querytype) {
+  //queryresult = await readshelfaggregate(reportbystore);
+}  else {
+ // throw new Error(configuration.error.errorwrongquerygroup);
 }
 res.json({ queryresult, status: true });
-*/
+
 
   }
   catch(e:any){

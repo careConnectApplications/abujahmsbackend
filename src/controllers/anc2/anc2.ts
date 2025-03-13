@@ -91,10 +91,11 @@ export const createancsv2 = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       const staffname = `${firstName} ${lastName}`;  
-      const {presentingcomplaints,historyofpresentingcomplaints,historyofindexpregnancy,gynaehistory,passsurgicalhistory,drughistory,familyandsocialhistory,systematicreview} = req.body;
+      const {presentingcomplaints,historyofpresentingcomplaints,historyofindexpregnancy,gynaehistory,passsurgicalhistory,drughistory,familyandsocialhistory,systematicreview,generalmedicalhistory} = req.body;
       const {bookingstatus,lmp,edd,gravidity,ega,lcb} = req.body;      
        const reproductiveprofile={bookingstatus,lmp,edd,gravidity,ega,lcb};
        const {pastobstetrichistory} = req.body;
+      
        //frequency must inlcude
        //route must contain allowed options
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
@@ -103,7 +104,7 @@ export const createancsv2 = async (req:any, res:any) => {
            throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
   
        }
-    const queryresult=await createanc({patient:patientrecord._id,reproductiveprofile,pastobstetrichistory,presentingcomplaints,historyofpresentingcomplaints,historyofindexpregnancy,gynaehistory,passsurgicalhistory,drughistory,familyandsocialhistory,systematicreview,staffname});
+    const queryresult=await createanc({patient:patientrecord._id,generalmedicalhistory,reproductiveprofile,pastobstetrichistory,presentingcomplaints,historyofpresentingcomplaints,historyofindexpregnancy,gynaehistory,passsurgicalhistory,drughistory,familyandsocialhistory,systematicreview,staffname});
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
