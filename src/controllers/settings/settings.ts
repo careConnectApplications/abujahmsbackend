@@ -44,7 +44,8 @@ export const settings = async function () {
             {querytype:"appointmentreport",querygroup:clinicNames},
             {querytype:"admissionreport",querygroup:wardNames}
           ];
-          return reports;
+        const summary=["financialaggreagate","cashieraggregate","appointmentaggregate","admissionaggregate","theatreaggregate"];
+          return {reports,summary};
     }
     catch (error: any) {
         console.log("error", error);
@@ -60,7 +61,24 @@ export async function settingsresponse(req:Request, res:any){
     //console.log("clinic", clinicdetails);
     var setting:any = await settings();
         res.status(200).json({
-            querygroupsettings:setting,
+            querygroupsettings:setting.reports,
+            status:true
+          }); 
+
+    }
+    catch(e:any){
+        res.json({status: false, msg:e.message});
+
+    }
+
+}
+export async function settingsummaryresponse(req:Request, res:any){
+    try{
+    //const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+    //console.log("clinic", clinicdetails);
+    var setting:any = await settings();
+        res.status(200).json({
+            querygroupsettings:setting.summary,
             status:true
           }); 
 

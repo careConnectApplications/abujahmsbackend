@@ -4,14 +4,14 @@ import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate} fr
 import {settings} from "../settings/settings";
 export const reports = async (req:any, res:any) => {
 try{
-  console.log(req.params);
+
   //paymentcategory
   //cashieremail
 var { querygroup, querytype, startdate, enddate }: any = req.params;
 if (!querygroup) {
   throw new Error(`querygroup ${configuration.error.errorisrequired}`);
 }
-console.log("got here");
+
 if (!startdate || !enddate) {
   var todaydate = new Date();
   enddate = todaydate;
@@ -198,11 +198,11 @@ const reportbystorestransfer = [
 ];
 */
 var queryresult: any;
-console.log('check',querytype);
+
 //var c = await configuration.settings2();
 
 
-let reports:any = await settings();
+let {reports}:any = await settings();
 console.log('settings',reports);
 //Financial report
 if (querytype == reports[0].querytype) {
@@ -229,4 +229,210 @@ res.json({ queryresult, status: true });
 
   }
 
+}
+// cashier reconcillation
+export const reconcillation = async (req:any, res:any) =>{
+
+}
+//report summary
+export const reportsummary = async (req:any,res:any) =>{
+  try{
+    console.log("////////////////////////");
+    var { querytype,startdate, enddate }: any = req.params;
+    if (!startdate || !enddate) {
+      var todaydate = new Date();
+      enddate = todaydate;
+      startdate = new Date(
+        todaydate.getFullYear(),
+        todaydate.getMonth(),
+        todaydate.getDate()
+      );
+    } else {
+      startdate = new Date(startdate);
+      enddate = new Date(enddate);
+    }
+    
+    let {summary}:any = await settings();
+    const financialaggregatepaid = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$paymentcategory",                // Group by product
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $project:{
+          paymentcategory:"$_id",
+          totalAmount:1,
+          status:configuration.status[3],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const financialaggregatependingpaid = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[2]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$paymentcategory",                // Group by product
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $project:{
+          paymentcategory:"$_id",
+          totalAmount:1,
+          status:configuration.status[2],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const cashieraggregatependingpaid = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$cashieremail",                // Group by product
+          totalAmount: { $sum: "$amount" },
+          cashierid:{$first:"$cashierid"}
+        }
+      },
+      {
+        $project:{
+          cashieremail:"$_id",
+          totalAmount:1,
+          cashierid:1,
+          status:configuration.status[3],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    //5 , 6 ,9
+    const appointmentaggregatescheduled = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[5]} , {
+          appointmentdate:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$clinic",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          clinic:"$_id",
+          Numberofappointment:1,
+          status:configuration.status[5],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const appointmentaggregatecomplete = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[6]} , {
+          appointmentdate:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$clinic",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          clinic:"$_id",
+          Numberofappointment:1,
+          status:configuration.status[6],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const appointmentaggregateinprogress = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[9]} , {
+          appointmentdate:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: "$clinic",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          clinic:"$_id",
+          Numberofappointment:1,
+          status:configuration.status[9],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    let queryresult:any; 
+    if(querytype == summary[0]){
+     queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
+    }
+    else if(querytype == summary[1]){
+    //cashier summary
+    queryresult = await readpaymentaggregate(cashieraggregatependingpaid);
+    }
+    else if(querytype == summary[2]){
+      queryresult = {scheduled: await readappointmentaggregate(appointmentaggregatescheduled),complete:await readappointmentaggregate(appointmentaggregatecomplete), inprogress:await readappointmentaggregate(appointmentaggregateinprogress)};
+
+    //appointment summary
+    }
+    else if(querytype == summary[3]){
+    //wardadmission dummary
+    }
+    else if(querytype == summary[4]){
+    //theatre admission summary
+    }
+    else{
+      //throw error
+    }
+    
+
+    res.json({ queryresult, status: true });
+    
+
+
+  }
+  catch(e:any){
+
+  }
 }
