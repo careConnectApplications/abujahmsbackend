@@ -603,7 +603,10 @@ const appointmentSchema = new Schema({
     default: configuration.status[5],
 
   }
-});
+},
+{ timestamps: true }
+
+);
 
 const appointment = model('Appointment', appointmentSchema);
 export default appointment;

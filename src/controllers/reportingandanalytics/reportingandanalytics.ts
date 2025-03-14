@@ -1,14 +1,17 @@
 
 import configuration from "../../config";
-export const financialreportreport = async (req:any, res:any) => {
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate} from "../../dao/reports";
+import {settings} from "../settings/settings";
+export const reports = async (req:any, res:any) => {
 try{
-  
+  console.log(req.params);
   //paymentcategory
   //cashieremail
 var { querygroup, querytype, startdate, enddate }: any = req.params;
 if (!querygroup) {
   throw new Error(`querygroup ${configuration.error.errorisrequired}`);
 }
+console.log("got here");
 if (!startdate || !enddate) {
   var todaydate = new Date();
   enddate = todaydate;
@@ -36,6 +39,7 @@ const reportbyfinancialreport = [
     }
     
 ];
+
 //admission
 //referedward
 //status
@@ -79,7 +83,7 @@ const reportbyadmissionreport = [
     $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
   },
   {
-    $match:{$and:[{"referedward.wardname": querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]} 
+    $match:{$and:[{"referedward.wardname": querygroup}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
 
@@ -93,9 +97,12 @@ const reportbyappointmentreport = [
     },
   },
   {
-    $match:{$and:[{clinic: querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]} 
+    $match:{$and:[{clinic: querygroup}, {
+      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
+
+
 //for scn and sra
 /*
 const reportbystorescnsra = [
@@ -191,10 +198,26 @@ const reportbystorestransfer = [
 ];
 */
 var queryresult: any;
+console.log('check',querytype);
+//var c = await configuration.settings2();
+
+
+let reports:any = await settings();
+console.log('settings',reports);
 //Financial report
-if (querytype == configuration.reports[0].querytype) {
-  //queryresult = await readshelfaggregate(reportbystore);
-}  else {
+if (querytype == reports[0].querytype) {
+  
+  queryresult = await readpaymentaggregate(reportbyfinancialreport);
+}  
+else if(querytype == reports[1].querytype){
+  queryresult= await readappointmentaggregate(reportbyappointmentreport);
+
+}
+else if(querytype == reports[2].querytype){
+  queryresult= await readadmissionaggregate(reportbyadmissionreport);
+
+}
+else {
  // throw new Error(configuration.error.errorwrongquerygroup);
 }
 res.json({ queryresult, status: true });
@@ -202,6 +225,7 @@ res.json({ queryresult, status: true });
 
   }
   catch(e:any){
+    console.log(e.message);
 
   }
 

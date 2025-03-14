@@ -1,9 +1,11 @@
   import {readallclinics} from "./dao/clinics";
   import  {readallservicetype}  from "./dao/servicetype";
-  
+  import {readwardaggregate,readclinicaggregate}  from "./dao/reports";
 const configuration = {
+  //clinic name
+  //wardname  
   reports:[
-    {querytype:"Financial Report",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
+    {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
   ],
   hmodrugpayment: 0.1,
   roles:[
@@ -37,11 +39,9 @@ const configuration = {
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],
   ishmo:["No","Yes"],
-
   settings: async function(){
-    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
-    const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
-
+const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
    
 const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category == this.category[2]);
 console.log('service', servicetypedetail);

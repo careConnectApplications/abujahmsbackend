@@ -23,6 +23,8 @@ import procedure from '../routes/procedure';
 import dashboard  from '../routes/dashboard';
 import anc from '../routes/anc';
 import theatreadmission from '../routes/theatreadmission';
+import reports  from '../routes/reportsandanalytics';
+
 
 import {protect} from "../utils/middleware";
 
@@ -67,6 +69,7 @@ function createServer(){
   app.use('/api/v1/dashboard', protect, dashboard);
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
+  app.use('/api/v1/reports', reports);
 
   
 
