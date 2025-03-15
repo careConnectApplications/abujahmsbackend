@@ -232,6 +232,15 @@ res.json({ queryresult, status: true });
 }
 // cashier reconcillation
 export const reconcillation = async (req:any, res:any) =>{
+  try{
+
+  //find cashier with status
+
+  //return total  
+  }
+  catch(e:any){
+
+  }
 
 }
 //report summary
@@ -422,13 +431,13 @@ export const reportsummary = async (req:any,res:any) =>{
       {
         $group: {
           _id: "$referedward.wardname",                // Group by product
-          Numberofappointment: { $sum: 1 },
+          Numberofadmission: { $sum: 1 },
         }
       },
       {
         $project:{
           wardname:"$_id",
-          Numberofappointment:1,
+          Numberofadmission:1,
           status:configuration.admissionstatus[1],
           _id:0
 
@@ -455,13 +464,13 @@ export const reportsummary = async (req:any,res:any) =>{
       {
         $group: {
           _id: "$referedward.wardname",                // Group by product
-          Numberofappointment: { $sum: 1 },
+          Numberofadmission: { $sum: 1 },
         }
       },
       {
         $project:{
           wardname:"$_id",
-          Numberofappointment:1,
+          Numberofadmission:1,
           status:configuration.admissionstatus[3],
           _id:0
 
@@ -488,13 +497,13 @@ export const reportsummary = async (req:any,res:any) =>{
       {
         $group: {
           _id: "$referedward.wardname",                // Group by product
-          Numberofappointment: { $sum: 1 },
+          Numberofadmission: { $sum: 1 },
         }
       },
       {
         $project:{
           wardname:"$_id",
-          Numberofappointment:1,
+          Numberofadmission:1,
           status:configuration.admissionstatus[5],
           _id:0
 
