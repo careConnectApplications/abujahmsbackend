@@ -1,6 +1,7 @@
 
 import configuration from "../../config";
 import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate} from "../../dao/reports";
+import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 export const reports = async (req:any, res:any) => {
 try{
@@ -218,7 +219,7 @@ else if(querytype == reports[2].querytype){
 
 }
 else {
- // throw new Error(configuration.error.errorwrongquerygroup);
+  throw new Error(`querytype ${configuration.error.errorisrequired}`);
 }
 res.json({ queryresult, status: true });
 
@@ -231,10 +232,62 @@ res.json({ queryresult, status: true });
 
 }
 // cashier reconcillation
-export const reconcillation = async (req:any, res:any) =>{
+export const cashierreport = async (req:any, res:any) =>{
   try{
 
   //find cashier with status
+   //paymentcategory
+  //cashieremail
+var {startdate, enddate, email }: any = req.params;
+if (!startdate || !enddate) {
+  var todaydate = new Date();
+  enddate = todaydate;
+  startdate = new Date(
+    todaydate.getFullYear(),
+    todaydate.getMonth(),
+    todaydate.getDate()
+  );
+} else {
+  startdate = new Date(startdate);
+  enddate = new Date(enddate);
+}
+
+   
+    var query ={cashieremail:email,createdAt:{ $gt: startdate, $lt: enddate }};
+      var populatequery ='patient';
+      const cashieraggregatependingpaid = [
+        {   
+        
+          $match:{$and:[{status:configuration.status[3]},{cashieremail:email} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+  
+  },
+        {
+          $group: {
+            _id: "$cashieremail",                // Group by product
+            totalAmount: { $sum: "$amount" },
+            cashierid:{$first:"$cashierid"}
+          }
+        },
+        {
+          $project:{
+            cashieremail:"$_id",
+            totalAmount:1,
+            cashierid:1,
+            status:configuration.status[3],
+            _id:0
+  
+          }
+  
+        }
+          
+      ];
+      const queryresult = {paymentrecords: (await readallpayment(query,populatequery)).paymentdetails, paymentsummary:await readpaymentaggregate(cashieraggregatependingpaid)};
+   
+      res.json({
+        queryresult,
+        status: true,
+      });
+
 
   //return total  
   }
@@ -530,7 +583,7 @@ export const reportsummary = async (req:any,res:any) =>{
     queryresult= {admited: await readadmissionaggregate(admissionaggregateadmited),transfered:await readadmissionaggregate(admissionaggregatetransfered),discharged:await readadmissionaggregate(admissionaggregatedischarged)};
     }
     else{
-      //throw error
+      throw new Error(`querytype ${configuration.error.errorisrequired}`);
     }
     
 

@@ -84,7 +84,7 @@ export async function confirmpayment(req:any, res:any){
 
     //var settings =await  configuration.settings();
      const status= configuration.status[3];
-     const {email, staffId} = req.user;
+     const {email, staffId} = (req.user).user;
      const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
       //const queryresult:any =await updatepayment(id,{status});
       //confirm payment of the service paid for 

@@ -1,5 +1,5 @@
 import { AnyARecord } from "dns";
-import { readwardaggregate, readclinicaggregate } from "../../dao/reports";
+import { readwardaggregate, readclinicaggregate, readpaymentaggregate } from "../../dao/reports";
 export const settings = async function () {
     try {
         const clinic: any = [
@@ -85,6 +85,47 @@ export async function settingsummaryresponse(req:Request, res:any){
     }
     catch(e:any){
         res.json({status: false, msg:e.message});
+
+    }
+
+}
+export async function cashiersettings(req:any, res:any) {
+    try{
+        const cashieraggregatependingpaid = [
+            {   
+        
+                $match:{cashieremail:{$ne:null}}    
+        
+        },
+          
+            {
+              $group: {
+                _id: "$cashieremail",                // Group by product
+                
+              }
+            },
+            {
+              $project:{
+                cashieremail:"$_id",
+                _id:0
+      
+              }
+      
+            }
+              
+          ];
+          readpaymentaggregate
+          var queryresult:any = await readpaymentaggregate(cashieraggregatependingpaid);
+          res.status(200).json({
+            queryresult,
+              status:true
+            }); 
+
+
+    }
+    catch(e:any){
+        res.json({status: false, msg:e.message});
+
 
     }
 
