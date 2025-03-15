@@ -403,6 +403,106 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
+    //3,5,
+    const admissionaggregateadmited = [
+      {
+        $lookup: {
+          from: "wardmanagements",
+          localField: "referedward",
+          foreignField: "_id",
+          as: "referedward",
+        },
+      },
+      {
+        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+      },
+      {
+        $match:{$and:[{status:configuration.admissionstatus[1]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
+      },
+      {
+        $group: {
+          _id: "$referedward.wardname",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          wardname:"$_id",
+          Numberofappointment:1,
+          status:configuration.admissionstatus[1],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const admissionaggregatetransfered = [
+      {
+        $lookup: {
+          from: "wardmanagements",
+          localField: "referedward",
+          foreignField: "_id",
+          as: "referedward",
+        },
+      },
+      {
+        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+      },
+      {
+        $match:{$and:[{status:configuration.admissionstatus[3]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
+      },
+      {
+        $group: {
+          _id: "$referedward.wardname",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          wardname:"$_id",
+          Numberofappointment:1,
+          status:configuration.admissionstatus[3],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const admissionaggregatedischarged = [
+      {
+        $lookup: {
+          from: "wardmanagements",
+          localField: "referedward",
+          foreignField: "_id",
+          as: "referedward",
+        },
+      },
+      {
+        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+      },
+      {
+        $match:{$and:[{status:configuration.admissionstatus[5]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
+      },
+      {
+        $group: {
+          _id: "$referedward.wardname",                // Group by product
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          wardname:"$_id",
+          Numberofappointment:1,
+          status:configuration.admissionstatus[5],
+          _id:0
+
+        }
+
+      }
+        
+    ];
     let queryresult:any; 
     if(querytype == summary[0]){
      queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -417,10 +517,8 @@ export const reportsummary = async (req:any,res:any) =>{
     //appointment summary
     }
     else if(querytype == summary[3]){
-    //wardadmission dummary
-    }
-    else if(querytype == summary[4]){
-    //theatre admission summary
+    //wardadmission summary
+    queryresult= {admited: await readadmissionaggregate(admissionaggregateadmited),transfered:await readadmissionaggregate(admissionaggregatetransfered),discharged:await readadmissionaggregate(admissionaggregatedischarged)};
     }
     else{
       //throw error
