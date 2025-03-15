@@ -49,7 +49,7 @@ export const settings = async function () {
     }
     catch (error: any) {
         console.log("error", error);
-        //throw error
+       throw new Error(error.message);
     }
 
 }

@@ -227,6 +227,7 @@ res.json({ queryresult, status: true });
   }
   catch(e:any){
     console.log(e.message);
+    res.json({status: false, msg:e.message});
 
   }
 
@@ -292,6 +293,7 @@ if (!startdate || !enddate) {
   //return total  
   }
   catch(e:any){
+    res.json({status: false, msg:e.message});
 
   }
 
@@ -593,6 +595,7 @@ export const reportsummary = async (req:any,res:any) =>{
 
   }
   catch(e:any){
+    res.json({status: false, msg:e.message});
 
   }
 }
