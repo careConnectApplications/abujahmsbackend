@@ -44,7 +44,7 @@ export const settings = async function () {
             {querytype:"appointmentreport",querygroup:clinicNames},
             {querytype:"admissionreport",querygroup:wardNames}
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate"];
           return {reports,summary};
     }
     catch (error: any) {

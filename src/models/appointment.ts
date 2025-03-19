@@ -558,10 +558,10 @@ const appointmentSchema = new Schema({
       history:history
     },
     clinicalencounter:{
-      diagnosisnote: String,
+      diagnosisnote:[],
       diagnosisicd10: String,
-      assessmentnote:String,
-      clinicalnote:String
+      assessmentnote:[],
+      clinicalnote:[]
 
     },
 

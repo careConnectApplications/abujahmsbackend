@@ -1,6 +1,6 @@
 
 import configuration from "../../config";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 export const reports = async (req:any, res:any) => {
@@ -341,6 +341,28 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
+    const financialaggregategrandtotalpaid = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: null,                // Group by product
+          grandtotalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $project:{
+          grandtotalAmount:1,
+          _id:0
+
+        }
+
+      }
+        
+    ];
     const financialaggregatependingpaid = [
       {   
       
@@ -365,7 +387,7 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
-    const cashieraggregatependingpaid = [
+    const cashieraggregatepaid = [
       {   
       
         $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
@@ -384,6 +406,28 @@ export const reportsummary = async (req:any,res:any) =>{
           totalAmount:1,
           cashierid:1,
           status:configuration.status[3],
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    const cashieraggregatepaidgrandtotal = [
+      {   
+      
+        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+
+},
+      {
+        $group: {
+          _id: null,                // Group by product
+          grandtotalAmount: { $sum: "$amount" }
+        }
+      },
+      {
+        $project:{
+          grandtotalAmount:1,
           _id:0
 
         }
@@ -467,6 +511,30 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
+    
+    const appointmentaggregatetotalnumberofappointments = [
+      {   
+      
+        $match:{$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],appointmentdate:{ $gt: startdate, $lt: enddate }}   
+
+},
+      {
+        $group: {
+          _id: null,                // Group by product
+          GrandTotalNumberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          GrandTotalNumberofappointment:1,
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    
     //3,5,
     const admissionaggregateadmited = [
       {
@@ -567,22 +635,163 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
+    const admissionaggregatetotalnumberofadmissions = [
+     
+     
+      {
+        $match:{$or:[{status:configuration.admissionstatus[1]},{status:configuration.admissionstatus[3]},{status:configuration.admissionstatus[5]}],referddate:{ $gt: startdate, $lt: enddate }} 
+      },
+      {
+        $group: {
+          _id: null,                // Group by product
+          TotalNumberofadmission: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          TotalNumberofadmission:1,
+          _id:0
+
+        }
+
+      }
+        
+    ];
+    //procedure aggregate
+    //9, 7
+    const procedureaggregatepaid = [
+      {
+        $lookup: {
+          from: "payments",
+          localField: "payment",
+          foreignField: "_id",
+          as: "payment",
+        },
+      },
+      {
+        $unwind: "$payment"        // Flatten the 'userDetails' array so we can access its fields directly
+      },
+ 
+     
+      {
+        $match:{"payment.status":configuration.status[3],createdAt:{ $gt: startdate, $lt: enddate }} 
+      },
+           
+     
+      {
+        $group: {
+          _id: "$clinic",                // Group by product
+          Numberofprocedures: { $sum: 1 },
+          totalAmount: { $sum: "$payment.amount" }
+        }
+      },
+      {
+        $project:{
+          clinic:"$_id",
+          Numberofprocedures:1,
+          totalAmount:1,
+          _id:0
+
+        }
+
+      }
+        
+        
+    ];
+    const totalprocedureaggregate = [
+      {
+        $lookup: {
+          from: "payments",
+          localField: "payment",
+          foreignField: "_id",
+          as: "payment",
+        },
+      },
+      {
+        $unwind: "$payment"        // Flatten the 'userDetails' array so we can access its fields directly
+      },
+ 
+     
+      {
+        $match:{"payment.status":configuration.status[3],createdAt:{ $gt: startdate, $lt: enddate }} 
+      },
+           
+     
+      {
+        $group: {
+          _id: null,                // Group by product
+          TotalNumberofprocedures: { $sum: 1 },
+          GrandtotalAmount: { $sum: "$payment.amount" }
+        }
+      },
+      {
+        $project:{
+         
+          TotalNumberofprocedures:1,
+          GrandtotalAmount:1,
+          _id:0
+
+        }
+
+      }
+        
+        
+    ];
+    //clinical aggregate
+    const clinicalaggregate = [
+      {   
+      
+        $match:{appointmentdate:{ $gt: startdate, $lt: enddate }}   
+
+},
+      {
+        $group: {
+          _id:{
+          $ifNull: ["$clinicalencounter.diagnosisicd10", "No Diagnosis"]             // Group by product
+          },
+          Numberofappointment: { $sum: 1 },
+        }
+      },
+      {
+        $project:{
+          diagnosis:"$_id",
+          Numberofappointment:1,
+          _id:0
+
+        }
+
+      }
+        
+    ];
+
     let queryresult:any; 
+    
     if(querytype == summary[0]){
-     queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
+     //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
+     queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), grandtotal: await readpaymentaggregate(financialaggregategrandtotalpaid)};
     }
     else if(querytype == summary[1]){
     //cashier summary
-    queryresult = await readpaymentaggregate(cashieraggregatependingpaid);
+    queryresult = {paid: await readpaymentaggregate(cashieraggregatepaid), grandtotal:await readpaymentaggregate(cashieraggregatepaidgrandtotal)};
     }
     else if(querytype == summary[2]){
-      queryresult = {scheduled: await readappointmentaggregate(appointmentaggregatescheduled),complete:await readappointmentaggregate(appointmentaggregatecomplete), inprogress:await readappointmentaggregate(appointmentaggregateinprogress)};
-
+      queryresult = {scheduled: await readappointmentaggregate(appointmentaggregatescheduled),complete:await readappointmentaggregate(appointmentaggregatecomplete), inprogress:await readappointmentaggregate(appointmentaggregateinprogress), totalnumberofappointments: await readappointmentaggregate(appointmentaggregatetotalnumberofappointments)};
+//appointmentaggregatetotalnumberofappointments
     //appointment summary
     }
     else if(querytype == summary[3]){
     //wardadmission summary
-    queryresult= {admited: await readadmissionaggregate(admissionaggregateadmited),transfered:await readadmissionaggregate(admissionaggregatetransfered),discharged:await readadmissionaggregate(admissionaggregatedischarged)};
+    queryresult= {admited: await readadmissionaggregate(admissionaggregateadmited),transfered:await readadmissionaggregate(admissionaggregatetransfered),discharged:await readadmissionaggregate(admissionaggregatedischarged), totalnumberofadmissions: await readadmissionaggregate(admissionaggregatetotalnumberofadmissions)};
+    }
+    else if(querytype == summary[4]){
+      console.log("procedure");
+      queryresult ={paid: await readprocedureaggregate(procedureaggregatepaid), grandtotal: await readprocedureaggregate(totalprocedureaggregate)}
+
+    }
+    else if(querytype == summary[5]){
+      //clinicalaggregate
+      queryresult = {clinicalreport: await readappointmentaggregate(clinicalaggregate)};
+
     }
     else{
       throw new Error(`querytype ${configuration.error.errorisrequired}`);
@@ -599,3 +808,7 @@ export const reportsummary = async (req:any,res:any) =>{
 
   }
 }
+
+
+//add pharmacy 1 , pharmacy 2
+//add agggreate appointbyicnd10

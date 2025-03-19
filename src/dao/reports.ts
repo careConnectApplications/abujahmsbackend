@@ -3,6 +3,7 @@ import Admission from "../models/admission";
 import Appointment from "../models/appointment";
 import Clinic from "../models/clinics";
 import Wardmanagement from "../models/wardmanagement";
+import Procedure from "../models/procedure";
 
 import configuration from "../config";
 export async function readpaymentaggregate(input:any) {
@@ -55,3 +56,12 @@ export async function readpaymentaggregate(input:any) {
               throw new Error(configuration.error.erroruserupdate);
             }
             }
+            export async function readprocedureaggregate(input:any) {
+              try{
+              return await Procedure.aggregate(input);
+              }
+              catch(e:any){
+                console.log(e);
+                throw new Error(configuration.error.erroruserupdate);
+              }
+              }
