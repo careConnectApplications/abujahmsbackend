@@ -68,8 +68,9 @@ export async function getallhmopatients(req:Request, res:any){
       S:"nextOfKinAddress",
       T:"maritalStatus",
       U:"disability",
-      W:"occupation",
-      X:"HMOPlan"
+      V:"occupation",
+      W:"HMOPlan",
+      X:"HMOId"
       
     
        

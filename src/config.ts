@@ -847,6 +847,11 @@ main:[
 
   },
   {
+    type:"hmobulkdownloadtemplate", fileName:"hmo.xlsx"
+   
+
+  },
+  {
    
     type:"stockbulkdownloadtemplate", fileName:"inventory.xlsx"
 
