@@ -158,6 +158,8 @@ if(orderPrice.qty <=0){
   throw new Error(`${prescription} ${configuration.error.erroravailability}`);
 
 }
+//validate quantity entered
+
 
 
 
@@ -245,4 +247,26 @@ res.status(200).json({queryresult, status: true});
     }
   };
 
+   // get price of drug
+   export const getpriceofdrug = async (req:any, res:any) =>{
+    try{
+      
+      const {id} = req.params;
+     
+    //search for the lab request
+    var prescriptionresponse:any = await readoneprescription({_id:id},{},'patient','','');
    
+    const {prescription,patient,pharmacy} = prescriptionresponse;
+    //get amount 
+    var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});  
+    var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
+    res.status(200).json({price:amount, status: true});
+    }
+    catch(e:any){
+      console.log("error", e);
+      res.status(403).json({ status: false, msg: e.message });
+  
+    }
+      
+  }
+  

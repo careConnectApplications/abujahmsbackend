@@ -11,6 +11,7 @@ const prescriptionSchema = new Schema({
     type: String, 
     required: true
   },
+  
   pharmacy:
   {
     type: String, 
