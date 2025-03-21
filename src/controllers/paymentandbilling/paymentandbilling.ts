@@ -132,6 +132,8 @@ export async function confirmpayment(req:any, res:any){
 export async function printreceipt(req:any, res:any){
   try{
   const { paymentreference } = req.params;
+  const { firstName,lastName} = (req.user).user;
+  var staffname = `${firstName} ${lastName}`;
 //paymentreference
   var query ={paymentreference, status:configuration.status[3]};
   var populatequery ='patient';
@@ -162,6 +164,7 @@ export async function printreceipt(req:any, res:any){
  res.json({
    queryresult,
    totalAmount,
+   printedbystaffname:staffname,
    status: true,
  });
 }
