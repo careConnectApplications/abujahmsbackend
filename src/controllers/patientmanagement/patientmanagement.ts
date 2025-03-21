@@ -2,11 +2,102 @@ import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import * as path from 'path';
-import  {readallpatient,createpatient,updatepatient,readonepatient}  from "../../dao/patientmanagement";
+import  {readallpatient,createpatient,updatepatient,readonepatient,deletePatietsByCondition}  from "../../dao/patientmanagement";
+import {createpatientachieve} from "../../dao/patientmanagementachieve"
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
-import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservices";
+import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
+//Insurance upload
+ //bulk upload users
+ export async function bulkuploadhmopatients(req:any, res:any){
+  try{  
+    const file = req.files.file;
+    
+    const {HMOName} = req.body;
+    const filename= configuration.hmouploadfilename;
+    let allowedextension = ['.csv','.xlsx'];
+    let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
+    //achieve document
+    const {patientdetails} =await readallpatient({HMOName},{},'','');
+    await createpatientachieve(patientdetails);
+    //delete patient management
+    await deletePatietsByCondition({HMOName});
+    var columnmapping={
+      A: "title",
+      B: "firstName",
+      C: "middleName",
+      D: "lastName",
+      E: "country",
+      F: "stateOfResidence",
+      G: "LGA",
+      H: "address",
+      I: "age",
+      J: "dateOfBirth",
+      K: "gender",
+      L: "nin",
+      M: "phoneNumber",
+      N: "email",
+      O:"oldMRN",
+      P:"nextOfKinName",
+      Q:"nextOfKinRelationship",
+      R:"nextOfKinPhoneNumber",
+      S:"nextOfKinAddress",
+      T:"maritalStatus",
+      U:"disability",
+      W:"occupation",
+      X:"HMOPlan"
+      
+    
+       
+    };
+  
+  await uploaddocument(file,filename,allowedextension,uploadpath);
+   //convert uploaded excel to json
+   var convert_to_json = convertexceltojson(`${uploadpath}/${filename}${path.extname(file.name)}`, configuration.hmotemplate, columnmapping);
+
+   //save to database
+   var {hmo} = convert_to_json;
+       if(hmo.length > 0){
+        for (var i = 0; i < hmo.length; i++) {    
+          hmo[i].isHMOCover=configuration.ishmo[1];
+          hmo[i].HMOName=HMOName;
+          const {phoneNumber,firstName,lastName,gender} = hmo[i];
+          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender});
+          console.log((phoneNumber.toString()).length);
+          if((phoneNumber.toString()).length !== 11 && (phoneNumber.toString()).length !==10){
+            throw new Error(`${phoneNumber} ${configuration.error.errorelevendigit}`);
+  
+          }
+          if(hmo[i].dateOfBirth) hmo[i].age= moment().diff(moment(hmo[i].dateOfBirth), 'years');
+          //if not dateObirth but age calculate date of birth
+          if(!hmo[i].dateOfBirth && hmo[i].age ) hmo[i].dateOfBirth = moment().subtract(Number(hmo[i].age), 'years').format('YYYY-MM-DD');
+          const foundUser:any =  await readonepatient({phoneNumber},{},'','');
+          //category
+          if(foundUser && phoneNumber !== configuration.defaultphonenumber){
+              throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+  
+          }
+           // chaorten the MRN to alphanumeric 
+           hmo[i].MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;        
+           hmo[i].password=configuration.defaultPassword;
+       
+         const createpatientqueryresult=await createpatient(hmo[i]);
+      }
+       }
+      
+      
+       res.status(200).json({status: true, queryresult: 'Bulk upload was successfull'});
+    }
+    catch(e:any){
+       //logger.error(e.message);
+       res.status(403).json({status: false, msg:e.message});
+
+    }
+}
+    
+
+
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
    

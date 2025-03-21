@@ -93,6 +93,7 @@ export function generateRandomNumber(n:number) {
 }
 
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
+ 
   const fileName = file.name;
   const size = file.data.length/1024;
   const extension = path.extname(fileName);
@@ -127,6 +128,7 @@ export function generateRandomNumber(n:number) {
  //convert excel to json
  export function convertexceltojson(pathtoexcelsheet:any, nameofsheet:any, columnmapping:any){
     var jsonresult =exeltojson({
+        //sourceFile: 'C:\Users\malachi.egbugha\Documents\project\hmsbackend\uploads\hmo.csv',
         sourceFile: `${pathtoexcelsheet}`,
         sheets: [
             {

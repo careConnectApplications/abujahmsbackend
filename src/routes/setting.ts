@@ -4,6 +4,7 @@ import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../control
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
 import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/theatremanagement';
+import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
 const router = express.Router();
 
 
@@ -34,6 +35,10 @@ router.put('/updateward/:id',updateward);
 router.post('/createtheatre',createtheatre);
 router.get('/getalltheatre',getalltheatre);
 router.put('/updatetheatre/:id',updatetheatre);
+//hmo
+router.post('/createinsurance',createhmo);
+router.get('/getallinsurance',getallhmo);
+router.put('/updateinsurance/:id',updatehmo);
 
 
 

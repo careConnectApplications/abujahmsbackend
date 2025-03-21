@@ -1,5 +1,5 @@
 import express from 'express';
-import {createpatients,getallpatients,updatepatients,uploadpix,getonepatients} from '../controllers/patientmanagement/patientmanagement';
+import {createpatients,getallpatients,updatepatients,uploadpix,getonepatients,bulkuploadhmopatients} from '../controllers/patientmanagement/patientmanagement';
 const router = express.Router();
 
 
@@ -8,7 +8,7 @@ router.post('/createpatients',createpatients);
 router.get('/getallpatients',getallpatients);
 router.put('/updatepatients/:id',updatepatients);
 router.get('/getonepatients/:id', getonepatients);
-
+router.post('/bulkuploadhmopatients', bulkuploadhmopatients);
 
 
 

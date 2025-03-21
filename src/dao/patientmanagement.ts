@@ -3,6 +3,16 @@ import {patientinterface} from '../models/patientmanagement'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 
+//delete patient
+export async function deletePatietsByCondition(query:any) {
+  try {
+    const result = await Patient.deleteMany(query);
+    return result;
+  } catch (err) {
+    throw new Error(configuration.error.erroruserread);
+  }
+}
+
   //read all patient history
   export async function readallpatient(query:any,selectquery:any,populatequery:any,populateappointmentquery:any ) {
     try {
