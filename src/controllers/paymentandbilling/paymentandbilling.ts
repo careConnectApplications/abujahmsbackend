@@ -170,7 +170,7 @@ export async function printreceipt(req:any, res:any){
 }
  catch(e:any){
   console.log(e);
-res.status(403).json({status: false, msg:e.message});
+  res.status(403).json({status: false, msg:e.message});
 
 }
 
