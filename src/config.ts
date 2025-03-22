@@ -27,7 +27,13 @@ const configuration = {
     {role: "Dental Therapist", roleId:"16"},
     {role: "ENT Nurse", roleId:"17"},
     {role: "Physiotheraphy", roleId:"18"},
-    {role: "Admin", roleId:"19"}
+    {role: "ICT", roleId:"19"},
+    {role: "Head of Clinical Services", roleId:"20"},
+    {role: "General Nurse", roleId:"21"},
+    //General Nurse
+
+    //Head of Clinical Services
+
   ],
   medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
