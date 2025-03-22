@@ -165,8 +165,9 @@ function bulkuploadhmopatients(req, res) {
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var appointmentid = String(Date.now());
-        if (req.body.isHMOCover) {
-            throw new Error(config_1.default.error.errorpayment);
+        console.log(req.body);
+        if (req.body.isHMOCover == "Yes" || req.body.isHMOCover == true) {
+            throw new Error(config_1.default.error.errorauthorizehmo);
         }
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];

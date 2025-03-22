@@ -127,8 +127,9 @@ export var createpatients = async (req:any,res:any) =>{
    
     try{
         var appointmentid:any=String(Date.now());
-        if(req.body.isHMOCover){
-          throw new Error(configuration.error.errorpayment);
+        console.log(req.body);
+        if(req.body.isHMOCover == "Yes" || req.body.isHMOCover == true){
+          throw new Error(configuration.error.errorauthorizehmo);
 
         }
         if(!(req.body.isHMOCover)){

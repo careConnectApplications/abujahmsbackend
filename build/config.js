@@ -813,6 +813,7 @@ const configuration = {
     error: {
         errorelevendigit: "Phone must be 11 digit",
         erroruserread: "Error in reading user",
+        errorauthorizehmo: "You cant create Insurance Patient from this service",
         errorgeneral: "Error in",
         errorrecordnotfound: "Record not found ",
         errorusercreate: "Error in creating user",
