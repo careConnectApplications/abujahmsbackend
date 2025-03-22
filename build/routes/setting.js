@@ -8,6 +8,8 @@ const pricesetting_1 = require("../controllers/setting/pricesetting");
 const clinics_1 = require("../controllers/setting/clinics");
 const servicetype_1 = require("../controllers/setting/servicetype");
 const wardmanagement_1 = require("../controllers/setting/wardmanagement");
+const theatremanagement_1 = require("../controllers/setting/theatremanagement");
+const hmomanagement_1 = require("../controllers/setting/hmomanagement");
 const router = express_1.default.Router();
 router.post('/createprices', pricesetting_1.createprices);
 router.get('/getallprices', pricesetting_1.getallprices);
@@ -27,5 +29,12 @@ router.get('/getpharmacyservicetype', servicetype_1.getpharmacyservicetype);
 router.post('/createward', wardmanagement_1.createward);
 router.get('/getallward', wardmanagement_1.getallward);
 router.put('/updateward/:id', wardmanagement_1.updateward);
-//updateward
+//theatre
+router.post('/createtheatre', theatremanagement_1.createtheatre);
+router.get('/getalltheatre', theatremanagement_1.getalltheatre);
+router.put('/updatetheatre/:id', theatremanagement_1.updatetheatre);
+//hmo
+router.post('/createinsurance', hmomanagement_1.createhmo);
+router.get('/getallinsurance', hmomanagement_1.getallhmo);
+router.put('/updateinsurance/:id', hmomanagement_1.updatehmo);
 exports.default = router;

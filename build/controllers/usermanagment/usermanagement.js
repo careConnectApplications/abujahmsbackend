@@ -13,11 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getallusers = getallusers;
+exports.updatepassword = updatepassword;
+exports.passwordreset = passwordreset;
 exports.updatestatus = updatestatus;
 exports.updateusers = updateusers;
 exports.bulkuploadusers = bulkuploadusers;
 const path_1 = __importDefault(require("path"));
 const config_1 = __importDefault(require("../../config"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const users_1 = require("../../dao/users");
 const otherservices_1 = require("../../utils/otherservices");
 //get all users
@@ -31,6 +34,51 @@ function getallusers(req, res) {
             });
         }
         catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//update a user password
+function updatepassword(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            //get id
+            const { id } = req.params;
+            var { currentpassword, newpassword } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ currentpassword, newpassword });
+            //read user 
+            var user = yield (0, users_1.readone)({ _id: id });
+            const { password } = user;
+            const isMatch = yield bcryptjs_1.default.compare(currentpassword, password);
+            if (!isMatch) {
+                //return error
+                throw new Error(config_1.default.error.errorinvalidcredentials);
+            }
+            //change password
+            var queryresult = yield (0, users_1.updateuser)(id, { password: newpassword });
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+function passwordreset(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { id } = req.params;
+        try {
+            const queryresult = yield (0, users_1.updateuser)(id, { password: config_1.default.defaultPassword });
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
             res.status(403).json({ status: false, msg: e.message });
         }
     });

@@ -8,7 +8,10 @@ const usermanagement_1 = require("../controllers/usermanagment/usermanagement");
 const router = express_1.default.Router();
 router.get('/getallusers', usermanagement_1.getallusers);
 router.put('/updateusers/:id', usermanagement_1.updateusers);
+router.put('/updatepassword/:id', usermanagement_1.updatepassword);
 router.put('/updatestatus/:id', usermanagement_1.updatestatus);
 router.post('/bulkuploadusers', usermanagement_1.bulkuploadusers);
+router.post('/passwordreset/:id', usermanagement_1.passwordreset);
+//updatepassword
 //updateusers
 exports.default = router;

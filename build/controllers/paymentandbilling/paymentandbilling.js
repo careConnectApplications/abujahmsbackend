@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.readbillinghistoryforapatient = readbillinghistoryforapatient;
 exports.readbillinghistoryforallapatient = readbillinghistoryforallapatient;
 exports.confirmpayment = confirmpayment;
+exports.printreceipt = printreceipt;
 const payment_1 = require("../../dao/payment");
 const appointment_1 = require("../../dao/appointment");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -94,7 +95,7 @@ function confirmpayment(req, res) {
             }
             //var settings =await  configuration.settings();
             const status = config_1.default.status[3];
-            const { email, staffId } = req.user;
+            const { email, staffId } = (req.user).user;
             const queryresult = yield (0, payment_1.updatepayment)(id, { status, cashieremail: email, cashierid: staffId });
             //const queryresult:any =await updatepayment(id,{status});
             //confirm payment of the service paid for 
@@ -119,6 +120,51 @@ function confirmpayment(req, res) {
             res.status(200).json({
                 queryresult,
                 status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//print receipt
+function printreceipt(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { paymentreference } = req.params;
+            const { firstName, lastName } = (req.user).user;
+            var staffname = `${firstName} ${lastName}`;
+            //paymentreference
+            var query = { paymentreference, status: config_1.default.status[3] };
+            var populatequery = 'patient';
+            let queryresult = yield (0, payment_1.readallpayment)({ paymentreference, status: config_1.default.status[3] }, populatequery);
+            //get total sum
+            // Aggregation to calculate sum and add it as a new field
+            let totalAmount = yield (0, payment_1.readallpaymentaggregate)([
+                {
+                    $match: query
+                },
+                {
+                    $group: {
+                        _id: null, // null means no grouping, we just want the total sum for the entire collection
+                        totalAmount: { $sum: "$amount" } // Sum of the itemPrice for all documents
+                    }
+                },
+                {
+                    $project: {
+                        totalAmount: 1,
+                        _id: 0
+                    }
+                }
+            ]);
+            //update numberoftimesprinted
+            yield (0, payment_1.updatepaymentbyquery)(query, { $inc: { numberoftimesprinted: 1 } });
+            res.json({
+                queryresult,
+                totalAmount,
+                printedbystaffname: staffname,
+                status: true,
             });
         }
         catch (e) {

@@ -36,7 +36,10 @@ const labSchema = new mongoose_1.Schema({
     appointment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Appointment",
-        default: [],
+        default: null,
+    },
+    remark: {
+        type: String
     },
     appointmentid: {
         type: String,
@@ -50,12 +53,13 @@ const labSchema = new mongoose_1.Schema({
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",
-        default: true,
+        default: null,
     },
+    amount: Number,
     status: {
         required: true,
         type: String,
-        default: config_1.default.status[2],
+        default: config_1.default.status[14],
     }
 }, { timestamps: true });
 const lab = (0, mongoose_1.model)('Lab', labSchema);

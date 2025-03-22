@@ -171,6 +171,7 @@ function uploaddocument(file, filename, allowedextension, uploadpath) {
 //convert excel to json
 function convertexceltojson(pathtoexcelsheet, nameofsheet, columnmapping) {
     var jsonresult = (0, convert_excel_to_json_1.default)({
+        //sourceFile: 'C:\Users\malachi.egbugha\Documents\project\hmsbackend\uploads\hmo.csv',
         sourceFile: `${pathtoexcelsheet}`,
         sheets: [
             {

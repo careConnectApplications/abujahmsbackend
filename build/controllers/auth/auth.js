@@ -22,6 +22,13 @@ var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //destructure email and password
         const { email, password } = req.body;
+        var requirepasswordchange;
+        if (password == config_1.default.defaultPassword) {
+            requirepasswordchange = true;
+        }
+        else {
+            requirepasswordchange = false;
+        }
         //validate email and password
         if (!email || !password) {
             throw new Error(config_1.default.error.errornoemailpassword);
@@ -43,7 +50,7 @@ var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         //respond with token
         var queryresult = (0, otherservices_1.sendTokenResponse)(user);
-        res.status(200).json({ queryresult, status: true });
+        res.status(200).json({ queryresult, status: true, requirepasswordchange });
     }
     catch (error) {
         res.status(403).json({ status: false, msg: error.message });

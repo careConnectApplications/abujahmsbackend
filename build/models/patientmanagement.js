@@ -148,7 +148,7 @@ const patientSchema = new mongoose_1.Schema({
     prcedure: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "Radiology",
+            ref: "Procedure",
             default: [],
         },
     ],

@@ -127,6 +127,10 @@ export var createpatients = async (req:any,res:any) =>{
    
     try{
         var appointmentid:any=String(Date.now());
+        if(req.body.isHMOCover){
+          throw new Error(configuration.error.errorpayment);
+
+        }
         if(!(req.body.isHMOCover)){
           req.body.isHMOCover = configuration.ishmo[0]
 

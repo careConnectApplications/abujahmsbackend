@@ -46,6 +46,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadpix = exports.createpatients = void 0;
+exports.getallhmopatients = getallhmopatients;
+exports.bulkuploadhmopatients = bulkuploadhmopatients;
 exports.getallpatients = getallpatients;
 exports.getonepatients = getonepatients;
 exports.updatepatients = updatepatients;
@@ -54,14 +56,118 @@ const uuid_1 = require("uuid");
 const moment_1 = __importDefault(require("moment"));
 const path = __importStar(require("path"));
 const patientmanagement_1 = require("../../dao/patientmanagement");
+const patientmanagementachieve_1 = require("../../dao/patientmanagementachieve");
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
 const otherservices_1 = require("../../utils/otherservices");
 const appointment_1 = require("../../dao/appointment");
+//Insurance upload
+//get hmo patient 
+//read all patients
+function getallhmopatients(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            //var settings = await configuration.settings();
+            var selectquery = { "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+            //var populatequery="payment";
+            const queryresult = yield (0, patientmanagement_1.readallpatient)({ isHMOCover: config_1.default.ishmo[1] }, selectquery, '', '');
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//bulk upload users
+function bulkuploadhmopatients(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const file = req.files.file;
+            const { HMOName } = req.body;
+            const filename = config_1.default.hmouploadfilename;
+            let allowedextension = ['.csv', '.xlsx'];
+            let uploadpath = `${process.cwd()}/${config_1.default.useruploaddirectory}`;
+            //achieve document
+            const { patientdetails } = yield (0, patientmanagement_1.readallpatient)({ HMOName }, {}, '', '');
+            yield (0, patientmanagementachieve_1.createpatientachieve)(patientdetails);
+            //delete patient management
+            yield (0, patientmanagement_1.deletePatietsByCondition)({ HMOName });
+            var columnmapping = {
+                A: "title",
+                B: "firstName",
+                C: "middleName",
+                D: "lastName",
+                E: "country",
+                F: "stateOfResidence",
+                G: "LGA",
+                H: "address",
+                I: "age",
+                J: "dateOfBirth",
+                K: "gender",
+                L: "nin",
+                M: "phoneNumber",
+                N: "email",
+                O: "oldMRN",
+                P: "nextOfKinName",
+                Q: "nextOfKinRelationship",
+                R: "nextOfKinPhoneNumber",
+                S: "nextOfKinAddress",
+                T: "maritalStatus",
+                U: "disability",
+                V: "occupation",
+                W: "HMOPlan",
+                X: "HMOId"
+            };
+            yield (0, otherservices_1.uploaddocument)(file, filename, allowedextension, uploadpath);
+            //convert uploaded excel to json
+            var convert_to_json = (0, otherservices_1.convertexceltojson)(`${uploadpath}/${filename}${path.extname(file.name)}`, config_1.default.hmotemplate, columnmapping);
+            //save to database
+            var { hmo } = convert_to_json;
+            if (hmo.length > 0) {
+                for (var i = 0; i < hmo.length; i++) {
+                    hmo[i].isHMOCover = config_1.default.ishmo[1];
+                    hmo[i].HMOName = HMOName;
+                    const { phoneNumber, firstName, lastName, gender } = hmo[i];
+                    (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender });
+                    console.log((phoneNumber.toString()).length);
+                    if ((phoneNumber.toString()).length !== 11 && (phoneNumber.toString()).length !== 10) {
+                        throw new Error(`${phoneNumber} ${config_1.default.error.errorelevendigit}`);
+                    }
+                    if (hmo[i].dateOfBirth)
+                        hmo[i].age = (0, moment_1.default)().diff((0, moment_1.default)(hmo[i].dateOfBirth), 'years');
+                    //if not dateObirth but age calculate date of birth
+                    if (!hmo[i].dateOfBirth && hmo[i].age)
+                        hmo[i].dateOfBirth = (0, moment_1.default)().subtract(Number(hmo[i].age), 'years').format('YYYY-MM-DD');
+                    const foundUser = yield (0, patientmanagement_1.readonepatient)({ phoneNumber }, {}, '', '');
+                    //category
+                    if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
+                        throw new Error(`Patient ${config_1.default.error.erroralreadyexit}`);
+                    }
+                    // chaorten the MRN to alphanumeric 
+                    hmo[i].MRN = `${firstName[0]}${(0, otherservices_1.generateRandomNumber)(4)}${lastName[0]}`;
+                    hmo[i].password = config_1.default.defaultPassword;
+                    const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(hmo[i]);
+                }
+            }
+            res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
+        }
+        catch (e) {
+            //logger.error(e.message);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
 //add patiient
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var appointmentid = String(Date.now());
+        if (req.body.isHMOCover) {
+            throw new Error(config_1.default.error.errorpayment);
+        }
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }

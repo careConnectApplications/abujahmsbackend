@@ -29,7 +29,7 @@ function readalladmission(query, selectquery, populatequery, populatesecondquery
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error(`${config_1.default.error.errorgeneral} reading admission`);
         }
     });
 }
@@ -54,7 +54,7 @@ function readoneadmission(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error(`${config_1.default.error.errorgeneral} creating admission`);
         }
     });
 }
@@ -67,13 +67,13 @@ function updateadmission(id, reqbody) {
             });
             if (!admission) {
                 //return json  false response
-                throw new Error(config_1.default.error.errorinvalidcredentials);
+                throw new Error(config_1.default.error.errorrecordnotfound);
             }
             return admission;
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error(`${config_1.default.error.errorgeneral} updating admission`);
         }
     });
 }
@@ -92,7 +92,7 @@ function updateadmissionbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error(`${config_1.default.error.errorgeneral} updating admission`);
         }
     });
 }

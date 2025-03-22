@@ -23,6 +23,9 @@ const admissionSchema = new mongoose_1.Schema({
     admittospecialization: {
         type: String
     },
+    admissionid: {
+        type: String
+    },
     referddate: {
         type: Date,
         required: true

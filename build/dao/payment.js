@@ -13,15 +13,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readallpayment = readallpayment;
+exports.readallpaymentaggregate = readallpaymentaggregate;
 exports.createpayment = createpayment;
 exports.readonepayment = readonepayment;
 exports.updatepayment = updatepayment;
+exports.updatepaymentbyquery = updatepaymentbyquery;
 const payment_1 = __importDefault(require("../models/payment"));
 const config_1 = __importDefault(require("../config"));
 //read all payment history
 function readallpayment(query, populatequery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log(query);
             const paymentdetails = yield payment_1.default.find(query).populate(populatequery).sort({ createdAt: -1 });
             ;
             const totalpaymentdetails = yield payment_1.default.find(query).countDocuments();
@@ -34,6 +37,16 @@ function readallpayment(query, populatequery) {
     });
 }
 ;
+function readallpaymentaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield payment_1.default.aggregate(input);
+        }
+        catch (e) {
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
 function createpayment(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -70,6 +83,25 @@ function updatepayment(id, reqbody) {
                 throw new Error(config_1.default.error.errorinvalidcredentials);
             }
             return transaction;
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//update  appointment by query
+function updatepaymentbyquery(query, reqbody) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const payment = yield payment_1.default.updateMany(query, reqbody, {
+                new: true
+            });
+            if (!payment) {
+                //return json  false response
+                throw new Error(config_1.default.error.errorinvalidcredentials);
+            }
+            return payment;
         }
         catch (err) {
             console.log(err);

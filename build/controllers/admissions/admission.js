@@ -28,6 +28,7 @@ const { ObjectId } = mongoose_1.default.Types;
 var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName } = (req.user).user;
+        var admissionid = String(Date.now());
         //accept _id from request
         const { id } = req.params;
         console.log('id', id);
@@ -57,7 +58,7 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             throw new Error(`Patient Admission ${config_1.default.error.erroralreadyexit}`);
         }
         //create admission
-        var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id });
+        var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id, admissionid });
         //update patient 
         var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { admission: admissionrecord._id } });
         res.status(200).json({ queryresult: admissionrecord, status: true });

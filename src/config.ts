@@ -876,6 +876,8 @@ main:[
   error:{
     errorelevendigit:"Phone must be 11 digit",
     erroruserread: "Error in reading user",
+    errorgeneral: "Error in",
+    errorrecordnotfound: "Record not found ",
     errorusercreate: "Error in creating user",
     errordownload:"Error downloading the file",
     errorinvalidcredentials: "Invalid credentials",
@@ -906,8 +908,8 @@ main:[
     errorservicetray: "This service no more exist in your service tray"
 
   },
-    environment: "test",
-  //environment: "prod",
+    //environment: "test",
+  environment: "prod",
 
 }
 export default configuration;

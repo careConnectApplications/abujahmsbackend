@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.scheduleappointment = void 0;
+exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.scheduleappointment = void 0;
 exports.updateappointments = updateappointments;
+exports.addclinicalencounter = addclinicalencounter;
 exports.addencounter = addencounter;
 const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
@@ -125,7 +126,24 @@ const getAllPreviousEncounter = (req, res) => __awaiter(void 0, void 0, void 0, 
         const { id } = req.params;
         //const {clinic} = (req.user).user;
         //console.log(clinic);
-        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        6;
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllPreviousEncounter = getAllPreviousEncounter;
+const getAllPreviousClininicalEncounter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        //const {clinic} = (req.user).user;
+        //console.log(clinic);
+        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
         res.status(200).json({
             queryresult,
             status: true
@@ -135,13 +153,29 @@ const getAllPreviousEncounter = (req, res) => __awaiter(void 0, void 0, void 0, 
         res.status(403).json({ status: false, msg: error.message });
     }
 });
-exports.getAllPreviousEncounter = getAllPreviousEncounter;
+exports.getAllPreviousClininicalEncounter = getAllPreviousClininicalEncounter;
+//get all completed clinical encounter
+const getAllCompletedClinicalEncounter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        //const {clinic} = (req.user).user;
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllCompletedClinicalEncounter = getAllCompletedClinicalEncounter;
 //completed encounter
 const getAllCompletedEncounter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         //const {clinic} = (req.user).user;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
         res.status(200).json({
             queryresult,
             status: true
@@ -157,7 +191,7 @@ const getAllInProgressEncounter = (req, res) => __awaiter(void 0, void 0, void 0
     try {
         // const {clinic} = (req.user).user;
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
         res.status(200).json({
             queryresult,
             status: true
@@ -168,6 +202,21 @@ const getAllInProgressEncounter = (req, res) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getAllInProgressEncounter = getAllInProgressEncounter;
+const getAllInProgressClinicalEncounter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const {clinic} = (req.user).user;
+        const { id } = req.params;
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllInProgressClinicalEncounter = getAllInProgressClinicalEncounter;
 //get all patient with paid schduled
 const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -324,7 +373,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { testname } = req.body;
         var testid = String(Date.now());
         var testsid = [];
-        var paymentids = [];
+        //var paymentids =[];
         (0, otherservices_1.validateinputfaulsyvalue)({ id, testname });
         //find the record in appointment and validate
         //find patient
@@ -363,14 +412,16 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             //search testname in setting
             var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
             //create payment
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: id, paymentype: testname[i], paymentcategory: testsetting[0].category, patient: appointment.patient, amount: Number(testPrice.amount) });
+            //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
             //create testrecord
-            var testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, payment: createpaymentqueryresult._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department });
+            //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
+            var testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department, amount: Number(testPrice.amount) });
             testsid.push(testrecord._id);
-            paymentids.push(createpaymentqueryresult._id);
+            //paymentids.push(createpaymentqueryresult._id);
         }
-        var queryresult = yield (0, patientmanagement_1.updatepatient)(appointment.patient, { $push: { lab: testsid, payment: paymentids } });
+        //var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
+        var queryresult = yield (0, patientmanagement_1.updatepatient)(appointment.patient, { $push: { lab: testsid } });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -379,6 +430,48 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.laborder = laborder;
+function addclinicalencounter(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { id } = req.params;
+            const { email, staffId } = (req.user).user;
+            //find doctor and add doctor who examined
+            const user = yield (0, users_1.readone)({ email, staffId });
+            //validate id
+            //validate other input paramaters
+            //search appoint where appoint id = id
+            //extract vitals id
+            if (req.body.status == 1) {
+                req.body.status = config_1.default.status[6];
+            }
+            else if (req.body.status == 2) {
+                req.body.status = config_1.default.status[5];
+            }
+            else {
+                req.body.status = config_1.default.status[9];
+            }
+            var { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, status } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote });
+            const clinicalencounter = { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote };
+            var queryresult;
+            //find id 
+            var checkadimmison = yield (0, admissions_1.readoneadmission)({ _id: new ObjectId(id) }, {}, '');
+            if (checkadimmison) {
+                queryresult = yield (0, appointment_1.updateappointment)(id, { clinicalencounter, status, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: true });
+            }
+            else {
+                queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: true });
+            }
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
 //create vitals
 //update a patient
 function addencounter(req, res) {
@@ -402,6 +495,7 @@ function addencounter(req, res) {
             else {
                 req.body.status = config_1.default.status[9];
             }
+            //fromclinicalencounter
             //validate empty object and initialize
             if (!((0, otherservices_1.isObjectAvailable)(req.body.medicalhistory)))
                 req.body.medicalhistory = {};
@@ -504,18 +598,18 @@ function addencounter(req, res) {
             //else update
             if (height || weight) {
                 if (checkadimmison) {
-                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient });
+                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: false });
                 }
                 else {
-                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id });
+                    queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: false });
                 }
             }
             else {
                 if (checkadimmison) {
-                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient });
+                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: false });
                 }
                 else {
-                    queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id });
+                    queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: false });
                 }
             }
             res.status(200).json({

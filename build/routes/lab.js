@@ -11,6 +11,8 @@ router.get('/readalllabb', lab_1.readalllabb);
 router.get('/readallscheduledlab', lab_1.readallscheduledlab);
 router.get('/readlabbypatientid/:id', lab_1.readAllLabByPatient);
 router.put('/labresultprocessing/:id', lab_1.labresultprocessing);
+router.put('/confirmlaborder/:id', lab_1.confirmlaborder);
+//confirmlaborder
 //labreport
 router.get('/listlabreport', lab_1.listlabreport);
 router.get('/printlabreport/:id', lab_1.printlabreport);

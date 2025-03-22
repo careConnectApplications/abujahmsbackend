@@ -42,14 +42,25 @@ const prescriptionSchema = new mongoose_1.Schema({
     pharmacistname: {
         type: String
     },
+    dosageform: String,
+    strength: String,
+    dosage: String,
+    frequency: String,
+    route: String,
+    qty: {
+        type: Number
+    },
+    remark: {
+        type: String
+    },
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",
-        default: true,
+        default: null,
     },
     dispensestatus: {
         type: String,
-        default: config_1.default.status[10],
+        default: config_1.default.status[14],
         required: true
     }
 }, { timestamps: true });

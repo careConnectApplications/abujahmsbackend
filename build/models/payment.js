@@ -23,6 +23,14 @@ const paymentSchema = new mongoose_1.Schema({
         type: Number,
         required: true,
     },
+    qty: {
+        type: Number,
+        default: 1,
+    },
+    numberoftimesprinted: {
+        type: Number,
+        default: 0,
+    },
     cashieremail: {
         type: String
     },

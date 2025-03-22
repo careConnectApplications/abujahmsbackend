@@ -26,4 +26,9 @@ router.get('/singlepatientvital/:id', appointment_1.getAllVtalsByPatient);
 router.get('/getallcompletedencounter/:id', appointment_1.getAllCompletedEncounter);
 router.get('/getallinprogressencounter/:id', appointment_1.getAllInProgressEncounter);
 router.get('/getallpreviousencounter/:id', appointment_1.getAllPreviousEncounter);
+// clinical encounter ////
+router.post('/addclinicalencounter/:id', appointment_1.addclinicalencounter);
+router.get('/getallcompletedclinicalencounter/:id', appointment_1.getAllCompletedClinicalEncounter);
+router.get('/getallinprogressclinicalencounter/:id', appointment_1.getAllInProgressClinicalEncounter);
+router.get('/getallpreviousclinicalencounter/:id', appointment_1.getAllPreviousClininicalEncounter);
 exports.default = router;

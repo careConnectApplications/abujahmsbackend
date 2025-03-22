@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
+exports.confirmradiologyorder = exports.uploadradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
 exports.updateradiologys = updateradiologys;
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -55,6 +55,7 @@ const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
+const admissions_1 = require("../../dao/admissions");
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -66,7 +67,7 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
         var testsid = [];
-        var paymentids = [];
+        //var paymentids =[];
         (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, note });
         //find the record in appointment and validate
         const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
@@ -87,17 +88,19 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             //search testname in setting
             console.log(servicetypedetails);
             var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-            if (!testsetting || testsetting.length < 1) {
-                throw new Error(`${testname[i]} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
-            }
+            /*
+             if(!testsetting || testsetting.length < 1){
+               throw new Error(`${testname[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
+           }
+               */
             //create payment
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: id, paymentype: testname[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
+            //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
             //create testrecordn 
-            var testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, payment: createpaymentqueryresult._id, testid, department: testsetting[0].department, raiseby });
+            var testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby, amount: Number(testPrice.amount) });
             testsid.push(testrecord._id);
-            paymentids.push(createpaymentqueryresult._id);
+            //paymentids.push(createpaymentqueryresult._id);
         }
-        var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { radiology: testsid, payment: paymentids } });
+        var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { radiology: testsid } });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -141,6 +144,11 @@ function updateradiologys(req, res) {
         try {
             //get id
             const { id } = req.params;
+            //check that the status is not complete
+            var myradiologystatus = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+            if (myradiologystatus.status !== config_1.default.status[13]) {
+                throw new Error(`${config_1.default.error.errortasknotpending} `);
+            }
             var { testname, note } = req.body;
             (0, otherservices_1.validateinputfaulsyvalue)({ testname, note });
             var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname });
@@ -152,12 +160,7 @@ function updateradiologys(req, res) {
             if (!testsetting || testsetting.length < 1) {
                 throw new Error(`${testname} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
             }
-            //check that the status is not complete
-            var myradiologystatus = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, '');
-            if (myradiologystatus.status !== config_1.default.status[9]) {
-                throw new Error(`${config_1.default.error.errortasknotpending} `);
-            }
-            yield (0, payment_1.updatepayment)({ _id: myradiologystatus.payment }, { paymentype: testname, amount: Number(testPrice.amount) });
+            // await updatepayment({_id:myradiologystatus.payment},{paymentype:testname,amount:Number(testPrice.amount)});
             var queryresult = yield (0, radiology_1.updateradiology)(id, { testname, note });
             //update price
             res.status(200).json({
@@ -206,3 +209,47 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.uploadradiologyresult = uploadradiologyresult;
+//confirm radiology order
+//this endpoint is use to accept or reject lab order
+const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //extract option
+        const { option, remark } = req.body;
+        const { id } = req.params;
+        //search for the lab request
+        var radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, '');
+        const { testname, testid, patient, amount } = radiology;
+        //validate the status
+        let queryresult;
+        let paymentreference;
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        if (findAdmission) {
+            paymentreference = findAdmission.admissionid;
+        }
+        else {
+            paymentreference = testid;
+        }
+        if (option == true) {
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
+            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], payment: createpaymentqueryresult._id, remark });
+            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
+        }
+        else {
+            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[13], remark });
+        }
+        res.status(200).json({ queryresult, status: true });
+        //if accept
+        //accept or reject lab order
+        //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+        //paymentids.push(createpaymentqueryresult._id);
+        //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+        //var testrecord = await createlab({payment:createpaymentqueryresult._id});
+        //change status to 2 or  13 for reject
+    }
+    catch (e) {
+        console.log("error", e);
+        res.status(403).json({ status: false, msg: e.message });
+    }
+});
+exports.confirmradiologyorder = confirmradiologyorder;

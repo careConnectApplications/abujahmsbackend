@@ -12,13 +12,19 @@ const router = express_1.default.Router();
 //router.put('/updatestatus/:id', updatestatus);
 router.post('/bulkstockupload', stock_1.bulkuploadinventory);
 router.get('/getallpharmacystock', stock_1.getallpharmacystock);
+router.get('/getallpharmacystockbyphamarcy/:clinic', stock_1.getallpharmacystockbyphamarcy);
+//getallpharmacystockbyphamarcy
 router.post('/createstock', stock_1.createstock);
 router.put('/updatestocks/:id', stock_1.updatestocks);
 //pharmacy
 router.post('/pharmacyorder/:id', pharmacy_1.pharmacyorder);
+router.put('/confirmpharmacyorder/:id', pharmacy_1.confirmpharmacyorder);
+//confirmpharmacyorder
 router.get('/readallpharmacytransaction', pharmacy_1.readallpharmacytransaction);
 router.put('/dispense/:id', pharmacy_1.dispense);
 //readallpharmacytransactionbypartient
 router.get('/readallpharmacytransactionbypartient/:patient', pharmacy_1.readallpharmacytransactionbypartient);
+//get 
+router.get('/getpriceofdrug/:id', pharmacy_1.getpriceofdrug);
 //updateusers
 exports.default = router;

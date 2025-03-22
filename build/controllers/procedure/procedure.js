@@ -55,6 +55,7 @@ const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
+const admissions_1 = require("../../dao/admissions");
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,8 +89,17 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
             if (!testsetting || testsetting.length < 1) {
                 throw new Error(`${procedure[i]} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
             }
+            let paymentreference;
+            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+            if (findAdmission) {
+                paymentreference = findAdmission.admissionid;
+            }
+            else {
+                paymentreference = procedureid;
+            }
             //create payment
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: id, paymentype: procedure[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
             //create testrecordn 
             var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
             proceduresid.push(procedurerecord._id);

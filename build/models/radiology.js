@@ -12,6 +12,9 @@ const radiologySchema = new mongoose_1.Schema({
     note: {
         type: String
     },
+    remark: {
+        type: String
+    },
     testname: {
         type: String,
         required: true
@@ -33,18 +36,19 @@ const radiologySchema = new mongoose_1.Schema({
     raiseby: {
         type: String,
     },
+    amount: Number,
     processby: {
         type: String
     },
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",
-        default: true,
+        default: null,
     },
     status: {
         required: true,
         type: String,
-        default: config_1.default.status[9],
+        default: config_1.default.status[14],
     }
 }, { timestamps: true });
 const radiology = (0, mongoose_1.model)('Radiology', radiologySchema);

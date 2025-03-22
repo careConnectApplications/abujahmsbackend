@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deletePatietsByCondition = deletePatietsByCondition;
 exports.readallpatient = readallpatient;
 exports.createpatient = createpatient;
 exports.readonepatient = readonepatient;
@@ -20,6 +21,18 @@ exports.updatepatientbyanyquery = updatepatientbyanyquery;
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const otherservices_1 = require("../utils/otherservices");
 const config_1 = __importDefault(require("../config"));
+//delete patient
+function deletePatietsByCondition(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = yield patientmanagement_1.default.deleteMany(query);
+            return result;
+        }
+        catch (err) {
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
 //read all patient history
 function readallpatient(query, selectquery, populatequery, populateappointmentquery) {
     return __awaiter(this, void 0, void 0, function* () {

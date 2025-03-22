@@ -518,6 +518,12 @@ const appointmentSchema = new mongoose_1.Schema({
         paediatrics: paediatrics,
         history: history
     },
+    clinicalencounter: {
+        diagnosisnote: [],
+        diagnosisicd10: String,
+        assessmentnote: [],
+        clinicalnote: []
+    },
     lab: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
@@ -544,11 +550,15 @@ const appointmentSchema = new mongoose_1.Schema({
     servicenumber: String,
     policephonenumber: String,
     division: String,
+    fromclinicalencounter: {
+        type: Boolean,
+        default: false,
+    },
     status: {
         required: true,
         type: String,
         default: config_1.default.status[5],
     }
-});
+}, { timestamps: true });
 const appointment = (0, mongoose_1.model)('Appointment', appointmentSchema);
 exports.default = appointment;

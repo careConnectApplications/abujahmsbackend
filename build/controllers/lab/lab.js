@@ -12,14 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
+const patientmanagement_1 = require("../../dao/patientmanagement");
 const otherservices_1 = require("../../utils/otherservices");
+const payment_1 = require("../../dao/payment");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
 const users_1 = require("../../dao/users");
 const config_1 = __importDefault(require("../../config"));
+const admissions_1 = require("../../dao/admissions");
 // Get all lab records
 const readalllabb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -92,7 +95,7 @@ const readallscheduledlab = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         //const {clinic} = (req.user).user;
         //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, lab_1.readalllab)({ status: config_1.default.status[5] }, {}, 'patient', 'appointment', 'payment');
+        const queryresult = yield (0, lab_1.readalllab)({ $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[13] }, { status: config_1.default.status[14] }] }, {}, 'patient', 'appointment', 'payment');
         res.status(200).json({
             queryresult,
             status: true
@@ -241,3 +244,48 @@ const listlabreportbypatient = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.listlabreportbypatient = listlabreportbypatient;
+//this endpoint is use to accept or reject lab order
+const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //extract option
+        const { option, remark } = req.body;
+        const { id } = req.params;
+        //search for the lab request
+        var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
+        const { testname, testid, patient, amount } = lab;
+        //validate the status
+        let queryresult;
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        let paymentreference;
+        //validate the status
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        if (findAdmission) {
+            paymentreference = findAdmission.admissionid;
+        }
+        else {
+            paymentreference = testid;
+        }
+        if (option == true) {
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient, amount });
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
+            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
+        }
+        else {
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[13], remark });
+        }
+        res.status(200).json({ queryresult, status: true });
+        //if accept
+        //accept or reject lab order
+        //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+        //paymentids.push(createpaymentqueryresult._id);
+        //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+        //var testrecord = await createlab({payment:createpaymentqueryresult._id});
+        //change status to 2 or  13 for reject
+    }
+    catch (e) {
+        console.log("error", e);
+        res.status(403).json({ status: false, msg: e.message });
+    }
+});
+exports.confirmlaborder = confirmlaborder;

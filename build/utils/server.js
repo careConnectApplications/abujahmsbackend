@@ -25,6 +25,9 @@ const referrer_1 = __importDefault(require("../routes/referrer"));
 const deliverynote_1 = __importDefault(require("../routes/deliverynote"));
 const procedure_1 = __importDefault(require("../routes/procedure"));
 const dashboard_1 = __importDefault(require("../routes/dashboard"));
+const anc_1 = __importDefault(require("../routes/anc"));
+const theatreadmission_1 = __importDefault(require("../routes/theatreadmission"));
+const reportsandanalytics_1 = __importDefault(require("../routes/reportsandanalytics"));
 const middleware_1 = require("../utils/middleware");
 function createServer() {
     const app = (0, express_1.default)();
@@ -64,6 +67,9 @@ function createServer() {
     app.use('/api/v1/deliverynote', middleware_1.protect, deliverynote_1.default);
     app.use('/api/v1/procedure', middleware_1.protect, procedure_1.default);
     app.use('/api/v1/dashboard', middleware_1.protect, dashboard_1.default);
+    app.use('/api/v1/anc', middleware_1.protect, anc_1.default);
+    app.use('/api/v1/theatreadmission', middleware_1.protect, theatreadmission_1.default);
+    app.use('/api/v1/reports', middleware_1.protect, reportsandanalytics_1.default);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {

@@ -12,6 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const clinics_1 = require("./dao/clinics");
 const servicetype_1 = require("./dao/servicetype");
 const configuration = {
+    //clinic name
+    //wardname  
+    reports: [
+        { querytype: "financialreport", querygroup: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure"] }
+    ],
     hmodrugpayment: 0.1,
     roles: [
         { role: "Medical Director", roleId: "1" },
@@ -32,13 +37,16 @@ const configuration = {
         { role: "Dental Therapist", roleId: "16" },
         { role: "ENT Nurse", roleId: "17" },
         { role: "Physiotheraphy", roleId: "18" },
-        { role: "Admin", roleId: "19" }
+        { role: "ICT", roleId: "19" },
+        { role: "Head of Clinical Services", roleId: "20" }
+        //General Nurse
+        //Head of Clinical Services
     ],
     medicationchartfrequency: ["Start", "Daily", "BD", "TDS", "QDS", "PRM", "NOCTE", "4 Hours", "8 Hours", "12 Hours"],
     medicationchartroute: ["oral", "caudal block", "continuous epidural", "continuous intra-arterial infusion", "continuous IV infusion", "continuous nebulization", "continuous subcutaneous infusion", "continuous intrathecal infusion", "cervical", "dental", "epidural", "otic (ear)", "endotracheal", "feeding tube", "G-tube",
         "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
     defaultphonenumber: "00000000000",
-    status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject"],
+    status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation"],
     admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
     clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
     defaultPassword: "HMSB",
@@ -58,6 +66,7 @@ const configuration = {
             }
             ;
             return ({
+                bookingstatus: ["booked", "unbooked"],
                 cptcodes: ["Anesthesia for Procedure ans Services on the head", "Anesthesia for Procedure ans Services on the neck"],
                 dxcodes: ["other amebic genitourinary infections", "Other amebic infections"],
                 priority: ["Urgent", "Routine", "Non-Urgent"],
@@ -76,7 +85,7 @@ const configuration = {
                 cervicaldilationb: ["3.0", "4.0", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0"],
                 descentofhead: ["5/5", "4/5", "3/5", "2/5", "1/5", "0/5"],
                 contraction: ["1/10", "2/10", "3/10", "4/10", "5/10", "6/10", "7/10"],
-                administrationroute: ["Oral(PO)", "Intravenous(IV)", "intramuscular(IM)", "Subcutaneous(SC or SQ)", "Intradermal (ID)", "Topical", "Transdermal", "Inhalation", "Nasal", "Rectal", "Vaginal", "Ophathalmic", "Otic", "Buccal", "Sublingual", "Intrathecal", "Epidural", "Intra-arterial", "Intraosseous(IO)", "intraperitoneal", "Intracardiac", "Intraocular", "Intra-articular", "Intravesical", "Intrapleural", "Intralymphatic", "Intrauterine", "Intracavernous", "Urethral", "Intrasynovial", "Intralesional", "Enteral(via feeding tube)", "Intracerebral", "Intracerebroventricular(ICV)", "Percutaneous", "Nasogastric", "Nasoduodenal/Nasojejunal"],
+                administrationroute: ["Oral(PO)", "injection", "Intravenous(IV)", "intramuscular(IM)", "Subcutaneous(SC or SQ)", "Intradermal (ID)", "Topical", "Transdermal", "Inhalation", "Nasal", "Rectal", "Vaginal", "Ophathalmic", "Otic", "Buccal", "Sublingual", "Intrathecal", "Epidural", "Intra-arterial", "Intraosseous(IO)", "intraperitoneal", "Intracardiac", "Intraocular", "Intra-articular", "Intravesical", "Intrapleural", "Intralymphatic", "Intrauterine", "Intracavernous", "Urethral", "Intrasynovial", "Intralesional", "Enteral(via feeding tube)", "Intracerebral", "Intracerebroventricular(ICV)", "Percutaneous", "Nasogastric", "Nasoduodenal/Nasojejunal"],
                 vaccinetype: ["Live-Attenuated", "Inactivated", "Subunit,Recombinant,Polysaccharide,and conjugate", "Toxoid", "mRNA", "Protein Subunit", "DNA", "Virus-Like Particle(VLP)", "Whole-cell", "Autogenous", "Cancer"],
                 consent: ["Full consent", "Partial consent", "No consent", "Emergency consent", "Proxy or Substitute consent", "Presumed", "Research or Study consent", "Assent and Dissent", "Cultural or Community Consent"],
                 immunizationstatus: ["Completed", "Partially completed", "Not Administered"],
@@ -785,20 +794,27 @@ const configuration = {
             type: "userbulkdownloadtemplate", fileName: "usercreationtemplate.xlsx"
         },
         {
+            type: "hmobulkdownloadtemplate", fileName: "hmo.xlsx"
+        },
+        {
             type: "stockbulkdownloadtemplate", fileName: "inventory.xlsx"
         }
     ],
     paymenttype: ["patientregistration"],
     allowedfilesize: 500,
     usertemplate: "userslist",
+    hmotemplate: "hmo",
     stocktemplate: "stocklist",
     useruploadfilename: "usersload",
+    hmouploadfilename: "hmo",
     pharmacyuploadfilename: "pharmacyload",
     useruploaddirectory: "uploads",
     userdownloadsdirectory: "downloads",
     error: {
         errorelevendigit: "Phone must be 11 digit",
         erroruserread: "Error in reading user",
+        errorgeneral: "Error in",
+        errorrecordnotfound: "Record not found ",
         errorusercreate: "Error in creating user",
         errordownload: "Error downloading the file",
         errorinvalidcredentials: "Invalid credentials",

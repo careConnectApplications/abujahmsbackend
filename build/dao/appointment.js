@@ -122,6 +122,7 @@ function updateappointmentbyquery(query, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const appointment = yield appointment_1.default.findOneAndUpdate(query, reqbody, {
+                upsert: true,
                 new: true
             });
             if (!appointment) {

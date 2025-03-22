@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const paymentandbilling_1 = require("../controllers/paymentandbilling/paymentandbilling");
 const router = express_1.default.Router();
 router.get('/getpatientbillinghistory/:id', paymentandbilling_1.readbillinghistoryforapatient);
+router.get('/printreceipt/:paymentreference', paymentandbilling_1.printreceipt);
 router.get('/getallpatientbillinghistory', paymentandbilling_1.readbillinghistoryforallapatient);
 router.put('/confirmpayment/:id', paymentandbilling_1.confirmpayment);
 //readbillinghistoryforallapatient

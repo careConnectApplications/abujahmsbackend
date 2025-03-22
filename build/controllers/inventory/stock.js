@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createstock = void 0;
 exports.bulkuploadinventory = bulkuploadinventory;
 exports.getallpharmacystock = getallpharmacystock;
+exports.getallpharmacystockbyphamarcy = getallpharmacystockbyphamarcy;
 exports.updatestocks = updatestocks;
 const path_1 = __importDefault(require("path"));
 const config_1 = __importDefault(require("../../config"));
@@ -81,6 +82,21 @@ function getallpharmacystock(req, res) {
         try {
             //const { clinic} = (req.user).user;
             const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1] });
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+function getallpharmacystockbyphamarcy(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { clinic } = req.params;
+            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1], pharmacy: clinic });
             res.status(200).json({
                 queryresult,
                 status: true

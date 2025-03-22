@@ -11,7 +11,7 @@ import configuration from "../config";
       return { admissiondetails, totaladmissiondetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error(`${configuration.error.errorgeneral} reading admission`);
     }
   };
   export async function createadmission(input:any){
@@ -33,7 +33,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error(`${configuration.error.errorgeneral} creating admission`);
 
     }
   }
@@ -48,12 +48,12 @@ import configuration from "../config";
     });
       if (!admission) {
         //return json  false response
-        throw new Error(configuration.error.errorinvalidcredentials);
+        throw new Error(configuration.error.errorrecordnotfound);
       }
       return admission;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error(`${configuration.error.errorgeneral} updating admission`);
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return admission;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error(`${configuration.error.errorgeneral} updating admission`);
 
     }
 
