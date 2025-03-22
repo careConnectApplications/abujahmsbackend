@@ -28,8 +28,7 @@ const configuration = {
     {role: "ENT Nurse", roleId:"17"},
     {role: "Physiotheraphy", roleId:"18"},
     {role: "ICT", roleId:"19"},
-    {role: "Head of Clinical Services", roleId:"20"},
-    {role: "General Nurse", roleId:"21"},
+    {role: "Head of Clinical Services", roleId:"20"}
     //General Nurse
 
     //Head of Clinical Services
