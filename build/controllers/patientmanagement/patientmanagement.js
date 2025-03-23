@@ -149,6 +149,7 @@ function bulkuploadhmopatients(req, res) {
                     }
                     // chaorten the MRN to alphanumeric 
                     hmo[i].MRN = `${firstName[0]}${(0, otherservices_1.generateRandomNumber)(4)}${lastName[0]}`;
+                    hmo[i].status = config_1.default.status[1];
                     hmo[i].password = config_1.default.defaultPassword;
                     const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(hmo[i]);
                 }
@@ -165,7 +166,6 @@ function bulkuploadhmopatients(req, res) {
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var appointmentid = String(Date.now());
-        console.log(req.body);
         if (req.body.isHMOCover == "Yes" || req.body.isHMOCover == true) {
             throw new Error(config_1.default.error.errorauthorizehmo);
         }

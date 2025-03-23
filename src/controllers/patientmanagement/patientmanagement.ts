@@ -103,7 +103,8 @@ export async function getallhmopatients(req:Request, res:any){
   
           }
            // chaorten the MRN to alphanumeric 
-           hmo[i].MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;        
+           hmo[i].MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;    
+           hmo[i].status=configuration.status[1];    
            hmo[i].password=configuration.defaultPassword;
        
          const createpatientqueryresult=await createpatient(hmo[i]);
@@ -127,7 +128,7 @@ export var createpatients = async (req:any,res:any) =>{
    
     try{
         var appointmentid:any=String(Date.now());
-        console.log(req.body);
+        
         if(req.body.isHMOCover == "Yes" || req.body.isHMOCover == true){
           throw new Error(configuration.error.errorauthorizehmo);
 
