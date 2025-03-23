@@ -5,6 +5,7 @@ import {createadmission,readalladmission,updateadmission,readoneadmission} from 
 import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
+import {readallpayment} from "../../dao/payment";
 import configuration from "../../config";
 const { ObjectId } = mongoose.Types;
 
@@ -143,9 +144,7 @@ export async function updateadmissionstatus(req:any, res:any){
       //validate if permitted base on status
      //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
       const queryresult:any =await updateadmission(id,{status});
-      console.log(queryresult.referedward);
-      console.log(queryresult.previousward);
-      console.log(status);
+     
       //if status is equal to admit reduce  ward count
       if(status == configuration.admissionstatus[1] || status == configuration.admissionstatus[3]){        
         await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:1,vacantbed:-1}});
@@ -155,6 +154,13 @@ export async function updateadmissionstatus(req:any, res:any){
         await updateadmission(id,{status,referedward:transfterto,previousward:queryresult.referedward});
       }
       else if(status == configuration.admissionstatus[5]){
+        //check that the patient is not owing
+        var paymentrecord:any = await readallpayment({paymentreference:response.admissionid,status:{$ne: configuration.status[3]}},'');
+        if((paymentrecord.paymentdetails).length > 0){
+          throw new Error(configuration.error.errorpayment);
+    
+        }
+
         await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:-1,vacantbed:1}});
 
       }
