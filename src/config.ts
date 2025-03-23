@@ -864,7 +864,8 @@ main:[
 ],
 
   paymenttype:["patientregistration"],
-  allowedfilesize: 500,
+//  allowedfilesize: 500,
+allowedfilesize: 20000,
   usertemplate: "userslist",
   hmotemplate: "hmo",
   stocktemplate: "stocklist",
