@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadpix = exports.createpatients = void 0;
+exports.searchpartient = searchpartient;
 exports.getallhmopatients = getallhmopatients;
 exports.bulkuploadhmopatients = bulkuploadhmopatients;
 exports.getallpatients = getallpatients;
@@ -63,6 +64,24 @@ const appointment_1 = require("../../dao/appointment");
 //Insurance upload
 //get hmo patient 
 //read all patients
+//search patients 
+function searchpartient(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            //var settings = await configuration.settings();
+            var selectquery = { "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+            const { searchparams } = req.params;
+            const queryresult = yield (0, patientmanagement_1.readallpatient)({ $or: [{ lastName: { $regex: searchparams, $options: 'i' } }, { firstName: { $regex: searchparams, $options: 'i' } }, { HMOId: { $regex: searchparams, $options: 'i' } }, { MRN: { $regex: searchparams, $options: 'i' } }, { phoneNumber: { $regex: searchparams, $options: 'i' } }] }, selectquery, '', '');
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+        }
+    });
+}
 function getallhmopatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

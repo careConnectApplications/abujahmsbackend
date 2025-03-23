@@ -13,4 +13,5 @@ router.put('/updatepatients/:id', patientmanagement_1.updatepatients);
 router.get('/getonepatients/:id', patientmanagement_1.getonepatients);
 router.post('/bulkuploadhmopatients', patientmanagement_1.bulkuploadhmopatients);
 router.get('/getallhmopatients', patientmanagement_1.getallhmopatients);
+router.get('/searchpartient/:searchparams', patientmanagement_1.searchpartient);
 exports.default = router;
