@@ -7,9 +7,30 @@ import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
+import { AnyObject } from "mongoose";
 //Insurance upload
 //get hmo patient 
 //read all patients
+//search patients 
+export async function searchpartient(req:AnyObject, res:any){
+  try{
+      //var settings = await configuration.settings();
+    var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
+        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
+    const {searchparams} = req.params;
+
+    const queryresult = await readallpatient({$or:[{ lastName: { $regex:searchparams , $options: 'i' } },{ firstName: { $regex:searchparams , $options: 'i' } },{ HMOId: { $regex:searchparams , $options: 'i' } },{ MRN: { $regex:searchparams , $options: 'i' } },{ phoneNumber: { $regex:searchparams , $options: 'i' } }]},selectquery,'','');
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+
+
+  }
+  catch(e:any){
+
+  }
+}
 export async function getallhmopatients(req:Request, res:any){
   try{
     //var settings = await configuration.settings();
