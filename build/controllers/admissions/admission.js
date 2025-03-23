@@ -22,6 +22,7 @@ const admissions_1 = require("../../dao/admissions");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const wardmanagement_1 = require("../../dao/wardmanagement");
 const clinics_1 = require("../../dao/clinics");
+const payment_1 = require("../../dao/payment");
 const config_1 = __importDefault(require("../../config"));
 const { ObjectId } = mongoose_1.default.Types;
 //refer for admission
@@ -139,9 +140,6 @@ function updateadmissionstatus(req, res) {
             //validate if permitted base on status
             //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
             const queryresult = yield (0, admissions_1.updateadmission)(id, { status });
-            console.log(queryresult.referedward);
-            console.log(queryresult.previousward);
-            console.log(status);
             //if status is equal to admit reduce  ward count
             if (status == config_1.default.admissionstatus[1] || status == config_1.default.admissionstatus[3]) {
                 yield (0, wardmanagement_1.updatewardmanagement)(queryresult.referedward, { $inc: { occupiedbed: 1, vacantbed: -1 } });
@@ -151,6 +149,11 @@ function updateadmissionstatus(req, res) {
                 yield (0, admissions_1.updateadmission)(id, { status, referedward: transfterto, previousward: queryresult.referedward });
             }
             else if (status == config_1.default.admissionstatus[5]) {
+                //check that the patient is not owing
+                var paymentrecord = yield (0, payment_1.readallpayment)({ paymentreference: response.admissionid, status: { $ne: config_1.default.status[3] } }, '');
+                if ((paymentrecord.paymentdetails).length > 0) {
+                    throw new Error(config_1.default.error.errorpayment);
+                }
                 yield (0, wardmanagement_1.updatewardmanagement)(queryresult.referedward, { $inc: { occupiedbed: -1, vacantbed: 1 } });
             }
             // status is equal to  transfer reduce target ward and increase 

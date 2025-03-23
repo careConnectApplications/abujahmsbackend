@@ -18,6 +18,8 @@ exports.createpatient = createpatient;
 exports.readonepatient = readonepatient;
 exports.updatepatient = updatepatient;
 exports.updatepatientbyanyquery = updatepatientbyanyquery;
+exports.updatepatientmanybyquery = updatepatientmanybyquery;
+exports.createpatientifnotexit = createpatientifnotexit;
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const otherservices_1 = require("../utils/otherservices");
 const config_1 = __importDefault(require("../config"));
@@ -112,6 +114,36 @@ function updatepatientbyanyquery(query, reqbody) {
         catch (err) {
             console.log(err);
             throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function updatepatientmanybyquery(query, reqbody) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const payment = yield patientmanagement_1.default.updateMany(query, reqbody, {
+                new: true
+            });
+            if (!payment) {
+                //return json  false response
+                throw new Error(config_1.default.error.errorinvalidcredentials);
+            }
+            return payment;
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function createpatientifnotexit(filterinput, input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            console.log(input);
+            return patientmanagement_1.default.updateMany(filterinput, input, { upsert: true });
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.errorusercreate);
         }
     });
 }

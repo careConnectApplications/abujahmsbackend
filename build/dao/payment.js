@@ -24,7 +24,6 @@ const config_1 = __importDefault(require("../config"));
 function readallpayment(query, populatequery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(query);
             const paymentdetails = yield payment_1.default.find(query).populate(populatequery).sort({ createdAt: -1 });
             ;
             const totalpaymentdetails = yield payment_1.default.find(query).countDocuments();

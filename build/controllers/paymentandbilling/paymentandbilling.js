@@ -90,6 +90,7 @@ function confirmpayment(req, res) {
             const response = yield (0, payment_1.readonepayment)({ _id: id });
             const { patient } = response;
             const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
+            console.log('patient', patientrecord);
             if (!patientrecord && response.paymentcategory !== config_1.default.category[3]) {
                 throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
             }

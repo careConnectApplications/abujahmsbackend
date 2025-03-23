@@ -180,11 +180,15 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         const { firstName, lastName } = (req.user).user;
         const { id } = req.params;
-        var response = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, '');
+        var response = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+        const { patient } = response;
         //validate payment
-        var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
-        if (paymentrecord.status !== config_1.default.status[3]) {
-            throw new Error(config_1.default.error.errorpayment);
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        if (!findAdmission) {
+            var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
+            if (paymentrecord.status !== config_1.default.status[3]) {
+                throw new Error(config_1.default.error.errorpayment);
+            }
         }
         const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
@@ -217,13 +221,13 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { option, remark } = req.body;
         const { id } = req.params;
         //search for the lab request
-        var radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, '');
+        var radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
         const { testname, testid, patient, amount } = radiology;
         //validate the status
         let queryresult;
         let paymentreference;
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
         if (findAdmission) {
             paymentreference = findAdmission.admissionid;
         }

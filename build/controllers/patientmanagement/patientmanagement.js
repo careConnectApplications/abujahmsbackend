@@ -56,7 +56,6 @@ const uuid_1 = require("uuid");
 const moment_1 = __importDefault(require("moment"));
 const path = __importStar(require("path"));
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const patientmanagementachieve_1 = require("../../dao/patientmanagementachieve");
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
 const otherservices_1 = require("../../utils/otherservices");
@@ -92,10 +91,10 @@ function bulkuploadhmopatients(req, res) {
             let allowedextension = ['.csv', '.xlsx'];
             let uploadpath = `${process.cwd()}/${config_1.default.useruploaddirectory}`;
             //achieve document
-            const { patientdetails } = yield (0, patientmanagement_1.readallpatient)({ HMOName }, {}, '', '');
-            yield (0, patientmanagementachieve_1.createpatientachieve)(patientdetails);
+            yield (0, patientmanagement_1.updatepatientmanybyquery)({ HMOName }, { status: config_1.default.status[15] });
+            //await createpatientachieve(patientdetails);
             //delete patient management
-            yield (0, patientmanagement_1.deletePatietsByCondition)({ HMOName });
+            //await deletePatietsByCondition({HMOName});
             var columnmapping = {
                 A: "title",
                 B: "firstName",
@@ -131,8 +130,8 @@ function bulkuploadhmopatients(req, res) {
                 for (var i = 0; i < hmo.length; i++) {
                     hmo[i].isHMOCover = config_1.default.ishmo[1];
                     hmo[i].HMOName = HMOName;
-                    const { phoneNumber, firstName, lastName, gender } = hmo[i];
-                    (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender });
+                    const { phoneNumber, firstName, lastName, gender, HMOId } = hmo[i];
+                    (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, HMOId });
                     console.log((phoneNumber.toString()).length);
                     if ((phoneNumber.toString()).length !== 11 && (phoneNumber.toString()).length !== 10) {
                         throw new Error(`${phoneNumber} ${config_1.default.error.errorelevendigit}`);
@@ -142,16 +141,19 @@ function bulkuploadhmopatients(req, res) {
                     //if not dateObirth but age calculate date of birth
                     if (!hmo[i].dateOfBirth && hmo[i].age)
                         hmo[i].dateOfBirth = (0, moment_1.default)().subtract(Number(hmo[i].age), 'years').format('YYYY-MM-DD');
-                    const foundUser = yield (0, patientmanagement_1.readonepatient)({ phoneNumber }, {}, '', '');
+                    /*
+                    const foundUser:any =  await readonepatient({phoneNumber},{},'','');
                     //category
-                    if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
-                        throw new Error(`Patient ${config_1.default.error.erroralreadyexit}`);
+                    if(foundUser && phoneNumber !== configuration.defaultphonenumber){
+                        throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+            
                     }
+                        */
                     // chaorten the MRN to alphanumeric 
                     hmo[i].MRN = `${firstName[0]}${(0, otherservices_1.generateRandomNumber)(4)}${lastName[0]}`;
                     hmo[i].status = config_1.default.status[1];
                     hmo[i].password = config_1.default.defaultPassword;
-                    const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(hmo[i]);
+                    const createpatientqueryresult = yield (0, patientmanagement_1.createpatientifnotexit)({ HMOId: hmo[i].HMOId, HMOName }, hmo[i]);
                 }
             }
             res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });

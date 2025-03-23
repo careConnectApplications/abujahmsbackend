@@ -909,8 +909,8 @@ main:[
     errorservicetray: "This service donot exist in your service tray"
 
   },
-    environment: "test",
-  //environment: "prod",
+    //environment: "test",
+  environment: "prod",
 
 }
 export default configuration;

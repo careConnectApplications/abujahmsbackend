@@ -104,7 +104,7 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.pharmacyorder = pharmacyorder;
-//get all pharmacy order
+//get all pharmacy orderf
 const readallpharmacytransaction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //extract staff department
@@ -196,16 +196,20 @@ const dispense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         //dispense
         //search product in inventory
-        var response = yield (0, prescription_1.readoneprescription)({ _id: id }, {}, '', '', '');
-        console.log('response', response);
+        var response = yield (0, prescription_1.readoneprescription)({ _id: id }, {}, 'patient', '', '');
+        const { dispensestatus, patient } = response;
         //check product status
-        if (response.dispensestatus !== config_1.default.status[10]) {
+        if (dispensestatus !== config_1.default.status[10]) {
             throw new Error(`Dispense ${config_1.default.error.errortasknotpending}`);
         }
         //check payment status
-        var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
-        if (paymentrecord.status !== config_1.default.status[3]) {
-            throw new Error(config_1.default.error.errorpayment);
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        console.log('findAdmission', findAdmission);
+        if (!findAdmission) {
+            var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
+            if (paymentrecord.status !== config_1.default.status[3]) {
+                throw new Error(config_1.default.error.errorpayment);
+            }
         }
         // console.log(testname[i]);
         var orderPrice = yield (0, price_1.readoneprice)({ servicetype: response.prescription, servicecategory: config_1.default.category[1] });
