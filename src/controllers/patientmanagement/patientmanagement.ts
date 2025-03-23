@@ -2,8 +2,7 @@ import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import * as path from 'path';
-import  {readallpatient,createpatient,updatepatient,readonepatient,deletePatietsByCondition}  from "../../dao/patientmanagement";
-import {createpatientachieve} from "../../dao/patientmanagementachieve"
+import  {readallpatient,createpatient,updatepatient,readonepatient,updatepatientmanybyquery,createpatientifnotexit}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson } from "../../utils/otherservices";
@@ -42,10 +41,10 @@ export async function getallhmopatients(req:Request, res:any){
     let allowedextension = ['.csv','.xlsx'];
     let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
     //achieve document
-    const {patientdetails} =await readallpatient({HMOName},{},'','');
-    await createpatientachieve(patientdetails);
+    await updatepatientmanybyquery({HMOName},{status:configuration.status[15]});
+    //await createpatientachieve(patientdetails);
     //delete patient management
-    await deletePatietsByCondition({HMOName});
+    //await deletePatietsByCondition({HMOName});
     var columnmapping={
       A: "title",
       B: "firstName",
@@ -86,8 +85,8 @@ export async function getallhmopatients(req:Request, res:any){
         for (var i = 0; i < hmo.length; i++) {    
           hmo[i].isHMOCover=configuration.ishmo[1];
           hmo[i].HMOName=HMOName;
-          const {phoneNumber,firstName,lastName,gender} = hmo[i];
-          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender});
+          const {phoneNumber,firstName,lastName,gender,HMOId} = hmo[i];
+          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,HMOId});
           console.log((phoneNumber.toString()).length);
           if((phoneNumber.toString()).length !== 11 && (phoneNumber.toString()).length !==10){
             throw new Error(`${phoneNumber} ${configuration.error.errorelevendigit}`);
@@ -96,18 +95,20 @@ export async function getallhmopatients(req:Request, res:any){
           if(hmo[i].dateOfBirth) hmo[i].age= moment().diff(moment(hmo[i].dateOfBirth), 'years');
           //if not dateObirth but age calculate date of birth
           if(!hmo[i].dateOfBirth && hmo[i].age ) hmo[i].dateOfBirth = moment().subtract(Number(hmo[i].age), 'years').format('YYYY-MM-DD');
+          /*
           const foundUser:any =  await readonepatient({phoneNumber},{},'','');
           //category
           if(foundUser && phoneNumber !== configuration.defaultphonenumber){
               throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
   
           }
+              */
            // chaorten the MRN to alphanumeric 
            hmo[i].MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;    
            hmo[i].status=configuration.status[1];    
            hmo[i].password=configuration.defaultPassword;
        
-         const createpatientqueryresult=await createpatient(hmo[i]);
+         const createpatientqueryresult=await createpatientifnotexit({HMOId:hmo[i].HMOId,HMOName},hmo[i]);
       }
        }
       

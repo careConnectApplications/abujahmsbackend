@@ -47,6 +47,11 @@ export const readalllabb = async (req:any, res:any) => {
   const {email, staffId} = (req.user).user;
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
+  //if not lab or status !== scheduled return error
+  if(!lab || lab.status !== configuration.status[5]){
+    throw new Error(configuration.error.errorservicetray);
+
+  }
   validateinputfaulsyvalue({lab,subcomponents});
   const user = await readone({email, staffId});
 
@@ -273,19 +278,22 @@ export const confirmlaborder = async (req:any, res:any) =>{
   let queryresult;
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
   let paymentreference; 
+  let status;
 //validate the status
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
   var  findAdmission = await readoneadmission({patient, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
     paymentreference = findAdmission.admissionid;
+    status=configuration.status[5];
 
 }
 else{
   paymentreference = testid;
+  status=configuration.status[2];
 }
   if(option == true){
     var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient,amount});
-  queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
+    queryresult= await updatelab({_id:id},{status,payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     
   }

@@ -94,4 +94,37 @@ export async function deletePatietsByCondition(query:any) {
       }
   
     }
+    export async function updatepatientmanybyquery(query:any, reqbody:any){
+      try{
+      const payment = await Patient.updateMany(query, reqbody,{
+        new: true
+      });
+        if (!payment) {
+          //return json  false response
+          throw new Error(configuration.error.errorinvalidcredentials);
+        }
+        return payment;
+      }catch(err){
+        console.log(err);
+        throw new Error(configuration.error.erroruserupdate);
   
+      }
+  
+    }
+
+    export async function createpatientifnotexit(filterinput:any,input:any){
+      try{
+        console.log(input);
+        return Patient.updateMany(
+          filterinput,
+          input,
+          { upsert: true }   );
+                
+          
+      }
+      catch(err){
+        console.log(err);
+        throw new Error(configuration.error.errorusercreate);
+  
+      }
+    }

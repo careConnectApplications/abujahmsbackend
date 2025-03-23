@@ -38,7 +38,7 @@ const configuration = {
   medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
   "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
   defaultphonenumber:"00000000000",
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation"],
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation","achieved"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
@@ -906,11 +906,11 @@ main:[
     errorpayment:"This service has not been paid for",
     errorreferrer: "You are not the preferred consultant for this referrer",
     errorgreaterthan:"Cannot be greater",
-    errorservicetray: "This service no more exist in your service tray"
+    errorservicetray: "This service donot exist in your service tray"
 
   },
-    //environment: "test",
-  environment: "prod",
+    environment: "test",
+  //environment: "prod",
 
 }
 export default configuration;

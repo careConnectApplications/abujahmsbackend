@@ -151,14 +151,17 @@ export var radiologyorder= async (req:any, res:any) =>{
     try{
       const { firstName,lastName} = (req.user).user;
       const {id} = req.params;
-      var response:any = await readoneradiology({_id:id},{},'');
+      var response:any = await readoneradiology({_id:id},{},'patient');
+      const {patient} = response;
       //validate payment
+      var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+      if(!findAdmission){
       var paymentrecord:any = await readonepayment({_id:response.payment});
-   
     if(paymentrecord.status !== configuration.status[3]){
       throw new Error(configuration.error.errorpayment);
 
     }
+  }
 
       const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
@@ -199,13 +202,13 @@ export const confirmradiologyorder = async (req:any, res:any) =>{
     const {option,remark} = req.body;
     const {id} = req.params;
   //search for the lab request
-  var radiology:any =await readoneradiology({_id:id},{},'');
+  var radiology:any =await readoneradiology({_id:id},{},'patient');
   const {testname, testid,patient,amount} = radiology;
   //validate the status
   let queryresult;
   let paymentreference;
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-  var  findAdmission = await readoneadmission({patient, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
     paymentreference = findAdmission.admissionid;
 

@@ -107,7 +107,7 @@ dosageform:String,
   
   }
 
-  //get all pharmacy order
+  //get all pharmacy orderf
   export const readallpharmacytransaction = async (req:any, res:any) => {
       try {
        //extract staff department
@@ -211,20 +211,23 @@ else{
     const {id} = req.params;
        //dispense
     //search product in inventory
-    var response:any = await readoneprescription({_id:id},{},'','','');
-    console.log('response', response);
+    var response:any = await readoneprescription({_id:id},{},'patient','','');
+    const {dispensestatus,patient} = response;
     //check product status
-    if(response.dispensestatus !== configuration.status[10]){
+    if(dispensestatus !== configuration.status[10]){
       throw new Error(`Dispense ${configuration.error.errortasknotpending}`);
 
     }
     //check payment status
+    var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+    console.log('findAdmission', findAdmission);
+    if(!findAdmission){
     var paymentrecord:any = await readonepayment({_id:response.payment});
-   
     if(paymentrecord.status !== configuration.status[3]){
       throw new Error(configuration.error.errorpayment);
 
     }
+  }
    // console.log(testname[i]);
   var orderPrice:any = await readoneprice({servicetype:response.prescription, servicecategory: configuration.category[1]});  
   console.log('orderprice', orderPrice);

@@ -27,7 +27,7 @@ export const scheduleappointment = async (req:any, res:any) => {
     validateinputfaulsyvalue({clinic,  appointmentdate, appointmentcategory, appointmenttype,patient});
     //pending
 
-     //validation
+     //validatioborder
      var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       //search patient if available and por
