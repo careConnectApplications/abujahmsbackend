@@ -12,7 +12,7 @@ const priceappointmentnewregistrationSchema = new mongoose_1.Schema({
     },
     amount: {
         type: Number,
-        required: true
+        default: 0,
     },
     servicetype: {
         type: String,
