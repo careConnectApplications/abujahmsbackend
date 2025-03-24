@@ -40,7 +40,7 @@ export async function bulkuploadinventory(req:any, res:any){
             var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy} = stocklist[i];
             lowstocklevel = Number(lowstocklevel);
             qty=Number(qty);
-            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,lastrestockdate,qty,amount});
+            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
         //await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
