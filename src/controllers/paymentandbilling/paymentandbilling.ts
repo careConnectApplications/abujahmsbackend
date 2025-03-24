@@ -32,24 +32,25 @@ export async function confirmgrouppayment(req:any, res:any){
   try{
     const {paymentreferenceid} = req.params;
     //check for null of id
-      const response:any = await readallpayment({paymentreference:paymentreferenceid},'');
-      console.log(response);
-      /*
-      const {patient} = response;
+      const response:any = await readallpayment({paymentreference:paymentreferenceid, status:configuration.status[2]},'');
+      const {paymentdetails} = response;
+      console.log(paymentdetails);
+      for(var i =0;i < paymentdetails.length; i++ ){
+        let  {paymentype,paymentcategory,paymentreference,patient,_id}= paymentdetails[i]
+
+        //const {patient} = paymentdetails[i];
       const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
       console.log('patient', patientrecord);
-      if(!patientrecord && response.paymentcategory !== configuration.category[3] ){
+      if(!patientrecord && paymentcategory !== configuration.category[3] ){
+        console.log('true');
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
-
     //var settings =await  configuration.settings();
-     const status= configuration.status[3];
-     const {email, staffId} = (req.user).user;
-     const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
-      //const queryresult:any =await updatepayment(id,{status});
-      //confirm payment of the service paid for 
-      const {paymentype,paymentcategory,paymentreference} = queryresult;
+    const status= configuration.status[3];
+    const {email, staffId} = (req.user).user;
+    const queryresult:any =await updatepayment(_id,{status,cashieremail:email,cashierid:staffId});
+    //const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
       if(paymentcategory == configuration.category[3]){
         //update patient registration status
@@ -57,29 +58,25 @@ export async function confirmgrouppayment(req:any, res:any){
 
 
       }
-      
-      //for appointment
       else if(paymentcategory == configuration.category[0]){
         //schedule the patient
         //payment
-        await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
+        await updateappointmentbyquery({payment:_id},{status:configuration.status[5]});
 
       }
-      
       //for lab test
       else if (paymentcategory == configuration.category[2]){
         //update lab test
-        await updatelabbyquery({payment:id},{status:configuration.status[5]})
+        await updatelabbyquery({payment:_id},{status:configuration.status[5]})
       }
-      //update for pharmacy
       
+  }
       
-
       res.status(200).json({
-          queryresult,
+          queryresult:paymentreferenceid,
           status:true
         }); 
-        */
+        
 
   }
   catch(e:any){
