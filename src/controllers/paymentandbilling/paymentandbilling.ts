@@ -1,8 +1,9 @@
-import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate} from "../../dao/payment";
+import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate,readpaymentaggregate} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
 import configuration from "../../config";
+import {validateinputfaulsyvalue} from "../../utils/otherservices";
 //deactivate a user
 /*
 export async function confirmpayment(req:any, res:any){
@@ -25,6 +26,145 @@ export async function confirmpayment(req:any, res:any){
 
 }
     */
+   //confirm payment
+export async function confirmgrouppayment(req:any, res:any){
+  //console.log(req.user);
+  try{
+    const {paymentreferenceid} = req.params;
+    //check for null of id
+      const response:any = await readallpayment({paymentreference:paymentreferenceid},'');
+      console.log(response);
+      /*
+      const {patient} = response;
+      const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
+      console.log('patient', patientrecord);
+      if(!patientrecord && response.paymentcategory !== configuration.category[3] ){
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+
+    }
+
+    //var settings =await  configuration.settings();
+     const status= configuration.status[3];
+     const {email, staffId} = (req.user).user;
+     const queryresult:any =await updatepayment(id,{status,cashieremail:email,cashierid:staffId});
+      //const queryresult:any =await updatepayment(id,{status});
+      //confirm payment of the service paid for 
+      const {paymentype,paymentcategory,paymentreference} = queryresult;
+      //for patient registration
+      if(paymentcategory == configuration.category[3]){
+        //update patient registration status
+        await updatepatientbyanyquery({_id:patient},{status:configuration.status[1]});
+
+
+      }
+      
+      //for appointment
+      else if(paymentcategory == configuration.category[0]){
+        //schedule the patient
+        //payment
+        await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
+
+      }
+      
+      //for lab test
+      else if (paymentcategory == configuration.category[2]){
+        //update lab test
+        await updatelabbyquery({payment:id},{status:configuration.status[5]})
+      }
+      //update for pharmacy
+      
+      
+
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+        */
+
+  }
+  catch(e:any){
+      console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
+export async function readpaymentbyreferencenumber(req: any, res: any) {
+  //
+  try {
+    const { paymentreference } = req.params;
+    //validate ticket id
+    validateinputfaulsyvalue({
+      paymentreference,
+   
+    });
+    
+    var populatequery ='patient';
+   const queryresult = await readallpayment({paymentreference},populatequery);
+  
+    res.json({
+      queryresult,
+      status: true,
+    });
+  } catch (e: any) {
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+  }
+}
+//recall
+
+export async function groupreadallpayment(req: any, res: any) {
+  try {
+    //const { paymentreference } = req.params;
+    const referencegroup = [
+     //look up patient
+     {
+      $lookup: {
+        from: "patientsmanagements",
+        localField: "patient",
+        foreignField: "_id",
+        as: "patient",
+      },
+    },
+      {
+        $group: {
+          _id: "$paymentreference",
+          paymentreference: {$first: "$paymentreference"},
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          amount: { $sum: "$amount" },
+          patient:{$first: "$patient"}   
+        },
+      },
+      {
+        $project:{
+          _id:0,
+          paymentreference:1,
+          createdAt:1,
+          updatedAt:1,
+          amount:1,
+          patient:1
+
+        }
+      },
+      
+      { $sort: { createdAt: -1 } },
+      
+      
+    ];
+    const queryresult = await readpaymentaggregate(referencegroup);
+    res.json({
+      queryresult,
+      status: true,
+    });
+
+    
+  } catch (e: any) {
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+  }
+}
    //read particular patient payment history
 export async function readbillinghistoryforapatient(req:any, res:any){
     try{

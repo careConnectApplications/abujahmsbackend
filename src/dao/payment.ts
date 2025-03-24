@@ -2,6 +2,18 @@ import Payment from "../models/payment";
 import {paymentinterface} from '../models/payment'
 import configuration from "../config";
 
+
+
+export async function readpaymentaggregate(input:any) {
+  try{
+  return await Payment.aggregate(input);
+  }
+  catch(e:any){
+    console.log(e);
+    throw new Error(configuration.error.erroruserupdate);
+  }
+  }
+
   //read all payment history
   export async function readallpayment(query:any,populatequery:any) {
     try {
