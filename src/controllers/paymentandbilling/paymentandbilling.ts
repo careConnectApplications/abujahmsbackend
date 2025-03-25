@@ -104,9 +104,10 @@ export async function readpaymentbyreferencenumber(req: any, res: any) {
     
     var populatequery ='patient';
     // Aggregation to calculate sum and add it as a new field
+    var query ={paymentreference};
  let totalAmount = await readallpaymentaggregate([
   {
-    $match: paymentreference
+    $match: query
   },
   {
     $group: {
