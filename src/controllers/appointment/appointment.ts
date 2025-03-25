@@ -41,22 +41,32 @@ export const scheduleappointment = async (req:any, res:any) => {
      }
 
     //search for price if available
-    var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype, isHMOCover:patientrecord.isHMOCover});
+    var appointmentPrice:any = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype, isHMOCover:configuration.ishmo[0]});
     
-    if(!appointmentPrice){
+    if(patientrecord.isHMOCover ==  configuration.ishmo[0] && !appointmentPrice){
       throw new Error(configuration.error.errornopriceset);
 
   }
 
 //create appointment
 //create payment
+let createpaymentqueryresult:any;
+let queryresult;
+if(patientrecord.isHMOCover ==  configuration.ishmo[1]){
+queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
+await updatepatient(patient,{$push: {appointment:queryresult._id}});
 
-const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
-//cater for phamarcy, lab ,radiology and procedure
-const queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
-console.log(queryresult);    
-//update patient
+}
+else{
+  createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
+queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
+
+
+}
+//cater for phamarcy, lab ,radiology and procedure
+  
+//update patient
     res.status(200).json({queryresult, status: true});
     
   } catch (error:any) {
@@ -241,7 +251,7 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
     },
    
     {
-      $match: { 'payment.status': configuration.status[3], clinic }  // Filter payment
+      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], clinic }  // Filter payment
     }
   ]; 
     const queryresult = await modifiedreadallappointment({clinic},aggregatequery);
@@ -319,7 +329,7 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
     },
    
     {
-      $match: { 'payment.status': configuration.status[3], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
     }
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);

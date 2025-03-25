@@ -4,6 +4,8 @@ import nodemailer from "nodemailer";
 import configuration from "../config";
 import * as path from 'path';
 import exeltojson from 'convert-excel-to-json';
+import {readonepatient} from '../dao/patientmanagement';
+import { count } from "console";
 export var encrypt = async function(password:any){
     try{
     //generate a salt
@@ -63,9 +65,39 @@ export var mail= async function mail(to:any,subject:any,textmessage:any){
 
     });
 }
+export async function storeUniqueNumber(n:number) {
+  try {
+      
+      // Generate unique 7-digit number
+      let uniqueNumber = await generateRandomNumber(n);
+      
 
+      // Check if the number already exists in the collection
+      const existing = await readonepatient({ 
+        MRN: uniqueNumber },{},'','');
+      
+      if (existing) {
+          console.log(`Number ${uniqueNumber} already exists. Generating a new one.`);
+          return storeUniqueNumber(n); // Retry if duplicate
+      }
+
+      return uniqueNumber;
+
+  } catch (err:any) {
+      throw new Error(err.message);
+  } 
+}
 export function generateRandomNumber(n:number) {
-    return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+    //return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+   // let number = Math.floor(1000000 + Math.random() * 9000000); // Generates a number between 1000000 and 9999999
+    //return number;
+      // Get the current timestamp (in milliseconds)
+      const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
+
+      // Take the first 7 characters (if needed, you can adjust this logic)
+      const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
+  
+      return uniqueString;
   }
   export function validateinputfaulsyvalue(input:any){
     for (const key in input) {

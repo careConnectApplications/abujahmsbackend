@@ -33,7 +33,7 @@ export async function confirmgrouppayment(req:any, res:any){
     const {paymentreferenceid} = req.params;
     //check for null of id
       const response:any = await readallpayment({paymentreference:paymentreferenceid, status:configuration.status[2]},'');
-      const {paymentdetails} = response;
+      const {paymentdetails} = response.paymentdetails;
       console.log(paymentdetails);
       for(var i =0;i < paymentdetails.length; i++ ){
         let  {paymentype,paymentcategory,paymentreference,patient,_id}= paymentdetails[i]
@@ -58,12 +58,14 @@ export async function confirmgrouppayment(req:any, res:any){
 
 
       }
+      
       else if(paymentcategory == configuration.category[0]){
         //schedule the patient
         //payment
         await updateappointmentbyquery({payment:_id},{status:configuration.status[5]});
 
       }
+        
       //for lab test
       else if (paymentcategory == configuration.category[2]){
         //update lab test

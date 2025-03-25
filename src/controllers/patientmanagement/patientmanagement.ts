@@ -5,7 +5,7 @@ import * as path from 'path';
 import  {readallpatient,createpatient,updatepatient,readonepatient,updatepatientmanybyquery,createpatientifnotexit}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
-import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson } from "../../utils/otherservices";
+import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson,storeUniqueNumber } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
 import { AnyObject } from "mongoose";
 //Insurance upload
@@ -124,8 +124,9 @@ export async function getallhmopatients(req:Request, res:any){
   
           }
               */
+          var uniqunumber =await storeUniqueNumber(4);
            // chaorten the MRN to alphanumeric 
-           hmo[i].MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;    
+           hmo[i].MRN=`${firstName[0]}${uniqunumber}${lastName[0]}`;    
            hmo[i].status=configuration.status[1];    
            hmo[i].password=configuration.defaultPassword;
        
@@ -194,8 +195,9 @@ export var createpatients = async (req:any,res:any) =>{
           throw new Error(configuration.error.errornopriceset);
 
       }
+      var uniqunumber =await storeUniqueNumber(4);
        // chaorten the MRN to alphanumeric 
-        req.body.MRN=`${firstName[0]}${generateRandomNumber(4)}${lastName[0]}`;        
+        req.body.MRN=`${firstName[0]}${uniqunumber}${lastName[0]}`;        
         req.body.password=configuration.defaultPassword;
         //other validations
         var payment=[];
