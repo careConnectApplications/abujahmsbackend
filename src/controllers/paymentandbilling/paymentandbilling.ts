@@ -103,10 +103,31 @@ export async function readpaymentbyreferencenumber(req: any, res: any) {
     });
     
     var populatequery ='patient';
+    // Aggregation to calculate sum and add it as a new field
+ let totalAmount = await readallpaymentaggregate([
+  {
+    $match: paymentreference
+  },
+  {
+    $group: {
+      _id: null, // null means no grouping, we just want the total sum for the entire collection
+      totalAmount: { $sum: "$amount" } // Sum of the itemPrice for all documents
+    }
+  },
+  {
+    $project:{
+      totalAmount:1,
+      _id:0
+    }
+  }
+
+ ]);
+
    const queryresult = await readallpayment({paymentreference},populatequery);
   
     res.json({
       queryresult,
+      totalAmount,
       status: true,
     });
   } catch (e: any) {
@@ -155,6 +176,7 @@ export async function groupreadallpayment(req: any, res: any) {
       
       
     ];
+
     const queryresult = await readpaymentaggregate(referencegroup);
     res.json({
       queryresult,
