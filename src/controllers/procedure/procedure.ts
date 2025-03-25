@@ -38,20 +38,22 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       //loop through all test and create record in lab order
       for(var i =0; i < procedure.length; i++){
     //search for price of test name
-        var testPrice:any = await readoneprice({servicetype:procedure[i]});
-        if(!testPrice){
+        var testPrice:any = await readoneprice({servicetype:procedure[i],isHMOCover:configuration.ishmo[0]});
+        if(foundPatient?.isHMOCover ==  configuration.ishmo[0] && !testPrice){
           throw new Error(`${configuration.error.errornopriceset}  ${procedure[i]}`);
       }
       
       //search testname in setting
-      console.log(servicetypedetails);
+      
       
       var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-      
+      /*
       if(!testsetting || testsetting.length < 1){
         throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
+        */
     let paymentreference;
+   
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
   var  findAdmission = await readoneadmission({patient:id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
@@ -62,14 +64,33 @@ else{
   paymentreference = procedureid;
 }
          //create payment
-      var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+         if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
+        
+          var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
      
-      //create testrecordn 
-      var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});
-      proceduresid.push(procedurerecord._id);
-      paymentids.push(createpaymentqueryresult._id);
+          //create testrecordn 
+          var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});
+          proceduresid.push(procedurerecord._id);
+          paymentids.push(createpaymentqueryresult._id);
+        }
+        else{
+         // var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+    
+          //create testrecordn 
+          var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});
+          proceduresid.push(procedurerecord._id);
+          //paymentids.push(createpaymentqueryresult._id);
+        }
+     
       }
-      var queryresult=await updatepatient(id,{$push: {prcedure:proceduresid,payment:paymentids}});
+      let queryresult:any;
+      if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
+      queryresult=await updatepatient(id,{$push: {prcedure:proceduresid,payment:paymentids}});
+      }
+      else{
+        queryresult=await updatepatient(id,{$push: {prcedure:proceduresid}});
+
+      }
       res.status(200).json({queryresult, status: true});
       
      
@@ -158,14 +179,16 @@ else{
     try{
         const { firstName,lastName} = (req.user).user;
         const {id} = req.params;
-        var response:any = await readoneprocedure({_id:id},{},'');
+        var response:any = await readoneprocedure({_id:id},{},'patient');
+        const {patient} =response;
         //validate payment
+        if(patient.isHMOCover == configuration.ishmo[0]){
         var paymentrecord:any = await readonepayment({_id:response.payment});
-     
       if(paymentrecord.status !== configuration.status[3]){
         throw new Error(configuration.error.errorpayment);
   
       }
+    }
         const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
         const {procedureoutcome} = req.body;

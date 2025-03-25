@@ -61,6 +61,7 @@ export async function confirmgrouppayment(req:any, res:any){
 
 
       }
+      /*
       
       else if(paymentcategory == configuration.category[0]){
         //schedule the patient
@@ -68,6 +69,7 @@ export async function confirmgrouppayment(req:any, res:any){
         await updateappointmentbyquery({payment:_id},{status:configuration.status[5]});
 
       }
+        */
         
       //for lab test
       else if (paymentcategory == configuration.category[2]){
@@ -262,6 +264,7 @@ export async function confirmpayment(req:any, res:any){
 
 
       }
+      /*
       
       //for appointment
       else if(paymentcategory == configuration.category[0]){
@@ -270,6 +273,7 @@ export async function confirmpayment(req:any, res:any){
         await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
 
       }
+        */
       
       //for lab test
       else if (paymentcategory == configuration.category[2]){

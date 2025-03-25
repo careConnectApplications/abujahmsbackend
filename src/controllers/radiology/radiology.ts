@@ -40,8 +40,8 @@ export var radiologyorder= async (req:any, res:any) =>{
       for(var i =0; i < testname.length; i++){
       
     //search for price of test name
-        var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover});
-        if(!testPrice){
+        var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover:configuration.ishmo[0]});
+        if(foundPatient?.isHMOCover ==  configuration.ishmo[0] && !testPrice){
           throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
       
@@ -55,9 +55,15 @@ export var radiologyorder= async (req:any, res:any) =>{
         */
          //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-     
+      let testrecord:any;
       //create testrecordn 
-      var testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby,amount:Number(testPrice.amount)});
+      if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
+      testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby,amount:Number(testPrice.amount)});
+      }
+      else{
+        testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby});
+
+      }
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
@@ -79,7 +85,6 @@ export var radiologyorder= async (req:any, res:any) =>{
   //get lab order by patient
     export const readAllRadiologyByPatient = async (req:any, res:any) => {
       try {
-     
         const {id} = req.params;
         const queryresult = await readallradiology({patient:id},{},'patient','payment');
         res.status(200).json({
@@ -155,7 +160,7 @@ export var radiologyorder= async (req:any, res:any) =>{
       const {patient} = response;
       //validate payment
       var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
-      if(!findAdmission){
+      if(!findAdmission && patient.isHMOCover == configuration.ishmo[0]){
       var paymentrecord:any = await readonepayment({_id:response.payment});
     if(paymentrecord.status !== configuration.status[3]){
       throw new Error(configuration.error.errorpayment);
@@ -216,11 +221,15 @@ export const confirmradiologyorder = async (req:any, res:any) =>{
 else{
   paymentreference = testid;
 }
-  if(option == true){
+  if(option == true && patient.isHMOCover == configuration.ishmo[0]){
     var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
   queryresult= await updateradiology({_id:id},{status:configuration.status[9],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     
+  }
+  else if(option == true && patient.isHMOCover == configuration.ishmo[1]){
+    queryresult= await updateradiology({_id:id},{status:configuration.status[9],remark});
+
   }
   else{
     queryresult= await updateradiology({_id:id},{status:configuration.status[13], remark});

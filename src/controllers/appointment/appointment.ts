@@ -382,7 +382,7 @@ export var laborder= async (req:any, res:any) =>{
     //find patient
     const foundPatient:any =  await readonepatient({_id:id},{},'','');
 // check is patient is under inssurance
-var isHMOCover;
+//var isHMOCover;
 
 // Create a new ObjectId
     var appointment:any;
@@ -392,7 +392,7 @@ var isHMOCover;
         appointmentid:String(Date.now()),
         _id:new ObjectId()
       }
-      isHMOCover = foundPatient.isHMOCover;
+     // isHMOCover = foundPatient.isHMOCover;
 
     }
     else{
@@ -402,9 +402,10 @@ var isHMOCover;
               throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
           }
-          isHMOCover = appointment.patient.isHMOCover;
+        //  isHMOCover = appointment.patient.isHMOCover;
     }
-    
+
+   
    
  
 
@@ -414,9 +415,10 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
   //    console.log(testname[i]);
-  console.log(isHMOCover);
-      var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover});
-      if(!testPrice){
+  //console.log(isHMOCover);
+      var testPrice:any = await readoneprice({servicetype:testname[i],isHMOCover:configuration.ishmo[0]});
+      console.log("oks");
+      if((foundPatient?.isHMOCover ==  configuration.ishmo[0] || (appointment.patient).isHMOCover ==  configuration.ishmo[0]) && !testPrice){
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
     }
     //var setting  = await configuration.settings();
@@ -427,8 +429,17 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
    
    //create testrecord
+   let testrecord:any;
     //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
-    var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department,amount:Number(testPrice.amount)});
+   if(foundPatient?.isHMOCover ==  configuration.ishmo[0] || (appointment.patient).isHMOCover ==  configuration.ishmo[0]){
+
+    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department,amount:Number(testPrice.amount)}); 
+  }
+   else{
+    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department}); 
+
+   }
+   
     testsid.push(testrecord._id);
     //paymentids.push(createpaymentqueryresult._id);
     }
@@ -437,7 +448,6 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     res.status(200).json({queryresult, status: true});
     
    
-
   }
   catch(error:any){
     console.log("error", error);

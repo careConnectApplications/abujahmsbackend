@@ -35,7 +35,7 @@ const procedureSchema = new Schema({
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
   
   status:{

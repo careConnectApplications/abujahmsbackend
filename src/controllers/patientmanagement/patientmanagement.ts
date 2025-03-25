@@ -152,7 +152,7 @@ export var createpatients = async (req:any,res:any) =>{
     try{
         var appointmentid:any=String(Date.now());
         
-        if(req.body.isHMOCover == "Yes" || req.body.isHMOCover == true){
+        if(req.body.isHMOCover == configuration.ishmo[1] || req.body.isHMOCover == true){
           throw new Error(configuration.error.errorauthorizehmo);
 
         }
