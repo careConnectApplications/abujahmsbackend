@@ -10,6 +10,7 @@ import {uploaddocument,convertexceltojson,validateinputfaulsyvalue,generateRando
 export async function bulkuploadinventory(req:any, res:any){
     try{  
       const file = req.files.file;
+      const {Pharmacy} = req.body;
       const filename= configuration.pharmacyuploadfilename;
       let allowedextension = ['.csv','.xlsx'];
       let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
@@ -22,7 +23,7 @@ export async function bulkuploadinventory(req:any, res:any){
         E: "lastrestockdate",
         F: "qty",
         G: "amount",
-        H: "pharmacy"
+        H: "drugid"
       };
     
     await uploaddocument(file,filename,allowedextension,uploadpath);
@@ -35,12 +36,13 @@ export async function bulkuploadinventory(req:any, res:any){
 
          if(stocklist.length > 0){
           var type:any = stocklist.map((services:any) => {return services.servicetype});
-          for (var i = 0; i < stocklist.length; i++) {   
+          for (var i = 0; i < stocklist.length; i++) {
+            stocklist[i].pharmacy = Pharmacy;
             stocklist[i].servicecategory=configuration.category[1];      
-            var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy} = stocklist[i];
+            var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy,drugid} = stocklist[i];
             lowstocklevel = Number(lowstocklevel);
             qty=Number(qty);
-            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty});
+            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,drugid});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
         //await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
@@ -48,7 +50,7 @@ export async function bulkuploadinventory(req:any, res:any){
             //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
           //)]);
 
-          await createmanyprice({servicecategory,servicetype,pharmacy},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy}});
+          await createmanyprice({servicecategory,drugid,pharmacy},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,amount,pharmacy,drugid}, $inc: {qty: qty}});
           await  createmanyservicetype({ category:servicecategory },
             {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
           );

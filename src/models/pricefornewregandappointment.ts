@@ -32,6 +32,10 @@ const priceappointmentnewregistrationSchema = new Schema({
   {
     type: String
   },
+  drugid:{
+    type: String
+
+  },
   pharmacy:
   {
     type: String
