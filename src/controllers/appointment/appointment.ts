@@ -216,6 +216,7 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
   try {
     //const {clinic} = (req.user).user;
     const {clinic} = req.params
+    console.log(clinic);
     //
     // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
     let aggregatequery = 
@@ -244,10 +245,17 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
       }
     },
     {
-      $unwind: '$payment'  // Deconstruct the payment array (from the lookup)
+      $unwind:{ 
+        path:'$payment' , // Deconstruct the payment array (from the lookup)
+      preserveNullAndEmptyArrays: true
+      }
     },
     {
-      $unwind: '$patient'  // Deconstruct the patient array (from the lookup)
+      $unwind: {
+        path: '$patient',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
     },
    
     {
@@ -323,16 +331,25 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
       }
     },
     {
-      $unwind: '$payment'  // Deconstruct the payment array (from the lookup)
+      $unwind: {
+        path: '$payment',
+        preserveNullAndEmptyArrays: true
+      }  // Deconstruct the payment array (from the lookup)
     },
     {
-      $unwind: '$patient'  // Deconstruct the patient array (from the lookup)
-    },
+      $unwind: {
+        path: '$patient',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
+    }
+    ,
    
     {
-      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], status:configuration.status[5],clinic }  // Filter payment
       //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
     }
+      
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
    console.log('r', queryresult);
