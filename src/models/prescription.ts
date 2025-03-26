@@ -62,6 +62,10 @@ const prescriptionSchema = new Schema({
   {
     type: Number
   },
+  balance:
+  {
+    type: Number
+  },
   remark:
   {
     type: String

@@ -154,10 +154,12 @@ export const confirmpharmacyorder = async (req:any, res:any) =>{
   if(!orderPrice){
     throw new Error(`${configuration.error.errornopriceset} ${prescription}`);
 }
+/*
 if(orderPrice.qty <=0){
   throw new Error(`${prescription} ${configuration.error.erroravailability}`);
 
 }
+  */
 //validate quantity entered
 
 
@@ -212,6 +214,7 @@ else{
        //dispense
     //search product in inventory
     var response:any = await readoneprescription({_id:id},{},'patient','','');
+
     const {dispensestatus,patient} = response;
     //check product status
     if(dispensestatus !== configuration.status[10]){
@@ -234,14 +237,17 @@ else{
   if(!orderPrice){
       throw new Error(configuration.error.errornopriceset);
   }
+  /*
   if(!orderPrice.qty || orderPrice.qty <=0){
     throw new Error(`${response.prescription} ${configuration.error.erroravailability} or qty not defined in inventory`);
 
   }
+    */
   //reduce the quantity
-await updateprice({_id:orderPrice._id},{qty:Number(orderPrice.qty) - Number(response.qty)});
+let {qty}= await updateprice({_id:orderPrice._id},{qty:Number(orderPrice.qty) - Number(response.qty)});
+
 //change status 6
-var queryresult=await updateprescription(response._id,{ dispensestatus: configuration.status[6]});
+var queryresult=await updateprescription(response._id,{ dispensestatus: configuration.status[6],balance:qty});
 res.status(200).json({queryresult, status: true});
 
     
