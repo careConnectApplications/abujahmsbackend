@@ -23,7 +23,7 @@ export async function bulkuploadinventory(req:any, res:any){
         E: "lastrestockdate",
         F: "qty",
         G: "amount",
-        H: "drugid"
+        H: "productid"
       };
     
     await uploaddocument(file,filename,allowedextension,uploadpath);
@@ -39,10 +39,10 @@ export async function bulkuploadinventory(req:any, res:any){
           for (var i = 0; i < stocklist.length; i++) {
             stocklist[i].pharmacy = Pharmacy;
             stocklist[i].servicecategory=configuration.category[1];      
-            var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy,drugid} = stocklist[i];
+            var {servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,pharmacy,productid} = stocklist[i];
             lowstocklevel = Number(lowstocklevel);
             qty=Number(qty);
-            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,drugid});
+            validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,productid});
             //ensure record does not exit
           var id = `${servicetype[0]}${generateRandomNumber(5)}${servicetype[servicetype.length -1]}`;    
         //await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
@@ -50,7 +50,7 @@ export async function bulkuploadinventory(req:any, res:any){
             //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
           //)]);
 
-          await createmanyprice({servicecategory,drugid,pharmacy},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,amount,pharmacy,drugid}, $inc: {qty: qty}});
+          await createmanyprice({servicecategory,productid,pharmacy},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,amount,pharmacy,productid}, $inc: {qty: qty}});
           await  createmanyservicetype({ category:servicecategory },
             {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
           );
@@ -113,12 +113,13 @@ export var createstock = async (req:any,res:any) =>{
    
   try{
     req.body.servicecategory = configuration.category[1];
-     const {pharmacy,servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate} = req.body;
+     const {pharmacy,servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate,productid} = req.body;
     //validations
-    validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount});
+    validateinputfaulsyvalue({pharmacy,servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount,productid});
     //ensure record does not exit
-    
-    const foundPrice =  await readoneprice({servicecategory,servicetype,pharmacy});
+    //check for duplicate product id
+
+    const foundPrice =  await readoneprice({servicecategory,productid,pharmacy});
     if(foundPrice){
         throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
 

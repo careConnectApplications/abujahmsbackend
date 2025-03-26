@@ -32,7 +32,7 @@ const priceappointmentnewregistrationSchema = new Schema({
   {
     type: String
   },
-  drugid:{
+  productid:{
     type: String
 
   },
