@@ -1,5 +1,6 @@
 import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery} from "../../dao/appointment";
 import {readoneadmission} from "../../dao/admissions";
+import {createvitalcharts} from "../../dao/vitalcharts";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
@@ -507,6 +508,7 @@ export async function addclinicalencounter(req:any, res:any){
   var checkadimmison = await readoneadmission({_id:new ObjectId(id)},{},'');
   if(checkadimmison){
     queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
+    
   }else{
   queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
   }  
@@ -528,7 +530,8 @@ export async function addencounter(req:any, res:any){
   try{
   //
   const {id} = req.params;
-  const {email, staffId} = (req.user).user;
+  const {email, staffId,lastName,firstName} = (req.user).user;
+  let staffname = `${firstName} ${lastName}`;
   
   //find doctor and add doctor who examined
   const user = await readone({email, staffId});
@@ -642,11 +645,14 @@ export async function addencounter(req:any, res:any){
   //if not found create 
   //else update
   if(height || weight ){
+   
       if(checkadimmison){
         queryresult = await updateappointment(id, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:false});
+        await createvitalcharts({patient:checkadimmison.patient,bmi:req.body.bmi,height,weight,temperature,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname});
       }else{
       queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {$set:{'encounter.history':history,'encounter.paediatrics':paediatrics,'encounter.vitals': vitals,'encounter.generalphysicalexamination':generalphysicalexaminations,'encounter.assessmentdiagnosis':assessmentdiagnosis,'encounter.physicalexamination':physicalexamination},status,additionalnote, doctor:user?._id,fromclinicalencounter:false});
-      }  
+      await createvitalcharts({patient:queryresult.patient,bmi:req.body.bmi,height,weight,temperature,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname});  
+    }  
 }
   else{
       if(checkadimmison){
