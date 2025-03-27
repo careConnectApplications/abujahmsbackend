@@ -28,6 +28,7 @@ function bulkuploadinventory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const file = req.files.file;
+            const { Pharmacy } = req.body;
             const filename = config_1.default.pharmacyuploadfilename;
             let allowedextension = ['.csv', '.xlsx'];
             let uploadpath = `${process.cwd()}/${config_1.default.useruploaddirectory}`;
@@ -39,7 +40,7 @@ function bulkuploadinventory(req, res) {
                 E: "lastrestockdate",
                 F: "qty",
                 G: "amount",
-                H: "pharmacy"
+                H: "productid"
             };
             yield (0, otherservices_1.uploaddocument)(file, filename, allowedextension, uploadpath);
             //convert uploaded excel to json
@@ -50,18 +51,19 @@ function bulkuploadinventory(req, res) {
             if (stocklist.length > 0) {
                 var type = stocklist.map((services) => { return services.servicetype; });
                 for (var i = 0; i < stocklist.length; i++) {
+                    stocklist[i].pharmacy = Pharmacy;
                     stocklist[i].servicecategory = config_1.default.category[1];
-                    var { servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, amount, pharmacy } = stocklist[i];
+                    var { servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, amount, pharmacy, productid } = stocklist[i];
                     lowstocklevel = Number(lowstocklevel);
                     qty = Number(qty);
-                    (0, otherservices_1.validateinputfaulsyvalue)({ pharmacy, servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty });
+                    (0, otherservices_1.validateinputfaulsyvalue)({ pharmacy, servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, productid });
                     //ensure record does not exit
                     var id = `${servicetype[0]}${(0, otherservices_1.generateRandomNumber)(5)}${servicetype[servicetype.length - 1]}`;
                     //await  Promise.all([createmanyprice({servicecategory,servicetype},{$set:{servicecategory,category,servicetype,lowstocklevel,expirationdate,lastrestockdate,qty,amount}}),
                     //createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
                     //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
                     //)]);
-                    yield (0, price_1.createmanyprice)({ servicecategory, servicetype, pharmacy }, { $set: { servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, amount, pharmacy } });
+                    yield (0, price_1.createmanyprice)({ servicecategory, productid, pharmacy }, { $set: { servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, amount, pharmacy, productid }, $inc: { qty: qty } });
                     yield (0, servicetype_1.createmanyservicetype)({ category: servicecategory }, { $push: { type: servicetype }, $set: { department: servicecategory, category: servicecategory, id } });
                     //await  createmanyservicetype({ category:servicecategory,type: { $nin: [servicetype]} },
                     //{$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id}}
@@ -111,11 +113,12 @@ function getallpharmacystockbyphamarcy(req, res) {
 var createstock = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         req.body.servicecategory = config_1.default.category[1];
-        const { pharmacy, servicecategory, amount, servicetype, category, qty, lowstocklevel, expirationdate, lastrestockdate } = req.body;
+        const { pharmacy, servicecategory, amount, servicetype, category, qty, lowstocklevel, expirationdate, lastrestockdate, productid } = req.body;
         //validations
-        (0, otherservices_1.validateinputfaulsyvalue)({ pharmacy, servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, amount });
+        (0, otherservices_1.validateinputfaulsyvalue)({ pharmacy, servicecategory, category, servicetype, lowstocklevel, expirationdate, lastrestockdate, qty, amount, productid });
         //ensure record does not exit
-        const foundPrice = yield (0, price_1.readoneprice)({ servicecategory, servicetype, pharmacy });
+        //check for duplicate product id
+        const foundPrice = yield (0, price_1.readoneprice)({ servicecategory, productid, pharmacy });
         if (foundPrice) {
             throw new Error(`${servicetype} ${config_1.default.error.erroralreadyexit}`);
         }

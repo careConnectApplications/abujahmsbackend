@@ -38,6 +38,9 @@ export const settings = async function () {
         const clinics = await readclinicaggregate(clinic);
         const wardNames = wards.map(ward => ward.wardname);
         const clinicNames = clinics.map(clinicname => clinicname.clinic);
+        //search pharmacy and spread the array
+        
+
         //console.log(check2);
         const reports=[
             {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]},

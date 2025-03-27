@@ -50,6 +50,9 @@ const prescriptionSchema = new mongoose_1.Schema({
     qty: {
         type: Number
     },
+    balance: {
+        type: Number
+    },
     remark: {
         type: String
     },

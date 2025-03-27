@@ -18,6 +18,7 @@ exports.addclinicalencounter = addclinicalencounter;
 exports.addencounter = addencounter;
 const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
+const vitalcharts_1 = require("../../dao/vitalcharts");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const servicetype_1 = require("../../dao/servicetype");
 const users_1 = require("../../dao/users");
@@ -48,18 +49,25 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
         }
         //search for price if available
-        var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype, isHMOCover: patientrecord.isHMOCover });
-        if (!appointmentPrice) {
+        var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype, isHMOCover: config_1.default.ishmo[0] });
+        if (patientrecord.isHMOCover == config_1.default.ishmo[0] && !appointmentPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
         //create appointment
         //create payment
-        const createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
+        let createpaymentqueryresult;
+        let queryresult;
+        if (patientrecord.isHMOCover == config_1.default.ishmo[1]) {
+            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
+            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { appointment: queryresult._id } });
+        }
+        else {
+            createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
+            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
+            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
+        }
         //cater for phamarcy, lab ,radiology and procedure
-        const queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
-        console.log(queryresult);
         //update patient
-        yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -222,6 +230,7 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         //const {clinic} = (req.user).user;
         const { clinic } = req.params;
+        console.log(clinic);
         //
         // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
         let aggregatequery = [{
@@ -249,16 +258,23 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
                 }
             },
             {
-                $unwind: '$payment' // Deconstruct the payment array (from the lookup)
+                $unwind: {
+                    path: '$payment', // Deconstruct the payment array (from the lookup)
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
-                $unwind: '$patient' // Deconstruct the patient array (from the lookup)
+                $unwind: {
+                    path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
             },
             {
-                $match: { 'payment.status': config_1.default.status[3], clinic } // Filter payment
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }], clinic } // Filter payment
             }
         ];
         const queryresult = yield (0, appointment_1.modifiedreadallappointment)({ clinic }, aggregatequery);
+        console.log('allresult', queryresult);
         //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
         //'payment.status':configuration.status[3]
         res.status(200).json({
@@ -324,16 +340,24 @@ const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0,
                 }
             },
             {
-                $unwind: '$payment' // Deconstruct the payment array (from the lookup)
+                $unwind: {
+                    path: '$payment',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the payment array (from the lookup)
             },
             {
-                $unwind: '$patient' // Deconstruct the patient array (from the lookup)
+                $unwind: {
+                    path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
             },
             {
-                $match: { 'payment.status': config_1.default.status[3], status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } } // Filter payment
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }], status: config_1.default.status[5], clinic } // Filter payment
+                //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
             }
         ];
         const queryresult = yield (0, appointment_1.modifiedreadallappointment)({ status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }, aggregatequery);
+        console.log('r', queryresult);
         //const queryresult = await readallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},{},'patient','doctor','payment');
         res.status(200).json({
             queryresult,
@@ -379,7 +403,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //find patient
         const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         // check is patient is under inssurance
-        var isHMOCover;
+        //var isHMOCover;
         // Create a new ObjectId
         var appointment;
         if (foundPatient) {
@@ -388,7 +412,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 appointmentid: String(Date.now()),
                 _id: new ObjectId()
             };
-            isHMOCover = foundPatient.isHMOCover;
+            // isHMOCover = foundPatient.isHMOCover;
         }
         else {
             appointment = yield (0, appointment_1.readoneappointment)({ _id: id }, {}, 'patient');
@@ -396,16 +420,17 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 //create an appointment
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
-            isHMOCover = appointment.patient.isHMOCover;
+            //  isHMOCover = appointment.patient.isHMOCover;
         }
         //console.log(testname);
         const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[2] }, { type: 1, category: 1, department: 1, _id: 0 });
         //loop through all test and create record in lab order
         for (var i = 0; i < testname.length; i++) {
             //    console.log(testname[i]);
-            console.log(isHMOCover);
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover });
-            if (!testPrice) {
+            //console.log(isHMOCover);
+            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover: config_1.default.ishmo[0] });
+            console.log("oks");
+            if (((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] || (appointment.patient).isHMOCover == config_1.default.ishmo[0]) && !testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
             //var setting  = await configuration.settings();
@@ -415,8 +440,14 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
             //create testrecord
+            let testrecord;
             //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
-            var testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department, amount: Number(testPrice.amount) });
+            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] || (appointment.patient).isHMOCover == config_1.default.ishmo[0]) {
+                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department, amount: Number(testPrice.amount) });
+            }
+            else {
+                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department });
+            }
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -479,7 +510,8 @@ function addencounter(req, res) {
         try {
             //
             const { id } = req.params;
-            const { email, staffId } = (req.user).user;
+            const { email, staffId, lastName, firstName } = (req.user).user;
+            let staffname = `${firstName} ${lastName}`;
             //find doctor and add doctor who examined
             const user = yield (0, users_1.readone)({ email, staffId });
             //validate id
@@ -599,9 +631,11 @@ function addencounter(req, res) {
             if (height || weight) {
                 if (checkadimmison) {
                     queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: false });
+                    yield (0, vitalcharts_1.createvitalcharts)({ patient: checkadimmison.patient, bmi: req.body.bmi, height, weight, temperature, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname });
                 }
                 else {
                     queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: false });
+                    yield (0, vitalcharts_1.createvitalcharts)({ patient: queryresult.patient, bmi: req.body.bmi, height, weight, temperature, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname });
                 }
             }
             else {

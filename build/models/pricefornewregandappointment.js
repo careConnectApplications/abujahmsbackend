@@ -25,6 +25,9 @@ const priceappointmentnewregistrationSchema = new mongoose_1.Schema({
     category: {
         type: String
     },
+    productid: {
+        type: String
+    },
     pharmacy: {
         type: String
     },

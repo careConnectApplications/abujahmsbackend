@@ -81,8 +81,8 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //loop through all test and create record in lab order
         for (var i = 0; i < testname.length; i++) {
             //search for price of test name
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover });
-            if (!testPrice) {
+            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover: config_1.default.ishmo[0] });
+            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] && !testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
             //search testname in setting
@@ -95,8 +95,14 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                */
             //create payment
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+            let testrecord;
             //create testrecordn 
-            var testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby, amount: Number(testPrice.amount) });
+            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
+                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby, amount: Number(testPrice.amount) });
+            }
+            else {
+                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby });
+            }
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -184,7 +190,7 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { patient } = response;
         //validate payment
         var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-        if (!findAdmission) {
+        if (!findAdmission && patient.isHMOCover == config_1.default.ishmo[0]) {
             var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
             if (paymentrecord.status !== config_1.default.status[3]) {
                 throw new Error(config_1.default.error.errorpayment);
@@ -234,10 +240,13 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
         else {
             paymentreference = testid;
         }
-        if (option == true) {
+        if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
             var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], payment: createpaymentqueryresult._id, remark });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
+        }
+        else if (option == true && patient.isHMOCover == config_1.default.ishmo[1]) {
+            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], remark });
         }
         else {
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[13], remark });

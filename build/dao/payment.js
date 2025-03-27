@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.readpaymentaggregate = readpaymentaggregate;
 exports.readallpayment = readallpayment;
 exports.readallpaymentaggregate = readallpaymentaggregate;
 exports.createpayment = createpayment;
@@ -20,6 +21,17 @@ exports.updatepayment = updatepayment;
 exports.updatepaymentbyquery = updatepaymentbyquery;
 const payment_1 = __importDefault(require("../models/payment"));
 const config_1 = __importDefault(require("../config"));
+function readpaymentaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield payment_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
 //read all payment history
 function readallpayment(query, populatequery) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -88,7 +88,7 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
             */
             //create 
-            console.log("got here");
+            // console.log("got here");
             //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
             var prescriptionrecord = yield (0, prescription_1.createprescription)({ pharmacy, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid });
             console.log(prescriptionrecord);
@@ -151,9 +151,12 @@ const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         if (!orderPrice) {
             throw new Error(`${config_1.default.error.errornopriceset} ${prescription}`);
         }
-        if (orderPrice.qty <= 0) {
-            throw new Error(`${prescription} ${config_1.default.error.erroravailability}`);
+        /*
+        if(orderPrice.qty <=0){
+          throw new Error(`${prescription} ${configuration.error.erroravailability}`);
+        
         }
+          */
         //validate quantity entered
         var amount = patient.isHMOCover == config_1.default.ishmo[1] ? Number(orderPrice.amount) * config_1.default.hmodrugpayment * qty : Number(orderPrice.amount) * qty;
         let paymentreference;
@@ -168,7 +171,7 @@ const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
         let queryresult;
         if (option == true) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: prescription, paymentcategory: config_1.default.category[1], patient: patient._id, amount, qty });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
             queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
             yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
         }
@@ -217,13 +220,16 @@ const dispense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!orderPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
-        if (!orderPrice.qty || orderPrice.qty <= 0) {
-            throw new Error(`${response.prescription} ${config_1.default.error.erroravailability} or qty not defined in inventory`);
+        /*
+        if(!orderPrice.qty || orderPrice.qty <=0){
+          throw new Error(`${response.prescription} ${configuration.error.erroravailability} or qty not defined in inventory`);
+      
         }
+          */
         //reduce the quantity
-        yield (0, price_1.updateprice)({ _id: orderPrice._id }, { qty: Number(orderPrice.qty) - Number(response.qty) });
+        let { qty } = yield (0, price_1.updateprice)({ _id: orderPrice._id }, { qty: Number(orderPrice.qty) - Number(response.qty) });
         //change status 6
-        var queryresult = yield (0, prescription_1.updateprescription)(response._id, { dispensestatus: config_1.default.status[6] });
+        var queryresult = yield (0, prescription_1.updateprescription)(response._id, { dispensestatus: config_1.default.status[6], balance: qty });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {

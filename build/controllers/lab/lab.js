@@ -255,28 +255,32 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
         const { option, remark } = req.body;
         const { id } = req.params;
         //search for the lab request
-        var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
+        var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, 'patient');
+        console.log('lab', lab);
         const { testname, testid, patient, amount } = lab;
         //validate the status
         let queryresult;
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
         let paymentreference;
-        let status;
+        //let status;
         //validate the status
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
         if (findAdmission) {
             paymentreference = findAdmission.admissionid;
-            status = config_1.default.status[5];
+            //status=configuration.status[5];
         }
         else {
             paymentreference = testid;
-            status = config_1.default.status[2];
+            //status=configuration.status[2];
         }
-        if (option == true) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient, amount });
-            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status, payment: createpaymentqueryresult._id, remark });
-            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
+        if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
+            yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
+        }
+        else if (option == true && patient.isHMOCover == config_1.default.ishmo[1]) {
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[5], remark });
         }
         else {
             queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[13], remark });

@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isObjectAvailable = exports.mail = exports.sendTokenResponse = exports.isValidPassword = exports.encrypt = void 0;
+exports.storeUniqueNumber = storeUniqueNumber;
 exports.generateRandomNumber = generateRandomNumber;
 exports.validateinputfaulsyvalue = validateinputfaulsyvalue;
 exports.validateinputyesno = validateinputyesno;
@@ -58,6 +59,7 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = __importDefault(require("../config"));
 const path = __importStar(require("path"));
 const convert_excel_to_json_1 = __importDefault(require("convert-excel-to-json"));
+const patientmanagement_1 = require("../dao/patientmanagement");
 var encrypt = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -119,8 +121,35 @@ var mail = function mail(to, subject, textmessage) {
     });
 };
 exports.mail = mail;
+function storeUniqueNumber(n) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // Generate unique 7-digit number
+            let uniqueNumber = yield generateRandomNumber(n);
+            // Check if the number already exists in the collection
+            const existing = yield (0, patientmanagement_1.readonepatient)({
+                MRN: uniqueNumber
+            }, {}, '', '');
+            if (existing) {
+                console.log(`Number ${uniqueNumber} already exists. Generating a new one.`);
+                return storeUniqueNumber(n); // Retry if duplicate
+            }
+            return uniqueNumber;
+        }
+        catch (err) {
+            throw new Error(err.message);
+        }
+    });
+}
 function generateRandomNumber(n) {
-    return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now() / 1000000);
+    //return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+    // let number = Math.floor(1000000 + Math.random() * 9000000); // Generates a number between 1000000 and 9999999
+    //return number;
+    // Get the current timestamp (in milliseconds)
+    const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
+    // Take the first 7 characters (if needed, you can adjust this logic)
+    const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
+    return uniqueString;
 }
 function validateinputfaulsyvalue(input) {
     for (const key in input) {

@@ -85,7 +85,7 @@ dosageform:String,
       var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
       */
       //create 
-      console.log("got here");
+     // console.log("got here");
       //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       var prescriptionrecord:any = await createprescription({pharmacy,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       console.log(prescriptionrecord);
@@ -179,7 +179,7 @@ else{
 }
   let queryresult;
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:configuration.category[1],patient:patient._id,amount,qty});
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
   queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     

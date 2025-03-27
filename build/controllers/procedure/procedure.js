@@ -79,16 +79,17 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         //loop through all test and create record in lab order
         for (var i = 0; i < procedure.length; i++) {
             //search for price of test name
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: procedure[i] });
-            if (!testPrice) {
+            var testPrice = yield (0, price_1.readoneprice)({ servicetype: procedure[i], isHMOCover: config_1.default.ishmo[0] });
+            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] && !testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${procedure[i]}`);
             }
             //search testname in setting
-            console.log(servicetypedetails);
             var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-            if (!testsetting || testsetting.length < 1) {
-                throw new Error(`${procedure[i]} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
-            }
+            /*
+            if(!testsetting || testsetting.length < 1){
+              throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
+          }
+              */
             let paymentreference;
             //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
             var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
@@ -99,13 +100,28 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 paymentreference = procedureid;
             }
             //create payment
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
-            //create testrecordn 
-            var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
-            proceduresid.push(procedurerecord._id);
-            paymentids.push(createpaymentqueryresult._id);
+            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
+                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
+                //create testrecordn 
+                var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
+                proceduresid.push(procedurerecord._id);
+                paymentids.push(createpaymentqueryresult._id);
+            }
+            else {
+                // var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+                //create testrecordn 
+                var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
+                proceduresid.push(procedurerecord._id);
+                //paymentids.push(createpaymentqueryresult._id);
+            }
         }
-        var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid, payment: paymentids } });
+        let queryresult;
+        if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
+            queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid, payment: paymentids } });
+        }
+        else {
+            queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid } });
+        }
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -186,11 +202,14 @@ var uploadprocedureresult = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         const { firstName, lastName } = (req.user).user;
         const { id } = req.params;
-        var response = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, '');
+        var response = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, 'patient');
+        const { patient } = response;
         //validate payment
-        var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
-        if (paymentrecord.status !== config_1.default.status[3]) {
-            throw new Error(config_1.default.error.errorpayment);
+        if (patient.isHMOCover == config_1.default.ishmo[0]) {
+            var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
+            if (paymentrecord.status !== config_1.default.status[3]) {
+                throw new Error(config_1.default.error.errorpayment);
+            }
         }
         const processby = `${firstName} ${lastName}`;
         const file = req.files.file;
