@@ -352,7 +352,7 @@ const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0,
                 } // Deconstruct the patient array (from the lookup)
             },
             {
-                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }], status: config_1.default.status[5], clinic } // Filter payment
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }], status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } } // Filter payment
                 //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
             }
         ];
