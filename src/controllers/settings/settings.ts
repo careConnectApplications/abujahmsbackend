@@ -1,5 +1,6 @@
 import { AnyARecord } from "dns";
 import { readwardaggregate, readclinicaggregate, readpaymentaggregate } from "../../dao/reports";
+import configuration from "../../config";
 export const settings = async function () {
     try {
         const clinic: any = [
@@ -39,11 +40,32 @@ export const settings = async function () {
         const wardNames = wards.map(ward => ward.wardname);
         const clinicNames = clinics.map(clinicname => clinicname.clinic);
         //search pharmacy and spread the array
-        
+        const query = { type: configuration.clinictype[2] };
+         const pharmacyselection : any = [
+            {
+                $match:query
+            },
 
+            {
+                $group: {
+                    _id: "$clinic",  // Group by 'userId'
+
+                }
+            },
+            {
+                $project: {
+                    clinic: "$_id",  // Rename _id to userId
+                    _id: 0           // Exclude _id
+                }
+            }
+
+
+        ];
+        const pharmacy = await readclinicaggregate(pharmacyselection);
+        const pharmacyNames = pharmacy.map((clinicname:any) => clinicname.clinic);
         //console.log(check2);
         const reports=[
-            {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]},
+            {querytype:"financialreport",querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]},
             {querytype:"appointmentreport",querygroup:clinicNames},
             {querytype:"admissionreport",querygroup:wardNames}
           ];
