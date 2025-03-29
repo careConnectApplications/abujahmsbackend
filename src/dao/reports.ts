@@ -3,6 +3,7 @@ import Admission from "../models/admission";
 import Appointment from "../models/appointment";
 import Clinic from "../models/clinics";
 import Wardmanagement from "../models/wardmanagement";
+import Hmomanagement from "../models/hmomanagement";
 import Procedure from "../models/procedure";
 
 import configuration from "../config";
@@ -15,6 +16,17 @@ export async function readpaymentaggregate(input:any) {
       throw new Error(configuration.error.erroruserupdate);
     }
     }
+
+    export async function readhmoaggregate(input:any) {
+      try{
+      return await Hmomanagement.aggregate(input);
+      }
+      catch(e:any){
+        console.log(e);
+        throw new Error(configuration.error.erroruserupdate);
+      }
+      }
+  
 
     export async function readappointmentaggregate(input:any) {
         try{

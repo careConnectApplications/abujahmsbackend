@@ -1,5 +1,5 @@
 import { AnyARecord } from "dns";
-import { readwardaggregate, readclinicaggregate, readpaymentaggregate } from "../../dao/reports";
+import { readwardaggregate, readclinicaggregate, readpaymentaggregate,readhmoaggregate } from "../../dao/reports";
 import configuration from "../../config";
 export const settings = async function () {
     try {
@@ -63,11 +63,41 @@ export const settings = async function () {
         ];
         const pharmacy = await readclinicaggregate(pharmacyselection);
         const pharmacyNames = pharmacy.map((clinicname:any) => clinicname.clinic);
+        //get all hmos
+        const hmoselection : any = [
+            {
+                $group: {
+                    _id: "$hmoname",  // Group by 'userId'
+                    
+
+                }
+            },
+            {
+                $project: {
+                    hmoname: "$_id",  // Rename _id to userId
+                    _id: 0           // Exclude _id
+                }
+            }
+
+
+        ];
+        const hmo=await readhmoaggregate(hmoselection);
+        const hmoNames = hmo.map((hmoname:any) => hmoname.hmoname);
+        console.log(hmoNames);
+
         //console.log(check2);
         const reports=[
             {querytype:"financialreport",querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]},
             {querytype:"appointmentreport",querygroup:clinicNames},
-            {querytype:"admissionreport",querygroup:wardNames}
+            {querytype:"admissionreport",querygroup:wardNames},
+
+            {querytype:"hmolabreport",querygroup:hmoNames},
+            {querytype:"hmoprocedurereport",querygroup:hmoNames},
+            {querytype:"hmopharmacyreport",querygroup:hmoNames},
+            {querytype:"hmolabappointmentreport",querygroup:hmoNames},
+            {querytype:"hmoradiologyreport",querygroup:hmoNames},
+
+
           ];
         const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate"];
           return {reports,summary};
