@@ -4,6 +4,7 @@ import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../control
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
 import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/theatremanagement';
+import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestcomponentbytestname} from '../controllers/setting/testscomponent';
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
 const router = express.Router();
 
@@ -40,7 +41,12 @@ router.post('/createinsurance',createhmo);
 router.get('/getallinsurance',getallhmo);
 router.put('/updateinsurance/:id',updatehmo);
 
-
+// test name
+router.post('/createtestcomponents',createtestcomponents);
+router.get('/getalltestcomponent',getalltestcomponent);
+router.put('/updatetestcomponents/:id',updatetestcomponents);
+router.get('/gettestcomponentbytestname/:testname',gettestcomponentbytestname);
+//gettestcomponentbytestname
 
     
 
