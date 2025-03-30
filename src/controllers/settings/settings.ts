@@ -92,10 +92,10 @@ export const settings = async function () {
             {querytype:"admissionreport",querygroup:wardNames},
 
             {querytype:"hmolabreport",querygroup:hmoNames},
-            {querytype:"hmoprocedurereport",querygroup:hmoNames},
+            {querytype:"hmoreportforprocedure",querygroup:hmoNames},
             {querytype:"hmopharmacyreport",querygroup:hmoNames},
             {querytype:"hmoappointmentreport",querygroup:hmoNames},
-            {querytype:"radiologyhmoreport",querygroup:hmoNames},
+            {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
 
           ];
