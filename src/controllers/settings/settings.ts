@@ -94,12 +94,12 @@ export const settings = async function () {
             {querytype:"hmolabreport",querygroup:hmoNames},
             {querytype:"hmoprocedurereport",querygroup:hmoNames},
             {querytype:"hmopharmacyreport",querygroup:hmoNames},
-            {querytype:"hmolabappointmentreport",querygroup:hmoNames},
+            {querytype:"hmoappointmentreport",querygroup:hmoNames},
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
 
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate"];
           return {reports,summary};
     }
     catch (error: any) {

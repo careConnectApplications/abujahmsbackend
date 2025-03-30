@@ -5,7 +5,9 @@ import Clinic from "../models/clinics";
 import Wardmanagement from "../models/wardmanagement";
 import Hmomanagement from "../models/hmomanagement";
 import Procedure from "../models/procedure";
-
+import Lab from "../models/lab";
+import Radiology from "../models/radiology";
+import Prescription from "../models/prescription";
 import configuration from "../config";
 export async function readpaymentaggregate(input:any) {
     try{
@@ -77,3 +79,37 @@ export async function readpaymentaggregate(input:any) {
                 throw new Error(configuration.error.erroruserupdate);
               }
               }
+
+              //  lab aggregate
+              
+              export async function readlabaggregate(input:any) {
+                try{
+                return await Lab.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error(configuration.error.erroruserupdate);
+                }
+                }
+
+                //radiology
+                export async function readradiologyaggregate(input:any) {
+                  try{
+                  return await Radiology.aggregate(input);
+                  }
+                  catch(e:any){
+                    console.log(e);
+                    throw new Error(configuration.error.erroruserupdate);
+                  }
+                  }
+                  
+                  //Prescription
+                  export async function readprescriptionaggregate(input:any) {
+                    try{
+                    return await Prescription.aggregate(input);
+                    }
+                    catch(e:any){
+                      console.log(e);
+                      throw new Error(configuration.error.erroruserupdate);
+                    }
+                    }

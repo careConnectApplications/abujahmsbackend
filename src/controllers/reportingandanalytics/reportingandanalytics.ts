@@ -1,6 +1,6 @@
 
 import configuration from "../../config";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 export const reports = async (req:any, res:any) => {
@@ -81,7 +81,11 @@ const reportbyadmissionreport = [
     },
   },
   {
-    $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+    $unwind: {
+      path: "$referedward",
+      preserveNullAndEmptyArrays: true
+    }
+    
   },
   {
     $match:{$and:[{"referedward.wardname": querygroup}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
@@ -103,108 +107,56 @@ const reportbyappointmentreport = [
   },
 ];
 
-
-//for scn and sra
-/*
-const reportbystorescnsra = [
+const reportbyhmoreport = [
   {
     $lookup: {
-      from: "productshelves",
-      localField: "shelfid",
+      from: "patientsmanagements",
+      localField: "patient",
       foreignField: "_id",
-      as: "shelfid",
+      as: "patient",
     },
   },
   {
-    $match: {
-      $and: [
-        { store: querygroup },
-        { createdAt: { $gt: startdate, $lt: enddate } },
-      ],
-    },
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+  {
+    $match:{$and:[{"patient.HMOName": querygroup}, {
+      createdAt:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
-const reportbystoresra = [
+const appointmentreportbyhmoreport = [
   {
     $lookup: {
-      from: "productshelves",
-      localField: "shelfid",
+      from: "patientsmanagements",
+      localField: "patient",
       foreignField: "_id",
-      as: "shelfid",
+      as: "patient",
     },
   },
   {
-    $lookup: {
-      from: "sras",
-      localField: "sra",
-      foreignField: "_id",
-      as: "sra",
-    },
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
   },
   {
-    $match: {
-      $and: [
-        { store: querygroup },
-        { createdAt: { $gt: startdate, $lt: enddate } },
-      ],
-    },
+    $match:{$and:[{"patient.HMOName": querygroup}, {
+      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
 
-//for request
-const reportbystoresrequest = [
-  {
-    $lookup: {
-      from: "productshelves",
-      localField: "productkey",
-      foreignField: "_id",
-      as: "shelfid",
-    },
-  },
-  {
-    $match: {
-      $and: [
-        { store: querygroup },
-        { createdAt: { $gt: startdate, $lt: enddate } },
-      ],
-    },
-  },
-];
-//for transfer
-const reportbystorestransfer = [
-  {
-    $lookup: {
-      from: "productshelves",
-      localField: "sendingshelfid",
-      foreignField: "_id",
-      as: "sendingshelfid",
-    },
-  },
-  {
-    $lookup: {
-      from: "productshelves",
-      localField: "receivingshelfid",
-      foreignField: "_id",
-      as: "receivingshelfid",
-    },
-  },
-  {
-    $match: {
-      $and: [
-        { "sendingshelfid.store": querygroup },
-        { createdAt: { $gt: startdate, $lt: enddate } },
-      ],
-    },
-  },
-];
-*/
+
 var queryresult: any;
 
 //var c = await configuration.settings2();
 
 
 let {reports}:any = await settings();
-console.log('settings',reports);
 //Financial report
 if (querytype == reports[0].querytype) {
   
@@ -218,6 +170,27 @@ else if(querytype == reports[2].querytype){
   queryresult= await readadmissionaggregate(reportbyadmissionreport);
 
 }
+else if(querytype == reports[3].querytype){
+  queryresult= await readlabaggregate(reportbyhmoreport);
+
+}
+else if(querytype == reports[4].querytype){
+  queryresult= await readprocedureaggregate(reportbyhmoreport);
+
+}
+else if(querytype == reports[5].querytype){
+  queryresult= await readprescriptionaggregate(reportbyhmoreport);
+
+}
+else if(querytype == reports[6].querytype){
+  queryresult= await readappointmentaggregate(appointmentreportbyhmoreport);
+
+}
+else if(querytype == reports[7].querytype){
+  queryresult= await readradiologyaggregate(reportbyhmoreport);
+
+}
+
 else {
   throw new Error(`querytype ${configuration.error.errorisrequired}`);
 }
@@ -308,7 +281,7 @@ export const reportsummary = async (req:any,res:any) =>{
       enddate = todaydate;
       startdate = new Date(
         todaydate.getFullYear(),
-        todaydate.getMonth(),
+        todaydate.getMonth() - 6,
         todaydate.getDate()
       );
     } else {
@@ -763,6 +736,100 @@ export const reportsummary = async (req:any,res:any) =>{
       }
         
     ];
+    const aggregatebyhmo = [
+      {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+      {
+        $match:{$and:[
+          {
+            "patient.isHMOCover": configuration.ishmo[1]
+
+          },
+           {createdAt:{ $gt: startdate, $lt: enddate }}
+          ]
+        } 
+      },
+      
+      {
+        $group: {
+          _id:{$ifNull: ["$patient.HMOName", "HMO Not Found"] } ,
+           //"$patient.HMOName",                // Group by product
+          TotalNumber: { $sum: 1 },
+         
+        }
+      },
+      {
+        $project:{
+          HMOName:"$_id",
+          TotalNumber:1,
+          _id:0
+
+        }
+
+      }
+    ];
+    ///////procedure ////////
+    const appointmentaggregatebyhmo = [
+      {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+      {
+        $match:{$and:[
+          {
+            "patient.isHMOCover": configuration.ishmo[1]
+
+          },
+           {appointmentdate:{ $gt: startdate, $lt: enddate }}
+          ]
+        } 
+      },
+      
+      {
+        $group: {
+          _id:{$ifNull: ["$patient.HMOName", "HMO Not Found"] } ,
+           //"$patient.HMOName",                // Group by product
+          TotalNumber: { $sum: 1 },
+         
+        }
+      },
+      {
+        $project:{
+          HMOName:"$_id",
+          TotalNumber:1,
+          _id:0
+
+        }
+
+      }
+    ];
+   
 
     let queryresult:any; 
     
@@ -791,6 +858,19 @@ export const reportsummary = async (req:any,res:any) =>{
     else if(querytype == summary[5]){
       //clinicalaggregate
       queryresult = {clinicalreport: await readappointmentaggregate(clinicalaggregate)};
+
+    }
+    else if(querytype == summary[6]){
+      //clinicalaggregate
+      //"hmoappointmentaggregate","hmoradiologyreport"];
+
+      queryresult = {
+         hmolabsummary: await readlabaggregate(aggregatebyhmo),
+         hmoproceduresummary: await readprocedureaggregate(aggregatebyhmo),
+         hmopharmacysummary: await readprescriptionaggregate(aggregatebyhmo),
+         hmoradiologysummary: await readradiologyaggregate(aggregatebyhmo),
+         hmsappointmentsummary: await readappointmentaggregate(appointmentaggregatebyhmo)
+        };
 
     }
     else{
