@@ -281,7 +281,7 @@ export const reportsummary = async (req:any,res:any) =>{
       enddate = todaydate;
       startdate = new Date(
         todaydate.getFullYear(),
-        todaydate.getMonth() - 6,
+        todaydate.getMonth(),
         todaydate.getDate()
       );
     } else {
@@ -519,7 +519,11 @@ export const reportsummary = async (req:any,res:any) =>{
         },
       },
       {
-        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+        $unwind: {
+          path: "$referedward",
+          preserveNullAndEmptyArrays: true
+        }
+        
       },
       {
         $match:{$and:[{status:configuration.admissionstatus[1]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
@@ -552,7 +556,11 @@ export const reportsummary = async (req:any,res:any) =>{
         },
       },
       {
-        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+        $unwind: {
+          path: "$referedward",
+          preserveNullAndEmptyArrays: true
+        }
+        
       },
       {
         $match:{$and:[{status:configuration.admissionstatus[3]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
@@ -585,8 +593,13 @@ export const reportsummary = async (req:any,res:any) =>{
         },
       },
       {
-        $unwind: "$referedward"        // Flatten the 'userDetails' array so we can access its fields directly
+        $unwind: {
+          path: "$referedward",
+          preserveNullAndEmptyArrays: true
+        }
+        
       },
+      
       {
         $match:{$and:[{status:configuration.admissionstatus[5]}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
       },
@@ -642,10 +655,12 @@ export const reportsummary = async (req:any,res:any) =>{
         },
       },
       {
-        $unwind: "$payment"        // Flatten the 'userDetails' array so we can access its fields directly
+        $unwind: {
+          path: "$payment",
+          preserveNullAndEmptyArrays: true
+        }
+        
       },
- 
-     
       {
         $match:{"payment.status":configuration.status[3],createdAt:{ $gt: startdate, $lt: enddate }} 
       },
@@ -681,8 +696,13 @@ export const reportsummary = async (req:any,res:any) =>{
         },
       },
       {
-        $unwind: "$payment"        // Flatten the 'userDetails' array so we can access its fields directly
+        $unwind: {
+          path: "$payment",
+          preserveNullAndEmptyArrays: true
+        }
+        
       },
+      
  
      
       {
