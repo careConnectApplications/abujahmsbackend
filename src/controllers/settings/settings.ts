@@ -93,7 +93,7 @@ export const settings = async function () {
 
             {querytype:"hmolabreport",querygroup:hmoNames},
             {querytype:"hmoreportforprocedure",querygroup:hmoNames},
-            {querytype:"hmopharmacyreport",querygroup:hmoNames},
+            {querytype:"hmoreportforpharmacy",querygroup:hmoNames},
             {querytype:"hmoappointmentreport",querygroup:hmoNames},
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
