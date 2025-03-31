@@ -6,6 +6,7 @@ import {createward,getallward,updateward} from '../controllers/setting/wardmanag
 import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/theatremanagement';
 import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestcomponentbytestname} from '../controllers/setting/testscomponent';
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
+//import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
 
 
@@ -46,7 +47,8 @@ router.post('/createtestcomponents',createtestcomponents);
 router.get('/getalltestcomponent',getalltestcomponent);
 router.put('/updatetestcomponents/:id',updatetestcomponents);
 router.get('/gettestcomponentbytestname/:testname',gettestcomponentbytestname);
-//gettestcomponentbytestname
+//readicdten
+//router.get('/readicdten',readicdten);
 
     
 

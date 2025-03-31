@@ -24,6 +24,7 @@ import dashboard  from '../routes/dashboard';
 import anc from '../routes/anc';
 import theatreadmission from '../routes/theatreadmission';
 import reports  from '../routes/reportsandanalytics';
+import { readicdten } from '../controllers/icdten/icdten';
 
 
 import {protect} from "../utils/middleware";
@@ -69,6 +70,7 @@ function createServer(){
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
   app.use('/api/v1/reports',protect,  reports);
+  app.use('/api/v1/readicdten',  readicdten);
 
   
 
