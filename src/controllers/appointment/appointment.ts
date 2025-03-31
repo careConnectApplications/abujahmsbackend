@@ -513,9 +513,9 @@ export async function addclinicalencounter(req:any, res:any){
   else{
     req.body.status = configuration.status[9];
   }
-  var {diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,status} = req.body;
-  validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote});
-  const clinicalencounter ={diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote};
+  var {diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,status,plannote,outcome} = req.body;
+  validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,outcome,plannote});
+  const clinicalencounter ={diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,plannote,outcome};
   var queryresult;
   
   //find id 

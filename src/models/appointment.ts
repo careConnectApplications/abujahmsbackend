@@ -563,6 +563,7 @@ const appointmentSchema = new Schema({
       assessmentnote:[],
       clinicalnote:[],
       plannote:[],
+      outcome: String
 
     },
 
