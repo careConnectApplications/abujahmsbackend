@@ -31,8 +31,8 @@ const radiologySchema = new Schema({
   },
   department:
   {
-    type: String, 
-    required: true
+    type: String
+    //required: true
   },
   testresult:[],
   patient: {

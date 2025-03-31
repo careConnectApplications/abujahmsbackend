@@ -1,6 +1,6 @@
 import  mongoose from 'mongoose';
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
-import {readoneappointment,} from "../../dao/appointment";
+import {readoneappointment,updateappointment} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
 import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
@@ -19,7 +19,7 @@ export var referadmission= async (req:any, res:any) =>{
       const {id} = req.params;
       console.log('id', id);
       //doctorname,patient,appointment
-      const {alldiagnosis,referedward,admittospecialization, referddate} = req.body;
+      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid} = req.body;
       validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate});
       //confirm ward
       const referedwardid = new ObjectId(referedward);
@@ -28,6 +28,18 @@ export var referadmission= async (req:any, res:any) =>{
           throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
 
       }
+         var appointment:any;
+                if(appointmentid){
+                  appointmentid = new ObjectId(appointmentid);
+                  appointment = await readoneappointment({_id:appointmentid},{},'');
+                        if(!appointment){
+                          //create an appointment
+                          throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+            
+                      }
+            
+            
+    }
       //confrim admittospecialization
       //validate specialization
           const foundSpecilization =  await readoneclinic({clinic:admittospecialization},'');
@@ -55,6 +67,10 @@ export var referadmission= async (req:any, res:any) =>{
 var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid});
 //update patient 
 var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
+if(appointmentid){
+              await updateappointment(appointment._id,{admission:admissionrecord._id});
+      
+}
 res.status(200).json({queryresult:admissionrecord, status: true});
     }
     

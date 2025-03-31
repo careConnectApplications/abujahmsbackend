@@ -1,5 +1,7 @@
+import  mongoose from 'mongoose';
 import { validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservices";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
+import {readoneappointment, updateappointment} from "../../dao/appointment";
 import  {readallservicetype}  from "../../dao/servicetype";
 import {createprocedure, readallprocedure,updateprocedure,readoneprocedure} from "../../dao/procedure";
 import {readoneprice} from "../../dao/price";
@@ -7,7 +9,7 @@ import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import {readoneadmission} from  "../../dao/admissions";
-
+const { ObjectId } = mongoose.Types;
 
 
 
@@ -18,7 +20,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
     try{
       //accept _id from request
       const {id} = req.params;
-      const {procedure,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes} = req.body;
+      var {procedure,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,appointmentid} = req.body;
   
       const { firstName,lastName} = (req.user).user;
       const raiseby = `${firstName} ${lastName}`;
@@ -32,6 +34,18 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       if(!foundPatient){
           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
+      }
+      var appointment:any;
+          if(appointmentid){
+            appointmentid = new ObjectId(appointmentid);
+            appointment = await readoneappointment({_id:appointmentid},{},'');
+                  if(!appointment){
+                    //create an appointment
+                    throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+      
+                }
+      
+      
       }
            
   const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
@@ -91,6 +105,11 @@ else{
         queryresult=await updatepatient(id,{$push: {prcedure:proceduresid}});
 
       }
+      if(appointmentid){
+                    await updateappointment(appointment._id,{$push: {procedure:proceduresid}});
+                    //procedure
+            
+    }
       res.status(200).json({queryresult, status: true});
       
      

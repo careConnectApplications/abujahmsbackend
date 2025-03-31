@@ -1,5 +1,7 @@
+import  mongoose from 'mongoose';
 import { validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservices";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
+import {readoneappointment, updateappointment} from "../../dao/appointment";
 import  {readallservicetype}  from "../../dao/servicetype";
 import {createradiology, readallradiology,updateradiology,readoneradiology} from "../../dao/radiology";
 import {readoneprice} from "../../dao/price";
@@ -7,6 +9,7 @@ import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import {readoneadmission} from  "../../dao/admissions";
+const { ObjectId } = mongoose.Types;
 
 
 
@@ -18,7 +21,7 @@ export var radiologyorder= async (req:any, res:any) =>{
       
       //accept _id from request
       const {id} = req.params;
-      const {testname,note} = req.body;
+      var {testname,note,appointmentid} = req.body;
       const { firstName,lastName} = (req.user).user;
       const raiseby = `${firstName} ${lastName}`;
       var testid:any=String(Date.now());
@@ -33,6 +36,18 @@ export var radiologyorder= async (req:any, res:any) =>{
           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
       }
+       var appointment:any;
+          if(appointmentid){
+            appointmentid = new ObjectId(appointmentid);
+            appointment = await readoneappointment({_id:appointmentid},{},'');
+                  if(!appointment){
+                    //create an appointment
+                    throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+      
+                }
+      
+      
+          }
            
   const {servicetypedetails} = await readallservicetype({category: configuration.category[4]},{type:1,category:1,department:1,_id:0});
    console.log(isHMOCover);
@@ -58,16 +73,22 @@ export var radiologyorder= async (req:any, res:any) =>{
       let testrecord:any;
       //create testrecordn 
       if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
-      testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby,amount:Number(testPrice.amount)});
+      testrecord = await createradiology({note,testname:testname[i],patient:id,testid,raiseby,amount:Number(testPrice.amount)});
       }
       else{
-        testrecord = await createradiology({note,testname:testname[i],patient:id,testid,department:testsetting[0].department,raiseby});
+        testrecord = await createradiology({note,testname:testname[i],patient:id,testid,raiseby});
 
       }
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
       var queryresult=await updatepatient(id,{$push: {radiology:testsid}});
+      //update appointment with radiology orders
+      //radiology
+      if(appointmentid){
+              await updateappointment(appointment._id,{$push: {radiology:testsid}});
+      
+      }
       res.status(200).json({queryresult, status: true});
       
      

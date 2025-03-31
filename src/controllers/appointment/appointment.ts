@@ -393,12 +393,13 @@ export var laborder= async (req:any, res:any) =>{
     
     //accept _id from request.
     const {id} = req.params;
-    const {testname} = req.body;
+    const {testname,appointmentunderscoreid} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
     //var paymentids =[];
     validateinputfaulsyvalue({id, testname});
     //find the record in appointment and validate
+
     //find patient
     const foundPatient:any =  await readonepatient({_id:id},{},'','');
 // check is patient is under inssurance
@@ -406,12 +407,16 @@ export var laborder= async (req:any, res:any) =>{
 
 // Create a new ObjectId
     var appointment:any;
+    let patientappointment:any;
     if(foundPatient){
+      patientappointment = await readoneappointment({_id:appointmentunderscoreid},{},'patient');
       appointment={
         patient:id,
-        appointmentid:String(Date.now()),
-        _id:new ObjectId()
+        appointmentid:patientappointment?patientappointment.appointmentid:String(Date.now()),
+        _id:patientappointment?patientappointment._id:new ObjectId()
       }
+      //update appoint with lab order
+      
      // isHMOCover = foundPatient.isHMOCover;
 
     }
@@ -422,6 +427,8 @@ export var laborder= async (req:any, res:any) =>{
               throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
           }
+          //update appoint with lab order
+
         //  isHMOCover = appointment.patient.isHMOCover;
     }
 
@@ -465,6 +472,11 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     }
     //var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
     var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid}});
+    //update appoint with lab order
+    if(patientappointment){
+      await updateappointment(patientappointment._id,{$push: {lab:testsid}});
+    }
+
     res.status(200).json({queryresult, status: true});
     
    

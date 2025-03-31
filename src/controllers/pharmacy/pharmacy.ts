@@ -5,7 +5,7 @@ import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
-import {readoneappointment} from "../../dao/appointment";
+import {readoneappointment, updateappointment} from "../../dao/appointment";
 import {readoneadmission} from  "../../dao/admissions";
 
 const { ObjectId } = mongoose.Types;
@@ -25,9 +25,6 @@ dosageform:String,
   frequency:String,
   route:String,
 */
-      
-
-      console.log(req.user);
       const { firstName,lastName} = (req.user).user;
       //accept _id from request
       const {id} = req.params;
@@ -44,7 +41,7 @@ dosageform:String,
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
-      var appointment:any;
+    var appointment:any;
     if(appointmentid){
       appointmentid = new ObjectId(appointmentid);
       appointment = await readoneappointment({_id:appointmentid},{},'');
@@ -88,7 +85,6 @@ dosageform:String,
      // console.log("got here");
       //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       var prescriptionrecord:any = await createprescription({pharmacy,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
-      console.log(prescriptionrecord);
       pharcyorderid.push(prescriptionrecord ._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
@@ -97,6 +93,12 @@ dosageform:String,
       
       //var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
       var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid}});
+      //update appointment with pharmacy orders
+      if(appointmentid){
+        await updateappointment(appointment._id,{$push: {prescription:pharcyorderid}});
+
+      }
+     
       res.status(200).json({queryresult, status: true});
     }
     

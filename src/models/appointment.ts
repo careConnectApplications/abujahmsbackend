@@ -561,7 +561,8 @@ const appointmentSchema = new Schema({
       diagnosisnote:[],
       diagnosisicd10: String,
       assessmentnote:[],
-      clinicalnote:[]
+      clinicalnote:[],
+      plannote:[],
 
     },
 
@@ -572,7 +573,28 @@ const appointmentSchema = new Schema({
         default: [],
       },
     ],
-  
+    radiology: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Radiology",
+        default: [],
+      },
+    ],
+    procedure: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Procedure",
+        default: [],
+      },
+    ],
+    prescription:[
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Prescription",
+        default: [],
+      },
+    ],
+   
   appointmentcategory: {
     type: String,
     required: true
