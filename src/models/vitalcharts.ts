@@ -66,6 +66,13 @@ const vitalchartsSchema = new Schema({
         {
           type: String
         },
+        status:{
+         
+          type: String,
+          default:configuration.status[8]
+        
+        
+        },
         staffname: String,
 },
 { timestamps: true }

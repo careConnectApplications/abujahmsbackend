@@ -45,7 +45,7 @@ export const createvitalchart = async (req:any, res:any) => {
       
      
       const {id} = req.params;
-      console.log('id',id);
+    
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
@@ -86,9 +86,9 @@ export async function updatevitalchart(req:any, res:any){
     const { firstName,lastName} = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
     var { height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname} = req.body;
-    validateinputfaulsyvalue({height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
+    validateinputfaulsyvalue({height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname});
     var bmi = weight/((height/100) * (height/100));
-    var queryresult = await updatevitalcharts(id, {bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname});
+    var queryresult = await updatevitalcharts(id, {bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,painscore,rbs,gcs,staffname,status:configuration.status[6]});
     res.status(200).json({
         queryresult,
         status:true

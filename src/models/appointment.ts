@@ -558,6 +558,7 @@ const appointmentSchema = new Schema({
       history:history
     },
     clinicalencounter:{
+     
       diagnosisnote:[],
       diagnosisicd10: String,
       assessmentnote:[],
@@ -566,6 +567,13 @@ const appointmentSchema = new Schema({
       outcome: String
 
     },
+    vitals: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Vitalchart",
+        default: [],
+      },
+    ],
 
     lab: [
       {

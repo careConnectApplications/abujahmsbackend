@@ -5,6 +5,7 @@ import * as path from 'path';
 import  {readallpatient,createpatient,updatepatient,readonepatient,updatepatientmanybyquery,createpatientifnotexit}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
+import {createvitalcharts} from "../../dao/vitalcharts";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson,storeUniqueNumber } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
 import { AnyObject } from "mongoose";
@@ -208,8 +209,8 @@ export var createpatients = async (req:any,res:any) =>{
          payment.push(createpaymentqueryresult._id);
          //payment.push(createappointmentpaymentqueryresult._id);
          //update createpatientquery
-
-         const queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[5]}}});
+        let vitals =await createvitalcharts({status:configuration.status[8]});
+         const queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
          const queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
         res.status(200).json({queryresult, status: true});
     }catch(error:any){
