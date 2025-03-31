@@ -24,7 +24,7 @@ import dashboard  from '../routes/dashboard';
 import anc from '../routes/anc';
 import theatreadmission from '../routes/theatreadmission';
 import reports  from '../routes/reportsandanalytics';
-import readicdten from '../routes/readicdten';
+import { readicdten } from '../controllers/icdten/icdten';
 
 
 import {protect} from "../utils/middleware";
