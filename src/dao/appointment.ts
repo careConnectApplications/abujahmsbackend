@@ -42,9 +42,10 @@ export async function readallappointmentfirstfive(query:any,selectquery:any,popu
 };
 
   //read all patient history
-  export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
+  export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any,populatefourthquery:any,populatefifthquery:any,populatesixthquery:any,populateseventhquery:any,populateeigthquery:any) {
     try {
-      const appointmentdetails = await Appointment.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+      const appointmentdetails = await Appointment.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).populate(populatefourthquery).populate(populatefifthquery).populate
+      (populatesixthquery).populate(populateseventhquery).populate(populateeigthquery).sort({ createdAt: -1 });
       const totalappointmentdetails = await Appointment.find(query).countDocuments();
       return { appointmentdetails, totalappointmentdetails };
     } catch (err) {
