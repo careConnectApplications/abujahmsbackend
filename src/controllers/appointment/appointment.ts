@@ -1,6 +1,7 @@
 import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery} from "../../dao/appointment";
 import {readoneadmission} from "../../dao/admissions";
 import {createvitalcharts} from "../../dao/vitalcharts";
+import {readonevitalcharts,updatevitalcharts} from "../../dao/vitalcharts";
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import  {readallservicetype}  from "../../dao/servicetype";
 import  {readone}  from "../../dao/users";
@@ -550,7 +551,20 @@ export async function addclinicalencounter(req:any, res:any){
     
   }else{
   queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
-  }  
+  const { firstName,lastName} = (req.user).user;
+  req.body.staffname = `${firstName} ${lastName}`; 
+  const {height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname} = req.body;
+  if(height || weight ){
+  var bmi = weight/((height/100) * (height/100));
+  await updatevitalcharts((queryresult.vitals)[0], {bmi,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname,status:configuration.status[6]})  
+ 
+}  
+ 
+ 
+  }
+
+
+
   res.status(200).json({
     queryresult,
     status:true
@@ -738,3 +752,25 @@ export const getAllVtalsByPatient = async (req:any, res:any) => {
   notes: String, // Additional notes (if any)
 */
 
+//readvitals by appoiinment 
+  // Get all lab records
+  export const readallvitalchartByAppointment = async (req:any, res:any) => {
+    try {
+     const {id} = req.params;
+      let appointments:any = await readoneappointment({_id:id},{},'');
+      console.log(appointments);
+      const {vitals} = appointments;
+      
+      
+     //find appointment
+  
+      const queryresult = await readonevitalcharts({_id:vitals[0]},{});
+      res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+    } catch (error:any) {
+      res.status(403).json({ status: false, msg: error.message });
+    }
+  };
+  
