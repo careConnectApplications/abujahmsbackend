@@ -47,8 +47,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.confirmradiologyorder = exports.uploadradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
 exports.updateradiologys = updateradiologys;
+const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
+const appointment_1 = require("../../dao/appointment");
 const servicetype_1 = require("../../dao/servicetype");
 const radiology_1 = require("../../dao/radiology");
 const price_1 = require("../../dao/price");
@@ -56,13 +58,14 @@ const payment_1 = require("../../dao/payment");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
 const admissions_1 = require("../../dao/admissions");
+const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //accept _id from request
         const { id } = req.params;
-        const { testname, note } = req.body;
+        var { testname, note, appointmentid } = req.body;
         const { firstName, lastName } = (req.user).user;
         const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
@@ -75,6 +78,15 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //category
         if (!foundPatient) {
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+        }
+        var appointment;
+        if (appointmentid) {
+            appointmentid = new ObjectId(appointmentid);
+            appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
+            if (!appointment) {
+                //create an appointment
+                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+            }
         }
         const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[4] }, { type: 1, category: 1, department: 1, _id: 0 });
         console.log(isHMOCover);
@@ -98,15 +110,20 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             let testrecord;
             //create testrecordn 
             if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby, amount: Number(testPrice.amount) });
+                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby, amount: Number(testPrice.amount) });
             }
             else {
-                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, department: testsetting[0].department, raiseby });
+                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby });
             }
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
         var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { radiology: testsid } });
+        //update appointment with radiology orders
+        //radiology
+        if (appointmentid) {
+            yield (0, appointment_1.updateappointment)(appointment._id, { $push: { radiology: testsid } });
+        }
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {

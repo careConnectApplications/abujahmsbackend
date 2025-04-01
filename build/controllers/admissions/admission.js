@@ -18,6 +18,7 @@ exports.getalladmissionbypatient = getalladmissionbypatient;
 exports.updateadmissionstatus = updateadmissionstatus;
 const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
+const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const wardmanagement_1 = require("../../dao/wardmanagement");
@@ -34,13 +35,22 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { id } = req.params;
         console.log('id', id);
         //doctorname,patient,appointment
-        const { alldiagnosis, referedward, admittospecialization, referddate } = req.body;
+        var { alldiagnosis, referedward, admittospecialization, referddate, appointmentid } = req.body;
         (0, otherservices_1.validateinputfaulsyvalue)({ id, alldiagnosis, referedward, admittospecialization, referddate });
         //confirm ward
         const referedwardid = new ObjectId(referedward);
         const foundWard = yield (0, wardmanagement_1.readonewardmanagement)({ _id: referedwardid }, '');
         if (!foundWard) {
             throw new Error(`Ward doesnt ${config_1.default.error.erroralreadyexit}`);
+        }
+        var appointment;
+        if (appointmentid) {
+            appointmentid = new ObjectId(appointmentid);
+            appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
+            if (!appointment) {
+                //create an appointment
+                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+            }
         }
         //confrim admittospecialization
         //validate specialization
@@ -62,6 +72,9 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id, admissionid });
         //update patient 
         var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { admission: admissionrecord._id } });
+        if (appointmentid) {
+            yield (0, appointment_1.updateappointment)(appointment._id, { admission: admissionrecord._id });
+        }
         res.status(200).json({ queryresult: admissionrecord, status: true });
     }
     catch (error) {

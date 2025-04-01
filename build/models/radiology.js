@@ -24,8 +24,8 @@ const radiologySchema = new mongoose_1.Schema({
         required: true
     },
     department: {
-        type: String,
-        required: true
+        type: String
+        //required: true
     },
     testresult: [],
     patient: {

@@ -37,7 +37,6 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
           frequency:String,
           route:String,
         */
-        console.log(req.user);
         const { firstName, lastName } = (req.user).user;
         //accept _id from request
         const { id } = req.params;
@@ -91,12 +90,15 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             // console.log("got here");
             //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
             var prescriptionrecord = yield (0, prescription_1.createprescription)({ pharmacy, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid });
-            console.log(prescriptionrecord);
             pharcyorderid.push(prescriptionrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
         //var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
         var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { prescription: pharcyorderid } });
+        //update appointment with pharmacy orders
+        if (appointmentid) {
+            yield (0, appointment_1.updateappointment)(appointment._id, { $push: { prescription: pharcyorderid } });
+        }
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {

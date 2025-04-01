@@ -13,22 +13,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readpaymentaggregate = readpaymentaggregate;
+exports.readhmoaggregate = readhmoaggregate;
 exports.readappointmentaggregate = readappointmentaggregate;
 exports.readadmissionaggregate = readadmissionaggregate;
 exports.readclinicaggregate = readclinicaggregate;
 exports.readwardaggregate = readwardaggregate;
 exports.readprocedureaggregate = readprocedureaggregate;
+exports.readlabaggregate = readlabaggregate;
+exports.readradiologyaggregate = readradiologyaggregate;
+exports.readprescriptionaggregate = readprescriptionaggregate;
 const payment_1 = __importDefault(require("../models/payment"));
 const admission_1 = __importDefault(require("../models/admission"));
 const appointment_1 = __importDefault(require("../models/appointment"));
 const clinics_1 = __importDefault(require("../models/clinics"));
 const wardmanagement_1 = __importDefault(require("../models/wardmanagement"));
+const hmomanagement_1 = __importDefault(require("../models/hmomanagement"));
 const procedure_1 = __importDefault(require("../models/procedure"));
+const lab_1 = __importDefault(require("../models/lab"));
+const radiology_1 = __importDefault(require("../models/radiology"));
+const prescription_1 = __importDefault(require("../models/prescription"));
 const config_1 = __importDefault(require("../config"));
 function readpaymentaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             return yield payment_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function readhmoaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield hmomanagement_1.default.aggregate(input);
         }
         catch (e) {
             console.log(e);
@@ -84,6 +103,42 @@ function readprocedureaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             return yield procedure_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//  lab aggregate
+function readlabaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield lab_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//radiology
+function readradiologyaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield radiology_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//Prescription
+function readprescriptionaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield prescription_1.default.aggregate(input);
         }
         catch (e) {
             console.log(e);

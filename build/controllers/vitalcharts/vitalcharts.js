@@ -59,7 +59,6 @@ const createvitalchart = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         // admission,patient,height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,bmi,painscore,rbs,gcs,wardname,staffname,
         const { id } = req.params;
-        console.log('id', id);
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
         var { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname } = req.body;
@@ -97,9 +96,9 @@ function updatevitalchart(req, res) {
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
             var { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname });
+            (0, otherservices_1.validateinputfaulsyvalue)({ height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname });
             var bmi = weight / ((height / 100) * (height / 100));
-            var queryresult = yield (0, vitalcharts_1.updatevitalcharts)(id, { bmi, height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname });
+            var queryresult = yield (0, vitalcharts_1.updatevitalcharts)(id, { bmi, height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname, status: config_1.default.status[6] });
             res.status(200).json({
                 queryresult,
                 status: true

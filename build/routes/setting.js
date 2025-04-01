@@ -9,7 +9,9 @@ const clinics_1 = require("../controllers/setting/clinics");
 const servicetype_1 = require("../controllers/setting/servicetype");
 const wardmanagement_1 = require("../controllers/setting/wardmanagement");
 const theatremanagement_1 = require("../controllers/setting/theatremanagement");
+const testscomponent_1 = require("../controllers/setting/testscomponent");
 const hmomanagement_1 = require("../controllers/setting/hmomanagement");
+//import {readicdten} from "../controllers/icdten/icdten";
 const router = express_1.default.Router();
 router.post('/createprices', pricesetting_1.createprices);
 router.get('/getallprices', pricesetting_1.getallprices);
@@ -37,4 +39,11 @@ router.put('/updatetheatre/:id', theatremanagement_1.updatetheatre);
 router.post('/createinsurance', hmomanagement_1.createhmo);
 router.get('/getallinsurance', hmomanagement_1.getallhmo);
 router.put('/updateinsurance/:id', hmomanagement_1.updatehmo);
+// test name
+router.post('/createtestcomponents', testscomponent_1.createtestcomponents);
+router.get('/getalltestcomponent', testscomponent_1.getalltestcomponent);
+router.put('/updatetestcomponents/:id', testscomponent_1.updatetestcomponents);
+router.get('/gettestcomponentbytestname/:testname', testscomponent_1.gettestcomponentbytestname);
+//readicdten
+//router.get('/readicdten',readicdten);
 exports.default = router;

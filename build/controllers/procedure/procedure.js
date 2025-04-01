@@ -47,8 +47,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadprocedureresult = exports.readAllprocedureByClinic = exports.readAllprocedureByPatient = exports.scheduleprocedureorder = void 0;
 exports.updateprocedures = updateprocedures;
+const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
+const appointment_1 = require("../../dao/appointment");
 const servicetype_1 = require("../../dao/servicetype");
 const procedure_1 = require("../../dao/procedure");
 const price_1 = require("../../dao/price");
@@ -56,13 +58,14 @@ const payment_1 = require("../../dao/payment");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
 const admissions_1 = require("../../dao/admissions");
+const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //accept _id from request
         const { id } = req.params;
-        const { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes } = req.body;
+        var { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
         const { firstName, lastName } = (req.user).user;
         const raiseby = `${firstName} ${lastName}`;
         var procedureid = String(Date.now());
@@ -74,6 +77,15 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         //category
         if (!foundPatient) {
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+        }
+        var appointment;
+        if (appointmentid) {
+            appointmentid = new ObjectId(appointmentid);
+            appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
+            if (!appointment) {
+                //create an appointment
+                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+            }
         }
         const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[5] }, { type: 1, category: 1, department: 1, _id: 0 });
         //loop through all test and create record in lab order
@@ -121,6 +133,10 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
         else {
             queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid } });
+        }
+        if (appointmentid) {
+            yield (0, appointment_1.updateappointment)(appointment._id, { $push: { procedure: proceduresid } });
+            //procedure
         }
         res.status(200).json({ queryresult, status: true });
     }

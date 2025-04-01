@@ -522,12 +522,42 @@ const appointmentSchema = new mongoose_1.Schema({
         diagnosisnote: [],
         diagnosisicd10: String,
         assessmentnote: [],
-        clinicalnote: []
+        clinicalnote: [],
+        plannote: [],
+        outcome: String
     },
+    vitals: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Vitalchart",
+            default: [],
+        },
+    ],
     lab: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
             ref: "Lab",
+            default: [],
+        },
+    ],
+    radiology: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Radiology",
+            default: [],
+        },
+    ],
+    procedure: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Procedure",
+            default: [],
+        },
+    ],
+    prescription: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Prescription",
             default: [],
         },
     ],

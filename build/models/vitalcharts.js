@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const config_1 = __importDefault(require("../config"));
 const vitalchartsSchema = new mongoose_1.Schema({
     admission: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -52,6 +56,10 @@ const vitalchartsSchema = new mongoose_1.Schema({
     },
     gcs: {
         type: String
+    },
+    status: {
+        type: String,
+        default: config_1.default.status[8]
     },
     staffname: String,
 }, { timestamps: true });

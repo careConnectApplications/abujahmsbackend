@@ -59,6 +59,7 @@ const path = __importStar(require("path"));
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
+const vitalcharts_1 = require("../../dao/vitalcharts");
 const otherservices_1 = require("../../utils/otherservices");
 const appointment_1 = require("../../dao/appointment");
 //Insurance upload
@@ -237,7 +238,8 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         payment.push(createpaymentqueryresult._id);
         //payment.push(createappointmentpaymentqueryresult._id);
         //update createpatientquery
-        const queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[5] } } });
+        let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
+        const queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
         const queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
         res.status(200).json({ queryresult, status: true });
     }

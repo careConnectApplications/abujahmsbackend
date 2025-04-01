@@ -8,12 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.settings = void 0;
 exports.settingsresponse = settingsresponse;
 exports.settingsummaryresponse = settingsummaryresponse;
 exports.cashiersettings = cashiersettings;
 const reports_1 = require("../../dao/reports");
+const config_1 = __importDefault(require("../../config"));
 const settings = function () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -48,13 +52,54 @@ const settings = function () {
             const wardNames = wards.map(ward => ward.wardname);
             const clinicNames = clinics.map(clinicname => clinicname.clinic);
             //search pharmacy and spread the array
+            const query = { type: config_1.default.clinictype[2] };
+            const pharmacyselection = [
+                {
+                    $match: query
+                },
+                {
+                    $group: {
+                        _id: "$clinic", // Group by 'userId'
+                    }
+                },
+                {
+                    $project: {
+                        clinic: "$_id", // Rename _id to userId
+                        _id: 0 // Exclude _id
+                    }
+                }
+            ];
+            const pharmacy = yield (0, reports_1.readclinicaggregate)(pharmacyselection);
+            const pharmacyNames = pharmacy.map((clinicname) => clinicname.clinic);
+            //get all hmos
+            const hmoselection = [
+                {
+                    $group: {
+                        _id: "$hmoname", // Group by 'userId'
+                    }
+                },
+                {
+                    $project: {
+                        hmoname: "$_id", // Rename _id to userId
+                        _id: 0 // Exclude _id
+                    }
+                }
+            ];
+            const hmo = yield (0, reports_1.readhmoaggregate)(hmoselection);
+            const hmoNames = hmo.map((hmoname) => hmoname.hmoname);
+            console.log(hmoNames);
             //console.log(check2);
             const reports = [
-                { querytype: "financialreport", querygroup: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure"] },
+                { querytype: "financialreport", querygroup: ["Appointment", "Lab", "Patient Registration", "Radiology", "Procedure", ...pharmacyNames] },
                 { querytype: "appointmentreport", querygroup: clinicNames },
-                { querytype: "admissionreport", querygroup: wardNames }
+                { querytype: "admissionreport", querygroup: wardNames },
+                { querytype: "hmolabreport", querygroup: hmoNames },
+                { querytype: "hmoreportforprocedure", querygroup: hmoNames },
+                { querytype: "hmoreportforpharmacy", querygroup: hmoNames },
+                { querytype: "hmoappointmentreport", querygroup: hmoNames },
+                { querytype: "hmoradiologyreport", querygroup: hmoNames },
             ];
-            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate"];
+            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate"];
             return { reports, summary };
         }
         catch (error) {

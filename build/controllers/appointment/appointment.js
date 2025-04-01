@@ -30,6 +30,7 @@ const lab_1 = require("../../dao/lab");
 const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
 const { ObjectId } = mongoose_1.default.Types;
+//add vitals for 
 // Create a new schedule
 const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -58,15 +59,18 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         let createpaymentqueryresult;
         let queryresult;
         if (patientrecord.isHMOCover == config_1.default.ishmo[1]) {
-            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
+            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
+            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { appointment: queryresult._id } });
         }
         else {
             createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
-            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
+            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
+            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
+            //create vitals
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
         }
-        //cater for phamarcy, lab ,radiology and procedure
+        //create vitals
         //update patient
         res.status(200).json({ queryresult, status: true });
     }
@@ -78,7 +82,7 @@ exports.scheduleappointment = scheduleappointment;
 // Get all schedueled records
 const getAllSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const queryresult = yield (0, appointment_1.readallappointment)({}, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({}, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -117,7 +121,7 @@ function updateappointments(req, res) {
 const getAllSchedulesByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -134,14 +138,13 @@ const getAllPreviousEncounter = (req, res) => __awaiter(void 0, void 0, void 0, 
         const { id } = req.params;
         //const {clinic} = (req.user).user;
         //console.log(clinic);
-        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment', 'lab', 'radiology', 'procedure', 'prescription', 'admission', 'vitals');
         res.status(200).json({
             queryresult,
             status: true
         });
     }
     catch (error) {
-        6;
         res.status(403).json({ status: false, msg: error.message });
     }
 });
@@ -151,7 +154,7 @@ const getAllPreviousClininicalEncounter = (req, res) => __awaiter(void 0, void 0
         const { id } = req.params;
         //const {clinic} = (req.user).user;
         //console.log(clinic);
-        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ $or: [{ status: config_1.default.status[6] }, { status: config_1.default.status[9] }], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment', 'lab', 'radiology', 'procedure', 'prescription', 'admission', 'vitals');
         res.status(200).json({
             queryresult,
             status: true
@@ -167,7 +170,7 @@ const getAllCompletedClinicalEncounter = (req, res) => __awaiter(void 0, void 0,
     try {
         const { id } = req.params;
         //const {clinic} = (req.user).user;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -183,7 +186,7 @@ const getAllCompletedEncounter = (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const { id } = req.params;
         //const {clinic} = (req.user).user;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[6], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -199,7 +202,7 @@ const getAllInProgressEncounter = (req, res) => __awaiter(void 0, void 0, void 0
     try {
         // const {clinic} = (req.user).user;
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: false }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -214,7 +217,7 @@ const getAllInProgressClinicalEncounter = (req, res) => __awaiter(void 0, void 0
     try {
         // const {clinic} = (req.user).user;
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ status: config_1.default.status[9], patient: id, fromclinicalencounter: true }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -258,6 +261,15 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
                 }
             },
             {
+                $lookup: {
+                    from: 'vitalcharts',
+                    localField: 'vitals',
+                    foreignField: '_id',
+                    as: 'vitals'
+                }
+            },
+            //vitals
+            {
                 $unwind: {
                     path: '$payment', // Deconstruct the payment array (from the lookup)
                     preserveNullAndEmptyArrays: true
@@ -266,6 +278,12 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
             {
                 $unwind: {
                     path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
+            },
+            {
+                $unwind: {
+                    path: '$vitals',
                     preserveNullAndEmptyArrays: true
                 } // Deconstruct the patient array (from the lookup)
             },
@@ -292,7 +310,7 @@ const getAllPaidSchedulesByPatient = (req, res) => __awaiter(void 0, void 0, voi
     try {
         // const {clinic} = (req.user).user;
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, {}, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -340,8 +358,22 @@ const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0,
                 }
             },
             {
+                $lookup: {
+                    from: 'vitalcharts',
+                    localField: 'vitals',
+                    foreignField: '_id',
+                    as: 'vitals'
+                }
+            },
+            {
                 $unwind: {
                     path: '$payment',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the payment array (from the lookup)
+            },
+            {
+                $unwind: {
+                    path: '$vitals',
                     preserveNullAndEmptyArrays: true
                 } // Deconstruct the payment array (from the lookup)
             },
@@ -394,7 +426,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //accept _id from request.
         const { id } = req.params;
-        const { testname } = req.body;
+        const { testname, appointmentunderscoreid } = req.body;
         var testid = String(Date.now());
         var testsid = [];
         //var paymentids =[];
@@ -406,12 +438,15 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //var isHMOCover;
         // Create a new ObjectId
         var appointment;
+        let patientappointment;
         if (foundPatient) {
+            patientappointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentunderscoreid }, {}, 'patient');
             appointment = {
                 patient: id,
-                appointmentid: String(Date.now()),
-                _id: new ObjectId()
+                appointmentid: patientappointment ? patientappointment.appointmentid : String(Date.now()),
+                _id: patientappointment ? patientappointment._id : new ObjectId()
             };
+            //update appoint with lab order
             // isHMOCover = foundPatient.isHMOCover;
         }
         else {
@@ -420,6 +455,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 //create an appointment
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
+            //update appoint with lab order
             //  isHMOCover = appointment.patient.isHMOCover;
         }
         //console.log(testname);
@@ -453,6 +489,10 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         //var queryresult=await updatepatient(appointment.patient,{$push: {lab:testsid,payment:paymentids}});
         var queryresult = yield (0, patientmanagement_1.updatepatient)(appointment.patient, { $push: { lab: testsid } });
+        //update appoint with lab order
+        if (patientappointment) {
+            yield (0, appointment_1.updateappointment)(patientappointment._id, { $push: { lab: testsid } });
+        }
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -481,9 +521,9 @@ function addclinicalencounter(req, res) {
             else {
                 req.body.status = config_1.default.status[9];
             }
-            var { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, status } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote });
-            const clinicalencounter = { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote };
+            var { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, status, plannote, outcome } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, outcome, plannote });
+            const clinicalencounter = { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, plannote, outcome };
             var queryresult;
             //find id 
             var checkadimmison = yield (0, admissions_1.readoneadmission)({ _id: new ObjectId(id) }, {}, '');
@@ -631,7 +671,6 @@ function addencounter(req, res) {
             if (height || weight) {
                 if (checkadimmison) {
                     queryresult = yield (0, appointment_1.updateappointment)(id, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: false });
-                    yield (0, vitalcharts_1.createvitalcharts)({ patient: checkadimmison.patient, bmi: req.body.bmi, height, weight, temperature, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname });
                 }
                 else {
                     queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { $set: { 'encounter.history': history, 'encounter.paediatrics': paediatrics, 'encounter.vitals': vitals, 'encounter.generalphysicalexamination': generalphysicalexaminations, 'encounter.assessmentdiagnosis': assessmentdiagnosis, 'encounter.physicalexamination': physicalexamination }, status, additionalnote, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: false });
@@ -663,7 +702,7 @@ const getAllVtalsByPatient = (req, res) => __awaiter(void 0, void 0, void 0, fun
         var selectquery = { 'encounter.vitals': 1 };
         //const {clinic} = (req.user).user;
         const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, selectquery, 'patient', 'doctor', 'payment');
+        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, selectquery, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
         res.status(200).json({
             queryresult,
             status: true

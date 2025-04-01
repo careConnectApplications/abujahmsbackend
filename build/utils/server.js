@@ -28,6 +28,7 @@ const dashboard_1 = __importDefault(require("../routes/dashboard"));
 const anc_1 = __importDefault(require("../routes/anc"));
 const theatreadmission_1 = __importDefault(require("../routes/theatreadmission"));
 const reportsandanalytics_1 = __importDefault(require("../routes/reportsandanalytics"));
+const icdten_1 = require("../controllers/icdten/icdten");
 const middleware_1 = require("../utils/middleware");
 function createServer() {
     const app = (0, express_1.default)();
@@ -70,6 +71,7 @@ function createServer() {
     app.use('/api/v1/anc', middleware_1.protect, anc_1.default);
     app.use('/api/v1/theatreadmission', middleware_1.protect, theatreadmission_1.default);
     app.use('/api/v1/reports', middleware_1.protect, reportsandanalytics_1.default);
+    app.use('/api/v1/readicdten', icdten_1.readicdten);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {

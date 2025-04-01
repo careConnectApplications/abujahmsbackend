@@ -60,10 +60,10 @@ function readallappointmentfirstfive(query, selectquery, populatequery, populate
 }
 ;
 //read all patient history
-function readallappointment(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
+function readallappointment(query, selectquery, populatequery, populatesecondquery, populatethirdquery, populatefourthquery, populatefifthquery, populatesixthquery, populateseventhquery, populateeigthquery, populateninththquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const appointmentdetails = yield appointment_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+            const appointmentdetails = yield appointment_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).populate(populatefourthquery).populate(populatefifthquery).populate(populatesixthquery).populate(populateseventhquery).populate(populateeigthquery).populate(populateninththquery).sort({ createdAt: -1 });
             const totalappointmentdetails = yield appointment_1.default.find(query).countDocuments();
             return { appointmentdetails, totalappointmentdetails };
         }

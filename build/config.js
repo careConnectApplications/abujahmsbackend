@@ -947,7 +947,7 @@ const configuration = {
         errorgreaterthan: "Cannot be greater",
         errorservicetray: "This service donot exist in your service tray"
     },
-    // environment: "test",
+    //environment: "test",
     environment: "prod",
 };
 exports.default = configuration;
