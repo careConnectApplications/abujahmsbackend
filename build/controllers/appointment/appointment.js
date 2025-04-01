@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.scheduleappointment = void 0;
+exports.readallvitalchartByAppointment = exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.scheduleappointment = void 0;
 exports.updateappointments = updateappointments;
 exports.addclinicalencounter = addclinicalencounter;
 exports.addencounter = addencounter;
 const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
 const vitalcharts_1 = require("../../dao/vitalcharts");
+const vitalcharts_2 = require("../../dao/vitalcharts");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const servicetype_1 = require("../../dao/servicetype");
 const users_1 = require("../../dao/users");
@@ -532,6 +533,13 @@ function addclinicalencounter(req, res) {
             }
             else {
                 queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, doctor: user === null || user === void 0 ? void 0 : user._id, fromclinicalencounter: true });
+                const { firstName, lastName } = (req.user).user;
+                req.body.staffname = `${firstName} ${lastName}`;
+                const { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname } = req.body;
+                if (height || weight) {
+                    var bmi = weight / ((height / 100) * (height / 100));
+                    yield (0, vitalcharts_2.updatevitalcharts)((queryresult.vitals)[0], { bmi, height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname, status: config_1.default.status[6] });
+                }
             }
             res.status(200).json({
                 queryresult,
@@ -720,3 +728,23 @@ exports.getAllVtalsByPatient = getAllVtalsByPatient;
   requestforlabtest: String,
   notes: String, // Additional notes (if any)
 */
+//readvitals by appoiinment 
+// Get all lab records
+const readallvitalchartByAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        let appointments = yield (0, appointment_1.readoneappointment)({ _id: id }, {}, '');
+        console.log(appointments);
+        const { vitals } = appointments;
+        //find appointment
+        const queryresult = yield (0, vitalcharts_2.readonevitalcharts)({ _id: vitals[0] }, {});
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.readallvitalchartByAppointment = readallvitalchartByAppointment;

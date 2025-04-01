@@ -10,6 +10,8 @@ const appointment_1 = require("../controllers/appointment/appointment");
 const router = express_1.default.Router();
 router.post('/scheduleappointment', appointment_1.scheduleappointment);
 router.get('/getallschedules', appointment_1.getAllSchedules);
+router.get('/readallvitalchartByAppointment/:id', appointment_1.readallvitalchartByAppointment);
+//readallvitalchartByAppointment
 router.get('/getallschedulesbypatient/:id', appointment_1.getAllSchedulesByPatient);
 router.put('/updateappointment/:id', appointment_1.updateappointments);
 //////////doctors end ///////////////////
