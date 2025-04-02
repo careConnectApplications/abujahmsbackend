@@ -13,3 +13,17 @@ export const readicdten = async (req:any, res:any) => {
       res.status(403).json({ status: false, msg: error.message });
     }
   };
+
+  export const readicdeleven = async (req:any, res:any) => {
+    try {
+     const {diagnosis} = req.body;
+     let result = await axios.get(`https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${diagnosis}`);
+     let queryresult:any = result.data;
+     res.status(200).json({
+        queryresult:queryresult[3],
+        status:true
+      }); 
+    } catch (error:any) {
+      res.status(403).json({ status: false, msg: error.message });
+    }
+  };
