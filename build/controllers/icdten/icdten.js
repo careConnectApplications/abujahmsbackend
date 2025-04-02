@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readicdten = void 0;
+exports.readicdeleven = exports.readicdten = void 0;
 const axios_1 = __importDefault(require("axios"));
 // Get all lab records
 const readicdten = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -30,3 +30,18 @@ const readicdten = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.readicdten = readicdten;
+const readicdeleven = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { diagnosis } = req.body;
+        let result = yield axios_1.default.get(`https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${diagnosis}`);
+        let queryresult = result.data;
+        res.status(200).json({
+            queryresult: queryresult[3],
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.readicdeleven = readicdeleven;

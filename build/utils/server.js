@@ -71,7 +71,7 @@ function createServer() {
     app.use('/api/v1/anc', middleware_1.protect, anc_1.default);
     app.use('/api/v1/theatreadmission', middleware_1.protect, theatreadmission_1.default);
     app.use('/api/v1/reports', middleware_1.protect, reportsandanalytics_1.default);
-    app.use('/api/v1/readicdten', icdten_1.readicdten);
+    app.use('/api/v1/readicdten', icdten_1.readicdeleven);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {
