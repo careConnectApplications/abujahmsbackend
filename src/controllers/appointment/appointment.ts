@@ -34,7 +34,8 @@ export const scheduleappointment = async (req:any, res:any) => {
        "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
       //search patient if available and por
        const patientrecord =  await readonepatient({_id:patient,status:configuration.status[1]},selectquery,'','');
-      // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
+     
+       // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
        if(!patientrecord){
          throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
      }
