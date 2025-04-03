@@ -50,14 +50,14 @@ export const scheduleappointment = async (req:any, res:any) => {
 let createpaymentqueryresult:any;
 let queryresult;
 if(patientrecord.isHMOCover ==  configuration.ishmo[1]){
-let vitals =await createvitalcharts({status:configuration.status[8]});
+let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
 queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
 await updatepatient(patient,{$push: {appointment:queryresult._id}});
 
 }
 else{
   createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
-  let vitals =await createvitalcharts({status:configuration.status[8]});
+  let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
   queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
 //create vitals
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
