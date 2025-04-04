@@ -60,13 +60,13 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         let createpaymentqueryresult;
         let queryresult;
         if (patientrecord.isHMOCover == config_1.default.ishmo[1]) {
-            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
+            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
             queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { appointment: queryresult._id } });
         }
         else {
             createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
-            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
+            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
             queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
             //create vitals
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });

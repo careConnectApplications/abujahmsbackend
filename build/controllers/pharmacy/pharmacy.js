@@ -12,7 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getpriceofdrug = exports.dispense = exports.confirmpharmacyorder = exports.readallpharmacytransactionbypartient = exports.readallpharmacytransaction = exports.pharmacyorder = void 0;
+exports.getpriceofdrug = exports.dispense = exports.confirmpharmacyorder = exports.confirmpharmacygrouporder = exports.readallpharmacytransactionbypartient = exports.readallpharmacytransaction = exports.pharmacyorder = void 0;
+exports.readpharmacybyorderid = readpharmacybyorderid;
+exports.groupreadallpharmacytransaction = groupreadallpharmacytransaction;
 const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
@@ -106,6 +108,118 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.pharmacyorder = pharmacyorder;
+function readpharmacybyorderid(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        //
+        try {
+            const { orderid } = req.params;
+            console.log(orderid);
+            //validate ticket id
+            (0, otherservices_1.validateinputfaulsyvalue)({
+                orderid,
+            });
+            const queryresult = yield (0, prescription_1.readallprescription)({ orderid }, {}, 'patient', 'appointment', 'payment');
+            res.json({
+                queryresult,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+function groupreadallpharmacytransaction(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { clinic } = (req.user).user;
+            const query = { pharmacy: clinic };
+            const ordergroup = [
+                //look up patient
+                {
+                    $match: query
+                },
+                {
+                    $lookup: {
+                        from: "patientsmanagements",
+                        localField: "patient",
+                        foreignField: "_id",
+                        as: "patient",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "appointments",
+                        localField: "appointment",
+                        foreignField: "_id",
+                        as: "appointment",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$appointment",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$patient",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$orderid",
+                        orderid: { $first: "$orderid" },
+                        createdAt: { $first: "$createdAt" },
+                        updatedAt: { $first: "$updatedAt" },
+                        prescribersname: { $first: "$prescribersname" },
+                        firstName: { $first: "$patient.firstName" },
+                        lastName: { $first: "$patient.lastName" },
+                        MRN: { $first: "$patient.MRN" },
+                        isHMOCover: { $first: "$patient.isHMOCover" },
+                        HMOName: { $first: "$patient.HMOName" },
+                        HMOId: { $first: "$patient.HMOId" },
+                        HMOPlan: { $first: "$patient.HMOPlan" },
+                        appointmentdate: { $first: "$appointment.appointmentdate" },
+                        clinic: { $first: "$appointment.clinic" },
+                        appointmentid: { $first: "$appointmentid" }
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        orderid: 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        prescribersname: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        MRN: 1,
+                        isHMOCover: 1,
+                        HMOName: 1,
+                        HMOId: 1,
+                        HMOPlan: 1,
+                        appointmentdate: 1,
+                        clinic: 1,
+                        appointmentid: 1
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+            ];
+            const queryresult = yield (0, prescription_1.readprescriptionaggregate)(ordergroup);
+            res.json({
+                queryresult,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
 //get all pharmacy orderf
 const readallpharmacytransaction = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -137,6 +251,51 @@ const readallpharmacytransactionbypartient = (req, res) => __awaiter(void 0, voi
     }
 });
 exports.readallpharmacytransactionbypartient = readallpharmacytransactionbypartient;
+//confirm group
+const confirmpharmacygrouporder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //extract option
+        var { pharmacyrequest } = req.body;
+        let queryresult;
+        for (let i = 0; pharmacyrequest.length > i; i++) {
+            let { option, remark, qty, id } = pharmacyrequest[i];
+            if (option == true) {
+                (0, otherservices_1.validateinputfaulsyvalue)({ qty });
+            }
+            var prescriptionresponse = yield (0, prescription_1.readoneprescription)({ _id: new ObjectId(id) }, {}, 'patient', '', '');
+            const { prescription, orderid, patient, pharmacy } = prescriptionresponse;
+            var orderPrice = yield (0, price_1.readoneprice)({ servicetype: prescription, servicecategory: config_1.default.category[1], pharmacy });
+            if (!orderPrice) {
+                throw new Error(`${config_1.default.error.errornopriceset} ${prescription}`);
+            }
+            var amount = patient.isHMOCover == config_1.default.ishmo[1] ? Number(orderPrice.amount) * config_1.default.hmodrugpayment * qty : Number(orderPrice.amount) * qty;
+            let paymentreference;
+            //validate the status
+            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+            if (findAdmission) {
+                paymentreference = findAdmission.admissionid;
+            }
+            else {
+                paymentreference = orderid;
+            }
+            if (option == true) {
+                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+                queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
+                yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
+            }
+            else {
+                queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[13], remark });
+            }
+        }
+        res.status(200).json({ queryresult, status: true });
+    }
+    catch (e) {
+        console.log("error", e);
+        res.status(403).json({ status: false, msg: e.message });
+    }
+});
+exports.confirmpharmacygrouporder = confirmpharmacygrouporder;
 const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //extract option

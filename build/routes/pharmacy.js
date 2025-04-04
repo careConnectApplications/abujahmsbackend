@@ -22,9 +22,12 @@ router.put('/confirmpharmacyorder/:id', pharmacy_1.confirmpharmacyorder);
 //confirmpharmacyorder
 router.get('/readallpharmacytransaction', pharmacy_1.readallpharmacytransaction);
 router.put('/dispense/:id', pharmacy_1.dispense);
-//readallpharmacytransactionbypartient
 router.get('/readallpharmacytransactionbypartient/:patient', pharmacy_1.readallpharmacytransactionbypartient);
-//get 
 router.get('/getpriceofdrug/:id', pharmacy_1.getpriceofdrug);
+//pharmacy grouping 
+router.get('/groupreadallpharmacytransaction', pharmacy_1.groupreadallpharmacytransaction);
+router.get('/readpharmacybyorderid/:orderid', pharmacy_1.readpharmacybyorderid);
+//confirmpharmacygrouporder
+router.put('/confirmpharmacygrouporder', pharmacy_1.confirmpharmacygrouporder);
 //updateusers
 exports.default = router;
