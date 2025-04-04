@@ -4,7 +4,7 @@ import configuration from "../../config";
 import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
-import { createprescription,readallprescription,readoneprescription,updateprescription } from "../../dao/prescription";
+import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate } from "../../dao/prescription";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
 import {readoneadmission} from  "../../dao/admissions";
 
@@ -109,6 +109,129 @@ dosageform:String,
   
   }
 
+
+  export async function readpharmacybyorderid(req: any, res: any) {
+    //
+    try {
+      const { orderid } = req.params;
+      console.log(orderid);
+      //validate ticket id
+      validateinputfaulsyvalue({
+        orderid,
+     
+      });
+        
+      
+      const queryresult = await readallprescription({orderid},{},'patient','appointment','payment');
+      res.json({
+        queryresult,
+        status: true,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+    }
+  }
+
+  export async function groupreadallpharmacytransaction(req: any, res: any) {
+    try {
+      const { clinic} = (req.user).user;
+      const query ={pharmacy:clinic};
+      const ordergroup = [
+       //look up patient
+       {
+        $match:query
+      },
+
+       {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "appointment",
+          foreignField: "_id",
+          as: "appointment",
+        },
+      },
+      {
+        $unwind: {
+          path: "$appointment",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+        {
+          $group: {
+            _id: "$orderid",
+            orderid: {$first: "$orderid"},
+            createdAt: { $first: "$createdAt" },
+            updatedAt: { $first: "$updatedAt" },
+            prescribersname: { $first: "$prescribersname" },
+            firstName:{$first: "$patient.firstName"},
+            lastName:{$first: "$patient.lastName"},
+            MRN:{$first: "$patient.MRN"},
+            isHMOCover:{$first: "$patient.isHMOCover"},
+            HMOName:{$first: "$patient.HMOName"},
+            HMOId:{$first: "$patient.HMOId"},
+            HMOPlan:{$first: "$patient.HMOPlan"},
+            appointmentdate:{$first: "$appointment.appointmentdate"},
+            clinic:{$first: "$appointment.clinic"},
+            appointmentid:{$first: "$appointmentid"}   
+          },
+        },
+        {
+          $project:{
+            _id:0,
+            orderid: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            prescribersname: 1,
+            firstName:1,
+            lastName:1,
+            MRN:1,
+            isHMOCover:1,
+            HMOName:1,
+            HMOId:1,
+            HMOPlan:1,
+            appointmentdate:1,
+            clinic:1,
+            appointmentid:1   
+          }
+        },
+        
+        { $sort: { createdAt: -1 } },
+        
+        
+      ];
+  
+      const queryresult = await readprescriptionaggregate(ordergroup);
+      res.json({
+        queryresult,
+        status: true,
+      });
+  
+      
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+    }
+  }
+
   //get all pharmacy orderf
   export const readallpharmacytransaction = async (req:any, res:any) => {
       try {
@@ -137,6 +260,60 @@ dosageform:String,
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+//confirm group
+export const confirmpharmacygrouporder = async (req:any, res:any) =>{
+  try{
+    //extract option
+    var {pharmacyrequest} = req.body;
+    let queryresult;
+    for(let i=0; pharmacyrequest.length > i; i++){
+      let {option,remark,qty,id} = pharmacyrequest[i];
+      if(option == true){
+        validateinputfaulsyvalue({qty});
+        }
+        var prescriptionresponse:any = await readoneprescription({_id:new ObjectId(id)},{},'patient','','');
+        const {prescription, orderid,patient,pharmacy} = prescriptionresponse;
+        var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});
+        
+        if(!orderPrice){
+          throw new Error(`${configuration.error.errornopriceset} ${prescription}`);
+      }
+      var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+      let paymentreference; 
+      //validate the status
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+        if(findAdmission){
+          paymentreference = findAdmission.admissionid;
+      
+      }
+      else{
+        paymentreference = orderid;
+      }
+      if(option == true){
+        var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+      queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+        await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+        
+      }
+      else{
+        queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
+    
+      }
+      
+
+    }
+    
+  res.status(200).json({queryresult, status: true});
+  }
+  catch(e:any){
+    console.log("error", e);
+    res.status(403).json({ status: false, msg: e.message });
+
+  }
+    
+}
+
 
 export const confirmpharmacyorder = async (req:any, res:any) =>{
   try{

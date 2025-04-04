@@ -13,6 +13,8 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
+
+  
   export async function createprescription(input:any){
     try{
        const prescription = new Prescription(input);
