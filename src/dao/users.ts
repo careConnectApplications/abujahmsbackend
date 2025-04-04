@@ -4,6 +4,18 @@ import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 import { AnyArray } from "mongoose";
 
+
+export async function countuser(query:any) {
+  try {
+    
+    return await User.countDocuments(query);
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+
   //read all payment history
   export async function readall(query:any) {
     try {

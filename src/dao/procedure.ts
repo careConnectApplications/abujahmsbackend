@@ -1,6 +1,17 @@
 import Procedure from "../models/procedure";
 import configuration from "../config";
 
+export async function countprocedure(query:any) {
+  try {
+    
+    return await Procedure.countDocuments(query);
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+
   //read all lab history
   export async function readallprocedure(query:any,selectquery:any,populatequery:any,populatesecondquery:any) {
     try {

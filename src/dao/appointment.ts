@@ -6,7 +6,7 @@ import configuration from "../config";
 export async function countappointment(query:any) {
   try {
     
-    return await Appointment.find(query).countDocuments();
+    return await Appointment.countDocuments(query);
    
   } catch (err) {
     console.log(err);

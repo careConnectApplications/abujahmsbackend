@@ -3,6 +3,19 @@ import {patientinterface} from '../models/patientmanagement'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 
+
+export async function countpatient(query:any) {
+  try {
+    return await Patient.countDocuments(query);
+    
+    //return await Appointment.find(query).countDocuments();
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+
 //delete patient
 export async function deletePatietsByCondition(query:any) {
   try {

@@ -1,6 +1,17 @@
 import Radiology from "../models/radiology";
 import configuration from "../config";
 
+export async function countradiology(query:any) {
+    try {
+      
+      return await Radiology.countDocuments(query);
+     
+    } catch (err) {
+      console.log(err);
+      throw new Error(configuration.error.erroruserread);
+    }
+  };
+
   //read all lab history
   export async function readallradiology(query:any,selectquery:any,populatequery:any,populatesecondquery:any) {
     try {

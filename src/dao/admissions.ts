@@ -3,6 +3,17 @@ import Admission from "../models/admission";
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 
+
+export async function countadmission(query:any) {
+  try {
+    
+    return await Admission.countDocuments(query);
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
   //read all patient history
   export async function readalladmission(query:any,selectquery:any,populatequery:any,populatesecondquery:any) {
     try {
