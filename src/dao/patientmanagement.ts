@@ -37,6 +37,20 @@ export async function deletePatietsByCondition(query:any) {
       throw new Error(configuration.error.erroruserread);
     }
   };
+  //read all patient history
+  export async function readallpatientpaginated(query:any,selectquery:any,populatequery:any,populateappointmentquery:any,page:any,size:any ) {
+    try {
+      const skip = (page - 1) * size;
+      const patientdetails = await Patient.find(query).select(selectquery).skip(skip)
+      .limit(size).populate(populatequery).populate(populateappointmentquery).sort({ createdAt: -1 });
+      const totalpatientdetails = await Patient.find(query).countDocuments();
+      const totalPages = Math.ceil(totalpatientdetails / size);
+      return { patientdetails, totalPages,totalpatientdetails, size, page};
+    } catch (err) {
+      console.log(err);
+      throw new Error(configuration.error.erroruserread);
+    }
+  };
   export async function createpatient(input:patientinterface){
     try{
        const user = new Patient(input);

@@ -2,7 +2,7 @@ import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import * as path from 'path';
-import  {readallpatient,createpatient,updatepatient,readonepatient,updatepatientmanybyquery,createpatientifnotexit}  from "../../dao/patientmanagement";
+import  {readallpatient,createpatient,updatepatient,readonepatient,updatepatientmanybyquery,createpatientifnotexit,readallpatientpaginated}  from "../../dao/patientmanagement";
 import {readoneprice} from "../../dao/price";
 import {createpayment} from "../../dao/payment";
 import {createvitalcharts} from "../../dao/vitalcharts";
@@ -219,8 +219,12 @@ export var createpatients = async (req:any,res:any) =>{
     }
 }
 //read all patients
-export async function getallpatients(req:Request, res:any){
+export async function getallpatients(req:any, res:any){
     try{
+      //apply pagination
+      const page = parseInt(req.query.page) || 1;
+      const size = parseInt(req.query.size) || 150;
+
       //var settings = await configuration.settings();
         var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
             "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
@@ -236,7 +240,7 @@ export async function getallpatients(req:Request, res:any){
             },
           };
           var populateappointmentquery="appointment";
-        const queryresult = await readallpatient({},selectquery,populatequery,populateappointmentquery);
+        const queryresult = await readallpatientpaginated({},selectquery,populatequery,populateappointmentquery,page,size);
         res.status(200).json({
             queryresult,
             status:true
