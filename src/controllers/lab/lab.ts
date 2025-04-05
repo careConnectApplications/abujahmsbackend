@@ -271,6 +271,8 @@ export const confirmlaborder = async (req:any, res:any) =>{
     //extract option
     const {option,remark} = req.body;
     const {id} = req.params;
+    console.log('////confirmbodyrequest body////',req.body);
+    console.log('////confirmbodyrequest params////',id);
   //search for the lab request
   var lab:any =await readonelab({_id:id},{},'patient');
   console.log('lab', lab);

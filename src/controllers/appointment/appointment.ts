@@ -422,6 +422,8 @@ export var laborder= async (req:any, res:any) =>{
     
     //accept _id from request.
     const {id} = req.params;
+    console.log('////lab order request body////',req.body);
+    console.log('////lab order request params////',id);
     const {testname,appointmentunderscoreid} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
