@@ -121,53 +121,7 @@ sevenDaysAgo.setDate(currentDate.getDate() - 7);  // Subtract 7 days
     totalnumberfactiveusers,
     status:true
   }); 
-   /*
-const datax = [
-    {
-      name: 'MON',
-      outPatient: 4000,
-      inPatient: 2400,
-      
-    },
-    {
-      name: 'TUE',
-      outPatient: 3000,
-      inPatient: 1398,
-      
-    },
-    {
-      name: 'WED',
-      outPatient: 2000,
-      inPatient: 9800,
-      
-    },
-    {
-      name: 'THR',
-      outPatient: 2780,
-      inPatient: 3908,
-      
-    },
-    {
-      name: 'FRI',
-      outPatient: 1890,
-      inPatient: 4800,
-      
-    },
-    {
-      name: 'SAT',
-      outPatient: 2390,
-      inPatient: 3800,
-      
-    },
-    {
-      name: 'SUN',
-      outPatient: 3490,
-      inPatient: 4300,
-     
-    },
-  ];
-   */
-
+ 
   }
   catch(e:any){
     res.status(403).json({status: false, msg:e.message});

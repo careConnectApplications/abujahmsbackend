@@ -7,5 +7,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dashboard_1 = require("../controllers/dashboard/dashboard");
 const router = express_1.default.Router();
-router.get('/', dashboard_1.dashboard);
+router.get('/', dashboard_1.newdashboard);
 exports.default = router;

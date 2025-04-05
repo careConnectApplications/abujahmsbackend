@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countradiology = countradiology;
 exports.readallradiology = readallradiology;
 exports.createradiology = createradiology;
 exports.readoneradiology = readoneradiology;
@@ -20,6 +21,18 @@ exports.updateradiologybyquery = updateradiologybyquery;
 exports.readradiologyaggregate = readradiologyaggregate;
 const radiology_1 = __importDefault(require("../models/radiology"));
 const config_1 = __importDefault(require("../config"));
+function countradiology(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield radiology_1.default.countDocuments(query);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 //read all lab history
 function readallradiology(query, selectquery, populatequery, populatesecondquery) {
     return __awaiter(this, void 0, void 0, function* () {

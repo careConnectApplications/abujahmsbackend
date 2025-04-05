@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countadmission = countadmission;
 exports.readalladmission = readalladmission;
 exports.createadmission = createadmission;
 exports.readoneadmission = readoneadmission;
@@ -19,6 +20,18 @@ exports.updateadmission = updateadmission;
 exports.updateadmissionbyquery = updateadmissionbyquery;
 const admission_1 = __importDefault(require("../models/admission"));
 const config_1 = __importDefault(require("../config"));
+function countadmission(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield admission_1.default.countDocuments(query);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 //read all patient history
 function readalladmission(query, selectquery, populatequery, populatesecondquery) {
     return __awaiter(this, void 0, void 0, function* () {

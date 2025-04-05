@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countpatient = countpatient;
 exports.deletePatietsByCondition = deletePatietsByCondition;
 exports.readallpatient = readallpatient;
 exports.createpatient = createpatient;
@@ -23,6 +24,19 @@ exports.createpatientifnotexit = createpatientifnotexit;
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const otherservices_1 = require("../utils/otherservices");
 const config_1 = __importDefault(require("../config"));
+function countpatient(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield patientmanagement_1.default.countDocuments(query);
+            //return await Appointment.find(query).countDocuments();
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 //delete patient
 function deletePatietsByCondition(query) {
     return __awaiter(this, void 0, void 0, function* () {

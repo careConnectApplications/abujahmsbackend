@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countuser = countuser;
 exports.readall = readall;
 exports.createuser = createuser;
 exports.readone = readone;
@@ -20,6 +21,18 @@ exports.createmanyuser = createmanyuser;
 const users_1 = __importDefault(require("../models/users"));
 const otherservices_1 = require("../utils/otherservices");
 const config_1 = __importDefault(require("../config"));
+function countuser(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield users_1.default.countDocuments(query);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 //read all payment history
 function readall(query) {
     return __awaiter(this, void 0, void 0, function* () {

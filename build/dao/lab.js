@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.countlab = countlab;
 exports.readalllablimitfive = readalllablimitfive;
 exports.readalllab = readalllab;
 exports.createlab = createlab;
@@ -23,6 +24,18 @@ const lab_1 = __importDefault(require("../models/lab"));
 const config_1 = __importDefault(require("../config"));
 //read all lab history
 //sort({createdAt: -1}).limit(5)
+function countlab(query) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield lab_1.default.countDocuments(query);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
 function readalllablimitfive(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

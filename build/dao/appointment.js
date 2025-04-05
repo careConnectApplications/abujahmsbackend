@@ -25,7 +25,7 @@ const config_1 = __importDefault(require("../config"));
 function countappointment(query) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield appointment_1.default.find(query).countDocuments();
+            return yield appointment_1.default.countDocuments(query);
         }
         catch (err) {
             console.log(err);
