@@ -224,6 +224,24 @@ export async function getallpatients(req:any, res:any){
       //apply pagination
       const page = parseInt(req.query.page) || 1;
       const size = parseInt(req.query.size) || 150;
+      const filter:any = {};
+      
+    // Add filters based on query parameters
+    if (req.query.firstName) {
+      //console.log(req.query.firstName)
+      filter.firstName = new RegExp(req.query.firstName, 'i'); // Case-insensitive search for name
+    }
+    if (req.query.MRN) {
+    
+      filter.MRN = new RegExp(req.query.MRN, 'i');
+    }
+    if (req.query.HMOId) {
+      filter.HMOId = new RegExp(req.query.HMOId, 'i'); // Case-insensitive search for email
+    }
+    if (req.query.lastName) {
+      filter.lastName = new RegExp(req.query.lastName, 'i'); // Case-insensitive search for email
+    }
+  
 
       //var settings = await configuration.settings();
         var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
@@ -240,7 +258,7 @@ export async function getallpatients(req:any, res:any){
             },
           };
           var populateappointmentquery="appointment";
-        const queryresult = await readallpatientpaginated({},selectquery,populatequery,populateappointmentquery,page,size);
+        const queryresult = await readallpatientpaginated(filter,selectquery,populatequery,populateappointmentquery,page,size);
         res.status(200).json({
             queryresult,
             status:true
