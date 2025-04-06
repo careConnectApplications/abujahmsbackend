@@ -49,7 +49,7 @@ export var createprices = async (req:any,res:any) =>{
 export async function getallprices(req:Request, res:any){
     try{
        
-        const queryresult = await readallprices({});
+        const queryresult = await readallprices({},{});
         res.status(200).json({
             queryresult,
             status:true
@@ -105,9 +105,9 @@ export async function updateprices(req:any, res:any){
 export async function searchtest(req:any, res:any){
   try{
     const {searchparams} = req.params;
-    const queryresult = await readallprices({servicecategory:configuration.category[2],servicetype: { $regex:searchparams , $options: 'i' }});
+    const queryresult = await readallprices({servicecategory:configuration.category[2],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
     res.status(200).json({
-        queryresult,
+        queryresult:queryresult.pricedetails,
         status:true
       }); 
 
