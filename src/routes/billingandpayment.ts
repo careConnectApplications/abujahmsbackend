@@ -8,7 +8,7 @@ router.get('/getpatientbillinghistory/:id',readbillinghistoryforapatient);
 router.get('/printreceipt/:paymentreference',printreceipt);
 router.get('/getallpatientbillinghistory',readbillinghistoryforallapatient);
 router.put('/confirmpayment/:id',confirmpayment);
-router.get('/groupreadallpayment',groupreadallpayment);
+router.get('/groupreadallpayment/:status?',groupreadallpayment);
 router.get('/readpaymentbyreferencenumber/:paymentreference',readpaymentbyreferencenumber);
 router.put('/confirmgrouppayment/:paymentreferenceid',confirmgrouppayment);
 

@@ -143,8 +143,25 @@ export async function readpaymentbyreferencenumber(req: any, res: any) {
 export async function groupreadallpayment(req: any, res: any) {
   try {
     //const { paymentreference } = req.params;
+    var {status} = req.params;
+    var filter:any = {};
+  
+    if(status == "paid"){
+      filter.status=configuration.status[3]
+
+    }
+    else{
+      filter.status=configuration.status[2];
+
+    } 
+    
+
     const referencegroup = [
      //look up patient
+     //add query
+     {
+      $match:filter
+     },
      {
       $lookup: {
         from: "patientsmanagements",
