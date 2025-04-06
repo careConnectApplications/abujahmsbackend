@@ -102,3 +102,19 @@ export async function updateprices(req:any, res:any){
 
 }
 
+export async function searchtest(req:any, res:any){
+  try{
+    const {searchparams} = req.params;
+    const queryresult = await readallprices({servicecategory:configuration.category[2],servicetype: { $regex:searchparams , $options: 'i' }});
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+
+}
+catch(e:any){
+    res.status(403).json({status: false, msg:e.message});
+
+}
+  
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import {createprices,getallprices,updateprices,updatepricestatus} from '../controllers/setting/pricesetting';
+import {createprices,getallprices,updateprices,updatepricestatus,searchtest} from '../controllers/setting/pricesetting';
 import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
@@ -12,6 +12,8 @@ const router = express.Router();
 
 router.post('/createprices',createprices);
 router.get('/getallprices',getallprices);
+router.get('/searchtest/:searchparams',searchtest);
+
 
 router.post('/createclinics',createclinics);
 router.get('/getallclinic',getallclinic);

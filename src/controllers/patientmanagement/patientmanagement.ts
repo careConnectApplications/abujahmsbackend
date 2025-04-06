@@ -13,7 +13,7 @@ import { AnyObject } from "mongoose";
 //get hmo patient 
 //read all patients
 //search patients 
-export async function searchpartient(req:AnyObject, res:any){
+export async function searchpartient(req:any, res:any){
   try{
       //var settings = await configuration.settings();
     var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
