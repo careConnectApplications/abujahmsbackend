@@ -79,7 +79,7 @@ export async function bulkuploadinventory(req:any, res:any){
 export async function getallpharmacystock(req:any, res:any){
   try{
       //const { clinic} = (req.user).user;
-      const queryresult = await readallprices({servicecategory:configuration.category[1]});
+      const queryresult = await readallprices({servicecategory:configuration.category[1]},{});
       res.status(200).json({
           queryresult,
           status:true
@@ -95,7 +95,7 @@ export async function getallpharmacystock(req:any, res:any){
 export async function getallpharmacystockbyphamarcy(req:any, res:any){
   try{
       const { clinic} = req.params;
-      const queryresult = await readallprices({servicecategory:configuration.category[1], pharmacy:clinic});
+      const queryresult = await readallprices({servicecategory:configuration.category[1], pharmacy:clinic},{});
       res.status(200).json({
           queryresult,
           status:true

@@ -62,7 +62,7 @@ export async function getallhmopatients(req:Request, res:any){
     const filename= configuration.hmouploadfilename;
     let allowedextension = ['.csv','.xlsx'];
     let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
-    //achieve document
+    //acieve document
     await updatepatientmanybyquery({HMOName},{status:configuration.status[15]});
     //await createpatientachieve(patientdetails);
     //delete patient management

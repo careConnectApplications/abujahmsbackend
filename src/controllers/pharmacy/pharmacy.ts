@@ -394,7 +394,7 @@ else{
     //search product in inventory
     var response:any = await readoneprescription({_id:id},{},'patient','','');
 
-    const {dispensestatus,patient} = response;
+    const {dispensestatus,patient,pharmacy} = response;
     //check product status
     if(dispensestatus !== configuration.status[10]){
       throw new Error(`Dispense ${configuration.error.errortasknotpending}`);
@@ -408,10 +408,9 @@ else{
     if(paymentrecord.status !== configuration.status[3]){
       throw new Error(configuration.error.errorpayment);
 
-    }
-  }
+    }  }
    // console.log(testname[i]);
-  var orderPrice:any = await readoneprice({servicetype:response.prescription, servicecategory: configuration.category[1]});  
+  var orderPrice:any = await readoneprice({servicetype:response.prescription, servicecategory: configuration.category[1],pharmacy});  
   console.log('orderprice', orderPrice);
   if(!orderPrice){
       throw new Error(configuration.error.errornopriceset);
