@@ -127,7 +127,7 @@ export async function getallhmopatients(req:Request, res:any){
               */
           var uniqunumber =await storeUniqueNumber(4);
            // chaorten the MRN to alphanumeric 
-           hmo[i].MRN=`${firstName[0]}${uniqunumber}${lastName[0]}`;    
+           hmo[i].MRN=uniqunumber;    
            hmo[i].status=configuration.status[1];    
            hmo[i].password=configuration.defaultPassword;
        
@@ -197,8 +197,9 @@ export var createpatients = async (req:any,res:any) =>{
 
       }
       var uniqunumber =await storeUniqueNumber(4);
+      console.log(uniqunumber);
        // chaorten the MRN to alphanumeric 
-        req.body.MRN=`${firstName[0]}${uniqunumber}${lastName[0]}`;        
+        req.body.MRN=uniqunumber;        
         req.body.password=configuration.defaultPassword;
         //other validations
         var payment=[];
