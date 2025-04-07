@@ -20,10 +20,10 @@ exports.updateprice = updateprice;
 const pricefornewregandappointment_1 = __importDefault(require("../models/pricefornewregandappointment"));
 const config_1 = __importDefault(require("../config"));
 //read all payment history
-function readallprices(query) {
+function readallprices(query, selectquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const pricedetails = yield pricefornewregandappointment_1.default.find(query).sort({ createdAt: -1 });
+            const pricedetails = yield pricefornewregandappointment_1.default.find(query).select(selectquery).sort({ createdAt: -1 });
             const totalpricedetails = yield pricefornewregandappointment_1.default.find(query).countDocuments();
             return { pricedetails, totalpricedetails };
         }

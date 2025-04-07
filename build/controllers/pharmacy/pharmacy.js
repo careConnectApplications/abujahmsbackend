@@ -361,7 +361,7 @@ const dispense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //dispense
         //search product in inventory
         var response = yield (0, prescription_1.readoneprescription)({ _id: id }, {}, 'patient', '', '');
-        const { dispensestatus, patient } = response;
+        const { dispensestatus, patient, pharmacy } = response;
         //check product status
         if (dispensestatus !== config_1.default.status[10]) {
             throw new Error(`Dispense ${config_1.default.error.errortasknotpending}`);
@@ -376,7 +376,7 @@ const dispense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         // console.log(testname[i]);
-        var orderPrice = yield (0, price_1.readoneprice)({ servicetype: response.prescription, servicecategory: config_1.default.category[1] });
+        var orderPrice = yield (0, price_1.readoneprice)({ servicetype: response.prescription, servicecategory: config_1.default.category[1], pharmacy });
         console.log('orderprice', orderPrice);
         if (!orderPrice) {
             throw new Error(config_1.default.error.errornopriceset);

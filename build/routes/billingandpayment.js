@@ -10,7 +10,7 @@ router.get('/getpatientbillinghistory/:id', paymentandbilling_1.readbillinghisto
 router.get('/printreceipt/:paymentreference', paymentandbilling_1.printreceipt);
 router.get('/getallpatientbillinghistory', paymentandbilling_1.readbillinghistoryforallapatient);
 router.put('/confirmpayment/:id', paymentandbilling_1.confirmpayment);
-router.get('/groupreadallpayment', paymentandbilling_1.groupreadallpayment);
+router.get('/groupreadallpayment/:status?', paymentandbilling_1.groupreadallpayment);
 router.get('/readpaymentbyreferencenumber/:paymentreference', paymentandbilling_1.readpaymentbyreferencenumber);
 router.put('/confirmgrouppayment/:paymentreferenceid', paymentandbilling_1.confirmgrouppayment);
 exports.default = router;

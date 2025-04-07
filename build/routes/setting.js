@@ -15,6 +15,7 @@ const hmomanagement_1 = require("../controllers/setting/hmomanagement");
 const router = express_1.default.Router();
 router.post('/createprices', pricesetting_1.createprices);
 router.get('/getallprices', pricesetting_1.getallprices);
+router.get('/searchtest/:searchparams', pricesetting_1.searchtest);
 router.post('/createclinics', clinics_1.createclinics);
 router.get('/getallclinic', clinics_1.getallclinic);
 router.get('/getonlyclinic', clinics_1.getonlyclinic);

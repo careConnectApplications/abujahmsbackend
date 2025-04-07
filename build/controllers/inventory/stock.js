@@ -83,7 +83,7 @@ function getallpharmacystock(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //const { clinic} = (req.user).user;
-            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1] });
+            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1] }, {});
             res.status(200).json({
                 queryresult,
                 status: true
@@ -98,7 +98,7 @@ function getallpharmacystockbyphamarcy(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { clinic } = req.params;
-            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1], pharmacy: clinic });
+            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[1], pharmacy: clinic }, {});
             res.status(200).json({
                 queryresult,
                 status: true

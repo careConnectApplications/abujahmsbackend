@@ -254,6 +254,8 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
         //extract option
         const { option, remark } = req.body;
         const { id } = req.params;
+        console.log('////confirmbodyrequest body////', req.body);
+        console.log('////confirmbodyrequest params////', id);
         //search for the lab request
         var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, 'patient');
         console.log('lab', lab);

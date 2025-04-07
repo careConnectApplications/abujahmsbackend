@@ -150,8 +150,20 @@ function groupreadallpayment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //const { paymentreference } = req.params;
+            var { status } = req.params;
+            var filter = {};
+            if (status == "paid") {
+                filter.status = config_1.default.status[3];
+            }
+            else {
+                filter.status = config_1.default.status[2];
+            }
             const referencegroup = [
                 //look up patient
+                //add query
+                {
+                    $match: filter
+                },
                 {
                     $lookup: {
                         from: "patientsmanagements",

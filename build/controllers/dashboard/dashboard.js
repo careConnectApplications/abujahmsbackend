@@ -108,8 +108,8 @@ function newdashboard(req, res) {
             for (let i = 0; i < 7; i++) {
                 datax.push({
                     name: dayNames[i],
-                    outPatient: ((_a = (appointmentresults.filter(result => result.dayOfWeek == i + 1))[0]) === null || _a === void 0 ? void 0 : _a.count) || 0,
-                    inPatient: ((_b = (admissionresult.filter(result => result.dayOfWeek == i + 1))[0]) === null || _b === void 0 ? void 0 : _b.count) || 0
+                    OutPatients: ((_a = (appointmentresults.filter(result => result.dayOfWeek == i + 1))[0]) === null || _a === void 0 ? void 0 : _a.count) || 0,
+                    InPatients: ((_b = (admissionresult.filter(result => result.dayOfWeek == i + 1))[0]) === null || _b === void 0 ? void 0 : _b.count) || 0
                 });
             }
             res.status(200).json({

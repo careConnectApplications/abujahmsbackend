@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.countpatient = countpatient;
 exports.deletePatietsByCondition = deletePatietsByCondition;
 exports.readallpatient = readallpatient;
+exports.readallpatientpaginated = readallpatientpaginated;
 exports.createpatient = createpatient;
 exports.readonepatient = readonepatient;
 exports.updatepatient = updatepatient;
@@ -56,6 +57,24 @@ function readallpatient(query, selectquery, populatequery, populateappointmentqu
             const patientdetails = yield patientmanagement_1.default.find(query).select(selectquery).populate(populatequery).populate(populateappointmentquery).sort({ createdAt: -1 });
             const totalpatientdetails = yield patientmanagement_1.default.find(query).countDocuments();
             return { patientdetails, totalpatientdetails };
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+;
+//read all patient history
+function readallpatientpaginated(query, selectquery, populatequery, populateappointmentquery, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            const patientdetails = yield patientmanagement_1.default.find(query).select(selectquery).skip(skip)
+                .limit(size).populate(populatequery).populate(populateappointmentquery).sort({ createdAt: -1 });
+            const totalpatientdetails = yield patientmanagement_1.default.find(query).countDocuments();
+            const totalPages = Math.ceil(totalpatientdetails / size);
+            return { patientdetails, totalPages, totalpatientdetails, size, page };
         }
         catch (err) {
             console.log(err);

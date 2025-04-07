@@ -45,7 +45,7 @@ const configuration = {
     medicationchartfrequency: ["Start", "Daily", "BD", "TDS", "QDS", "PRM", "NOCTE", "4 Hours", "8 Hours", "12 Hours"],
     medicationchartroute: ["oral", "caudal block", "continuous epidural", "continuous intra-arterial infusion", "continuous IV infusion", "continuous nebulization", "continuous subcutaneous infusion", "continuous intrathecal infusion", "cervical", "dental", "epidural", "otic (ear)", "endotracheal", "feeding tube", "G-tube",
         "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
-    defaultphonenumber: "00000000000",
+    defaultphonenumber: "11111111111",
     status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
     admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
     clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
@@ -101,7 +101,7 @@ const configuration = {
                 medicationchartfrequency: ["Start", "Daily", "BD", "TDS", "QDS", "PRM", "NOCTE", "4 Hours", "8 Hours", "12 Hours"],
                 medicationchartroute: ["oral", "caudal block", "continuous epidural", "continuous intra-arterial infusion", "continuous IV infusion", "continuous nebulization", "continuous subcutaneous infusion", "continuous intrathecal infusion", "cervical", "dental", "epidural", "otic (ear)", "endotracheal", "feeding tube", "G-tube",
                     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
-                clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
+                clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure", "lab"],
                 presentingcompalintcode: [
                     "518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",
                     "543378014 Anosmia",

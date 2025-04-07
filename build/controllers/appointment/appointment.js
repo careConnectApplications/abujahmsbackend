@@ -427,6 +427,8 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //accept _id from request.
         const { id } = req.params;
+        console.log('////lab order request body////', req.body);
+        console.log('////lab order request params////', id);
         const { testname, appointmentunderscoreid } = req.body;
         var testid = String(Date.now());
         var testsid = [];

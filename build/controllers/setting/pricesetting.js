@@ -16,6 +16,7 @@ exports.createprices = void 0;
 exports.getallprices = getallprices;
 exports.updateprices = updateprices;
 exports.updatepricestatus = updatepricestatus;
+exports.searchtest = searchtest;
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
@@ -58,7 +59,7 @@ exports.createprices = createprices;
 function getallprices(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const queryresult = yield (0, price_1.readallprices)({});
+            const queryresult = yield (0, price_1.readallprices)({}, {});
             res.status(200).json({
                 queryresult,
                 status: true
@@ -101,6 +102,21 @@ function updatepricestatus(req, res) {
         }
         catch (e) {
             console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+function searchtest(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { searchparams } = req.params;
+            const queryresult = yield (0, price_1.readallprices)({ servicecategory: config_1.default.category[2], servicetype: { $regex: searchparams, $options: 'i' } }, { servicetype: 1, _id: 0 });
+            res.status(200).json({
+                queryresult: queryresult.pricedetails,
+                status: true
+            });
+        }
+        catch (e) {
             res.status(403).json({ status: false, msg: e.message });
         }
     });
