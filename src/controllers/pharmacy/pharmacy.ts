@@ -63,7 +63,7 @@ dosageform:String,
     
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
-        let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote} = products[i];
+        let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote,duration} = products[i];
     //    console.log(testname[i]);
         //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
         /*
@@ -84,7 +84,7 @@ dosageform:String,
       //create 
      // console.log("got here");
       //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
-      var prescriptionrecord:any = await createprescription({pharmacy,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+      var prescriptionrecord:any = await createprescription({pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
       pharcyorderid.push(prescriptionrecord ._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
