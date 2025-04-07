@@ -103,8 +103,8 @@ sevenDaysAgo.setDate(currentDate.getDate() - 7);  // Subtract 7 days
   for(let i=0; i < 7;i++){
     datax.push({
       name:dayNames[i],
-      outPatient:(appointmentresults.filter(result=> result.dayOfWeek == i + 1))[0]?.count || 0,
-      inPatient: (admissionresult.filter(result=> result.dayOfWeek == i + 1))[0]?.count || 0
+      OutPatients:(appointmentresults.filter(result=> result.dayOfWeek == i + 1))[0]?.count || 0,
+      InPatients: (admissionresult.filter(result=> result.dayOfWeek == i + 1))[0]?.count || 0
     })
       
 
