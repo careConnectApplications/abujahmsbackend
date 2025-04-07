@@ -241,6 +241,13 @@ export async function getallpatients(req:any, res:any){
     if (req.query.lastName) {
       filter.lastName = new RegExp(req.query.lastName, 'i'); // Case-insensitive search for email
     }
+    if (req.query.phoneNumber) {
+      filter.phoneNumber = new RegExp(req.query.phoneNumber, 'i'); // Case-insensitive search for email
+    }
+    if (req.query.email) {
+      filter.email = new RegExp(req.query.email, 'i'); // Case-insensitive search for email
+    }
+   
   
 
       //var settings = await configuration.settings();

@@ -149,7 +149,7 @@ function generateRandomNumber(n) {
     const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
     // Take the first 7 characters (if needed, you can adjust this logic)
     const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
-    return uniqueString;
+    return uniqueString.toUpperCase();
 }
 function validateinputfaulsyvalue(input) {
     for (const key in input) {

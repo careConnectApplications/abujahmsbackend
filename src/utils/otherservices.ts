@@ -97,7 +97,7 @@ export function generateRandomNumber(n:number) {
       // Take the first 7 characters (if needed, you can adjust this logic)
       const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
   
-      return uniqueString;
+      return uniqueString.toUpperCase();
   }
   export function validateinputfaulsyvalue(input:any){
     for (const key in input) {
