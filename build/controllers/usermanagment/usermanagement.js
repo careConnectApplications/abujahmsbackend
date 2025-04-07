@@ -108,6 +108,13 @@ function updateusers(req, res) {
         try {
             //get id
             const { id } = req.params;
+            //map role to role id
+            const { role } = req.body;
+            //get role id
+            if (role) {
+                var roleId = (config_1.default.roles).filter((e) => e.role == role)[0].roleId;
+                req.body.roleId = roleId;
+            }
             var queryresult = yield (0, users_1.updateuser)(id, req.body);
             res.status(200).json({
                 queryresult,

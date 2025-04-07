@@ -45,6 +45,7 @@ const prescriptionSchema = new mongoose_1.Schema({
     dosageform: String,
     strength: String,
     dosage: String,
+    duration: String,
     frequency: String,
     route: String,
     qty: {
