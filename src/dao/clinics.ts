@@ -4,7 +4,7 @@ import configuration from "../config";
   //read all patient history
   export async function readallclinics(query:any,selectquery:any) {
     try {
-      const clinicdetails = await Clinic.find(query).select(selectquery);
+      const clinicdetails = await Clinic.find(query).select(selectquery).sort({ createdAt: -1 });
       const totalclinicdetails = await Clinic.find(query).countDocuments();
       return { clinicdetails, totalclinicdetails };
     } catch (err) {

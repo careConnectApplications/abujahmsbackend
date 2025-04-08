@@ -3,9 +3,30 @@ import {labinterface} from '../models/lab'
 import configuration from "../config";
 
   //read all lab history
+  //sort({createdAt: -1}).limit(5)
+  export async function countlab(query:any) {
+    try {
+      
+      return await Lab.countDocuments(query);
+     
+    } catch (err) {
+      console.log(err);
+      throw new Error(configuration.error.erroruserread);
+    }
+  };
+  
+  export async function readalllablimitfive(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
+    try {
+      return await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({createdAt: -1}).limit(5);
+      
+    } catch (err) {
+      console.log(err);
+      throw new Error(configuration.error.erroruserread);
+    }
+  };
   export async function readalllab(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
+      const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
       const totallabdetails = await Lab.find(query).countDocuments();
       return { labdetails, totallabdetails };
     } catch (err) {

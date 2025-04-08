@@ -116,7 +116,6 @@ export async function getpharmacyservicetype(req:Request, res:any){
 }
 
 
-
   
   
 /*

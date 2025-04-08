@@ -11,7 +11,210 @@ export interface appointinterface {
   appointmenttype:String
  
 }
-const physicalexaminationSchema = new Schema(({
+const history = new Schema({
+presentingcomplaints:String,
+presentingcompalintcode:[],
+pastmedicalhistory:String,
+drugandallergyhistory:String,
+familyandsocialhistory:String,
+nutritionhistory:String,
+spirituality:String,
+cvs:{
+cvsassessmentimpression:String,
+historyofcvsdisorder:String,
+historyofcvssurgicalprocedures:String,
+historycvsremark:String
+},
+resp:{
+historyofrespiratorydisorders:String,
+respremark:String
+
+},
+gi:{
+nausea:String,
+typeofdiet:String,
+giboweleliminationpattern:String,
+bmfrequency:String,
+bmusualtimeoftheday:String,
+bmregularity:String,
+usualconsistency:String,
+dateoflastbm:String,
+consistency:String,
+color:String,
+amount:String,
+appearance:String,
+historyofgidisorders:String,
+historyofsurgicalprocedureofgisystem:String
+
+},
+gu:{
+historyofgenitourinarydisorders:String,
+historyofsrgicalprocedureforgusyetm:String,
+numberstools:String,
+fluidoutputemesis:String,
+guboweleliminationpattern:String,
+consistencystool:String,
+historyguremark:String
+
+},
+neuro:{
+historyofneurologicdisorders:String,
+historyofsurgicalproceduresofnervoussystem:String,
+historyneuroremark:String
+},
+msk:{
+historyofmusculoskeletaldisorders:String,
+historyofsurgicalproceduresofmsksystem:String,
+historymskremarks:String,
+
+}
+});
+const paediatrics = new Schema({
+immunizationhistory:{
+immunization: String,
+hepb0:String,
+opv0:String,
+bcg:String,
+opv1:String,
+penta1:String,
+pcv1:String,
+rota1:String,
+opv2:String,
+pcv2:String,
+rota2:String,
+opv3:String,
+penta3:String,
+pcv3:String,
+rota3:String,
+ipv:String,
+vitamina1:String,
+vitamina2:String,
+measles:String,
+yellowfever:String,
+mena:String,
+measles2:String,
+hpv914:String,
+llin:String
+},
+  developmentmilestonehistorydetails:{
+agewhenrolledover:String,
+satupunsupported:String,
+crawled:String,
+walked:String,
+spokefirstword:String,
+spokeinsentences:String,
+totaltrianed:String,
+anyfoodallergies:String,
+anyfoodallergiesnote:String,
+contacttypesport:String,
+contacttypesportnote:String,
+historyofcaraccident:String,
+historyofcaraccidentnote:String,
+everbeenseenonemergency:String,
+everbeenseenonemergencynote:String,
+otherhistoryoftrauma:String,
+otherhistoryoftraumanote:String,
+historyoffrequentfalls:String,
+historyoffrequentfallsnote:String,
+anysignofmuscleweakness:String,
+anysignofmuscleweaknessnote:String,
+},
+prepostnatalhistory:{
+stressors:String,
+stressorsnote:String,
+pregnancymedication:String,
+pregnancymedicationnote:String,
+cigarettealcoholuse:String,
+cigarettealcoholusenote:String,
+delivery:String,
+deliverynote:String,
+deliverytype:String,
+deliverytypenote:String,
+emergencydelivery:String,
+emergencydeliverynote:String,
+labourinduction:String,
+labourinductionnote:String,
+birthhistorymedication:String,
+birthhistorymedicationnote:String,
+assisteddelivery:String,
+assisteddeliverynote:String,
+typeofassisteddelivery:String,
+typeofassisteddeliverynote:String,
+complicationsduringdelivery:String,
+complicationsduringdeliverynote:String,
+apgarscoreafteroneminute:String,
+apgarscoreafterfiveminutes:String,
+birthweight:String,
+birthlengthheight:String,
+useofoxygenafterbirth:String,
+feedingofthechild:String,
+feedingofthechildnote:String,
+difficultyinlatchingsucking:String,
+difficultyinlatchingsuckingnote:String
+  },
+  medicalhistory:{
+attentiondeficitdisorderhyperactivitydisorder:String,
+attentiondeficitdisorderhyperactivitydisordernote:String,
+constipation:String,
+constipationnote:String,
+fatigue:String,
+fatiguenote:String,
+
+orthopedicconditions: String,
+orthopedicconditionsnote:String,
+allergies:String,
+allergiesnote:String,
+diabetes:String,
+diabetesnote:String,
+headaches:String,
+headachesnote:String,
+scoliosis:String,
+scoliosisnote:String,
+asthma:String,
+asthmanote:String,
+
+digestiveproblems:String,
+digestiveproblemsnote:String,
+hearingdifficulties:String,
+hearingdifficultiesnote:String,
+seizures:String,
+seizuresnote:String,
+
+blooddisorder:String,
+blooddisordernote:String,
+depressionanxiety:String,
+depressionanxietynote:String,
+heartproblems:String,
+heartproblemsnote:String,
+
+sleepdisturbances:String,
+sleepdisturbancesnote:String,
+chroniccolds:String,
+chroniccoldsnote:String,
+dyslexia:String,
+dyslexianote:String,
+
+kidneydisorders:String,
+kidneydisordersnote:String,
+torticollis:String,
+torticollisnote:String,
+colic:String,
+colicnote:String,
+
+earinfections:String,
+earinfectionsnote:String,
+lymphdisorders:String,
+lymphdisordersnote:String,
+visiondifficulties:String,
+visiondifficultiesnote:String,
+
+autism:String,
+autismnote:String,
+sensoryprocessingchallenges:String,
+sensoryprocessingchallengesnote:String
+  }
+});
+const physicalexaminationSchema = new Schema({
   cvs:{
 heartrate:String,
 bpsystolic:String,
@@ -181,10 +384,14 @@ paralysistype:String,
 paresthesiatype:String,
 physiologicfinding:String,
 musculoskeletalassessmentimpression:String,
-mskremark:String
+mskremark:String,
+passiverangeflexionkneel:String,
+passiverangeextensionkneel:String,
+passiverangeflexionkneer:String,
+passiverangeextensionkneer:String
   }
 
-}))
+})
 const assessmentSchema = new Schema({
   assessment: String,
   assessmentnote: String,
@@ -320,9 +527,16 @@ const appointmentSchema = new Schema({
     type: Date, 
     required: true
   },
+  additionalnote:String,
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
+    default: null,
+  },
+  admission: 
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Admission",
     default: null,
   },
   doctor: {
@@ -333,14 +547,34 @@ const appointmentSchema = new Schema({
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
     encounter:{ 
       vitals: vitalsSchema,
       assessmentdiagnosis: assessmentSchema,
       generalphysicalexamination:generalphysicalexaminationSchema,
-      physicalexamination: physicalexaminationSchema
+      physicalexamination: physicalexaminationSchema,
+      paediatrics:paediatrics,
+      history:history
     },
+    clinicalencounter:{
+     
+      diagnosisnote:[],
+      diagnosisicd10: String,
+      assessmentnote:[],
+      clinicalnote:[],
+      plannote:[],
+      outcome: String
+
+    },
+    vitals: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Vitalchart",
+        default: [],
+      },
+    ],
+
     lab: [
       {
         type: Schema.Types.ObjectId,
@@ -348,7 +582,28 @@ const appointmentSchema = new Schema({
         default: [],
       },
     ],
-  
+    radiology: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Radiology",
+        default: [],
+      },
+    ],
+    procedure: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Procedure",
+        default: [],
+      },
+    ],
+    prescription:[
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Prescription",
+        default: [],
+      },
+    ],
+   
   appointmentcategory: {
     type: String,
     required: true
@@ -361,13 +616,28 @@ const appointmentSchema = new Schema({
     type: String,
     required: true
   },
+  policecase: Boolean,
+  physicalassault:Boolean,
+  sexualassault: Boolean,
+  policaename: String,
+  servicenumber: String,
+  policephonenumber: String,
+  division:String,
+  fromclinicalencounter:{
+    type: Boolean,
+    default: false,
+
+  },
   status:{
     required: true,
     type: String,
-    default: configuration.status[2],
+    default: configuration.status[5],
 
   }
-});
+},
+{ timestamps: true }
+
+);
 
 const appointment = model('Appointment', appointmentSchema);
 export default appointment;

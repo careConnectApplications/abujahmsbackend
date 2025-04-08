@@ -18,10 +18,13 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 //create schema
 const userSchema = new mongoose_1.Schema({
     title: {
+        type: String
+    },
+    staffId: {
         required: true,
         type: String,
     },
-    staffId: {
+    roleId: {
         required: true,
         type: String,
     },
@@ -30,7 +33,6 @@ const userSchema = new mongoose_1.Schema({
         type: String,
     },
     middleName: {
-        required: true,
         type: String,
     },
     lastName: {
@@ -38,40 +40,32 @@ const userSchema = new mongoose_1.Schema({
         type: String,
     },
     country: {
-        required: true,
-        type: String,
+        type: String
     },
     state: {
-        required: true,
-        type: String,
+        type: String
     },
     city: {
-        required: true,
-        type: String,
+        type: String
     },
     address: {
-        required: true,
-        type: String,
+        type: String
     },
     age: {
-        required: true,
-        type: String,
+        type: String
     },
     dateOfBirth: {
-        required: true,
-        type: String,
+        type: String
     },
     gender: {
         required: true,
         type: String,
     },
     licence: {
-        required: true,
-        type: String,
+        type: String
     },
     phoneNumber: {
-        required: true,
-        type: String,
+        type: String
     },
     email: {
         required: true,
@@ -82,45 +76,41 @@ const userSchema = new mongoose_1.Schema({
         type: String,
     },
     degree: {
-        required: true,
-        type: String,
+        type: String
     },
     profession: {
-        required: true,
-        type: String,
+        type: String
     },
     employmentStatus: {
-        required: true,
-        type: String,
+        type: String
     },
     nativeSpokenLanguage: {
-        required: true,
-        type: String,
+        type: String
     },
     otherLanguage: {
-        required: true,
-        type: String,
+        type: String
     },
     readWriteLanguage: {
+        type: String
+    },
+    clinic: {
         required: true,
         type: String,
     },
     zip: {
-        required: true,
-        type: String,
+        type: String
     },
     specializationDetails: {
-        required: true,
-        type: String,
+        type: String
     },
     password: {
-        required: true,
+        required: [true, "Password is required"],
         type: String,
     },
     status: {
         required: true,
         type: String,
-        default: config_1.default.userstatus[1],
+        default: config_1.default.status[1],
     }
 }, { timestamps: true });
 userSchema.pre("save", function (next) {

@@ -4,9 +4,9 @@ import configuration from "../config";
 
 
   //read all payment history
-  export async function readallprices(query:any) {
+  export async function readallprices(query:any,selectquery:any) {
     try {
-      const pricedetails = await Price.find(query);
+      const pricedetails = await Price.find(query).select(selectquery).sort({ createdAt: -1 });
       const totalpricedetails = await Price.find(query).countDocuments();
       return { pricedetails, totalpricedetails };
     } catch (err) {

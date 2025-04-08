@@ -11,10 +11,27 @@ const prescriptionSchema = new Schema({
     type: String, 
     required: true
   },
+  
+  pharmacy:
+  {
+    type: String, 
+    required: true
+  },
   prescriptionnote:
   {
     type: String
   },
+  appointment:{
+    type: Schema.Types.ObjectId,
+    ref: "Appointment",
+    default: [],
+  },
+  appointmentid:
+  {
+    type: String, 
+    required: true
+  },
+  
   orderid:
   {
     type: String, 
@@ -25,13 +42,7 @@ const prescriptionSchema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
-  appointment: 
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Appointment",
-      default: null,
-    }
-  ,
+ 
   prescribersname:
   {
     type: String, 
@@ -42,15 +53,33 @@ const prescriptionSchema = new Schema({
   {
     type: String
   },
+  dosageform:String,
+  strength:String,
+  dosage:String,
+  duration:String,
+  frequency:String,
+  route:String,
+  qty:
+  {
+    type: Number
+  },
+  balance:
+  {
+    type: Number
+  },
+  remark:
+  {
+    type: String
+  },
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
-      default: true,
+      default: null,
     },
   
   dispensestatus:{
     type: String,
-    default: configuration.status[10],
+    default: configuration.status[14],
     required: true
 
   }

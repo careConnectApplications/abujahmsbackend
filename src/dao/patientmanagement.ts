@@ -3,12 +3,49 @@ import {patientinterface} from '../models/patientmanagement'
 import {encrypt} from "../utils/otherservices";
 import configuration from "../config";
 
+
+export async function countpatient(query:any) {
+  try {
+    return await Patient.countDocuments(query);
+    
+    //return await Appointment.find(query).countDocuments();
+   
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+
+//delete patient
+export async function deletePatietsByCondition(query:any) {
+  try {
+    const result = await Patient.deleteMany(query);
+    return result;
+  } catch (err) {
+    throw new Error(configuration.error.erroruserread);
+  }
+}
+
   //read all patient history
   export async function readallpatient(query:any,selectquery:any,populatequery:any,populateappointmentquery:any ) {
     try {
-      const patientdetails = await Patient.find(query).select(selectquery).populate(populatequery).populate(populateappointmentquery);
+      const patientdetails = await Patient.find(query).select(selectquery).populate(populatequery).populate(populateappointmentquery).sort({ createdAt: -1 });
       const totalpatientdetails = await Patient.find(query).countDocuments();
       return { patientdetails, totalpatientdetails };
+    } catch (err) {
+      console.log(err);
+      throw new Error(configuration.error.erroruserread);
+    }
+  };
+  //read all patient history
+  export async function readallpatientpaginated(query:any,selectquery:any,populatequery:any,populateappointmentquery:any,page:any,size:any ) {
+    try {
+      const skip = (page - 1) * size;
+      const patientdetails = await Patient.find(query).select(selectquery).skip(skip)
+      .limit(size).populate(populatequery).populate(populateappointmentquery).sort({ createdAt: -1 });
+      const totalpatientdetails = await Patient.find(query).countDocuments();
+      const totalPages = Math.ceil(totalpatientdetails / size);
+      return { patientdetails, totalPages,totalpatientdetails, size, page};
     } catch (err) {
       console.log(err);
       throw new Error(configuration.error.erroruserread);
@@ -84,4 +121,37 @@ import configuration from "../config";
       }
   
     }
+    export async function updatepatientmanybyquery(query:any, reqbody:any){
+      try{
+      const payment = await Patient.updateMany(query, reqbody,{
+        new: true
+      });
+        if (!payment) {
+          //return json  false response
+          throw new Error(configuration.error.errorinvalidcredentials);
+        }
+        return payment;
+      }catch(err){
+        console.log(err);
+        throw new Error(configuration.error.erroruserupdate);
   
+      }
+  
+    }
+
+    export async function createpatientifnotexit(filterinput:any,input:any){
+      try{
+        console.log(input);
+        return Patient.updateMany(
+          filterinput,
+          input,
+          { upsert: true }   );
+                
+          
+      }
+      catch(err){
+        console.log(err);
+        throw new Error(configuration.error.errorusercreate);
+  
+      }
+    }

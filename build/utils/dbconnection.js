@@ -11,7 +11,7 @@ function dbconnect() {
     mongoose_1.default.set('strictQuery', true);
     return mongoose_1.default.connect(database, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+        // useUnifiedTopology: true,
         directConnection: true,
         family: 4,
     }).then(() => console.log('MongoDb Connected')).catch((e) => console.log(e));

@@ -4,7 +4,7 @@ import configuration from "../config";
   //read all patient history
   export async function readallservicetype(query:any,selectquery:any) {
     try {
-      const servicetypedetails = await Servicetype.find(query).select(selectquery);
+      const servicetypedetails = await Servicetype.find(query).select(selectquery).sort({ createdAt: -1 });
       const totalservicetypedetails = await Servicetype.find(query).countDocuments();
       return { servicetypedetails, totalservicetypedetails };
     } catch (err) {

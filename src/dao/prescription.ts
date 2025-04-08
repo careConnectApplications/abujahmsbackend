@@ -5,7 +5,7 @@ import configuration from "../config";
   //read all lab history
   export async function readallprescription(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      const prescriptiondetails = await Prescription.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
+      const prescriptiondetails = await Prescription.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
       const totalprescriptiondetails = await Prescription.find(query).countDocuments();
       return { prescriptiondetails, totalprescriptiondetails };
     } catch (err) {
@@ -13,6 +13,8 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
+
+  
   export async function createprescription(input:any){
     try{
        const prescription = new Prescription(input);
