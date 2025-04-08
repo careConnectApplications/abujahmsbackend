@@ -76,7 +76,8 @@ function labresultprocessing(req, res) {
             for (var i = 0; i < subcomponents.length; i++) {
                 //throw error if no subcomponent
                 const { subcomponent, result, nranges, unit } = subcomponents[i];
-                (0, otherservices_1.validateinputfaulsyvalue)({ subcomponent, result, nranges, unit });
+                // validateinputfaulsyvalue({subcomponent,result,nranges,unit})
+                (0, otherservices_1.validateinputfaulsyvalue)({ subcomponent });
             }
             var processeddate = new Date();
             //update test, lab technical name and test status
