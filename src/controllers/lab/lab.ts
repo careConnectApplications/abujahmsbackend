@@ -59,7 +59,8 @@ export const readalllabb = async (req:any, res:any) => {
   for(var i=0; i < subcomponents.length; i++){
     //throw error if no subcomponent
     const {subcomponent,result,nranges,unit} =subcomponents[i];
-    validateinputfaulsyvalue({subcomponent,result,nranges,unit})
+   // validateinputfaulsyvalue({subcomponent,result,nranges,unit})
+   validateinputfaulsyvalue({subcomponent})
   }
   var processeddate:any=new Date();
   //update test, lab technical name and test status
