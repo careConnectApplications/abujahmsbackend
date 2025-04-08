@@ -8,6 +8,7 @@ import  {readone}  from "../../dao/users";
 import configuration from "../../config";
 import {readoneadmission} from  "../../dao/admissions";
 
+//adjust lab to view from department
 
 // Get all lab records
 export const readalllabb = async (req:any, res:any) => {
