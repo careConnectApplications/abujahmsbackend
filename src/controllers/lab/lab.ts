@@ -84,9 +84,10 @@ export const readalllabb = async (req:any, res:any) => {
 // Get all lab records
 export const readallscheduledlab = async (req:any, res:any) => {
   try {
-      //const {clinic} = (req.user).user;
+      const {clinic} = (req.user).user;
+      
     //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[13]},{status:configuration.status[14]}]},{},'patient','appointment','payment');
+    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[13]},{status:configuration.status[14]}],department:clinic},{},'patient','appointment','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -102,7 +103,8 @@ export const listlabreport = async (req:any, res:any) => {
    
    
     // find related
-    const query = { status:configuration.status[7]};
+    const {clinic} = (req.user).user;
+    const query = { status:configuration.status[7],department:clinic};
     const queryresult = await readlabaggregate([
       {
         $lookup: {

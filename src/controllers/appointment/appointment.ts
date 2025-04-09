@@ -424,11 +424,11 @@ export var laborder= async (req:any, res:any) =>{
     const {id} = req.params;
     console.log('////lab order request body////',req.body);
     console.log('////lab order request params////',id);
-    const {testname,appointmentunderscoreid} = req.body;
+    const {testname,appointmentunderscoreid,department} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
     //var paymentids =[];
-    validateinputfaulsyvalue({id, testname});
+    validateinputfaulsyvalue({id, testname,department});
     //find the record in appointment and validate
 
     //find patient
@@ -481,7 +481,7 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     }
     //var setting  = await configuration.settings();
     //search testname in setting
-    var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
+    //var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
        //create payment
     //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
@@ -491,10 +491,10 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
    if(foundPatient?.isHMOCover ==  configuration.ishmo[0] || (appointment.patient).isHMOCover ==  configuration.ishmo[0]){
 
-    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department,amount:Number(testPrice.amount)}); 
+    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department,amount:Number(testPrice.amount)}); 
   }
    else{
-    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department}); 
+    testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department}); 
 
    }
    
@@ -543,7 +543,8 @@ export async function addclinicalencounter(req:any, res:any){
     req.body.status = configuration.status[9];
   }
   var {diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,status,plannote,outcome} = req.body;
-  validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,outcome,plannote});
+  //validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,outcome,plannote});
+  validateinputfaulsyvalue({diagnosisnote,assessmentnote,clinicalnote,plannote});
   const clinicalencounter ={diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,plannote,outcome};
   var queryresult;
   
