@@ -96,7 +96,7 @@ export async function updatestatus(req:any, res:any){
       const {role} = req.body;
             //get role id
             if(role){
-            var roleId = (configuration.roles).filter((e) => e.role == role )[0].roleId;
+            var roleId = (configuration.roles).filter((e:any) => e.role == role )[0].roleId;
             req.body.roleId = roleId;
             }
     var queryresult = await updateuser(id, req.body);

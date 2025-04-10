@@ -77,6 +77,16 @@ import configuration from "../config";
 
   }
   
+  export async function optimizedreadprescriptionaggregate(input:any,page:any,size:any ) {
+    try{
+    const skip = (page - 1) * size;
+    return await Prescription.aggregate(input).skip(skip).limit(size);
+    }
+    catch(e:any){
+      console.log(e);
+      throw new Error(configuration.error.erroruserupdate);
+    }
+    }
 
   export async function readprescriptionaggregate(input:any) {
     try{

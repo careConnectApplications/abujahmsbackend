@@ -4,7 +4,7 @@ import configuration from "../../config";
 import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
-import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate } from "../../dao/prescription";
+import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate,optimizedreadprescriptionaggregate } from "../../dao/prescription";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
 import {readoneadmission} from  "../../dao/admissions";
 
@@ -232,11 +232,153 @@ dosageform:String,
     }
   }
 
+
+
+//awaiting confirmation configuration.status[14]
+//pending configuration.status[10]
+//dispense configuration.status[6]
+//dispense
+  export async function groupreadallpharmacytransactionoptimized(req: any, res: any) {
+    try {
+      const { clinic} = (req.user).user;
+      const page = parseInt(req.query.page) || 1;
+      const size = parseInt(req.query.size) || 150;
+
+      var status;
+      if(req.query.status == "pending"){
+        status=configuration.status[10];
+
+      }
+      else if(req.query.status == "confirmation"){
+        console.log("in confirmation");
+        status=configuration.status[14];
+
+      }
+      else if(req.query.status == "dispense"){
+        status=configuration.status[6];
+
+      }
+      else{
+        status=configuration.status[10];
+      }
+      
+      //const size = parseInt(req.query.size) || 150;
+      const { firstName,MRN,HMOId,lastName,orderid } = req.query;  // Get query parameters from the request
+       // Add filters based on query parameters
+  
+    const matchPosts = firstName ? { firstName: new RegExp(firstName, 'i') } :MRN ? { MRN: new RegExp(MRN, 'i') }:HMOId ? { HMOId: new RegExp(HMOId, 'i') }: lastName ? { lastName: new RegExp(lastName, 'i') }:orderid ? { orderid: new RegExp(orderid, 'i') }:{}; // Case-insensitive search
+    //const matchPosts = MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}; // Case-insensitive search 
+   console.log('matchpost', matchPosts);
+   console.log('clinic', clinic);
+    const query ={pharmacy:clinic,dispensestatus:status};
+    console.log("query", query);
+      const ordergroup = [
+       //look up patient
+       {
+        $match:query
+      },
+
+       {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "appointment",
+          foreignField: "_id",
+          as: "appointment",
+        },
+      },
+      {
+        $unwind: {
+          path: "$appointment",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      
+        {
+          $group: {
+            _id: "$orderid",
+            orderid: {$first: "$orderid"},
+            createdAt: { $first: "$createdAt" },
+            updatedAt: { $first: "$updatedAt" },
+            prescribersname: { $first: "$prescribersname" },
+            firstName:{$first: "$patient.firstName"},
+            lastName:{$first: "$patient.lastName"},
+            MRN:{$first: "$patient.MRN"},
+            isHMOCover:{$first: "$patient.isHMOCover"},
+            HMOName:{$first: "$patient.HMOName"},
+            HMOId:{$first: "$patient.HMOId"},
+            HMOPlan:{$first: "$patient.HMOPlan"},
+            appointmentdate:{$first: "$appointment.appointmentdate"},
+            clinic:{$first: "$appointment.clinic"},
+            appointmentid:{$first: "$appointmentid"}   
+          },
+          
+        },
+        {
+          $match:matchPosts
+        },
+        {
+          $project:{
+            _id:0,
+            orderid: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            prescribersname: 1,
+            firstName:1,
+            lastName:1,
+            MRN:1,
+            isHMOCover:1,
+            HMOName:1,
+            HMOId:1,
+            HMOPlan:1,
+            appointmentdate:1,
+            clinic:1,
+            appointmentid:1   
+          }
+        },
+        
+        { $sort: { createdAt: -1 } },
+        
+        
+      ];
+  
+      const queryresult = await optimizedreadprescriptionaggregate(ordergroup,page,size);
+      res.json({
+        queryresult,
+        status: true,
+      });
+  
+      
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+    }
+  }
+
+
   //get all pharmacy orderf
   export const readallpharmacytransaction = async (req:any, res:any) => {
       try {
        //extract staff department
-       const { clinic} = (req.user).user;
+       const 
+       
+       { clinic} = (req.user).user;
         const queryresult = await readallprescription({pharmacy:clinic},{},'patient','appointment','payment');
         res.status(200).json({
           queryresult,

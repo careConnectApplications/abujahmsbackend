@@ -1,7 +1,7 @@
   import {readallclinics} from "./dao/clinics";
   import  {readallservicetype}  from "./dao/servicetype";
   import {readwardaggregate,readclinicaggregate}  from "./dao/reports";
-const configuration = {
+const configuration:any = {
   //clinic name
   //wardname  
   reports:[
