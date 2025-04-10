@@ -20,6 +20,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
     try{
       //accept _id from request
       const {id} = req.params;
+      console.log("///////id", id);
       var {procedure,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,appointmentid} = req.body;
   
       const { firstName,lastName} = (req.user).user;
