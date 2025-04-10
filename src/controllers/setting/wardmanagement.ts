@@ -2,6 +2,7 @@ import configuration from "../../config";
 import  {createwardmanagement,readonewardmanagement,readallwardmanagement,updatewardmanagement}  from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createward = async (req:any,res:any) =>{
    
@@ -35,7 +36,10 @@ export var createward = async (req:any,res:any) =>{
 
         }
          const queryresult=await createwardmanagement({bedspecialization,vacantbed,wardname,totalbed,occupiedbed,wardid});
-        res.status(200).json({queryresult, status: true});
+        const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;    
+            await createaudit({action:"Created Ward",actor,affectedentity:wardname}); 
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -79,7 +83,10 @@ export async function updateward(req:any, res:any){
 
     }
     const vacantbed = totalbed - occupiedbed;
-    var queryresult = await updatewardmanagement(id, {bedspecialization,vacantbed,totalbed,occupiedbed});
+    var queryresult:any = await updatewardmanagement(id, {bedspecialization,vacantbed,totalbed,occupiedbed});
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;    
+    await createaudit({action:"Updated Ward",actor,affectedentity:queryresult.wardname}); 
     res.status(200).json({
         queryresult,
         status:true

@@ -1,7 +1,8 @@
 import {Schema, model} from "mongoose";
 export interface auditinterface{
     "action": String,
-    "actor": String
+    "actor": String,
+    "affectedentity": String
   }
 //create schema
  const auditSchema = new Schema(
@@ -11,6 +12,11 @@ export interface auditinterface{
             type: String
         },
         actor:{
+            required: true,
+            type: String,
+
+        },
+        affectedentity:{
             required: true,
             type: String,
 

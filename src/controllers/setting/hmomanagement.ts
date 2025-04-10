@@ -2,13 +2,15 @@ import { types } from "util";
 import configuration from "../../config";
 import  {readallhmomanagement,createhmomanagement,readonehmomanagement,updatehmomanagement}  from "../../dao/hmomanagement";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
-
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createhmo = async (req:any,res:any) =>{
    
     try{
      console.log(req.body);
        const {hmoname} = req.body;
+       const { firstName, lastName } = (req.user).user;
+      var actor = `${firstName} ${lastName}`;
        validateinputfaulsyvalue({hmoname});
        var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length -1]}`;  
         const foundHmo =  await readonehmomanagement({hmoname},'');
@@ -18,7 +20,8 @@ export var createhmo = async (req:any,res:any) =>{
 
         }
          const queryresult=await createhmomanagement({hmoname,id});
-        res.status(200).json({queryresult, status: true});
+        await createaudit({action:"Create HMO",actor,affectedentity:hmoname});
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -53,7 +56,10 @@ export async function updatehmo(req:any, res:any){
     //get id
     const {id} = req.params;
     const {hmoname} = req.body;
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
     validateinputfaulsyvalue({hmoname,id});
+    await createaudit({action:"Update HMO",actor,affectedentity:hmoname});
     var queryresult = await updatehmomanagement(id, {hmoname});
     res.status(200).json({
         queryresult,

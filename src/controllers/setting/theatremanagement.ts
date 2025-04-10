@@ -2,6 +2,7 @@ import configuration from "../../config";
 import  {createtheatremanagement,readonetheatremanagement,readalltheatremanagement,updatetheatremanagement}  from "../../dao/theatre";
 import {readoneclinic} from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createtheatre = async (req:any,res:any) =>{
    
@@ -35,7 +36,11 @@ export var createtheatre = async (req:any,res:any) =>{
 
         }
          const queryresult=await createtheatremanagement({bedspecialization,vacantbed,theatrename,totalbed,occupiedbed,theatreid});
-        res.status(200).json({queryresult, status: true});
+         const { firstName, lastName } = (req.user).user;
+          var actor = `${firstName} ${lastName}`;    
+          await createaudit({action:"Created Theatre",actor,affectedentity:theatrename}); 
+         
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -79,7 +84,10 @@ export async function updatetheatre(req:any, res:any){
 
     }
     const vacantbed = totalbed - occupiedbed;
-    var queryresult = await updatetheatremanagement(id, {bedspecialization,vacantbed,totalbed,occupiedbed});
+    var queryresult:any = await updatetheatremanagement(id, {bedspecialization,vacantbed,totalbed,occupiedbed});
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;    
+    await createaudit({action:"Updated Theatre",actor,affectedentity:queryresult.theatrename}); 
     res.status(200).json({
         queryresult,
         status:true

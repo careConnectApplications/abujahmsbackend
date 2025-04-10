@@ -4,11 +4,13 @@ import  {readall,updateuser,readone,createuser}  from "../../dao/users";
 import {createmanyprice,readoneprice,readallprices,createprice,updateprice} from "../../dao/price";
 import {createmanyservicetype} from "../../dao/servicetype";;
 import {uploaddocument,convertexceltojson,validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
-
+import {createaudit} from "../../dao/audit";
 
 //bulk upload users
 export async function bulkuploadinventory(req:any, res:any){
     try{  
+      const { firstName, lastName } = (req.user).user;
+      var actor = `${firstName} ${lastName}`;
       const file = req.files.file;
       const {Pharmacy} = req.body;
       const filename= configuration.pharmacyuploadfilename;
@@ -64,7 +66,9 @@ export async function bulkuploadinventory(req:any, res:any){
        
          }
         
-        
+        //audit
+        await createaudit({action:"Bulk Uploaded Inventory",actor,affectedentity:Pharmacy});
+
          res.status(200).json({status: true, queryresult: 'Bulk upload was successfull'});
          
       }
@@ -112,6 +116,8 @@ export async function getallpharmacystockbyphamarcy(req:any, res:any){
 export var createstock = async (req:any,res:any) =>{
    
   try{
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
     req.body.servicecategory = configuration.category[1];
      const {pharmacy,servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate,productid} = req.body;
     //validations
@@ -134,6 +140,7 @@ export var createstock = async (req:any,res:any) =>{
          )
         ]);
        // create service type
+       await createaudit({action:"Created Inventory",actor,affectedentity:servicetype});
        res.status(200).json({queryresult, status: true});
       
 
@@ -145,6 +152,8 @@ export var createstock = async (req:any,res:any) =>{
 //update stock
 export async function updatestocks(req:any, res:any){
   try{
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
   //get id
   const {id} = req.params;
   req.body.servicecategory = configuration.category[1];
@@ -168,6 +177,7 @@ export async function updatestocks(req:any, res:any){
        {$push: {type: servicetype},$set:{department:servicecategory,category:servicecategory,id:servicetypeid}}
      )
     ]);
+    await createaudit({action:"Updated Inventory",actor,affectedentity:servicetype});
   res.status(200).json({
       queryresult,
       status:true

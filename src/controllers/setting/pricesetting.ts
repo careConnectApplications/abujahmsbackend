@@ -1,6 +1,7 @@
 import configuration from "../../config";
 import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
 import { validateinputfaulsyvalue} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    
@@ -37,7 +38,10 @@ export var createprices = async (req:any,res:any) =>{
 
         }
          const queryresult=await createprice(req.body);
-        res.status(200).json({queryresult, status: true});
+         const { firstName, lastName } = (req.user).user;
+         var actor = `${firstName} ${lastName}`;
+         await createaudit({action:"Created Price",actor,affectedentity:servicetype});
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -68,7 +72,10 @@ export async function updateprices(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
     var queryresult = await updateprice(id, req.body);
+    await createaudit({action:"Updated Price",actor,affectedentity:queryresult.servicetype});
     res.status(200).json({
         queryresult,
         status:true
