@@ -11,6 +11,7 @@ testsubcomponent:[
 import configuration from "../../config";
 import  {createtestcomponent, readonetestcomponent, readalltestcomponent,updatetestcomponent}  from "../../dao/testcomponent";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createtestcomponents = async (req:any,res:any) =>{
    
@@ -38,7 +39,10 @@ export var createtestcomponents = async (req:any,res:any) =>{
       }
     
          const queryresult=await createtestcomponent({testname,subcomponients});
-  
+        const { firstName, lastName } = (req.user).user;
+           var actor = `${firstName} ${lastName}`;    
+           await createaudit({action:"Created Test Component",actor,affectedentity:testname});
+           
         res.status(200).json({queryresult, status: true});
         
 
@@ -103,7 +107,10 @@ export async function updatetestcomponents(req:any, res:any){
  
    
   var queryresult=await updatetestcomponent({_id:id},{testname,subcomponients});
-   // var queryresult = await updateservicetype(id, {clinic});
+  const { firstName, lastName } = (req.user).user;
+  var actor = `${firstName} ${lastName}`;    
+  await createaudit({action:"Updated Test Component",actor,affectedentity:testname}); 
+  // var queryresult = await updateservicetype(id, {clinic});
     res.status(200).json({
         queryresult,
         status:true

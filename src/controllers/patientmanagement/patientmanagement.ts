@@ -9,6 +9,7 @@ import {createvitalcharts} from "../../dao/vitalcharts";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson,storeUniqueNumber } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
 import { AnyObject } from "mongoose";
+import {createaudit} from "../../dao/audit";
 //Insurance upload
 //get hmo patient 
 //read all patients
@@ -55,9 +56,10 @@ export async function getallhmopatients(req:Request, res:any){
 
  //bulk upload users
  export async function bulkuploadhmopatients(req:any, res:any){
-  try{  
+  try{ 
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`; 
     const file = req.files.file;
-    
     const {HMOName} = req.body;
     const filename= configuration.hmouploadfilename;
     let allowedextension = ['.csv','.xlsx'];
@@ -135,7 +137,7 @@ export async function getallhmopatients(req:Request, res:any){
       }
        }
       
-      
+      await createaudit({action:"Bulk Uploaded HMO Patient",actor,affectedentity:HMOName});
        res.status(200).json({status: true, queryresult: 'Bulk upload was successfull'});
     }
     catch(e:any){
