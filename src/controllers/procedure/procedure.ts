@@ -13,7 +13,6 @@ const { ObjectId } = mongoose.Types;
 
 
 
-
 import configuration from "../../config";
 //lab order
 export var scheduleprocedureorder= async (req:any, res:any) =>{
@@ -200,6 +199,9 @@ else{
         const { firstName,lastName} = (req.user).user;
         const {id} = req.params;
         var response:any = await readoneprocedure({_id:id},{},'patient');
+        if(response.status !== configuration.status[9]){
+          throw new Error(`Procedure Record ${configuration.error.errortasknotpending}`);
+         }
         const {patient} =response;
         //validate payment
         if(patient.isHMOCover == configuration.ishmo[0]){

@@ -178,6 +178,12 @@ export var radiologyorder= async (req:any, res:any) =>{
       const { firstName,lastName} = (req.user).user;
       const {id} = req.params;
       var response:any = await readoneradiology({_id:id},{},'patient');
+      // validate patient status
+       if(response.status !== configuration.status[9]){
+        throw new Error(`Radiology Record ${configuration.error.errortasknotpending}`);
+
+
+       }
       const {patient} = response;
       //validate payment
       var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
@@ -229,6 +235,8 @@ export const confirmradiologyorder = async (req:any, res:any) =>{
     const {id} = req.params;
   //search for the lab request
   var radiology:any =await readoneradiology({_id:id},{},'patient');
+  // if not radiology return error
+
   const {testname, testid,patient,amount} = radiology;
   //validate the status
   let queryresult;
