@@ -19,11 +19,14 @@ exports.updateclinics = updateclinics;
 const config_1 = __importDefault(require("../../config"));
 const clinics_1 = require("../../dao/clinics");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createclinics = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(req.body);
         const { clinic, type } = req.body;
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
         (0, otherservices_1.validateinputfaulsyvalue)({ clinic, type });
         var id = `${clinic[0]}${(0, otherservices_1.generateRandomNumber)(5)}${clinic[clinic.length - 1]}`;
         //validate that category is in the list of accepted category
@@ -42,6 +45,8 @@ var createclinics = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             throw new Error(`clinic ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, clinics_1.createclinic)({ clinic, type, id });
+        //create audit log
+        yield (0, audit_1.createaudit)({ action: "Created Clinic/Department/Pharmacy", actor, affectedentity: clinic });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -88,8 +93,11 @@ function updateclinics(req, res) {
             //get id
             const { id } = req.params;
             const { clinic, type } = req.body;
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             (0, otherservices_1.validateinputfaulsyvalue)({ clinic, id, type });
             var queryresult = yield (0, clinics_1.updateclinic)(id, { clinic, type });
+            yield (0, audit_1.createaudit)({ action: "Update Clinic/Department/Pharmacy", actor, affectedentity: clinic });
             res.status(200).json({
                 queryresult,
                 status: true

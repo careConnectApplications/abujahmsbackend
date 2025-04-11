@@ -65,6 +65,7 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
     try {
         //accept _id from request
         const { id } = req.params;
+        console.log("///////id", id);
         var { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
         const { firstName, lastName } = (req.user).user;
         const raiseby = `${firstName} ${lastName}`;
@@ -219,6 +220,9 @@ var uploadprocedureresult = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { firstName, lastName } = (req.user).user;
         const { id } = req.params;
         var response = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, 'patient');
+        if (response.status !== config_1.default.status[9]) {
+            throw new Error(`Procedure Record ${config_1.default.error.errortasknotpending}`);
+        }
         const { patient } = response;
         //validate payment
         if (patient.isHMOCover == config_1.default.ishmo[0]) {

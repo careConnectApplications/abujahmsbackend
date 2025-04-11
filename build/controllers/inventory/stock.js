@@ -23,10 +23,13 @@ const price_1 = require("../../dao/price");
 const servicetype_1 = require("../../dao/servicetype");
 ;
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //bulk upload users
 function bulkuploadinventory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             const file = req.files.file;
             const { Pharmacy } = req.body;
             const filename = config_1.default.pharmacyuploadfilename;
@@ -70,6 +73,8 @@ function bulkuploadinventory(req, res) {
                     //);
                 }
             }
+            //audit
+            yield (0, audit_1.createaudit)({ action: "Bulk Uploaded Inventory", actor, affectedentity: Pharmacy });
             res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
         }
         catch (e) {
@@ -112,6 +117,8 @@ function getallpharmacystockbyphamarcy(req, res) {
 //add a stock
 var createstock = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
         req.body.servicecategory = config_1.default.category[1];
         const { pharmacy, servicecategory, amount, servicetype, category, qty, lowstocklevel, expirationdate, lastrestockdate, productid } = req.body;
         //validations
@@ -129,6 +136,7 @@ var createstock = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             (0, servicetype_1.createmanyservicetype)({ category: servicecategory, type: { $nin: [servicetype] } }, { $push: { type: servicetype }, $set: { department: servicecategory, category: servicecategory, id } })
         ]);
         // create service type
+        yield (0, audit_1.createaudit)({ action: "Created Inventory", actor, affectedentity: servicetype });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -141,6 +149,8 @@ exports.createstock = createstock;
 function updatestocks(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             //get id
             const { id } = req.params;
             req.body.servicecategory = config_1.default.category[1];
@@ -160,6 +170,7 @@ function updatestocks(req, res) {
                 (0, price_1.updateprice)(id, { pharmacy, servicecategory, amount, servicetype, category, qty, lowstocklevel, expirationdate, lastrestockdate }),
                 (0, servicetype_1.createmanyservicetype)({ category: servicecategory, type: { $nin: [servicetype] } }, { $push: { type: servicetype }, $set: { department: servicecategory, category: servicecategory, id: servicetypeid } })
             ]);
+            yield (0, audit_1.createaudit)({ action: "Updated Inventory", actor, affectedentity: servicetype });
             res.status(200).json({
                 queryresult,
                 status: true

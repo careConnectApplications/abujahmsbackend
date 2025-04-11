@@ -429,11 +429,11 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         console.log('////lab order request body////', req.body);
         console.log('////lab order request params////', id);
-        const { testname, appointmentunderscoreid } = req.body;
+        const { testname, appointmentunderscoreid, department } = req.body;
         var testid = String(Date.now());
         var testsid = [];
         //var paymentids =[];
-        (0, otherservices_1.validateinputfaulsyvalue)({ id, testname });
+        (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, department });
         //find the record in appointment and validate
         //find patient
         const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
@@ -474,7 +474,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             //var setting  = await configuration.settings();
             //search testname in setting
-            var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
+            //var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
             //create payment
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
@@ -482,10 +482,10 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             let testrecord;
             //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
             if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] || (appointment.patient).isHMOCover == config_1.default.ishmo[0]) {
-                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department, amount: Number(testPrice.amount) });
+                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
             }
             else {
-                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department: testsetting[0].department });
+                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department });
             }
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
@@ -525,7 +525,8 @@ function addclinicalencounter(req, res) {
                 req.body.status = config_1.default.status[9];
             }
             var { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, status, plannote, outcome } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, outcome, plannote });
+            //validateinputfaulsyvalue({diagnosisnote,diagnosisicd10,assessmentnote,clinicalnote,outcome,plannote});
+            (0, otherservices_1.validateinputfaulsyvalue)({ diagnosisnote, assessmentnote, clinicalnote, plannote });
             const clinicalencounter = { diagnosisnote, diagnosisicd10, assessmentnote, clinicalnote, plannote, outcome };
             var queryresult;
             //find id 

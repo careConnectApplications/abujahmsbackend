@@ -23,6 +23,7 @@ const { ObjectId } = mongoose_1.default.Types;
 const users_1 = require("../../dao/users");
 const config_1 = __importDefault(require("../../config"));
 const admissions_1 = require("../../dao/admissions");
+//adjust lab to view from department
 // Get all lab records
 const readalllabb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -98,9 +99,9 @@ function labresultprocessing(req, res) {
 // Get all lab records
 const readallscheduledlab = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //const {clinic} = (req.user).user;
+        const { clinic } = (req.user).user;
         //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, lab_1.readalllab)({ $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[13] }, { status: config_1.default.status[14] }] }, {}, 'patient', 'appointment', 'payment');
+        const queryresult = yield (0, lab_1.readalllab)({ $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[13] }, { status: config_1.default.status[14] }], department: clinic }, {}, 'patient', 'appointment', 'payment');
         res.status(200).json({
             queryresult,
             status: true
@@ -115,7 +116,8 @@ exports.readallscheduledlab = readallscheduledlab;
 const listlabreport = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // find related
-        const query = { status: config_1.default.status[7] };
+        const { clinic } = (req.user).user;
+        const query = { status: config_1.default.status[7], department: clinic };
         const queryresult = yield (0, lab_1.readlabaggregate)([
             {
                 $lookup: {

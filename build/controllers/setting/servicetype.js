@@ -19,6 +19,7 @@ exports.getpharmacyservicetype = getpharmacyservicetype;
 const config_1 = __importDefault(require("../../config"));
 const servicetype_1 = require("../../dao/servicetype");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createservicetypes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -41,6 +42,9 @@ var createservicetypes = (req, res) => __awaiter(void 0, void 0, void 0, functio
             throw new Error(`service category ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, servicetype_1.createservicetype)({ type: servicetype, category: servicecategory, department, id });
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
+        yield (0, audit_1.createaudit)({ action: "Created Service Type", actor, affectedentity: servicecategory });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -83,6 +87,9 @@ function updateservicetypes(req, res) {
             }
             var queryresult = yield (0, servicetype_1.updateservicetype)({ _id: id }, { $push: { type: { $each: servicetype } }, department });
             // var queryresult = await updateservicetype(id, {clinic});
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
+            yield (0, audit_1.createaudit)({ action: "Updated Service Type", actor, affectedentity: queryresult.servicecategory });
             res.status(200).json({
                 queryresult,
                 status: true

@@ -29,5 +29,7 @@ router.get('/groupreadallpharmacytransaction', pharmacy_1.groupreadallpharmacytr
 router.get('/readpharmacybyorderid/:orderid', pharmacy_1.readpharmacybyorderid);
 //confirmpharmacygrouporder
 router.put('/confirmpharmacygrouporder', pharmacy_1.confirmpharmacygrouporder);
+//optimized pharmacy grouping
+router.get('/groupreadallpharmacytransactionoptimized', pharmacy_1.groupreadallpharmacytransactionoptimized);
 //updateusers
 exports.default = router;

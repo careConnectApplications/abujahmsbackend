@@ -19,6 +19,7 @@ const config_1 = __importDefault(require("../../config"));
 const wardmanagement_1 = require("../../dao/wardmanagement");
 const clinics_1 = require("../../dao/clinics");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createward = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -42,6 +43,9 @@ var createward = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error(`Ward ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, wardmanagement_1.createwardmanagement)({ bedspecialization, vacantbed, wardname, totalbed, occupiedbed, wardid });
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
+        yield (0, audit_1.createaudit)({ action: "Created Ward", actor, affectedentity: wardname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -80,6 +84,9 @@ function updateward(req, res) {
             }
             const vacantbed = totalbed - occupiedbed;
             var queryresult = yield (0, wardmanagement_1.updatewardmanagement)(id, { bedspecialization, vacantbed, totalbed, occupiedbed });
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
+            yield (0, audit_1.createaudit)({ action: "Updated Ward", actor, affectedentity: queryresult.wardname });
             res.status(200).json({
                 queryresult,
                 status: true

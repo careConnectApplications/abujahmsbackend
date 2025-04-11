@@ -20,6 +20,7 @@ exports.searchtest = searchtest;
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -47,6 +48,9 @@ var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             throw new Error(`service category and type ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, price_1.createprice)(req.body);
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
+        yield (0, audit_1.createaudit)({ action: "Created Price", actor, affectedentity: servicetype });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -76,7 +80,10 @@ function updateprices(req, res) {
         try {
             //get id
             const { id } = req.params;
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             var queryresult = yield (0, price_1.updateprice)(id, req.body);
+            yield (0, audit_1.createaudit)({ action: "Updated Price", actor, affectedentity: queryresult.servicetype });
             res.status(200).json({
                 queryresult,
                 status: true
