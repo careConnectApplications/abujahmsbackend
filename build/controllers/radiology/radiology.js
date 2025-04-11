@@ -204,6 +204,10 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { firstName, lastName } = (req.user).user;
         const { id } = req.params;
         var response = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+        // validate patient status
+        if (response.status !== config_1.default.status[9]) {
+            throw new Error(`Radiology Record ${config_1.default.error.errortasknotpending}`);
+        }
         const { patient } = response;
         //validate payment
         var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
@@ -245,6 +249,7 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { id } = req.params;
         //search for the lab request
         var radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+        // if not radiology return error
         const { testname, testid, patient, amount } = radiology;
         //validate the status
         let queryresult;

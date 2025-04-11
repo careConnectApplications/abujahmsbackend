@@ -27,6 +27,7 @@ exports.updatetestcomponents = updatetestcomponents;
 const config_1 = __importDefault(require("../../config"));
 const testcomponent_1 = require("../../dao/testcomponent");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createtestcomponents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -42,6 +43,9 @@ var createtestcomponents = (req, res) => __awaiter(void 0, void 0, void 0, funct
             throw new Error(`Test name ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, testcomponent_1.createtestcomponent)({ testname, subcomponients });
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
+        yield (0, audit_1.createaudit)({ action: "Created Test Component", actor, affectedentity: testname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -94,6 +98,9 @@ function updatetestcomponents(req, res) {
                 throw new Error(`Test name ${config_1.default.error.errornotfound}`);
             }
             var queryresult = yield (0, testcomponent_1.updatetestcomponent)({ _id: id }, { testname, subcomponients });
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
+            yield (0, audit_1.createaudit)({ action: "Updated Test Component", actor, affectedentity: testname });
             // var queryresult = await updateservicetype(id, {clinic});
             res.status(200).json({
                 queryresult,

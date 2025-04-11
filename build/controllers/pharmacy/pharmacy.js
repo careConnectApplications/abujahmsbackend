@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getpriceofdrug = exports.dispense = exports.confirmpharmacyorder = exports.confirmpharmacygrouporder = exports.readallpharmacytransactionbypartient = exports.readallpharmacytransaction = exports.pharmacyorder = void 0;
 exports.readpharmacybyorderid = readpharmacybyorderid;
 exports.groupreadallpharmacytransaction = groupreadallpharmacytransaction;
+exports.groupreadallpharmacytransactionoptimized = groupreadallpharmacytransactionoptimized;
 const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
@@ -209,6 +210,127 @@ function groupreadallpharmacytransaction(req, res) {
                 { $sort: { createdAt: -1 } },
             ];
             const queryresult = yield (0, prescription_1.readprescriptionaggregate)(ordergroup);
+            res.json({
+                queryresult,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//awaiting confirmation configuration.status[14]
+//pending configuration.status[10]
+//dispense configuration.status[6]
+//dispense
+function groupreadallpharmacytransactionoptimized(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { clinic } = (req.user).user;
+            const page = parseInt(req.query.page) || 1;
+            const size = parseInt(req.query.size) || 150;
+            var status;
+            if (req.query.status == "pending") {
+                status = config_1.default.status[10];
+            }
+            else if (req.query.status == "confirmation") {
+                console.log("in confirmation");
+                status = config_1.default.status[14];
+            }
+            else if (req.query.status == "dispense") {
+                status = config_1.default.status[6];
+            }
+            else {
+                status = config_1.default.status[10];
+            }
+            //const size = parseInt(req.query.size) || 150;
+            const { firstName, MRN, HMOId, lastName, orderid } = req.query; // Get query parameters from the request
+            // Add filters based on query parameters
+            const matchPosts = firstName ? { firstName: new RegExp(firstName, 'i') } : MRN ? { MRN: new RegExp(MRN, 'i') } : HMOId ? { HMOId: new RegExp(HMOId, 'i') } : lastName ? { lastName: new RegExp(lastName, 'i') } : orderid ? { orderid: new RegExp(orderid, 'i') } : {}; // Case-insensitive search
+            //const matchPosts = MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}; // Case-insensitive search 
+            console.log('matchpost', matchPosts);
+            console.log('clinic', clinic);
+            const query = { pharmacy: clinic, dispensestatus: status };
+            console.log("query", query);
+            const ordergroup = [
+                //look up patient
+                {
+                    $match: query
+                },
+                {
+                    $lookup: {
+                        from: "patientsmanagements",
+                        localField: "patient",
+                        foreignField: "_id",
+                        as: "patient",
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "appointments",
+                        localField: "appointment",
+                        foreignField: "_id",
+                        as: "appointment",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$appointment",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$patient",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$orderid",
+                        orderid: { $first: "$orderid" },
+                        createdAt: { $first: "$createdAt" },
+                        updatedAt: { $first: "$updatedAt" },
+                        prescribersname: { $first: "$prescribersname" },
+                        firstName: { $first: "$patient.firstName" },
+                        lastName: { $first: "$patient.lastName" },
+                        MRN: { $first: "$patient.MRN" },
+                        isHMOCover: { $first: "$patient.isHMOCover" },
+                        HMOName: { $first: "$patient.HMOName" },
+                        HMOId: { $first: "$patient.HMOId" },
+                        HMOPlan: { $first: "$patient.HMOPlan" },
+                        appointmentdate: { $first: "$appointment.appointmentdate" },
+                        clinic: { $first: "$appointment.clinic" },
+                        appointmentid: { $first: "$appointmentid" }
+                    },
+                },
+                {
+                    $match: matchPosts
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        orderid: 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        prescribersname: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        MRN: 1,
+                        isHMOCover: 1,
+                        HMOName: 1,
+                        HMOId: 1,
+                        HMOPlan: 1,
+                        appointmentdate: 1,
+                        clinic: 1,
+                        appointmentid: 1
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+            ];
+            const queryresult = yield (0, prescription_1.optimizedreadprescriptionaggregate)(ordergroup, page, size);
             res.json({
                 queryresult,
                 status: true,

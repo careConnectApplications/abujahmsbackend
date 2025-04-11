@@ -62,6 +62,7 @@ const payment_1 = require("../../dao/payment");
 const vitalcharts_1 = require("../../dao/vitalcharts");
 const otherservices_1 = require("../../utils/otherservices");
 const appointment_1 = require("../../dao/appointment");
+const audit_1 = require("../../dao/audit");
 //Insurance upload
 //get hmo patient 
 //read all patients
@@ -105,6 +106,8 @@ function getallhmopatients(req, res) {
 function bulkuploadhmopatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             const file = req.files.file;
             const { HMOName } = req.body;
             const filename = config_1.default.hmouploadfilename;
@@ -177,6 +180,7 @@ function bulkuploadhmopatients(req, res) {
                     const createpatientqueryresult = yield (0, patientmanagement_1.createpatientifnotexit)({ HMOId: hmo[i].HMOId, HMOName }, hmo[i]);
                 }
             }
+            yield (0, audit_1.createaudit)({ action: "Bulk Uploaded HMO Patient", actor, affectedentity: HMOName });
             res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
         }
         catch (e) {

@@ -20,7 +20,7 @@ function downloadtemplates(req, res) {
         const downloadtemplatetypes = config_1.default.downloadtemplatetypes;
         //const fileName = req.params.type;
         //const fileName:any = downloadtemplatetypes.map(x => {if(x.type == req.params.type) return x.fileName});
-        const fileName = downloadtemplatetypes.filter(x => { if (x.type == req.params.type)
+        const fileName = downloadtemplatetypes.filter((x) => { if (x.type == req.params.type)
             return x.fileName; });
         const filePath = `${process.cwd()}/${config_1.default.userdownloadsdirectory}/${fileName[0].fileName}`;
         // Send the file as an attachment to trigger download

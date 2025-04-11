@@ -17,6 +17,7 @@ exports.createprescription = createprescription;
 exports.readoneprescription = readoneprescription;
 exports.updateprescription = updateprescription;
 exports.updateprescriptionbyquery = updateprescriptionbyquery;
+exports.optimizedreadprescriptionaggregate = optimizedreadprescriptionaggregate;
 exports.readprescriptionaggregate = readprescriptionaggregate;
 const prescription_1 = __importDefault(require("../models/prescription"));
 const config_1 = __importDefault(require("../config"));
@@ -93,6 +94,21 @@ function updateprescriptionbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function optimizedreadprescriptionaggregate(input, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            const pharmacydetails = yield prescription_1.default.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+            const totalpharmacydetails = (yield prescription_1.default.aggregate(input)).length;
+            const totalPages = Math.ceil(totalpharmacydetails / size);
+            return { pharmacydetails, totalPages, totalpharmacydetails, size, page };
+        }
+        catch (e) {
+            console.log(e);
             throw new Error(config_1.default.error.erroruserupdate);
         }
     });

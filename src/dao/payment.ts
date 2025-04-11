@@ -13,6 +13,19 @@ export async function readpaymentaggregate(input:any) {
     throw new Error(configuration.error.erroruserupdate);
   }
   }
+  export async function readpaymentaggregateoptimized(input:any,page:any,size:any) {
+    try{
+    const skip = (page - 1) * size;
+    const paymentdetails=await Payment.aggregate(input);
+     const totalpaymentdetails = (await Payment.aggregate(input)).length;
+          const totalPages = Math.ceil(totalpaymentdetails / size);
+          return { paymentdetails, totalPages,totalpaymentdetails, size, page};  
+  }
+    catch(e:any){
+      console.log(e);
+      throw new Error(configuration.error.erroruserupdate);
+    }
+    }
 
   //read all payment history
   export async function readallpayment(query:any,populatequery:any) {

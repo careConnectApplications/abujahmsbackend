@@ -11,6 +11,7 @@ const wardmanagement_1 = require("../controllers/setting/wardmanagement");
 const theatremanagement_1 = require("../controllers/setting/theatremanagement");
 const testscomponent_1 = require("../controllers/setting/testscomponent");
 const hmomanagement_1 = require("../controllers/setting/hmomanagement");
+const audit_1 = require("../controllers/audit/audit");
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express_1.default.Router();
 router.post('/createprices', pricesetting_1.createprices);
@@ -45,6 +46,6 @@ router.post('/createtestcomponents', testscomponent_1.createtestcomponents);
 router.get('/getalltestcomponent', testscomponent_1.getalltestcomponent);
 router.put('/updatetestcomponents/:id', testscomponent_1.updatetestcomponents);
 router.get('/gettestcomponentbytestname/:testname', testscomponent_1.gettestcomponentbytestname);
-//readicdten
-//router.get('/readicdten',readicdten);
+//audit
+router.get('/readallaudit', audit_1.readAllaudit);
 exports.default = router;

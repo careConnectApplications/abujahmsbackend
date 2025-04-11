@@ -19,6 +19,7 @@ const config_1 = __importDefault(require("../../config"));
 const theatre_1 = require("../../dao/theatre");
 const clinics_1 = require("../../dao/clinics");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createtheatre = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -42,6 +43,9 @@ var createtheatre = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             throw new Error(`Theatre ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, theatre_1.createtheatremanagement)({ bedspecialization, vacantbed, theatrename, totalbed, occupiedbed, theatreid });
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
+        yield (0, audit_1.createaudit)({ action: "Created Theatre", actor, affectedentity: theatrename });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -80,6 +84,9 @@ function updatetheatre(req, res) {
             }
             const vacantbed = totalbed - occupiedbed;
             var queryresult = yield (0, theatre_1.updatetheatremanagement)(id, { bedspecialization, vacantbed, totalbed, occupiedbed });
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
+            yield (0, audit_1.createaudit)({ action: "Updated Theatre", actor, affectedentity: queryresult.theatrename });
             res.status(200).json({
                 queryresult,
                 status: true

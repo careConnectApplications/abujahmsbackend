@@ -18,11 +18,14 @@ exports.updatehmo = updatehmo;
 const config_1 = __importDefault(require("../../config"));
 const hmomanagement_1 = require("../../dao/hmomanagement");
 const otherservices_1 = require("../../utils/otherservices");
+const audit_1 = require("../../dao/audit");
 //add patiient
 var createhmo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log(req.body);
         const { hmoname } = req.body;
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;
         (0, otherservices_1.validateinputfaulsyvalue)({ hmoname });
         var id = `${hmoname[0]}${(0, otherservices_1.generateRandomNumber)(5)}${hmoname[hmoname.length - 1]}`;
         const foundHmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname }, '');
@@ -31,6 +34,7 @@ var createhmo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error(`HMO ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, hmomanagement_1.createhmomanagement)({ hmoname, id });
+        yield (0, audit_1.createaudit)({ action: "Create HMO", actor, affectedentity: hmoname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -61,7 +65,10 @@ function updatehmo(req, res) {
             //get id
             const { id } = req.params;
             const { hmoname } = req.body;
+            const { firstName, lastName } = (req.user).user;
+            var actor = `${firstName} ${lastName}`;
             (0, otherservices_1.validateinputfaulsyvalue)({ hmoname, id });
+            yield (0, audit_1.createaudit)({ action: "Update HMO", actor, affectedentity: hmoname });
             var queryresult = yield (0, hmomanagement_1.updatehmomanagement)(id, { hmoname });
             res.status(200).json({
                 queryresult,
