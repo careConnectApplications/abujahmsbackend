@@ -95,7 +95,7 @@ const patientSchema = new Schema(
     isHMOCover: {
   
       type: String,
-      default: "No",
+      default: configuration.ishmo[0],
     },
     HMOName: {
       type: String,
@@ -125,6 +125,14 @@ const patientSchema = new Schema(
           default: [],
         },
       ],
+      admission:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Admission",
+          default: [],
+        },
+
+      ],
       prescription: [
         {
           type: Schema.Types.ObjectId,
@@ -137,6 +145,20 @@ const patientSchema = new Schema(
         {
           type: Schema.Types.ObjectId,
           ref: "Lab",
+          default: [],
+        },
+      ],
+      radiology: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Radiology",
+          default: [],
+        },
+      ],
+      prcedure:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Procedure",
           default: [],
         },
       ],

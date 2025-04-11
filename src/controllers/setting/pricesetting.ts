@@ -1,12 +1,17 @@
 import configuration from "../../config";
 import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
 import { validateinputfaulsyvalue} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    
     try{
-     
-       const {servicecategory,amount,servicetype} = req.body;
+    
+       var {servicecategory,amount,servicetype,isHMOCover} = req.body;
+      if(!isHMOCover){
+        isHMOCover =configuration.ishmo[0];
+      }
+
        
         //validate that category is in the list of accepted category
         /*
@@ -21,19 +26,22 @@ export var createprices = async (req:any,res:any) =>{
         if(req.body.servicecategory == configuration.category[3]){
           req.body.servicetype=configuration.category[3]
         }
-        
+       
         //validation
         validateinputfaulsyvalue({servicecategory,amount,servicetype});
-        const foundPrice =  await readoneprice({servicecategory,servicetype});
+        const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        
-        console.log(foundPrice);
+       
         if(foundPrice){
             throw new Error(`service category and type ${configuration.error.erroralreadyexit}`);
 
         }
          const queryresult=await createprice(req.body);
-        res.status(200).json({queryresult, status: true});
+         const { firstName, lastName } = (req.user).user;
+         var actor = `${firstName} ${lastName}`;
+         await createaudit({action:"Created Price",actor,affectedentity:servicetype});
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -45,7 +53,7 @@ export var createprices = async (req:any,res:any) =>{
 export async function getallprices(req:Request, res:any){
     try{
        
-        const queryresult = await readallprices({});
+        const queryresult = await readallprices({},{});
         res.status(200).json({
             queryresult,
             status:true
@@ -64,7 +72,10 @@ export async function updateprices(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
     var queryresult = await updateprice(id, req.body);
+    await createaudit({action:"Updated Price",actor,affectedentity:queryresult.servicetype});
     res.status(200).json({
         queryresult,
         status:true
@@ -98,3 +109,19 @@ export async function updateprices(req:any, res:any){
 
 }
 
+export async function searchtest(req:any, res:any){
+  try{
+    const {searchparams} = req.params;
+    const queryresult = await readallprices({servicecategory:configuration.category[2],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
+    res.status(200).json({
+        queryresult:queryresult.pricedetails,
+        status:true
+      }); 
+
+}
+catch(e:any){
+    res.status(403).json({status: false, msg:e.message});
+
+}
+  
+}

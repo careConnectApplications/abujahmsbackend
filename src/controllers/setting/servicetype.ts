@@ -1,6 +1,7 @@
 import configuration from "../../config";
 import  {createservicetype, readoneservicetype, readallservicetype,updateservicetype}  from "../../dao/servicetype";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
 //add patiient
 export var createservicetypes = async (req:any,res:any) =>{
    
@@ -33,7 +34,11 @@ export var createservicetypes = async (req:any,res:any) =>{
     
          const queryresult=await createservicetype({type:servicetype,category:servicecategory,department, id});
   
-        res.status(200).json({queryresult, status: true});
+        const { firstName, lastName } = (req.user).user;
+        var actor = `${firstName} ${lastName}`;    
+        await createaudit({action:"Created Service Type",actor,affectedentity:servicecategory});
+            
+         res.status(200).json({queryresult, status: true});
         
 
     }catch(error:any){
@@ -84,9 +89,12 @@ export async function updateservicetypes(req:any, res:any){
       throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
 
   }
-  var queryresult=await updateservicetype({_id:id},{$push: {type:{$each: servicetype}},department});
+  var queryresult:any=await updateservicetype({_id:id},{$push: {type:{$each: servicetype}},department});
    // var queryresult = await updateservicetype(id, {clinic});
-    res.status(200).json({
+   const { firstName, lastName } = (req.user).user;
+   var actor = `${firstName} ${lastName}`;    
+   await createaudit({action:"Updated Service Type",actor,affectedentity:queryresult.servicecategory});
+   res.status(200).json({
         queryresult,
         status:true
       }); 
@@ -114,7 +122,6 @@ export async function getpharmacyservicetype(req:Request, res:any){
   }
 
 }
-
 
 
   

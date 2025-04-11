@@ -1,9 +1,14 @@
 import {readalllab,updatelab,readonelab,readlabaggregate} from "../../dao/lab";
+import  {updatepatient}  from "../../dao/patientmanagement";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
+import {createpayment} from "../../dao/payment";
 import  mongoose from 'mongoose';
 const { ObjectId } = mongoose.Types;
 import  {readone}  from "../../dao/users";
 import configuration from "../../config";
+import {readoneadmission} from  "../../dao/admissions";
+
+//adjust lab to view from department
 
 // Get all lab records
 export const readalllabb = async (req:any, res:any) => {
@@ -43,6 +48,11 @@ export const readalllabb = async (req:any, res:any) => {
   const {email, staffId} = (req.user).user;
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
+  //if not lab or status !== scheduled return error
+  if(!lab || lab.status !== configuration.status[5]){
+    throw new Error(configuration.error.errorservicetray);
+
+  }
   validateinputfaulsyvalue({lab,subcomponents});
   const user = await readone({email, staffId});
 
@@ -50,7 +60,8 @@ export const readalllabb = async (req:any, res:any) => {
   for(var i=0; i < subcomponents.length; i++){
     //throw error if no subcomponent
     const {subcomponent,result,nranges,unit} =subcomponents[i];
-    validateinputfaulsyvalue({subcomponent,result,nranges,unit})
+   // validateinputfaulsyvalue({subcomponent,result,nranges,unit})
+   validateinputfaulsyvalue({subcomponent})
   }
   var processeddate:any=new Date();
   //update test, lab technical name and test status
@@ -73,9 +84,10 @@ export const readalllabb = async (req:any, res:any) => {
 // Get all lab records
 export const readallscheduledlab = async (req:any, res:any) => {
   try {
-      //const {clinic} = (req.user).user;
+      const {clinic} = (req.user).user;
+      
     //const queryresult = await readalllab({department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readalllab({status:configuration.status[5]},{},'patient','appointment','payment');
+    const queryresult = await readalllab({$or:[{status:configuration.status[5]},{status:configuration.status[13]},{status:configuration.status[14]}],department:clinic},{},'patient','appointment','payment');
     res.status(200).json({
       queryresult,
       status:true
@@ -91,7 +103,8 @@ export const listlabreport = async (req:any, res:any) => {
    
    
     // find related
-    const query = { status:configuration.status[7]};
+    const {clinic} = (req.user).user;
+    const query = { status:configuration.status[7],department:clinic};
     const queryresult = await readlabaggregate([
       {
         $lookup: {
@@ -122,8 +135,11 @@ export const listlabreport = async (req:any, res:any) => {
           firstName:{$first: {$first:"$patient.firstName"}},
           lastName:{$first: {$first:"$patient.lastName"}},
           phoneNumber:{$first: {$first:"$patient.phoneNumber"}},
-          appointmentid: {$first: {$first:"$appointments.appointmentid"}},
-          appointmentdate: {$first: {$first: "$appointments.appointmentdate"}}
+          appointmentid: {$first:"$appointmentid"},
+          //appointmentid: {$first: {$first:"$appointments.appointmentid"}},
+          appointmentdate: {$first: {$first: "$appointments.appointmentdate"}},
+          createdAt: {$first:"$createdAt"}
+         
           
         },
         
@@ -174,6 +190,7 @@ export const printlabreport = async (req:any, res:any) => {
       },
     };
     const {id} = req.params;
+    
     const queryresult = await readalllab({appointment:id, testresult: { $exists: true, $not: { $size: 0 } }},{testname:1,testid:1,testresult:1,status:1,appointmentid:1,createdAt:1,processeddate:1},populatequery,patientpopulatequery,'');
     res.status(200).json({
       queryresult,
@@ -252,5 +269,64 @@ export const listlabreportbypatient = async (req:any, res:any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+//this endpoint is use to accept or reject lab order
+export const confirmlaborder = async (req:any, res:any) =>{
+  try{
+    //extract option
+    const {option,remark} = req.body;
+    const {id} = req.params;
+    console.log('////confirmbodyrequest body////',req.body);
+    console.log('////confirmbodyrequest params////',id);
+  //search for the lab request
+  var lab:any =await readonelab({_id:id},{},'patient');
+  console.log('lab', lab);
+  const {testname, testid,patient,amount} = lab;
+  //validate the status
+  let queryresult;
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  let paymentreference; 
+  //let status;
+//validate the status
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+    //status=configuration.status[5];
+
+}
+else{
+  paymentreference = testid;
+  //status=configuration.status[2];
+}
+  if(option == true && patient.isHMOCover == configuration.ishmo[0]){
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
+    queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
+    await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+    
+  }
+  else if(option == true && patient.isHMOCover == configuration.ishmo[1]){
+    queryresult= await updatelab({_id:id},{status:configuration.status[5],remark});
+
+  }
+  else{
+    queryresult= await updatelab({_id:id},{status:configuration.status[13],remark});
+
+  }
+  res.status(200).json({queryresult, status: true});
+    //if accept
+//accept or reject lab order
+//var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+//paymentids.push(createpaymentqueryresult._id);
+//var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+//var testrecord = await createlab({payment:createpaymentqueryresult._id});
+//change status to 2 or  13 for reject
+
+  }
+  catch(e:any){
+    console.log("error", e);
+    res.status(403).json({ status: false, msg: e.message });
+
+  }
+}
 
 

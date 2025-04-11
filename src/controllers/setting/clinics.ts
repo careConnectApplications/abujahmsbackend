@@ -1,13 +1,18 @@
+import { types } from "util";
 import configuration from "../../config";
 import  {readallclinics,createclinic,readoneclinic,updateclinic}  from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber} from "../../utils/otherservices";
+import {createaudit} from "../../dao/audit";
+import clinic from "../../models/clinics";
 //add patiient
 export var createclinics = async (req:any,res:any) =>{
    
     try{
-     
-       const {clinic} = req.body;
-       validateinputfaulsyvalue({clinic});
+     console.log(req.body);
+       const {clinic,type} = req.body;
+       const { firstName, lastName } = (req.user).user;
+       var actor = `${firstName} ${lastName}`;
+       validateinputfaulsyvalue({clinic,type});
        var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
         //validate that category is in the list of accepted category
         //get token from header
@@ -28,7 +33,10 @@ export var createclinics = async (req:any,res:any) =>{
             throw new Error(`clinic ${configuration.error.erroralreadyexit}`);
 
         }
-         const queryresult=await createclinic({clinic, id});
+         const queryresult=await createclinic({clinic,type,id});
+         //create audit log
+       
+         await createaudit({action:"Created Clinic/Department/Pharmacy",actor,affectedentity:clinic});
         res.status(200).json({queryresult, status: true});
         
 
@@ -55,15 +63,37 @@ export async function getallclinic(req:Request, res:any){
     }
 
 }
+//get only clinics
+//read all patients
+export async function getonlyclinic(req:Request, res:any){
+  try{
+     
+      const queryresult = await readallclinics({type:configuration.clinictype[1]},'');
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+  }
+  catch(e:any){
+      res.status(403).json({status: false, msg:e.message});
+
+  }
+
+}
+
 
 //update a price
 export async function updateclinics(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
-    const {clinic} = req.body;
-    validateinputfaulsyvalue({clinic,id});
-    var queryresult = await updateclinic(id, {clinic});
+    const {clinic,type} = req.body;
+    const { firstName, lastName } = (req.user).user;
+    var actor = `${firstName} ${lastName}`;
+    validateinputfaulsyvalue({clinic,id, type});
+    var queryresult = await updateclinic(id, {clinic, type});
+    await createaudit({action:"Update Clinic/Department/Pharmacy",actor,affectedentity:clinic});
     res.status(200).json({
         queryresult,
         status:true

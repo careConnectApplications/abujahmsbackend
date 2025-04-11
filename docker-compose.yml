@@ -1,0 +1,71 @@
+version: '3.4'
+services:
+  #mongo db services
+  mongo_db:
+    container_name: mongodb
+    image: mongo:5.0
+    restart: unless-stopped
+    volumes:
+      - newdb:/data/db
+  #hms services1
+  hmsservicesone:
+    container_name: hmsservicesone
+    restart: unless-stopped
+    build: .
+    ports:
+      - 5003:5000
+    environment:
+        PORT: 5000
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
+        KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
+        
+    volumes: 
+      - ./uploads:/app/uploads
+      #- ./errorlogs:/app/errorlogs
+    depends_on:
+      - mongo_db
+  
+
+  #hms services2
+  hmsservicestwo:
+    container_name: hmsservicestwo
+    restart: unless-stopped
+    build: .
+    ports:
+      - 5001:5000
+    environment:
+        PORT: 5000
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
+        KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
+
+    volumes: 
+      - ./uploads:/app/uploads
+      #- ./errorlogs:/app/errorlogs
+    depends_on:
+      - mongo_db
+    
+
+#hms services3
+  hmsservicesthree:
+    container_name: hmsservicesthree
+    restart: unless-stopped
+    build: .
+    ports:
+      - 5002:5000
+    environment:
+        PORT: 5000
+        DOCKERDATABASE: mongodb://mongo_db:27017/hms
+        KEYGEN: 'w{v{<J2e&$x[/<V#&#G:?Ti?Frv+-P'
+
+
+    volumes: 
+      - ./uploads:/app/uploads
+      #- ./errorlogs:/app/errorlogs
+    depends_on:
+      - mongo_db
+  
+
+ 
+
+volumes:
+  newdb:

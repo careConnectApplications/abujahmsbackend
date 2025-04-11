@@ -1,5 +1,6 @@
 import configuration from "../../config";
-import  {readone,createuser}  from "../../dao/users";
+import bcrypt from "bcryptjs";
+import  {readone,createuser,updateuser}  from "../../dao/users";
 import {readallclinics} from "../../dao/clinics";
 import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
 
@@ -9,6 +10,15 @@ export var signin = async(req:any,res:any) =>{
     try{
         //destructure email and password
         const {email, password} = req.body;
+        var requirepasswordchange;
+        if(password == configuration.defaultPassword){
+            requirepasswordchange = true;
+
+        }
+        else{
+            requirepasswordchange=false;
+
+        }
    
         //validate email and password
         if(!email || !password){
@@ -37,7 +47,7 @@ export var signin = async(req:any,res:any) =>{
         }
 //respond with token
 var queryresult = sendTokenResponse(user);
-res.status(200).json({queryresult, status: true});
+res.status(200).json({queryresult, status: true,requirepasswordchange});
     }
     catch(error:any){
         res.status(403).json({ status: false, msg: error.message });
@@ -52,6 +62,9 @@ export var signup = async (req:any,res:any) =>{
     try{
         //get token from header
         const {email,firstName,title,staffId,lastName,country,state,city,address,age,dateOfBirth,gender,licence,phoneNumber,role,degree,profession,employmentStatus,nativeSpokenLanguage,otherLanguage,readWriteLanguage,clinic,zip,specializationDetails} = req.body;
+        //get role id
+        var roleId = (configuration.roles).filter((e:any) => e.role == role )[0].roleId;
+        req.body.roleId = roleId;
         validateinputfaulsyvalue({email,firstName,staffId,lastName,gender,role,clinic});
         const foundUser =  await readone({$or:[{email},{phoneNumber}]});
         if(foundUser){

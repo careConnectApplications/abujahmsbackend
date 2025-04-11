@@ -4,6 +4,8 @@ import nodemailer from "nodemailer";
 import configuration from "../config";
 import * as path from 'path';
 import exeltojson from 'convert-excel-to-json';
+import {readonepatient} from '../dao/patientmanagement';
+import { count } from "console";
 export var encrypt = async function(password:any){
     try{
     //generate a salt
@@ -30,8 +32,8 @@ export var isValidPassword = async function(newPassword:any, currentpassword:any
   }
 
   export var sendTokenResponse= (user:any) =>{
-    const {firstName, lastName, role, staffId,email,clinic,_id} =user;
-    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic,_id}},process.env.KEYGEN as string,{expiresIn:"1d"});
+    const {firstName, lastName, role, staffId,email,clinic,_id,roleId} =user;
+    const token= jwt.sign({user: {firstName, lastName, role, staffId, email, clinic,_id,roleId}},process.env.KEYGEN as string,{expiresIn:"1d"});
    
     const options ={
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -63,9 +65,41 @@ export var mail= async function mail(to:any,subject:any,textmessage:any){
 
     });
 }
+export async function storeUniqueNumber(n:number) {
+  try {
+      
+      // Generate unique 7-digit number
+      let uniqueNumber = await generateRandomNumber(n);
+      
 
+      // Check if the number already exists in the collection
+      const existing = await readonepatient({ 
+        MRN: uniqueNumber },{},'','');
+      
+      if (existing) {
+          console.log(`Number ${uniqueNumber} already exists. Generating a new one.`);
+          return storeUniqueNumber(n); // Retry if duplicate
+      }
+
+      return uniqueNumber;
+
+  } catch (err:any) {
+      throw new Error(err.message);
+  } 
+}
 export function generateRandomNumber(n:number) {
-    return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+    //return Math.floor((Math.random() * Math.random() * Math.random()) * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1) + Math.floor(Date.now()/1000000);
+   // let number = Math.floor(1000000 + Math.random() * 9000000); // Generates a number between 1000000 and 9999999
+    //return number;
+      // Get the current timestamp (in milliseconds)
+      //const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
+
+      // Take the first 7 characters (if needed, you can adjust this logic)
+      //const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
+
+  
+      //return uniqueString.toUpperCase();
+      return Math.floor(1000000 + Math.random() * 9000000);
   }
   export function validateinputfaulsyvalue(input:any){
     for (const key in input) {
@@ -75,6 +109,14 @@ export function generateRandomNumber(n:number) {
    }
  }      
  }
+ export function validateinputyesno(input:any){
+  for (const key in input) {
+ if (!(configuration.ishmo).includes(input[key])) {
+   throw new Error(`${key} ${configuration.error.erroroption}`);
+   
+ }
+}      
+}
  export function validateinputfornumber(input:any){
   for (const key in input) {
  if (isNaN(input[key])) {
@@ -85,6 +127,7 @@ export function generateRandomNumber(n:number) {
 }
 
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
+ 
   const fileName = file.name;
   const size = file.data.length/1024;
   const extension = path.extname(fileName);
@@ -119,6 +162,7 @@ export function generateRandomNumber(n:number) {
  //convert excel to json
  export function convertexceltojson(pathtoexcelsheet:any, nameofsheet:any, columnmapping:any){
     var jsonresult =exeltojson({
+        //sourceFile: 'C:\Users\malachi.egbugha\Documents\project\hmsbackend\uploads\hmo.csv',
         sourceFile: `${pathtoexcelsheet}`,
         sheets: [
             {
@@ -138,3 +182,15 @@ export function generateRandomNumber(n:number) {
        return jsonresult;
 
  }
+
+
+ export const isObjectAvailable = (objectName:any) => {
+if(!objectName || objectName.constructor !== Object ){
+  return false;
+
+}
+  //console.log(objectName.constructor === Object)
+  //return Object.keys(objectName).length === 0;
+  return Object.keys(objectName).length >= 0 && objectName.constructor === Object;
+  
+}

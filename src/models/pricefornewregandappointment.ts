@@ -18,13 +18,25 @@ const priceappointmentnewregistrationSchema = new Schema({
   },
   amount: {
     type: Number,
-    required: true
+    default: 0,
   },
   servicetype: {
     type: String,
     required: true
   },
+  isHMOCover: {
+    type: String,
+    default: configuration.ishmo[0],
+  },
   category:
+  {
+    type: String
+  },
+  productid:{
+    type: String
+
+  },
+  pharmacy:
   {
     type: String
   },

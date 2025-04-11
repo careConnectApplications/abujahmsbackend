@@ -11,7 +11,24 @@ import settings from '../routes/setting';
 import downloads from "../routes/downloads";
 import lab from '../routes/lab';
 import pharmacy from '../routes/pharmacy';
+import admission from '../routes/admission';
+import nursingcare from '../routes/nursingcare';
+import immunization from '../routes/immunization';
+import radiology from '../routes/radiology';
+import pathogragh from '../routes/pathograph';
+import familyplanning from '../routes/familyplanning';
+import referrer from '../routes/referrer';
+import deliverynote from '../routes/deliverynote';
+import procedure from '../routes/procedure';
+import dashboard  from '../routes/dashboard';
+import anc from '../routes/anc';
+import theatreadmission from '../routes/theatreadmission';
+import reports  from '../routes/reportsandanalytics';
+import { readicdeleven } from '../controllers/icdten/icdten';
+
+
 import {protect} from "../utils/middleware";
+
 
 function createServer(){
     const app:Application=express();
@@ -34,13 +51,29 @@ function createServer(){
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
-  app.use('/api/v1/users',users);
+  app.use('/api/v1/users',protect,users);
   app.use('/api/v1/billing',protect,billingandpayment);
   app.use('/api/v1/patientsmanagement',protect,patientsmanagement);
   app.use('/api/v1/appointment',protect, appointment);
   app.use('/api/v1/lab',protect, lab);
-  app.use('/api/v1/settings',settings);
+  app.use('/api/v1/settings',protect, settings);
   app.use('/api/v1/pharmacy',protect, pharmacy);
+  app.use('/api/v1/admission',protect, admission);
+  app.use('/api/v1/nursingcare',protect, nursingcare);
+  app.use('/api/v1/immunization',protect, immunization);
+  app.use('/api/v1/pathogragh', protect,pathogragh)
+  app.use('/api/v1/radiology',protect, radiology);
+  app.use('/api/v1/familyplanning',protect, familyplanning);
+  app.use('/api/v1/referrer',protect, referrer);
+  app.use('/api/v1/deliverynote', protect, deliverynote);  app.use('/api/v1/procedure', protect, procedure);
+  app.use('/api/v1/dashboard', protect, dashboard);
+  app.use('/api/v1/anc', protect, anc);
+  app.use('/api/v1/theatreadmission', protect, theatreadmission);
+  app.use('/api/v1/reports',protect,  reports);
+  app.use('/api/v1/readicdten',  readicdeleven);
+
+  
+
   // Handle POST requests to /webhook
   /*
 app.post('/api/v1/webhook', (req, res) => {

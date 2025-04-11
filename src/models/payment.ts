@@ -5,6 +5,7 @@ export interface paymentinterface {
   paymentype: String;
   patient:any;
   amount:Number,
+  qty:Number,
   paymentreference:String,
   paymentcategory:String,
   
@@ -28,6 +29,16 @@ const paymentSchema = new Schema(
     amount: {
       type: Number,
       required: true,
+     
+    },
+    qty: {
+      type: Number,
+      default: 1,
+     
+    },
+    numberoftimesprinted: {
+      type: Number,
+      default: 0,
      
     },
     cashieremail:{

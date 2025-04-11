@@ -1,19 +1,276 @@
   import {readallclinics} from "./dao/clinics";
   import  {readallservicetype}  from "./dao/servicetype";
-  
-const configuration = {
-  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending"],
-  defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab","Patient Registration"],
+  import {readwardaggregate,readclinicaggregate}  from "./dao/reports";
+const configuration:any = {
+  //clinic name
+  //wardname  
+  reports:[
+    {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
+  ],
+  hmodrugpayment: 0.1,
+  roles:[
+    {role: "Medical Director", roleId:"1"},
+    {role: "Pharmacist", roleId:"2"},
+    {role: "HOD Cashier", roleId:"3"},
+    {role: "General Nurse", roleId:"4"},
+    {role: "Cashier", roleId:"5"},
+    {role: "Medical Doctor", roleId:"6"},
+    {role: "Nurse/Midwife", roleId:"7"},
+    {role: "Theatre Nurse", roleId:"8"},
+    {role: "Radiologist", roleId:"9"},
+    {role: "Lab technician", roleId:"10"},
+    {role: "Pharmacy Technician", roleId:"11"},
+    {role: "Accountant", roleId:"12"},
+    {role: "Record Officers", roleId:"13"},
+    {role: "HOD Records", roleId:"14"},
+    {role: "Dental Technician", roleId:"15"},
+    {role: "Dental Therapist", roleId:"16"},
+    {role: "ENT Nurse", roleId:"17"},
+    {role: "Physiotheraphy", roleId:"18"},
+    {role: "ICT", roleId:"19"},
+    {role: "Head of Clinical Services", roleId:"20"}
+    //General Nurse
 
+    //Head of Clinical Services
+
+  ],
+  medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
+  medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
+  "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
+  defaultphonenumber:"11111111111",
+  status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation","achieved"],
+  admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
+  clinictype: ["department","clinic","pharmacy","radiology","procedure"],
+  defaultPassword: "HMSB",
+  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],
+  ishmo:["No","Yes"],
   settings: async function(){
-    const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
-    const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
+const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
+const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
    
+const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category == this.category[2]);
+console.log('service', servicetypedetail);
+var service:any=[];
+for(var i =0; i < servicetypedetail.length ; i++){
+ // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
+ var tem =servicetypedetail[i].type;
+ service.push(...tem);
+
+};
 
     
     return (
       {
+
+        bookingstatus:["booked","unbooked"],
+        cptcodes:["Anesthesia for Procedure ans Services on the head","Anesthesia for Procedure ans Services on the neck"],
+        dxcodes:["other amebic genitourinary infections","Other amebic infections"],
+        priority:["Urgent", "Routine","Non-Urgent"],
+        presentingcomplaints:["Ankle/Foot Symptom Or C/O Lower Limb Symptom","Anosmia","Black Faeces Or C/O Melaena","A Back Symptom","A Head Symptom"],
+        diagnosis:["A04.9 Bacterial intestinal infection, unspecified","A05 Other bacterial foodborne intoxications, not elsewhere classified","A05.1 Botulism food poisoning"],
+        voluntorysterilization:["Male","Female"],
+        typeofiud:["Hormonal", "Copper"],
+        typeofimplants:["Implanon(IMP)","Jadelle(JD)","Others"],
+        nursingdiagnosis: ["Acute Confusion","Acute Substance Withdrawal","Adult Pressure Injury","Anxiety","Autonomic Dysreflexia",""],
+        familyplanningyesnooption: ["Yes","No"],
+        typeoffamilyplanningclient: ["Post Abortion Care (PAC)","Post-Partum Family Planning(PPFP)","Routine"],
+        nameofinjectable: ["Depo medroxyprogrsterone ","Noristerat(NOR)","Others"],
+        typeofbarriermethods: ["Internal Condom","External Condom","Spermicide","Sponge","Diaphragm","Cervical Cap"],
+        liquor:["0","+1","+2","+3"],
+        moulding:["0","+1","+2","+3"],
+        cervicaldilationb:["3.0","4.0","5.0","5.5","6.0","6.5","7.0","7.5","8.0","8.5","9.0","9.5","10.0"],
+        descentofhead:["5/5","4/5","3/5","2/5","1/5","0/5"],
+        contraction:["1/10","2/10","3/10","4/10","5/10","6/10","7/10"],
+        administrationroute:["Oral(PO)","injection","Intravenous(IV)","intramuscular(IM)","Subcutaneous(SC or SQ)","Intradermal (ID)","Topical","Transdermal","Inhalation","Nasal","Rectal","Vaginal","Ophathalmic","Otic","Buccal","Sublingual","Intrathecal","Epidural","Intra-arterial","Intraosseous(IO)","intraperitoneal","Intracardiac","Intraocular","Intra-articular","Intravesical","Intrapleural","Intralymphatic","Intrauterine","Intracavernous","Urethral","Intrasynovial","Intralesional","Enteral(via feeding tube)","Intracerebral","Intracerebroventricular(ICV)","Percutaneous","Nasogastric","Nasoduodenal/Nasojejunal"],
+        vaccinetype:["Live-Attenuated","Inactivated","Subunit,Recombinant,Polysaccharide,and conjugate", "Toxoid","mRNA","Protein Subunit","DNA","Virus-Like Particle(VLP)","Whole-cell","Autogenous","Cancer"],
+        consent:["Full consent", "Partial consent","No consent","Emergency consent","Proxy or Substitute consent","Presumed","Research or Study consent","Assent and Dissent","Cultural or Community Consent"],
+        immunizationstatus:["Completed","Partially completed","Not Administered"],
+        reporter:["Patient reported","Provider reported","public health registry"],
+        oralfluids:["Water","Beverages","Soups"],
+        medication:["IV", "Oral"],
+        drainage:["Chest Tubes", "Surgical Drains"],
+        typeofinsulin:["Rapid-acting","Long-acting","Mixed"],
+        insulinroute:["Subcutaneous","Insulin Pump"],
+        insulinsymptoms:["Sweating","Dizziness","Confusion"],
+        insulininterventionprovided:["Oral","Glucose","IV"],
+        admissionstatus:["admited","totransfer","transfered","todischarge", "discharged"],
+        medicationchartfrequency:["Start","Daily","BD","TDS","QDS","PRM","NOCTE","4 Hours","8 Hours","12 Hours"],
+        medicationchartroute:["oral","caudal block","continuous epidural","continuous intra-arterial infusion","continuous IV infusion","continuous nebulization","continuous subcutaneous infusion","continuous intrathecal infusion","cervical","dental","epidural","otic (ear)","endotracheal","feeding tube","G-tube",
+        "hand bulb nebulizer","intra-articular","intrabursal","intra-cavernosal","intradermal","Infiltration","irrigation","inhalation","Intracardiac","intrapleural","IM"],
+        clinictype: ["department","clinic","pharmacy","radiology","procedure","lab"],
+        presentingcompalintcode:
+        [
+"518298011 Ankle/Foot Symptom Or C/) Lower Limb Symptom",
+"543378014 Anosmia",
+"517930010 Black Faeces [Symptom] Or C/O Melaena",
+"271717401 C/O - A Black Symptom",
+"664514017 C/O - A Head Symptom",
+"664505010 C/O - A Headache",
+"664483015 C/O - A Neck Symptom",
+"2546333013 C/O - Akathisia",
+"664489016 C/O - Ankle Symptom",
+"664506011 C/O - Anosmia",
+"2547486015 C/O - Bizarre Dreams",
+"543047018 C/O Catarrh",
+"664518019 C/O Cough",
+"664515016 C/O - Debility Malaise",
+"2546406013 C/O - Dreams",
+"664509016 C/O - Excess Tears",
+"664498018 C/O - Feeling Depressed",
+"664502013 C/O - Feeling Unhappy",
+"664490013 C/O Foot Symptom",
+"2547153013 C/O - Illusions Seen"
+        ],
+        nausea:
+        [
+        "None",
+        "Mild",
+        "Moderate",
+        "Severe",
+        "Resolved"
+        ],
+        
+        typeofdiet:
+        [
+        "Regular",
+        "Diabetic",
+        "Mechanical Soft",
+        "Liquid",
+        "Clear Liquid",
+        "Sips",
+        "Formula",
+        "NPO"
+        ],
+        
+        giboweleliminationpattern:
+        [
+        "Constipation",
+        "Diarrhea",
+        "Flatulence",
+        "Impaction",
+        "Incontinent of bowels",
+        "Normal bowel pattern for Patient"
+        ],
+        
+        bmfrequency:
+        [
+        "Weekly",
+        "Every 3 days",
+        "Every other day",
+        "1-3 times per day",
+        "Greater than 3 times per day"
+        ],
+        
+        bmusualtimeoftheday:
+        [
+        "Morning",
+        "Morning and night",
+        "Afternoon",
+        "Night"
+        ],
+        
+        bmregularity:[
+        "Irregular",
+        "Regular"
+        ],
+        
+        usualconsistency:[
+        "Dry",
+        "Normal",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Soft"
+        ],
+        
+        consistency:[
+        "Normal",
+        "Soft",
+        "Clots Present",
+        "Creamy",
+        "Dry",
+        "Frothy",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Mucoid",
+        "Seedy",
+        "Tarry"
+        ],
+        
+        color:
+        [
+        "Clay colored",
+        "Black tarry",
+        "Blood tinged",
+        "Blood frank",
+        "Bright red stool",
+        "Dark red stool",
+        "Brown",
+        "Green",
+        "Yellow",
+        "Orange stool",
+        "Red streaked stool"
+        ],
+        amount:[
+        "Negative",
+        "Small",
+        "Moderate",
+        "Large"
+        ],
+        
+        appearance:
+        [
+        "Irregular contour",
+        "Distended",
+        "Mass",
+        "rigid",
+        "Distended abdominal vein",
+        "Cullen's sign",
+        "Distinct protrusions",
+        "Rash",
+        "Firm",
+       "Flat",
+        "Inguinal Hernia",
+        "Symmetrical contour",
+        "Obese",
+        "Pendulous"
+        ],
+        
+        guboweleleiminationpattern:
+        [
+        "Constipation",
+        "Diarrhea",
+        "Flatulence",
+        "Impaction",
+        "Incontinent of bowels",
+        "Normal bowel pattern for Patient"
+        ],
+        
+        consistencystool:
+        [
+        "Normal",
+        "Soft",
+        "Clots present",
+        "Creamy",
+        "Dry",
+        "Frothy",
+        "Hard",
+        "Liquid",
+        "Loose",
+        "Mucoid",
+        "Seedy",
+        "Tarry"
+      ],
+
+
+
+apgarscoreafteroneminute:["1","2","3","4","5","6","7","8","9","10"],
+deliverytype:["Vagina Delivery","Caesarean Scetion"],
+delivery:["Pre-term","Term"],
+typeofassisteddelivery:["Vacuum Assisted", "Forceps"],
+feedingofthechild:["Exclusive Breastfeeding","Bottle Feeding","Both"],
+immunization:["Fully Immunized","Ongoing Immunization","Not Fully Immunized"],
 heartsound:[
 "Abnormal S1",
 "S4",
@@ -529,20 +786,140 @@ main:[
   servicecategory:servicetypedetails,
   pharmacycategory:["Medication Inventory","Non Medication Inventory"],
   category:configuration.category,
-  testnames:["PCV", "ESR", "Clothing Profile","Widal"],
+  //testnames:["PCV", "ESR", "Clothing Profile","Widal"],
+  testnames:service,
   testsubcomponent:[
-      {type:"Widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
+      {type:"widal", subcomponent:["Salmonella Typhi A (O) (H)","Salmonella Paratyphi A (O) (H)","Salmonella Paratyphi B (O) (H)","Salmonella Paratyphi C (O) (H)","Diagnostic Titre","Monocytes","Eosinophils","Basophils","Comments"]},
       {type:"PCV", subcomponent:["PCV%"]},
       {type:"ESR", subcomponent:["ESR (mm/hr)"]},
-      {type:"Clothing Profile", subcomponent:["PT (Seconds)","APTT (Seconds)","INR"]}
+      {type:"Clothing Profile", subcomponent:["PT (Seconds)","APTT (Seconds)","INR"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+
+
+
+/*
+      {type:"E/U/CR", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"MPS", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"LFT", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"FBS", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"RVS", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"E/U/CR EMERGENCY/URGENT", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"URIC ACID", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"PSA(QUALITATIVE)", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"LIPD PROFILE", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"SERUM CALSIUM", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"SERUM ALBUMIN", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"HCV", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Hbsag", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"urine Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Sputum Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Semen Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Rbs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Semen Analysis", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Ear Swab mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Eye Swab Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Uretheral Swab Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Pus swab Mcs", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"Wound Swab M/C/S", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+      {type:"combo Test", subcomponent:["HbsAg","HbsAb","HbeAg","HbeAb","HbcAb"]},
+ 
+  
+   
+  
+    
+      "E/c/s M/C/S",
+      "HVS m/c/s",
+      "Throat Swab M/c/s",
+      "Histology",
+      "FNAC",
+      "Transfusion",
+      "Blood Group",
+      "Genotype",
+      "ANC",
+      "Stool M/c/s",
+      "Stool Analysis",
+      "Urinalysis",
+      "C.S.F. M/c/s",
+      "C.S.F. Analysis",
+      "Serum Protein",
+      "Urine Sugar",
+      "Urine PT",
+      "Serum PT",
+      "Rheumatoid factor",
+      "Mantoux (PPD)",
+      "Mantoux (chromatography)",
+      "FBC & Diff (Automation)",
+      "FBC & Diff (Manual)",
+      "FSH",
+      "Estrogen",
+      "LH",
+      "Progesterone",
+      "Testesterone",
+      "PSA (Quantative)",
+      "D-Dimer",
+      "Troponin 1",
+      "HbA1c",
+      "Alpha Feto Protein",
+      "CRP",
+      "Prolactin",
+      "Beta HCG",
+      "H. Pylori",
+      "Occult Blood Test",
+      "Gram Stain",
+      "",
+      "Coomb Test Direct",
+      "Clotting Profile",
+      "Coomb Test Indirect",
+      "VDRL",
+      "Blood Bag",
+      "Eliza Screening",
+      "OGTT",
+      "Serum Bilirubin",
+      "Pap Smear",
+      "2HPP",
+      "AST",
+      "Blood Culture",
+      "Gastric Aspirate",
+      "Albumin",
+      "ALT",
+      "ALP",
+      "Pre marital Screening (Female)",
+      "Pre Marital Screening (Male)",
+      "Inorganic Phosphate",
+      "RVD",
+      "Magnesium"
+      */
+      //HbsAg
+
   ],
 
   roles:[
-    {role: "Doctor", roleId:"1"},
+    {role: "Medical Director", roleId:"1"},
     {role: "Pharmacist", roleId:"2"},
-    {role: "Receptionist", roleId:3},
-    {role: "Nurse", roleId:"4"},
+    {role: "HOD Cashier", roleId:3},
+    {role: "General Nurse", roleId:"4"},
     {role: "Cashier", roleId:"5"},
+    {role: "Medical Doctor", roleId:"6"},
+    {role: "Nurse/Midwife", roleId:"7"},
+    {role: "Theatre Nurse", roleId:"8"},
+    {role: "Radiologist", roleId:"9"},
+    {role: "Lab technician", roleId:"10"},
+    {role: "Pharmacy Technician", roleId:"11"},
+    {role: "Accountant", roleId:"12"},
+    {role: "Record Officers", roleId:"13"},
+    {role: "HOD Records", roleId:"14"},
+    {role: "Dental Technician", roleId:"15"},
+    {role: "Dental Therapist", roleId:"16"},
+    {role: "ENT Nurse", roleId:"17"},
+    {role: "Physiotheraphy", roleId:"18"},
+    {role: "Admin", roleId:"19"}
   ],
   clinics: clinicdetails,
   /*
@@ -580,6 +957,11 @@ main:[
 
   },
   {
+    type:"hmobulkdownloadtemplate", fileName:"hmo.xlsx"
+   
+
+  },
+  {
    
     type:"stockbulkdownloadtemplate", fileName:"inventory.xlsx"
 
@@ -587,15 +969,22 @@ main:[
 ],
 
   paymenttype:["patientregistration"],
-  allowedfilesize: 500,
+//  allowedfilesize: 500,
+allowedfilesize: 20000,
   usertemplate: "userslist",
+  hmotemplate: "hmo",
   stocktemplate: "stocklist",
   useruploadfilename:"usersload",
+  hmouploadfilename:"hmo",
   pharmacyuploadfilename:"pharmacyload",
   useruploaddirectory:"uploads",
   userdownloadsdirectory:"downloads",
   error:{
+    errorelevendigit:"Phone must be 11 digit",
     erroruserread: "Error in reading user",
+    errorauthorizehmo: "You cant create Insurance Patient from this service",
+    errorgeneral: "Error in",
+    errorrecordnotfound: "Record not found ",
     errorusercreate: "Error in creating user",
     errordownload:"Error downloading the file",
     errorinvalidcredentials: "Invalid credentials",
@@ -605,12 +994,14 @@ main:[
     errordeactivate:"You have been Deactivated",
     errorpasswordmismatch:"Wrong Password Detected",
     erroralreadyexit: "already exist",
+    errorvacantspace:"has no vancant bed",
     errorencryptingpassword:"Error in encrypting Password",
     errorvalidatingpassword:"Error in Validating Password",
     errorfilextension: "File extension not allowed",
     errorfilelarge: "File should not be greater than 500kb",
     errorfileupload: "Error in uploading file",
     errorisrequired: "is required",
+    erroroption: "value selected is not part of the available options",
     errorservicecategory:"service category does not exist in the list of accepted categories",
     errornopriceset:"No Price has been set for this service",
     erroravailability:"Is out of stock",
@@ -619,10 +1010,13 @@ main:[
     errornotfound:"not found",
     errortasknotpending:"Task not pending on you",
     errorpayment:"This service has not been paid for",
+    errorreferrer: "You are not the preferred consultant for this referrer",
+    errorgreaterthan:"Cannot be greater",
+    errorservicetray: "This service donot exist in your service tray"
 
   },
-    environment: "test",
-  //environment: "prod",
+   // environment: "test",
+ environment: "prod",
 
 }
 export default configuration;

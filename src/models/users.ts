@@ -18,6 +18,11 @@ const userSchema = new Schema(
       required: true,
       type: String,
     },
+    roleId: {
+      required: true,
+      type: String,
+    },
+    
     firstName: {
       required: true,
       type: String,
