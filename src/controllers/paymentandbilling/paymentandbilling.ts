@@ -1,4 +1,4 @@
-import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate,readpaymentaggregate} from "../../dao/payment";
+import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate,readpaymentaggregate,readpaymentaggregateoptimized} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
@@ -209,6 +209,130 @@ export async function groupreadallpayment(req: any, res: any) {
     res.status(403).json({status: false, msg:e.message});
   }
 }
+
+export async function groupreadallpaymentoptimized(req: any, res: any) {
+  try {
+    //const { paymentreference } = req.params;
+    var {status,firstName,MRN,HMOId,lastName,phoneNumber,email,paymentreference} = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 150;
+    var filter:any = {};
+    var statusfilter:any = {};
+    // Add filters based on query parameters
+    if (firstName) {
+      
+      filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+      
+    }
+    if (MRN) {
+    
+      filter.MRN = new RegExp(MRN, 'i');
+    }
+    if (HMOId) {
+      filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+    }
+    if (lastName) {
+      filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+    }
+    if (phoneNumber) {
+      filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+    }
+    
+    if (paymentreference) {
+      filter.paymentreference = new RegExp(paymentreference, 'i'); // Case-insensitive search for email
+    }
+    console.log('filter', filter);
+  //payments status
+    if(status == "paid"){
+      statusfilter.status=configuration.status[3]
+
+    }
+    else{
+      statusfilter.status=configuration.status[2];
+
+    } 
+    
+
+    const referencegroup = [
+     //look up patient
+     //add query
+     {
+      $match:statusfilter
+     },
+     {
+      $lookup: {
+        from: "patientsmanagements",
+        localField: "patient",
+        foreignField: "_id",
+        as: "patient",
+      },
+    },
+    {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true
+      }
+      
+    },
+ 
+      {
+        $group: {
+          _id: "$paymentreference",
+          paymentreference: {$first: "$paymentreference"},
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          amount: { $sum: "$amount" },
+          firstName:{$first: "$patient.firstName"},
+          phoneNumber:{$first: "$patient.phoneNumber"},
+          lastName:{$first: "$patient.lastName"},
+          MRN:{$first: "$patient.MRN"},
+          isHMOCover:{$first: "$patient.isHMOCover"},
+          HMOName:{$first: "$patient.HMOName"},
+          HMOId:{$first: "$patient.HMOId"},
+          HMOPlan:{$first: "$patient.HMOPlan"}, 
+        },
+      },
+      
+      {
+        $match:filter
+      },
+      {
+        $project:{
+          _id:0,
+          paymentreference:1,
+          createdAt:1,
+          updatedAt:1,
+          amount:1,
+          firstName:1,
+          phoneNumber:1,
+          lastName:1,
+          MRN:1,
+          isHMOCover:1,
+          HMOName:1,
+          HMOId:1,
+          HMOPlan:1
+
+        }
+      },
+      
+      { $sort: { createdAt: -1 } },
+      
+      
+    ];
+
+    const queryresult = await readpaymentaggregateoptimized(referencegroup, page, size);
+    res.json({
+      queryresult,
+      status: true,
+    });
+
+    
+  } catch (e: any) {
+    console.log(e);
+    res.status(403).json({status: false, msg:e.message});
+  }
+}
+
    //read particular patient payment history
 export async function readbillinghistoryforapatient(req:any, res:any){
     try{
