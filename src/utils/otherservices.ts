@@ -92,12 +92,14 @@ export function generateRandomNumber(n:number) {
    // let number = Math.floor(1000000 + Math.random() * 9000000); // Generates a number between 1000000 and 9999999
     //return number;
       // Get the current timestamp (in milliseconds)
-      const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
+      //const timestamp = Date.now().toString(36); // Convert timestamp to base-36 (alphanumeric)
 
       // Take the first 7 characters (if needed, you can adjust this logic)
-      const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
+      //const uniqueString = timestamp.slice(-7); // Ensures we get the last 7 characters
+
   
-      return uniqueString.toUpperCase();
+      //return uniqueString.toUpperCase();
+      return Math.floor(1000000 + Math.random() * 9000000);
   }
   export function validateinputfaulsyvalue(input:any){
     for (const key in input) {

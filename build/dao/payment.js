@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readpaymentaggregate = readpaymentaggregate;
+exports.readpaymentaggregateoptimized = readpaymentaggregateoptimized;
 exports.readallpayment = readallpayment;
 exports.readallpaymentaggregate = readallpaymentaggregate;
 exports.createpayment = createpayment;
@@ -25,6 +26,21 @@ function readpaymentaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             return yield payment_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function readpaymentaggregateoptimized(input, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            const paymentdetails = yield payment_1.default.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+            const totalpaymentdetails = (yield payment_1.default.aggregate(input)).length;
+            const totalPages = Math.ceil(totalpaymentdetails / size);
+            return { paymentdetails, totalPages, totalpaymentdetails, size, page };
         }
         catch (e) {
             console.log(e);
