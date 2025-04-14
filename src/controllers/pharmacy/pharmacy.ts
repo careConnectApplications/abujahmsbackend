@@ -240,6 +240,7 @@ dosageform:String,
 //dispense
   export async function groupreadallpharmacytransactionoptimized(req: any, res: any) {
     try {
+      console.log('/////query//', req.query);
       const { clinic} = (req.user).user;
       const page = parseInt(req.query.page) || 1;
       const size = parseInt(req.query.size) || 150;
