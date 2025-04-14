@@ -322,6 +322,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     ];
 
     const queryresult = await readpaymentaggregateoptimized(referencegroup, page, size);
+    console.log('*******', queryresult);
     res.json({
       queryresult,
       status: true,
