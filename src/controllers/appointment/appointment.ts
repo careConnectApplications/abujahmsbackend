@@ -1,4 +1,4 @@
-import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery} from "../../dao/appointment";
+import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery,readallappointmentpaginated} from "../../dao/appointment";
 import {readoneadmission} from "../../dao/admissions";
 import {createvitalcharts} from "../../dao/vitalcharts";
 import {readonevitalcharts,updatevitalcharts} from "../../dao/vitalcharts";
@@ -72,6 +72,142 @@ await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appoin
   }
 };
 
+// Get all schedueled records
+export const getAllSchedulesoptimized = async (req:any, res:any) => {
+  try {
+    var {firstName,MRN,lastName,appointmenttype} = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 150;
+    let filter:any = {};
+    var otherfilter:any = {};
+    //appointment, type, MRN,patient name, 
+     // Add filters based on query parameters
+     if (firstName) {
+      //console.log(req.query.firstName)
+      filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+    }
+    if (MRN) {
+    
+      filter.MRN = new RegExp(MRN, 'i');
+    }
+    if (lastName) {
+      filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+    }
+   
+   console.log("filter", filter);
+   if (appointmenttype) {
+    otherfilter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
+  }
+  /*
+    if(status == "paid"){
+      otherfilter.status=configuration.status[3]
+   
+       }
+       else{
+        otherfilter.status=configuration.status[5];
+   
+       }
+        */ 
+       const referencegroup = [
+        //look up patient
+        //add query
+        {
+         $match:otherfilter
+        },
+        {
+         $lookup: {
+           from: "patientsmanagements",
+           localField: "patient",
+           foreignField: "_id",
+           as: "patient",
+         },
+       },
+       {
+        $lookup: {
+          from: "payments",
+          localField: "payment",
+          foreignField: "_id",
+          as: "payment",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "doctor",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+       {
+         $unwind: {
+           path: "$patient",
+           preserveNullAndEmptyArrays: true
+         }
+         
+       },
+       {
+        $unwind: {
+          path: "$doctor",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+      {
+        $unwind: {
+          path: "$payment",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+        
+         {
+           $project:{
+             _id:0,
+             createdAt:1,
+             updatedAt:1,
+             appointmenttype:1,
+             appointmentdate:1,
+             clinic:1,
+             appointmentcategory:1,
+             firstName:"$patient.firstName",
+             lastName:"$patient.lastName",
+             MRN:"$patient.MRN",
+             HMOId:"$patient.HMOId",
+             HMOName:"$patient.HMOName",
+             status:1,
+             paymentstatus:"$payment.status",
+             paymentreference:"$payment.paymentreference",
+             doctorsfirstName:"$doctor.firstName",
+             doctorslastName:"$doctor.lastName"
+
+             //phoneNumber
+             //isHMOCover
+             
+
+                  
+           
+             
+   
+           }
+         },
+         {
+          $match:filter
+        },
+         
+         { $sort: { createdAt: -1 } },
+         
+         
+       ];
+   
+    const queryresult = await readallappointmentpaginated(referencegroup,page,size);
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
 
 // Get all schedueled records
 export const getAllSchedules = async (req:any, res:any) => {
