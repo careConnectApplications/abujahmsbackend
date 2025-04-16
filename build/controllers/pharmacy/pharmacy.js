@@ -228,6 +228,7 @@ function groupreadallpharmacytransaction(req, res) {
 function groupreadallpharmacytransactionoptimized(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log('/////query//', req.query);
             const { clinic } = (req.user).user;
             const page = parseInt(req.query.page) || 1;
             const size = parseInt(req.query.size) || 150;

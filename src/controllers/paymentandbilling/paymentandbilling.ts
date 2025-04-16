@@ -214,8 +214,9 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
   try {
     //const { paymentreference } = req.params;
     var {status,firstName,MRN,HMOId,lastName,phoneNumber,email,paymentreference} = req.query;
-    const page = parseInt(req.query.page) || 1;
-    const size = parseInt(req.query.size) || 150;
+    console.log('/////query//', req.query);
+    var page = parseInt(req.query.page) || 1;
+    var size = parseInt(req.query.size) || 150;
     var filter:any = {};
     var statusfilter:any = {};
     // Add filters based on query parameters
@@ -321,6 +322,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     ];
 
     const queryresult = await readpaymentaggregateoptimized(referencegroup, page, size);
+    console.log('*******', queryresult);
     res.json({
       queryresult,
       status: true,

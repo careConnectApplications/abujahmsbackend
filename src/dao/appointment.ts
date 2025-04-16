@@ -40,6 +40,21 @@ export async function readallappointmentfirstfive(query:any,selectquery:any,popu
     throw new Error(configuration.error.erroruserread);
   }
 };
+export async function readallappointmentpaginated(input:any,page:any,size:any) {
+    try{
+    const skip = (page - 1) * size;
+    const appointmentdetails=await Appointment.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+     const totalappointentdetails = (await Appointment.aggregate(input)).length;
+          const totalPages = Math.ceil(totalappointentdetails / size);
+          return { appointmentdetails, totalPages,totalappointentdetails, size, page};  
+  }
+    catch(e:any){
+      console.log(e);
+      throw new Error(configuration.error.erroruserupdate);
+    }
+    }
+
+
 
   //read all patient history
   export async function readallappointment(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any,populatefourthquery:any,populatefifthquery:any,populatesixthquery:any,populateseventhquery:any,populateeigthquery:any,populateninththquery:any) {
