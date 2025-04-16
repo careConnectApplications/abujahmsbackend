@@ -212,8 +212,9 @@ function groupreadallpaymentoptimized(req, res) {
         try {
             //const { paymentreference } = req.params;
             var { status, firstName, MRN, HMOId, lastName, phoneNumber, email, paymentreference } = req.query;
-            const page = parseInt(req.query.page) || 1;
-            const size = parseInt(req.query.size) || 150;
+            console.log('/////query//', req.query);
+            var page = parseInt(req.query.page) || 1;
+            var size = parseInt(req.query.size) || 150;
             var filter = {};
             var statusfilter = {};
             // Add filters based on query parameters
@@ -303,6 +304,7 @@ function groupreadallpaymentoptimized(req, res) {
                 { $sort: { createdAt: -1 } },
             ];
             const queryresult = yield (0, payment_1.readpaymentaggregateoptimized)(referencegroup, page, size);
+            console.log('*******', queryresult);
             res.json({
                 queryresult,
                 status: true,

@@ -38,7 +38,15 @@ const configuration = {
         { role: "ENT Nurse", roleId: "17" },
         { role: "Physiotheraphy", roleId: "18" },
         { role: "ICT", roleId: "19" },
-        { role: "Head of Clinical Services", roleId: "20" }
+        { role: "Head of Clinical Services", roleId: "20" },
+        //new roles
+        { role: "HOD Radiology", roleId: "21" },
+        { role: "HOD Pharmacy", roleId: "22" },
+        { role: "HOD ENT", roleId: "23" },
+        { role: "HOD Dental", roleId: "24" },
+        { role: "HOD Lab", roleId: "25" },
+        { role: "Lab Scientist", roleId: "26" },
+        { role: "HOD A&E", roleId: "27" }
         //General Nurse
         //Head of Clinical Services
     ],
@@ -844,7 +852,7 @@ const configuration = {
                 roles: [
                     { role: "Medical Director", roleId: "1" },
                     { role: "Pharmacist", roleId: "2" },
-                    { role: "HOD Cashier", roleId: 3 },
+                    { role: "HOD Cashier", roleId: "3" },
                     { role: "General Nurse", roleId: "4" },
                     { role: "Cashier", roleId: "5" },
                     { role: "Medical Doctor", roleId: "6" },
@@ -860,7 +868,16 @@ const configuration = {
                     { role: "Dental Therapist", roleId: "16" },
                     { role: "ENT Nurse", roleId: "17" },
                     { role: "Physiotheraphy", roleId: "18" },
-                    { role: "Admin", roleId: "19" }
+                    { role: "ICT", roleId: "19" },
+                    { role: "Head of Clinical Services", roleId: "20" },
+                    //new roles
+                    { role: "HOD Radiology", roleId: "21" },
+                    { role: "HOD Pharmacy", roleId: "22" },
+                    { role: "HOD ENT", roleId: "23" },
+                    { role: "HOD Dental", roleId: "24" },
+                    { role: "HOD Lab", roleId: "25" },
+                    { role: "Lab Scientist", roleId: "26" },
+                    { role: "HOD A&E", roleId: "27" }
                 ],
                 clinics: clinicdetails,
                 /*
@@ -947,7 +964,7 @@ const configuration = {
         errorgreaterthan: "Cannot be greater",
         errorservicetray: "This service donot exist in your service tray"
     },
-    //environment: "test",
+    // environment: "test",
     environment: "prod",
 };
 exports.default = configuration;
