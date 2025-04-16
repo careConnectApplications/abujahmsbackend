@@ -28,7 +28,15 @@ const configuration:any = {
     {role: "ENT Nurse", roleId:"17"},
     {role: "Physiotheraphy", roleId:"18"},
     {role: "ICT", roleId:"19"},
-    {role: "Head of Clinical Services", roleId:"20"}
+    {role: "Head of Clinical Services", roleId:"20"},
+    //new roles
+    {role: "HOD Radiology", roleId:"21"},
+    {role: "HOD Pharmacy", roleId:"22"},
+    {role: "HOD ENT", roleId:"23"},
+    {role: "HOD Dental", roleId:"24"},
+    {role: "HOD Lab", roleId:"25"},
+    {role: "Lab Scientist", roleId:"26"},
+    {role: "HOD A&E", roleId:"27"}
     //General Nurse
 
     //Head of Clinical Services
