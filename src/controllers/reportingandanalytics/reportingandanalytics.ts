@@ -370,12 +370,14 @@ export const reportsummary = async (req:any,res:any) =>{
         $group: {
           _id: "$cashieremail",                // Group by product
           totalAmount: { $sum: "$amount" },
-          cashierid:{$first:"$cashierid"}
+          cashierid:{$first:"$cashierid"},
+          cashiername:{$first:"$cashiername"}
         }
       },
       {
         $project:{
           cashieremail:"$_id",
+          cashiername:1,
           totalAmount:1,
           cashierid:1,
           status:configuration.status[3],
