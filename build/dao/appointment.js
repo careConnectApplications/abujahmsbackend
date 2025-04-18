@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.countappointment = countappointment;
 exports.modifiedreadallappointment = modifiedreadallappointment;
 exports.readallappointmentfirstfive = readallappointmentfirstfive;
+exports.readallappointmentpaginated = readallappointmentpaginated;
 exports.readallappointment = readallappointment;
 exports.createappointment = createappointment;
 exports.readoneappointment = readoneappointment;
@@ -59,6 +60,21 @@ function readallappointmentfirstfive(query, selectquery, populatequery, populate
     });
 }
 ;
+function readallappointmentpaginated(input, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            const appointmentdetails = yield appointment_1.default.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+            const totalappointentdetails = (yield appointment_1.default.aggregate(input)).length;
+            const totalPages = Math.ceil(totalappointentdetails / size);
+            return { appointmentdetails, totalPages, totalappointentdetails, size, page };
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
 //read all patient history
 function readallappointment(query, selectquery, populatequery, populatesecondquery, populatethirdquery, populatefourthquery, populatefifthquery, populatesixthquery, populateseventhquery, populateeigthquery, populateninththquery) {
     return __awaiter(this, void 0, void 0, function* () {

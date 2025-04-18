@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readallvitalchartByAppointment = exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.scheduleappointment = void 0;
+exports.readallvitalchartByAppointment = exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.getAllSchedulesoptimized = exports.scheduleappointment = void 0;
 exports.updateappointments = updateappointments;
 exports.addclinicalencounter = addclinicalencounter;
 exports.addencounter = addencounter;
@@ -80,6 +80,127 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.scheduleappointment = scheduleappointment;
+// Get all schedueled records
+const getAllSchedulesoptimized = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        var { firstName, MRN, lastName, appointmenttype } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        let filter = {};
+        var otherfilter = {};
+        //appointment, type, MRN,patient name, 
+        // Add filters based on query parameters
+        if (firstName) {
+            //console.log(req.query.firstName)
+            filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if (MRN) {
+            filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (lastName) {
+            filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        console.log("filter", filter);
+        if (appointmenttype) {
+            otherfilter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
+        }
+        /*
+          if(status == "paid"){
+            otherfilter.status=configuration.status[3]
+         
+             }
+             else{
+              otherfilter.status=configuration.status[5];
+         
+             }
+              */
+        const referencegroup = [
+            //look up patient
+            //add query
+            {
+                $match: otherfilter
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $lookup: {
+                    from: "payments",
+                    localField: "payment",
+                    foreignField: "_id",
+                    as: "payment",
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "doctor",
+                    foreignField: "_id",
+                    as: "doctor",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: "$doctor",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: "$payment",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    appointmenttype: 1,
+                    appointmentdate: 1,
+                    clinic: 1,
+                    appointmentcategory: 1,
+                    firstName: "$patient.firstName",
+                    lastName: "$patient.lastName",
+                    MRN: "$patient.MRN",
+                    HMOId: "$patient.HMOId",
+                    HMOName: "$patient.HMOName",
+                    status: 1,
+                    paymentstatus: "$payment.status",
+                    paymentreference: "$payment.paymentreference",
+                    doctorsfirstName: "$doctor.firstName",
+                    doctorslastName: "$doctor.lastName"
+                    //phoneNumber
+                    //isHMOCover
+                }
+            },
+            {
+                $match: filter
+            },
+            { $sort: { createdAt: -1 } },
+        ];
+        const queryresult = yield (0, appointment_1.readallappointmentpaginated)(referencegroup, page, size);
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllSchedulesoptimized = getAllSchedulesoptimized;
 // Get all schedueled records
 const getAllSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
