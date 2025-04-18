@@ -83,17 +83,21 @@ export async function updateservicetypes(req:any, res:any){
 
     
   }
- 
+ /*
     for(var i =0; i < servicetype.length; i++){
       if((foundservicetype.type).includes(servicetype[i]))
       throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
 
   }
-  var queryresult:any=await updateservicetype({_id:id},{$push: {type:{$each: servicetype}},department});
-   // var queryresult = await updateservicetype(id, {clinic});
+      */
+      
+  //var queryresult:any=await updateservicetype({_id:id},{$push: {type:{$each: servicetype}},department});
+  var queryresult:any=await updateservicetype({_id:id},{type:servicetype,department}); 
+
+  // var queryresult = await updateservicetype(id, {clinic});
    const { firstName, lastName } = (req.user).user;
    var actor = `${firstName} ${lastName}`;    
-   await createaudit({action:"Updated Service Type",actor,affectedentity:queryresult.servicecategory});
+   await createaudit({action:"Updated Service Type",actor,affectedentity:queryresult.category});
    res.status(200).json({
         queryresult,
         status:true
