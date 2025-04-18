@@ -125,3 +125,38 @@ catch(e:any){
 }
   
 }
+//search procedure
+export async function searchprocedure(req:any, res:any){
+  try{
+    const {searchparams} = req.params;
+    const queryresult = await readallprices({servicecategory:configuration.category[5],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
+    res.status(200).json({
+        queryresult:queryresult.pricedetails,
+        status:true
+      }); 
+
+}
+catch(e:any){
+    res.status(403).json({status: false, msg:e.message});
+
+}
+  
+}
+//search radiology
+//search procedure
+export async function searchradiology(req:any, res:any){
+  try{
+    const {searchparams} = req.params;
+    const queryresult = await readallprices({servicecategory:configuration.category[4],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
+    res.status(200).json({
+        queryresult:queryresult.pricedetails,
+        status:true
+      }); 
+
+}
+catch(e:any){
+    res.status(403).json({status: false, msg:e.message});
+
+}
+  
+}
