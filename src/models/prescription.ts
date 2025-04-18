@@ -82,6 +82,11 @@ const prescriptionSchema = new Schema({
     default: configuration.status[14],
     required: true
 
+  },
+  servedstatus:{
+    type: String,
+    default: configuration.servedstatus[1]
+
   }
 },
 { timestamps: true }

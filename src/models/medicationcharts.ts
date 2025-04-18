@@ -17,6 +17,12 @@ const medicalchartsSchema = new Schema({
         ref: "Patientsmanagement",
         default: null,
       },
+    prescription: 
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Prescription",
+      default: null,
+    },
       drug:String,
         note:String,
         dose:String,

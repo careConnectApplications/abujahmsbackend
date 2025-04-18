@@ -48,6 +48,7 @@ const configuration:any = {
   defaultphonenumber:"11111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation","achieved"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
+  servedstatus:["served","unserved"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],

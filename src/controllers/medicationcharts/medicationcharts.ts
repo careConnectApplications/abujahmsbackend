@@ -1,4 +1,5 @@
 import {readallmedicationcharts, createmedicationcharts,updatemedicationcharts} from "../../dao/medicationcharts";
+import { updateprescription } from "../../dao/prescription";
 import {readoneadmission} from "../../dao/admissions";
 import  {readonepatient}  from "../../dao/patientmanagement";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
@@ -11,7 +12,7 @@ import configuration from "../../config";
 export const readallmedicationchartByAdmission = async (req:any, res:any) => {
     try {
      const {admission} = req.params;
-      const queryresult = await readallmedicationcharts({admission},{},'patient','admission');
+      const queryresult = await readallmedicationcharts({admission},{},'prescription','');
       res.status(200).json({
         queryresult,
         status:true
@@ -47,7 +48,7 @@ export const createmedicationchart = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
-      var { drug,note,dose,frequency,route,staffname} = req.body;
+      var { drug,note,dose,frequency,route,staffname,prescription} = req.body;
       validateinputfaulsyvalue({drug,note,dose,frequency,route,staffname});
        //frequency must inlcude
        //route must contain allowed options
@@ -70,7 +71,11 @@ export const createmedicationchart = async (req:any, res:any) => {
 
        }
       
-    const queryresult=await createmedicationcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,drug,note,dose,frequency,route,staffname});
+    const queryresult=await createmedicationcharts({referedward:admissionrecord.referedward,prescription,admission:admissionrecord._id,patient:admissionrecord.patient,drug,note,dose,frequency,route,staffname});
+     //find prescription and change status
+     await updateprescription(prescription,{servedstatus:configuration.servedstatus[0]});
+     //configuration.servedstatus[]
+
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
