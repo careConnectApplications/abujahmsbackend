@@ -44,6 +44,9 @@ const paymentSchema = new Schema(
     cashieremail:{
       type: String
     },
+    cashiername:{
+      type: String
+    },
     cashierid:{
       type: String
     },
