@@ -19,7 +19,7 @@ const feedingtubechartSchema = new Schema({
       },
       Datetimefeeds:Date, 
       amount:String,
-      sign:String,
+      feed:String,
         staffname: String,
 },
 { timestamps: true }

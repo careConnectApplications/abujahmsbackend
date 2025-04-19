@@ -33,6 +33,14 @@ totalintake:String,
 totaloutput:String,
 netfliudbalancefor24hours:String,
 staffname: String,
+//updated
+datetime:Date,
+intaketype:String,
+intakeroute:String,
+intakeamount:String,
+outputtype:String,
+outputroute:String,
+outputamount:String
 },
 { timestamps: true }
 );
