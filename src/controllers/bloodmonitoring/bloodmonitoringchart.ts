@@ -43,7 +43,7 @@ export const createbloodmonitorings = async (req:any, res:any) => {
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       
-      
+      //blood sugar monitoring chart (contents: Date, Time, Test Type (drop down, RBS FBS), Value (mmol/l) , done by user acct.
       var { typeoftestRBSFBS,value,staffname} = req.body;
       validateinputfaulsyvalue({typeoftestRBSFBS,value,staffname});
        //frequency must inlcude

@@ -10,7 +10,7 @@ import configuration from "../../config";
 export const readalltubefeedingchartByAdmission = async (req:any, res:any) => {
     try {
      const {admission} = req.params;
-      const queryresult = await readalltubefeedingcharts({admission},{},'patient','admission');
+      const queryresult = await readalltubefeedingcharts({admission},{Datetimefeeds:1,amount:1,feed:1,staffname:1,createdAt:1,updatedAt:1},'','');
       res.status(200).json({
         queryresult,
         status:true
@@ -25,7 +25,7 @@ export const readalltubefeedingchartByAdmission = async (req:any, res:any) => {
       //const {clinic} = (req.user).user;
       const {patient} = req.params;
       //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-      const queryresult = await readalltubefeedingcharts({patient},{},'patient','admission');
+      const queryresult = await readalltubefeedingcharts({patient},{Datetimefeeds:1,amount:1,feed:1,staffname:1,createdAt:1,updatedAt:1},'','');
       res.status(200).json({
         queryresult,
         status:true
@@ -41,15 +41,15 @@ export const createtubefeedingchart = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
-      var { Datetimefeeds,amount,sign,staffname} = req.body;
-      validateinputfaulsyvalue({Datetimefeeds,amount,sign,staffname}); 
+      var { Datetimefeeds,amount,feed,staffname} = req.body;
+      validateinputfaulsyvalue({Datetimefeeds,amount,feed,staffname}); 
       const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
       console.log(admissionrecord);   
       if(!admissionrecord){
            throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
   
        }
-    const queryresult=await createtubefeedingcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,Datetimefeeds,amount,sign,staffname});
+    const queryresult=await createtubefeedingcharts({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,Datetimefeeds,amount,feed,staffname});
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
@@ -64,10 +64,10 @@ export async function updatetubefeedingchart(req:any, res:any){
     const {id} = req.params;
     const { firstName,lastName} = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
-    var { Datetimefeeds,amount,sign,staffname} = req.body;
-    validateinputfaulsyvalue({Datetimefeeds,amount,sign,staffname});
+    var { Datetimefeeds,amount,feed,staffname} = req.body;
+    validateinputfaulsyvalue({Datetimefeeds,amount,feed,staffname});
 
-    var queryresult = await updatetubefeedingcharts(id, {Datetimefeeds,amount,sign,staffname});
+    var queryresult = await updatetubefeedingcharts(id, {Datetimefeeds,amount,feed,staffname});
     res.status(200).json({
         queryresult,
         status:true
