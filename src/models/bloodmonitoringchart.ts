@@ -20,6 +20,7 @@ const bloodmonitoringSchema = new Schema({
       typeoftestRBSFBS:String, 
       value:String,
       staffname: String,
+      datetime:Date
 },
 { timestamps: true }
 );

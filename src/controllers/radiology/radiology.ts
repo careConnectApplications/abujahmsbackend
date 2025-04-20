@@ -128,6 +128,7 @@ export var radiologyorder= async (req:any, res:any) =>{
         res.status(403).json({ status: false, msg: error.message });
       }
     };
+    
 
     //update radiology
     export async function updateradiologys(req:any, res:any){
@@ -171,6 +172,43 @@ export var radiologyorder= async (req:any, res:any) =>{
         }
     
       }
+      export var enterradiologyresult = async (req:any, res:any) =>{
+        try{
+          const { firstName,lastName} = (req.user).user;
+      const {id} = req.params;
+      const {typetestresult} = req.body;
+      var response:any = await readoneradiology({_id:id},{},'patient');
+      // validate patient status
+       if(response.status !== configuration.status[9]){
+        throw new Error(`Radiology Record ${configuration.error.errortasknotpending}`);
+
+
+       }
+      const {patient} = response;
+      //validate payment
+      var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+      if(!findAdmission && patient.isHMOCover == configuration.ishmo[0]){
+            var paymentrecord:any = await readonepayment({_id:response.payment});
+            if(paymentrecord.status !== configuration.status[3]){
+            throw new Error(configuration.error.errorpayment);
+
+            }
+     }
+  const processby = `${firstName} ${lastName}`;
+  var queryresult = await updateradiology(id, {typetestresult,status:configuration.status[7],processby});
+  res.json({
+    queryresult,
+    status:true
+  });
+
+        }
+        catch(e:any){
+          res.json({status: false, msg:e.message});
+
+        }
+      }
+      //typeresult
+    //typetestresult
     //process result
     //upload patients photo
   export var uploadradiologyresult = async (req:any, res:any)=>{
@@ -199,7 +237,7 @@ export var radiologyorder= async (req:any, res:any) =>{
         const file = req.files.file;
         const fileName = file.name;
         const filename= "radiology" + uuidv4();
-        let allowedextension = ['.jpg','.png','.jpeg','.pdf'];
+        let allowedextension = ['.jpg','.png','.jpeg','.pdf','.docx','doc'];
         let uploadpath =`${process.cwd()}/${configuration.useruploaddirectory}`;
         const extension = path.extname(fileName);
         const renamedurl= `${filename}${extension}`;
