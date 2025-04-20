@@ -8,6 +8,7 @@ import {createinsulin,readAllinsulinByPatient,readallinsulinByAdmission,updatein
 import {createtubefeedingchart,readAlltubefeedingchartByPatient,readalltubefeedingchartByAdmission,updatetubefeedingchart} from '../controllers/tubefeedingchart/tubefeedingchart';
 import {createfluidbalance,readAllfluidbalanceByPatient,readallfluidbalanceByAdmission,updatefluidbalance} from '../controllers/fluidbalance/fluidbalance';
 import {readAllnursingcareplanByPatient,readallnursingcareByAdmission, updatenursingcareplans, createnursingcareplans} from '../controllers/nursingcareplan/nursingcareplan';
+import {readalldailywardreports,readalldailywardreportsByward, createdailywardreport, updatedailywardreport} from '../controllers/dailywardreport/dailywardreport';
 const router = express.Router();
 
 router.post('/createvitalchart/:id', createvitalchart);
@@ -57,6 +58,14 @@ router.post('/createnursingcareplans/:id', createnursingcareplans);
 router.put('/updatenursingcareplans/:id', updatenursingcareplans);
 router.get('/readallnursingcareplanbypatient/:patient', readAllnursingcareplanByPatient);
 router.get('/readallnursingcarebyadmission/:admission', readallnursingcareByAdmission);
+
+//daily word report
+router.post('/createdailywardreport', createdailywardreport);
+router.put('/updatedailywardreport/:id', updatedailywardreport);
+router.get('/readalldailywardreports', readalldailywardreports);
+router.get('/readalldailywardreportsByward/:ward', readalldailywardreportsByward);
+
+
 
 
 
