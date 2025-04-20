@@ -17,7 +17,8 @@ const progressreportSchema = new Schema({
         ref: "Patientsmanagement",
         default: null,
       },
-      report:String
+      report:String,
+      staffname:String
 },
 { timestamps: true }
 );
