@@ -4,6 +4,7 @@
 const configuration:any = {
   //clinic name
   //wardname  
+  patienttype:["primary","secondary"],
   reports:[
     {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
   ],

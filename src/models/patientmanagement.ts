@@ -18,6 +18,11 @@ const patientSchema = new Schema(
       required: true,
       type: String,
     },
+    patienttype:{
+      type:String,
+      default:configuration.patienttype[0]
+    },
+    authorizationcode:String,
     middleName: {
       type: String,
     },
@@ -27,19 +32,15 @@ const patientSchema = new Schema(
     },
 
     country: {
-     
       type: String
     },
     stateOfResidence: {
- 
       type: String,
     },
     LGA: {
-      
       type: String
     },
     address: {
-      
       type: String
     },
     age: {
@@ -65,27 +66,21 @@ const patientSchema = new Schema(
       type: String,
     },
     nextOfKinName: {
-    
       type: String,
     },
     nextOfKinRelationship: {
-    
       type: String,
     },
     nextOfKinPhoneNumber: {
-        
         type: String,
       },
       nextOfKinAddress: {
-       
         type: String,
       },
     maritalStatus: {
-     
       type: String,
     },
     disability: {
-      
       type: String,
     },
     occupation: {

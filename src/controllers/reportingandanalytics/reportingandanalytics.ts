@@ -149,6 +149,27 @@ const appointmentreportbyhmoreport = [
       appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
+const secondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
 
 
 var queryresult: any;
@@ -188,6 +209,11 @@ else if(querytype == reports[6].querytype){
 }
 else if(querytype == reports[7].querytype){
   queryresult= await readradiologyaggregate(reportbyhmoreport);
+
+}
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[0]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readappointmentaggregate(secondaryservice);
 
 }
 
