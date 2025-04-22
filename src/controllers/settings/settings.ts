@@ -97,6 +97,8 @@ export const settings = async function () {
             {querytype:"hmoappointmentreport",querygroup:hmoNames},
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
+            {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]},
+
 
           ];
         const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate"];
