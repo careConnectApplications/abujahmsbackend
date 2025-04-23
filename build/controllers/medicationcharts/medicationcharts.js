@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createmedicationchart = exports.readAllmedicationByPatient = exports.readallmedicationchartByAdmission = void 0;
 exports.updatemedicalchart = updatemedicalchart;
 const medicationcharts_1 = require("../../dao/medicationcharts");
+const prescription_1 = require("../../dao/prescription");
 const admissions_1 = require("../../dao/admissions");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const otherservices_1 = require("../../utils/otherservices");
@@ -25,7 +26,7 @@ const config_1 = __importDefault(require("../../config"));
 const readallmedicationchartByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { admission } = req.params;
-        const queryresult = yield (0, medicationcharts_1.readallmedicationcharts)({ admission }, {}, 'patient', 'admission');
+        const queryresult = yield (0, medicationcharts_1.readallmedicationcharts)({ admission }, {}, 'prescription', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -61,7 +62,7 @@ const createmedicationchart = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { id } = req.params;
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
-        var { drug, note, dose, frequency, route, staffname } = req.body;
+        var { drug, note, dose, frequency, route, staffname, prescription } = req.body;
         (0, otherservices_1.validateinputfaulsyvalue)({ drug, note, dose, frequency, route, staffname });
         //frequency must inlcude
         //route must contain allowed options
@@ -80,7 +81,10 @@ const createmedicationchart = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
             }
         }
-        const queryresult = yield (0, medicationcharts_1.createmedicationcharts)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, drug, note, dose, frequency, route, staffname });
+        const queryresult = yield (0, medicationcharts_1.createmedicationcharts)({ referedward: admissionrecord.referedward, prescription, admission: admissionrecord._id, patient: admissionrecord.patient, drug, note, dose, frequency, route, staffname });
+        //find prescription and change status
+        yield (0, prescription_1.updateprescription)(prescription, { servedstatus: config_1.default.servedstatus[0] });
+        //configuration.servedstatus[]
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {

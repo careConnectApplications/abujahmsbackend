@@ -24,7 +24,7 @@ const config_1 = __importDefault(require("../../config"));
 const readallfluidbalanceByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { admission } = req.params;
-        const queryresult = yield (0, fluidbalance_1.readallfluidbalances)({ admission }, {}, 'patient', 'admission');
+        const queryresult = yield (0, fluidbalance_1.readallfluidbalances)({ admission }, { intaketype: 1, intakeroute: 1, intakeamount: 1, outputtype: 1, outputroute: 1, outputamount: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -41,7 +41,7 @@ const readAllfluidbalanceByPatient = (req, res) => __awaiter(void 0, void 0, voi
         //const {clinic} = (req.user).user;
         const { patient } = req.params;
         //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, fluidbalance_1.readallfluidbalances)({ patient }, {}, 'patient', 'admission');
+        const queryresult = yield (0, fluidbalance_1.readallfluidbalances)({ patient }, { intaketype: 1, intakeroute: 1, intakeamount: 1, outputtype: 1, outputroute: 1, outputamount: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -59,8 +59,9 @@ const createfluidbalance = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const { id } = req.params;
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
-        var { oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname } = req.body;
-        (0, otherservices_1.validateinputfaulsyvalue)({ oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname });
+        var { datetime, intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname } = req.body;
+        // var { oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname} = req.body;
+        (0, otherservices_1.validateinputfaulsyvalue)({ datetime, intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname });
         //frequency must inlcude
         //route must contain allowed options
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
@@ -68,7 +69,8 @@ const createfluidbalance = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!admissionrecord) {
             throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
         }
-        const queryresult = yield (0, fluidbalance_1.createfluidbalances)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname });
+        // const queryresult=await createfluidbalances({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname});
+        const queryresult = yield (0, fluidbalance_1.createfluidbalances)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, datetime, intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {
@@ -84,9 +86,9 @@ function updatefluidbalance(req, res) {
             const { id } = req.params;
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
-            var { oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname });
-            var queryresult = yield (0, fluidbalance_1.updatefluidbalances)(id, { oralfluids, tubefeedingvolume, IVfluidtype, IVfluidvolume, IVfluidrate, medication, urineoutput, stoolfrequency, consistency, stoolamount, vomitamount, drainage, totalintake, totaloutput, netfliudbalancefor24hours, staffname });
+            var { intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname });
+            var queryresult = yield (0, fluidbalance_1.updatefluidbalances)(id, { intaketype, intakeroute, intakeamount, outputtype, outputroute, outputamount, staffname });
             res.status(200).json({
                 queryresult,
                 status: true

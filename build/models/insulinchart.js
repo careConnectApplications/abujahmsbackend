@@ -26,6 +26,7 @@ const insulinSchema = new mongoose_1.Schema({
     typeofinsulin: String,
     dosage: String,
     route: String,
+    rbsvalue: String,
     mealtimes: String,
     carbonhydrateintakeestimation: String,
     symtoms: String,

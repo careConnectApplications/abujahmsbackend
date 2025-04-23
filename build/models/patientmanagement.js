@@ -24,6 +24,11 @@ const patientSchema = new mongoose_1.Schema({
         required: true,
         type: String,
     },
+    patienttype: {
+        type: String,
+        default: config_1.default.patienttype[0]
+    },
+    authorizationcode: String,
     middleName: {
         type: String,
     },

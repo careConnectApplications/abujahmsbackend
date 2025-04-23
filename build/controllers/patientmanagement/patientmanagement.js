@@ -193,10 +193,25 @@ function bulkuploadhmopatients(req, res) {
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var appointmentid = String(Date.now());
-        if (req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true) {
+        const { patienttype, authorizationcode } = req.body;
+        /*
+            patienttype:{
+              type:String,
+              default:configuration.patienttype[0]
+            },
+            authorizationcode:String,
+        */
+        if (patienttype !== config_1.default.patienttype[1] && (req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true)) {
             throw new Error(config_1.default.error.errorauthorizehmo);
         }
-        if (!(req.body.isHMOCover)) {
+        if (patienttype == config_1.default.patienttype[1]) {
+            //validate authorization code 
+            (0, otherservices_1.validateinputfaulsyvalue)({ authorizationcode });
+        }
+        if (patienttype == config_1.default.patienttype[1]) {
+            req.body.isHMOCover = config_1.default.ishmo[1];
+        }
+        else {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
         //get token from header and extract clinic
@@ -226,7 +241,7 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
         //console.log('appointmentprice', appointmentPrice);
         var newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover });
-        if (!newRegistrationPrice) {
+        if (isHMOCover !== config_1.default.ishmo[1] && !newRegistrationPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
         var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
@@ -238,14 +253,23 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         var payment = [];
         const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(req.body);
         //create payment
-        const createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
-        // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
-        payment.push(createpaymentqueryresult._id);
-        //payment.push(createappointmentpaymentqueryresult._id);
-        //update createpatientquery
+        //create payment for only none hmo patient
+        let queryappointmentresult;
+        let queryresult;
         let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
-        const queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
-        const queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
+        if (isHMOCover == config_1.default.ishmo[1]) {
+            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
+            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
+        }
+        else {
+            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
+            // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
+            payment.push(createpaymentqueryresult._id);
+            //payment.push(createappointmentpaymentqueryresult._id);
+            //update createpatientquery
+            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
+            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
+        }
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {

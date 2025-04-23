@@ -24,7 +24,7 @@ const config_1 = __importDefault(require("../../config"));
 const readallbloodmonitoringByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { admission } = req.params;
-        const queryresult = yield (0, bloodmonitoring_1.readallbloodmonitoring)({ admission }, {}, 'patient', 'admission');
+        const queryresult = yield (0, bloodmonitoring_1.readallbloodmonitoring)({ admission }, {}, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -41,7 +41,7 @@ const readAllbloodmonitoringByPatient = (req, res) => __awaiter(void 0, void 0, 
         //const {clinic} = (req.user).user;
         const { patient } = req.params;
         //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, bloodmonitoring_1.readallbloodmonitoring)({ patient }, {}, 'patient', 'admission');
+        const queryresult = yield (0, bloodmonitoring_1.readallbloodmonitoring)({ patient }, {}, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -59,8 +59,9 @@ const createbloodmonitorings = (req, res) => __awaiter(void 0, void 0, void 0, f
         const { id } = req.params;
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
-        var { typeoftestRBSFBS, value, staffname } = req.body;
-        (0, otherservices_1.validateinputfaulsyvalue)({ typeoftestRBSFBS, value, staffname });
+        //blood sugar monitoring chart (contents: Date, Time, Test Type (drop down, RBS FBS), Value (mmol/l) , done by user acct.
+        var { typeoftestRBSFBS, value, staffname, datetime } = req.body;
+        (0, otherservices_1.validateinputfaulsyvalue)({ typeoftestRBSFBS, value, staffname, datetime });
         //frequency must inlcude
         //route must contain allowed options
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
@@ -68,7 +69,7 @@ const createbloodmonitorings = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!admissionrecord) {
             throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
         }
-        const queryresult = yield (0, bloodmonitoring_1.createbloodmonitoring)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, typeoftestRBSFBS, value, staffname });
+        const queryresult = yield (0, bloodmonitoring_1.createbloodmonitoring)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, typeoftestRBSFBS, value, datetime, staffname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {
@@ -84,9 +85,9 @@ function updatebloodmonitorings(req, res) {
             const { id } = req.params;
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
-            var { typeoftestRBSFBS, value, staffname } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ typeoftestRBSFBS, value, staffname });
-            var queryresult = yield (0, bloodmonitoring_1.updatebloodmonitoring)(id, { typeoftestRBSFBS, value, staffname });
+            var { typeoftestRBSFBS, value, staffname, datetime } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ typeoftestRBSFBS, value, staffname, datetime });
+            var queryresult = yield (0, bloodmonitoring_1.updatebloodmonitoring)(id, { typeoftestRBSFBS, value, datetime, staffname });
             res.status(200).json({
                 queryresult,
                 status: true
