@@ -148,6 +148,26 @@ export async function getallhmopatients(req:Request, res:any){
 }
     
 
+//update authorization code
+
+export async function updateauthorizationcode(req:any, res:any){
+    try{
+    //get id
+    const {id} = req.params;
+    const {authorizationcode} = req.body;
+    var queryresult = await updatepatient(id, {authorizationcode});
+    res.status(200).json({
+        queryresult,
+        status:true
+      });
+    }catch(e:any){
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+
+    }
+
+  }
+
 
 //add patiient
 export var createpatients = async (req:any,res:any) =>{
