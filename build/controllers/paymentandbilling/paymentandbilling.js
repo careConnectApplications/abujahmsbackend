@@ -70,8 +70,9 @@ function confirmgrouppayment(req, res) {
                 }
                 //var settings =await  configuration.settings();
                 const status = config_1.default.status[3];
-                const { email, staffId } = (req.user).user;
-                const queryresult = yield (0, payment_1.updatepayment)(_id, { status, cashieremail: email, cashierid: staffId });
+                const { email, staffId, firstName, lastName } = (req.user).user;
+                var cashiername = `${firstName} ${lastName}`;
+                const queryresult = yield (0, payment_1.updatepayment)(_id, { status, cashieremail: email, cashiername, cashierid: staffId });
                 //const {paymentype,paymentcategory,paymentreference} = queryresult;
                 //for patient registration
                 if (paymentcategory == config_1.default.category[3]) {

@@ -17,7 +17,8 @@ const progressreportSchema = new mongoose_1.Schema({
         ref: "Patientsmanagement",
         default: null,
     },
-    report: String
+    report: String,
+    staffname: String
 }, { timestamps: true });
 const progressreport = (0, mongoose_1.model)('ProgressReport', progressreportSchema);
 exports.default = progressreport;

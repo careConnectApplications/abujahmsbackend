@@ -4,6 +4,7 @@
 const configuration:any = {
   //clinic name
   //wardname  
+  patienttype:["primary","secondary"],
   reports:[
     {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
   ],
@@ -48,6 +49,7 @@ const configuration:any = {
   defaultphonenumber:"11111111111",
   status:["inactive", "active","pending payment","paid","pending vitals","scheduled","complete","processed","pending vital","inprogress","pending","new","accept","reject","awaiting confirmation","achieved"],
   admissionstatus:["toadmit","admited","totransfer","transfered","todischarge", "discharged"],
+  servedstatus:["served","unserved"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
   category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],
@@ -97,8 +99,11 @@ for(var i =0; i < servicetypedetail.length ; i++){
         oralfluids:["Water","Beverages","Soups"],
         medication:["IV", "Oral"],
         drainage:["Chest Tubes", "Surgical Drains"],
-        typeofinsulin:["Rapid-acting","Long-acting","Mixed"],
-        insulinroute:["Subcutaneous","Insulin Pump"],
+       // typeofinsulin:["Rapid-acting","Long-acting","Mixed"],
+        typeofinsulin:["soluble", "mixtured"],
+        testtype:["RBS","FBS"],
+        //insulinroute:["Subcutaneous","Insulin Pump"],
+        insulinroute:["SC", "IV", "IM"],
         insulinsymptoms:["Sweating","Dizziness","Confusion"],
         insulininterventionprovided:["Oral","Glucose","IV"],
         admissionstatus:["admited","totransfer","transfered","todischarge", "discharged"],

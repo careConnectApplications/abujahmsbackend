@@ -149,6 +149,27 @@ const appointmentreportbyhmoreport = [
       appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
   },
 ];
+const secondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
 
 
 var queryresult: any;
@@ -188,6 +209,11 @@ else if(querytype == reports[6].querytype){
 }
 else if(querytype == reports[7].querytype){
   queryresult= await readradiologyaggregate(reportbyhmoreport);
+
+}
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[0]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readappointmentaggregate(secondaryservice);
 
 }
 
@@ -370,12 +396,14 @@ export const reportsummary = async (req:any,res:any) =>{
         $group: {
           _id: "$cashieremail",                // Group by product
           totalAmount: { $sum: "$amount" },
-          cashierid:{$first:"$cashierid"}
+          cashierid:{$first:"$cashierid"},
+          cashiername:{$first:"$cashiername"}
         }
       },
       {
         $project:{
           cashieremail:"$_id",
+          cashiername:1,
           totalAmount:1,
           cashierid:1,
           status:configuration.status[3],

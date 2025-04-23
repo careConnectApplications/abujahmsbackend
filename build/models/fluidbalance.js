@@ -33,6 +33,14 @@ const fluidbalanceSchema = new mongoose_1.Schema({
     totaloutput: String,
     netfliudbalancefor24hours: String,
     staffname: String,
+    //updated
+    datetime: Date,
+    intaketype: String,
+    intakeroute: String,
+    intakeamount: String,
+    outputtype: String,
+    outputroute: String,
+    outputamount: String
 }, { timestamps: true });
 const fluidbalance = (0, mongoose_1.model)('Fluidbalance', fluidbalanceSchema);
 exports.default = fluidbalance;

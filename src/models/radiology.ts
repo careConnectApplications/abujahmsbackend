@@ -35,6 +35,7 @@ const radiologySchema = new Schema({
     //required: true
   },
   testresult:[],
+  typetestresult:[],
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",

@@ -19,7 +19,7 @@ const feedingtubechartSchema = new mongoose_1.Schema({
     },
     Datetimefeeds: Date,
     amount: String,
-    sign: String,
+    feed: String,
     staffname: String,
 }, { timestamps: true });
 const feedingtubechart = (0, mongoose_1.model)('Feedingtubechart', feedingtubechartSchema);

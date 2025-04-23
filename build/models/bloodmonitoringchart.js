@@ -20,6 +20,7 @@ const bloodmonitoringSchema = new mongoose_1.Schema({
     typeoftestRBSFBS: String,
     value: String,
     staffname: String,
+    datetime: Date
 }, { timestamps: true });
 const bloodmonitoring = (0, mongoose_1.model)('Bloodmonitoring', bloodmonitoringSchema);
 exports.default = bloodmonitoring;

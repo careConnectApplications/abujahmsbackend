@@ -24,7 +24,7 @@ const config_1 = __importDefault(require("../../config"));
 const readalltubefeedingchartByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { admission } = req.params;
-        const queryresult = yield (0, tubefeedingchart_1.readalltubefeedingcharts)({ admission }, {}, 'patient', 'admission');
+        const queryresult = yield (0, tubefeedingchart_1.readalltubefeedingcharts)({ admission }, { Datetimefeeds: 1, amount: 1, feed: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -41,7 +41,7 @@ const readAlltubefeedingchartByPatient = (req, res) => __awaiter(void 0, void 0,
         //const {clinic} = (req.user).user;
         const { patient } = req.params;
         //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, tubefeedingchart_1.readalltubefeedingcharts)({ patient }, {}, 'patient', 'admission');
+        const queryresult = yield (0, tubefeedingchart_1.readalltubefeedingcharts)({ patient }, { Datetimefeeds: 1, amount: 1, feed: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -57,14 +57,14 @@ const createtubefeedingchart = (req, res) => __awaiter(void 0, void 0, void 0, f
         const { id } = req.params;
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
-        var { Datetimefeeds, amount, sign, staffname } = req.body;
-        (0, otherservices_1.validateinputfaulsyvalue)({ Datetimefeeds, amount, sign, staffname });
+        var { Datetimefeeds, amount, feed, staffname } = req.body;
+        (0, otherservices_1.validateinputfaulsyvalue)({ Datetimefeeds, amount, feed, staffname });
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
         console.log(admissionrecord);
         if (!admissionrecord) {
             throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
         }
-        const queryresult = yield (0, tubefeedingchart_1.createtubefeedingcharts)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, Datetimefeeds, amount, sign, staffname });
+        const queryresult = yield (0, tubefeedingchart_1.createtubefeedingcharts)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, Datetimefeeds, amount, feed, staffname });
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {
@@ -80,9 +80,9 @@ function updatetubefeedingchart(req, res) {
             const { id } = req.params;
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
-            var { Datetimefeeds, amount, sign, staffname } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ Datetimefeeds, amount, sign, staffname });
-            var queryresult = yield (0, tubefeedingchart_1.updatetubefeedingcharts)(id, { Datetimefeeds, amount, sign, staffname });
+            var { Datetimefeeds, amount, feed, staffname } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ Datetimefeeds, amount, feed, staffname });
+            var queryresult = yield (0, tubefeedingchart_1.updatetubefeedingcharts)(id, { Datetimefeeds, amount, feed, staffname });
             res.status(200).json({
                 queryresult,
                 status: true

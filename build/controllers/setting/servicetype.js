@@ -81,15 +81,19 @@ function updateservicetypes(req, res) {
             if (!foundservicetype) {
                 throw new Error(`service category ${config_1.default.error.errornotfound}`);
             }
-            for (var i = 0; i < servicetype.length; i++) {
-                if ((foundservicetype.type).includes(servicetype[i]))
-                    throw new Error(`${servicetype[i]} ${config_1.default.error.erroralreadyexit}`);
-            }
-            var queryresult = yield (0, servicetype_1.updateservicetype)({ _id: id }, { $push: { type: { $each: servicetype } }, department });
+            /*
+               for(var i =0; i < servicetype.length; i++){
+                 if((foundservicetype.type).includes(servicetype[i]))
+                 throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+           
+             }
+                 */
+            //var queryresult:any=await updateservicetype({_id:id},{$push: {type:{$each: servicetype}},department});
+            var queryresult = yield (0, servicetype_1.updateservicetype)({ _id: id }, { type: servicetype, department });
             // var queryresult = await updateservicetype(id, {clinic});
             const { firstName, lastName } = (req.user).user;
             var actor = `${firstName} ${lastName}`;
-            yield (0, audit_1.createaudit)({ action: "Updated Service Type", actor, affectedentity: queryresult.servicecategory });
+            yield (0, audit_1.createaudit)({ action: "Updated Service Type", actor, affectedentity: queryresult.category });
             res.status(200).json({
                 queryresult,
                 status: true

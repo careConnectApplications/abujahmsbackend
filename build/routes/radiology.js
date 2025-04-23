@@ -15,5 +15,6 @@ router.put('/updateradiology/:id', radiology_1.updateradiologys);
 router.put('/confirmradiologyorder/:id', radiology_1.confirmradiologyorder);
 //confirmradiologyorder
 router.post('/uploadradiologyresult/:id', radiology_1.uploadradiologyresult);
+router.post('/enterradiologyresult/:id', radiology_1.enterradiologyresult);
 //uploadradiologyresult
 exports.default = router;
