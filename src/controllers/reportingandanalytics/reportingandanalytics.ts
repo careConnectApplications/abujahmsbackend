@@ -266,7 +266,7 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
 }
 else if(querytype == reports[8].querytype){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readprescriptionaggregate(secondaryservice);
+  queryresult= await readprescriptionaggregate(pharmacysecondaryservice);
 
 }
 else {
