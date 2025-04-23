@@ -8,7 +8,17 @@ import Procedure from "../models/procedure";
 import Lab from "../models/lab";
 import Radiology from "../models/radiology";
 import Prescription from "../models/prescription";
+import Patientsmanagement from "../models/patientmanagement";
 import configuration from "../config";
+export async function readpatientsmanagementaggregate(input:any) {
+  try{
+  return await Patientsmanagement.aggregate(input);
+  }
+  catch(e:any){
+    console.log(e);
+    throw new Error(configuration.error.erroruserupdate);
+  }
+  }
 export async function readpaymentaggregate(input:any) {
     try{
     return await Payment.aggregate(input);

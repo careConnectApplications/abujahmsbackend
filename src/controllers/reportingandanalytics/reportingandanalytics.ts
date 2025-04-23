@@ -1,6 +1,6 @@
 
 import configuration from "../../config";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 export const reports = async (req:any, res:any) => {
@@ -170,6 +170,34 @@ const secondaryservice = [
     }
     
 ];
+const patientsecondaryservice = [
+ 
+    {   
+            $match:{$and:[{patienttype: configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
+const pharmacysecondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{pharmacy: querygroup},{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
 
 
 var queryresult: any;
@@ -216,7 +244,31 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
   queryresult= await readappointmentaggregate(secondaryservice);
 
 }
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[1]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readlabaggregate(secondaryservice);
 
+}
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readpatientsmanagementaggregate(patientsecondaryservice);
+
+}
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[3]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readradiologyaggregate(secondaryservice);
+
+}
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readprocedureaggregate(secondaryservice);
+
+}
+else if(querytype == reports[8].querytype){
+  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+  queryresult= await readprescriptionaggregate(secondaryservice);
+
+}
 else {
   throw new Error(`querytype ${configuration.error.errorisrequired}`);
 }
