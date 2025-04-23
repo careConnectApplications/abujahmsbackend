@@ -24,7 +24,7 @@ const config_1 = __importDefault(require("../../config"));
 const readallinsulinByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { admission } = req.params;
-        const queryresult = yield (0, insulin_1.readallinsulins)({ admission }, {}, 'patient', 'admission');
+        const queryresult = yield (0, insulin_1.readallinsulins)({ admission }, { dateandtimeofinsulinadministration: 1, rbsvalue: 1, typeofinsulin: 1, dosage: 1, route: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -41,7 +41,7 @@ const readAllinsulinByPatient = (req, res) => __awaiter(void 0, void 0, void 0, 
         //const {clinic} = (req.user).user;
         const { patient } = req.params;
         //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, insulin_1.readallinsulins)({ patient }, {}, 'patient', 'admission');
+        const queryresult = yield (0, insulin_1.readallinsulins)({ patient }, { dateandtimeofinsulinadministration: 1, rbsvalue: 1, typeofinsulin: 1, dosage: 1, route: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
         res.status(200).json({
             queryresult,
             status: true
@@ -56,11 +56,19 @@ exports.readAllinsulinByPatient = readAllinsulinByPatient;
 // Create a new schedule
 const createinsulin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //dateandtimeofinsulinadministration,typeofinsulin,dosage,route,
+        // rbsvalue, 
+        // typeofinsulin,
+        //  dosage,
+        //  route,
+        //  served by user profile 
         const { id } = req.params;
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
-        var { dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname } = req.body;
-        (0, otherservices_1.validateinputfaulsyvalue)({ dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname });
+        //var { dateandtimeofbloodglucosemonitoring,premealbloodglucoselevel,postmealbloodglucoselevel,fastingbloodglucose,dateandtimeofinsulinadministration,typeofinsulin,dosage,route,mealtimes,carbonhydrateintakeestimation,symtoms,interventionprovided,staffname} = req.body;
+        var { dateandtimeofinsulinadministration, rbsvalue, typeofinsulin, dosage, route, staffname } = req.body;
+        //validateinputfaulsyvalue({dateandtimeofbloodglucosemonitoring,premealbloodglucoselevel,postmealbloodglucoselevel,fastingbloodglucose,dateandtimeofinsulinadministration,typeofinsulin,dosage,route,mealtimes,carbonhydrateintakeestimation,symtoms,interventionprovided,staffname});
+        (0, otherservices_1.validateinputfaulsyvalue)({ dateandtimeofinsulinadministration, typeofinsulin, rbsvalue, dosage, route, staffname });
         //frequency must inlcude
         //route must contain allowed options
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
@@ -68,7 +76,9 @@ const createinsulin = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!admissionrecord) {
             throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
         }
-        const queryresult = yield (0, insulin_1.createinsulins)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname });
+        //const queryresult=await createinsulins({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,dateandtimeofbloodglucosemonitoring,premealbloodglucoselevel,postmealbloodglucoselevel,fastingbloodglucose,dateandtimeofinsulinadministration,typeofinsulin,dosage,route,mealtimes,carbonhydrateintakeestimation,symtoms,interventionprovided,staffname});
+        const queryresult = yield (0, insulin_1.createinsulins)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, dateandtimeofinsulinadministration, typeofinsulin, rbsvalue, dosage, route, staffname });
+        //dateandtimeofinsulinadministration,rbsvalue,typeofinsulin,dosage,route,staffname
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {
@@ -84,9 +94,9 @@ function updateinsulin(req, res) {
             const { id } = req.params;
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
-            var { dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname } = req.body;
-            (0, otherservices_1.validateinputfaulsyvalue)({ dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname });
-            var queryresult = yield (0, insulin_1.updateinsulins)(id, { dateandtimeofbloodglucosemonitoring, premealbloodglucoselevel, postmealbloodglucoselevel, fastingbloodglucose, dateandtimeofinsulinadministration, typeofinsulin, dosage, route, mealtimes, carbonhydrateintakeestimation, symtoms, interventionprovided, staffname });
+            var { dateandtimeofinsulinadministration, rbsvalue, typeofinsulin, dosage, route, staffname } = req.body;
+            (0, otherservices_1.validateinputfaulsyvalue)({ dateandtimeofinsulinadministration, typeofinsulin, rbsvalue, dosage, route, staffname });
+            var queryresult = yield (0, insulin_1.updateinsulins)(id, { dateandtimeofinsulinadministration, rbsvalue, typeofinsulin, dosage, route, staffname });
             res.status(200).json({
                 queryresult,
                 status: true

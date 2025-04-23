@@ -66,6 +66,10 @@ const prescriptionSchema = new mongoose_1.Schema({
         type: String,
         default: config_1.default.status[14],
         required: true
+    },
+    servedstatus: {
+        type: String,
+        default: config_1.default.servedstatus[1]
     }
 }, { timestamps: true });
 const prescription = (0, mongoose_1.model)('Prescription', prescriptionSchema);

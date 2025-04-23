@@ -28,6 +28,7 @@ const radiologySchema = new mongoose_1.Schema({
         //required: true
     },
     testresult: [],
+    typetestresult: [],
     patient: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Patientsmanagement",

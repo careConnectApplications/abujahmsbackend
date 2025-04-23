@@ -34,6 +34,9 @@ const paymentSchema = new mongoose_1.Schema({
     cashieremail: {
         type: String
     },
+    cashiername: {
+        type: String
+    },
     cashierid: {
         type: String
     },

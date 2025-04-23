@@ -150,6 +150,25 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         }] }
             },
         ];
+        const secondaryservice = [
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            }
+        ];
         var queryresult;
         //var c = await configuration.settings2();
         let { reports } = yield (0, settings_1.settings)();
@@ -177,6 +196,10 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (querytype == reports[7].querytype) {
             queryresult = yield (0, reports_1.readradiologyaggregate)(reportbyhmoreport);
+        }
+        else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[0]) {
+            //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+            queryresult = yield (0, reports_1.readappointmentaggregate)(secondaryservice);
         }
         else {
             throw new Error(`querytype ${config_1.default.error.errorisrequired}`);
@@ -318,12 +341,14 @@ const reportsummary = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 $group: {
                     _id: "$cashieremail", // Group by product
                     totalAmount: { $sum: "$amount" },
-                    cashierid: { $first: "$cashierid" }
+                    cashierid: { $first: "$cashierid" },
+                    cashiername: { $first: "$cashiername" }
                 }
             },
             {
                 $project: {
                     cashieremail: "$_id",
+                    cashiername: 1,
                     totalAmount: 1,
                     cashierid: 1,
                     status: config_1.default.status[3],

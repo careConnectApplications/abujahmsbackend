@@ -12,6 +12,7 @@ const insulin_1 = require("../controllers/insulin/insulin");
 const tubefeedingchart_1 = require("../controllers/tubefeedingchart/tubefeedingchart");
 const fluidbalance_1 = require("../controllers/fluidbalance/fluidbalance");
 const nursingcareplan_1 = require("../controllers/nursingcareplan/nursingcareplan");
+const dailywardreport_1 = require("../controllers/dailywardreport/dailywardreport");
 const router = express_1.default.Router();
 router.post('/createvitalchart/:id', vitalcharts_1.createvitalchart);
 router.get('/readallvitalchartbyadmission/:admission', vitalcharts_1.readallvitalchartByAdmission);
@@ -52,4 +53,9 @@ router.post('/createnursingcareplans/:id', nursingcareplan_1.createnursingcarepl
 router.put('/updatenursingcareplans/:id', nursingcareplan_1.updatenursingcareplans);
 router.get('/readallnursingcareplanbypatient/:patient', nursingcareplan_1.readAllnursingcareplanByPatient);
 router.get('/readallnursingcarebyadmission/:admission', nursingcareplan_1.readallnursingcareByAdmission);
+//daily word report
+router.post('/createdailywardreport', dailywardreport_1.createdailywardreport);
+router.put('/updatedailywardreport/:id', dailywardreport_1.updatedailywardreport);
+router.get('/readalldailywardreports', dailywardreport_1.readalldailywardreports);
+router.get('/readalldailywardreportsByward/:ward', dailywardreport_1.readalldailywardreportsByward);
 exports.default = router;

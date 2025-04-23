@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmradiologyorder = exports.uploadradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
+exports.confirmradiologyorder = exports.uploadradiologyresult = exports.enterradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
 exports.updateradiologys = updateradiologys;
 const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
@@ -197,6 +197,39 @@ function updateradiologys(req, res) {
         }
     });
 }
+var enterradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { firstName, lastName } = (req.user).user;
+        const { id } = req.params;
+        const { typetestresult } = req.body;
+        var response = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+        // validate patient status
+        if (response.status !== config_1.default.status[9]) {
+            throw new Error(`Radiology Record ${config_1.default.error.errortasknotpending}`);
+        }
+        const { patient } = response;
+        //validate payment
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        if (!findAdmission && patient.isHMOCover == config_1.default.ishmo[0]) {
+            var paymentrecord = yield (0, payment_1.readonepayment)({ _id: response.payment });
+            if (paymentrecord.status !== config_1.default.status[3]) {
+                throw new Error(config_1.default.error.errorpayment);
+            }
+        }
+        const processby = `${firstName} ${lastName}`;
+        var queryresult = yield (0, radiology_1.updateradiology)(id, { typetestresult, status: config_1.default.status[7], processby });
+        res.json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (e) {
+        res.json({ status: false, msg: e.message });
+    }
+});
+exports.enterradiologyresult = enterradiologyresult;
+//typeresult
+//typetestresult
 //process result
 //upload patients photo
 var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -221,7 +254,7 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
         const file = req.files.file;
         const fileName = file.name;
         const filename = "radiology" + (0, uuid_1.v4)();
-        let allowedextension = ['.jpg', '.png', '.jpeg', '.pdf'];
+        let allowedextension = ['.jpg', '.png', '.jpeg', '.pdf', '.docx', 'doc'];
         let uploadpath = `${process.cwd()}/${config_1.default.useruploaddirectory}`;
         const extension = path.extname(fileName);
         const renamedurl = `${filename}${extension}`;

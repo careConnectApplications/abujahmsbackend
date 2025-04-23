@@ -17,6 +17,11 @@ const medicalchartsSchema = new mongoose_1.Schema({
         ref: "Patientsmanagement",
         default: null,
     },
+    prescription: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Prescription",
+        default: null,
+    },
     drug: String,
     note: String,
     dose: String,
