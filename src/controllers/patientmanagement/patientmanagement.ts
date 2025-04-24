@@ -174,33 +174,26 @@ export var createpatients = async (req:any,res:any) =>{
    
     try{
         var appointmentid:any=String(Date.now());
-        const {patienttype,authorizationcode} = req.body;
-        /*
-            patienttype:{
-              type:String,
-              default:configuration.patienttype[0]
-            },
-            authorizationcode:String,
-        */
+        if(!(req.body.isHMOCover)){
+          req.body.isHMOCover=configuration.ishmo[0]
+
+        } 
+        var {authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+        //validation
+         validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype,isHMOCover});
         
-        if(patienttype !==configuration.patienttype[1] && (req.body.isHMOCover==configuration.ishmo[1] || req.body.isHMOCover == true)){
-          throw new Error(configuration.error.errorauthorizehmo);
-
-        }
-        if(patienttype == configuration.patienttype[1]){
-          //validate authorization code 
+        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
+          console.log("here");
+          //throw new Error(configuration.error.errorauthorizehmo);
+          req.body.patienttype = configuration.patienttype[1];
+          req.body.status = configuration.status[1];
           validateinputfaulsyvalue({authorizationcode});
-        }
-        if(patienttype == configuration.patienttype[1]){
-          req.body.isHMOCover = configuration.ishmo[1]
 
         }
-        else{
-          req.body.isHMOCover = configuration.ishmo[0]
-
-        }
+       
+       
         //get token from header and extract clinic
-        var {policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+       
         //check for 11 digit
         if(phoneNumber.length !== 11){
           throw new Error(configuration.error.errorelevendigit);
@@ -212,8 +205,7 @@ export var createpatients = async (req:any,res:any) =>{
         //if not dateObirth but age calculate date of birth
         if(!dateOfBirth && req.body.age ) req.body.dateOfBirth = moment().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
         console.log(req.body);
-        //validation
-        validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype});
+       
         var selectquery ={"title":1,"firstName":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
           "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1};
         const foundUser:any =  await readonepatient({phoneNumber},selectquery,'','');
@@ -228,14 +220,13 @@ export var createpatients = async (req:any,res:any) =>{
        // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
         //console.log('appointmentprice', appointmentPrice);
       
-      
+      var {isHMOCover} = req.body;
         var newRegistrationPrice:any = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
         if(isHMOCover !== configuration.ishmo[1] && !newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
       }
       var uniqunumber =await storeUniqueNumber(4);
-      console.log(uniqunumber);
        // chaorten the MRN to alphanumeric 
         req.body.MRN=uniqunumber;        
         req.body.password=configuration.defaultPassword;
