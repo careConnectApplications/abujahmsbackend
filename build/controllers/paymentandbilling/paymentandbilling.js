@@ -442,6 +442,9 @@ function printreceipt(req, res) {
             res.json({
                 queryresult,
                 totalAmount,
+                timestamp: new Date().toLocaleString("en-NG", {
+                    timeZone: "Africa/Lagos"
+                }),
                 printedbystaffname: staffname,
                 status: true,
             });

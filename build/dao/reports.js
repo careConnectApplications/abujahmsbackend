@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.readpatientsmanagementaggregate = readpatientsmanagementaggregate;
 exports.readpaymentaggregate = readpaymentaggregate;
 exports.readhmoaggregate = readhmoaggregate;
 exports.readappointmentaggregate = readappointmentaggregate;
@@ -32,7 +33,19 @@ const procedure_1 = __importDefault(require("../models/procedure"));
 const lab_1 = __importDefault(require("../models/lab"));
 const radiology_1 = __importDefault(require("../models/radiology"));
 const prescription_1 = __importDefault(require("../models/prescription"));
+const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const config_1 = __importDefault(require("../config"));
+function readpatientsmanagementaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield patientmanagement_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
 function readpaymentaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

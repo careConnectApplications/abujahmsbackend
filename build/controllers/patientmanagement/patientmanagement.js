@@ -49,6 +49,7 @@ exports.uploadpix = exports.createpatients = void 0;
 exports.searchpartient = searchpartient;
 exports.getallhmopatients = getallhmopatients;
 exports.bulkuploadhmopatients = bulkuploadhmopatients;
+exports.updateauthorizationcode = updateauthorizationcode;
 exports.getallpatients = getallpatients;
 exports.getonepatients = getonepatients;
 exports.updatepatients = updatepatients;
@@ -189,33 +190,43 @@ function bulkuploadhmopatients(req, res) {
         }
     });
 }
+//update authorization code
+function updateauthorizationcode(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            //get id
+            const { id } = req.params;
+            const { authorizationcode } = req.body;
+            var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { authorizationcode });
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
 //add patiient
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var appointmentid = String(Date.now());
-        const { patienttype, authorizationcode } = req.body;
-        /*
-            patienttype:{
-              type:String,
-              default:configuration.patienttype[0]
-            },
-            authorizationcode:String,
-        */
-        if (patienttype !== config_1.default.patienttype[1] && (req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true)) {
-            throw new Error(config_1.default.error.errorauthorizehmo);
-        }
-        if (patienttype == config_1.default.patienttype[1]) {
-            //validate authorization code 
-            (0, otherservices_1.validateinputfaulsyvalue)({ authorizationcode });
-        }
-        if (patienttype == config_1.default.patienttype[1]) {
-            req.body.isHMOCover = config_1.default.ishmo[1];
-        }
-        else {
+        if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
+        var { authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
+        //validation
+        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype, isHMOCover });
+        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
+            console.log("here");
+            //throw new Error(configuration.error.errorauthorizehmo);
+            req.body.patienttype = config_1.default.patienttype[1];
+            req.body.status = config_1.default.status[1];
+            (0, otherservices_1.validateinputfaulsyvalue)({ authorizationcode });
+        }
         //get token from header and extract clinic
-        var { policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
         //check for 11 digit
         if (phoneNumber.length !== 11) {
             throw new Error(config_1.default.error.errorelevendigit);
@@ -226,8 +237,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!dateOfBirth && req.body.age)
             req.body.dateOfBirth = (0, moment_1.default)().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
         console.log(req.body);
-        //validation
-        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype });
         var selectquery = { "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
             "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
         const foundUser = yield (0, patientmanagement_1.readonepatient)({ phoneNumber }, selectquery, '', '');
@@ -240,12 +249,12 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
         // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
         //console.log('appointmentprice', appointmentPrice);
+        var { isHMOCover } = req.body;
         var newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover });
         if (isHMOCover !== config_1.default.ishmo[1] && !newRegistrationPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
         var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
-        console.log(uniqunumber);
         // chaorten the MRN to alphanumeric 
         req.body.MRN = uniqunumber;
         req.body.password = config_1.default.defaultPassword;
@@ -308,7 +317,7 @@ function getallpatients(req, res) {
             }
             //var settings = await configuration.settings();
             var selectquery = { "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1 };
             //var populatequery="payment";
             var populatequery = {
                 path: "payment",

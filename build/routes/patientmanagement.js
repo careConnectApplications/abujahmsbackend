@@ -8,6 +8,7 @@ const patientmanagement_1 = require("../controllers/patientmanagement/patientman
 const router = express_1.default.Router();
 router.post('/uploadpatientphoto/:id', patientmanagement_1.uploadpix);
 router.post('/createpatients', patientmanagement_1.createpatients);
+router.put('/updateauthorizationcode/:id', patientmanagement_1.updateauthorizationcode);
 router.get('/getallpatients', patientmanagement_1.getallpatients);
 router.put('/updatepatients/:id', patientmanagement_1.updatepatients);
 router.get('/getonepatients/:id', patientmanagement_1.getonepatients);
