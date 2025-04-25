@@ -529,6 +529,7 @@ export const reportsummary = async (req:any,res:any) =>{
           $cond: [{ $ne: ["$cashiername", null] }, "$cashiername", "$$REMOVE"]
            }
           },
+          
           //cashiername:{$first:"$cashiername"}
         }
       },
