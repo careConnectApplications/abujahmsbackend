@@ -249,17 +249,19 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
   queryresult= await readlabaggregate(secondaryservice);
 
 }
+/*
 else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readpatientsmanagementaggregate(patientsecondaryservice);
 
 }
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[3]){
+  */
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readradiologyaggregate(secondaryservice);
 
 }
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[3]){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readprocedureaggregate(secondaryservice);
 
