@@ -169,6 +169,30 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
             }
         ];
+        const patientsecondaryservice = [
+            {
+                $match: { $and: [{ patienttype: config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            }
+        ];
+        const pharmacysecondaryservice = [
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: { $and: [{ pharmacy: querygroup }, { "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            }
+        ];
         var queryresult;
         //var c = await configuration.settings2();
         let { reports } = yield (0, settings_1.settings)();
@@ -200,6 +224,29 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[0]) {
             //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
             queryresult = yield (0, reports_1.readappointmentaggregate)(secondaryservice);
+        }
+        else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[1]) {
+            //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+            queryresult = yield (0, reports_1.readlabaggregate)(secondaryservice);
+        }
+        /*
+        else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
+          //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+          queryresult= await readpatientsmanagementaggregate(patientsecondaryservice);
+        
+        }
+          */
+        else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[2]) {
+            //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+            queryresult = yield (0, reports_1.readradiologyaggregate)(secondaryservice);
+        }
+        else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[3]) {
+            //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+            queryresult = yield (0, reports_1.readprocedureaggregate)(secondaryservice);
+        }
+        else if (querytype == reports[8].querytype) {
+            //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
+            queryresult = yield (0, reports_1.readprescriptionaggregate)(pharmacysecondaryservice);
         }
         else {
             throw new Error(`querytype ${config_1.default.error.errorisrequired}`);

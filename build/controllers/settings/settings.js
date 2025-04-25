@@ -98,7 +98,7 @@ const settings = function () {
                 { querytype: "hmoreportforpharmacy", querygroup: hmoNames },
                 { querytype: "hmoappointmentreport", querygroup: hmoNames },
                 { querytype: "hmoradiologyreport", querygroup: hmoNames },
-                { querytype: "secondaryservicereport", querygroup: ["Appointment", "Lab", "Patient Registration", "Radiology", "Procedure", ...pharmacyNames] },
+                { querytype: "secondaryservicereport", querygroup: ["Appointment", "Lab", "Radiology", "Procedure", ...pharmacyNames] },
             ];
             const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate"];
             return { reports, summary };

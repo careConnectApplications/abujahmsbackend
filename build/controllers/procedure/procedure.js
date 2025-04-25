@@ -51,7 +51,6 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const appointment_1 = require("../../dao/appointment");
-const servicetype_1 = require("../../dao/servicetype");
 const procedure_1 = require("../../dao/procedure");
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
@@ -88,7 +87,7 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
         }
-        const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[5] }, { type: 1, category: 1, department: 1, _id: 0 });
+        //const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
         //loop through all test and create record in lab order
         for (var i = 0; i < procedure.length; i++) {
             //search for price of test name
@@ -97,9 +96,8 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 throw new Error(`${config_1.default.error.errornopriceset}  ${procedure[i]}`);
             }
             //search testname in setting
-            var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-            /*
-            if(!testsetting || testsetting.length < 1){
+            //var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
+            /*      f(!testsetting || testsetting.length < 1){
               throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
           }
               */
@@ -114,7 +112,7 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
             }
             //create payment
             if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
+                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: config_1.default.category[5], patient: id, amount: Number(testPrice.amount) });
                 //create testrecordn 
                 var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
                 proceduresid.push(procedurerecord._id);
@@ -189,11 +187,13 @@ function updateprocedures(req, res) {
             if (!testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${procedure}`);
             }
-            const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[5] }, { type: 1, category: 1, department: 1, _id: 0 });
-            var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
-            if (!testsetting || testsetting.length < 1) {
-                throw new Error(`${procedure} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[5]} as a service type  `);
-            }
+            //      const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
+            //  var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
+            /*
+            if(!testsetting || testsetting.length < 1){
+              throw new Error(`${procedure} donot ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
+          }
+              */
             //check that the status is not complete
             var myprocedurestatus = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, '');
             if (myprocedurestatus.status !== config_1.default.status[9]) {
