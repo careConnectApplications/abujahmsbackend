@@ -48,7 +48,7 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       
       }
            
-  const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
+  //const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
       //loop through all test and create record in lab order
       for(var i =0; i < procedure.length; i++){
     //search for price of test name
@@ -60,9 +60,8 @@ export var scheduleprocedureorder= async (req:any, res:any) =>{
       //search testname in setting
       
       
-      var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-      /*
-      if(!testsetting || testsetting.length < 1){
+      //var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
+      /*      f(!testsetting || testsetting.length < 1){
         throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
         */
@@ -80,7 +79,7 @@ else{
          //create payment
          if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
         
-          var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+          var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:configuration.category[5],patient:id,amount:Number(testPrice.amount)})
      
           //create testrecordn 
           var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});
@@ -164,12 +163,13 @@ else{
         if(!testPrice){
           throw new Error(`${configuration.error.errornopriceset}  ${procedure}`);
       }
-      const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
-      var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
-      
+//      const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
+    //  var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
+      /*
       if(!testsetting || testsetting.length < 1){
         throw new Error(`${procedure} donot ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
     }
+        */
  
         //check that the status is not complete
     var myprocedurestatus:any = await readoneprocedure({_id:id},{},'');
