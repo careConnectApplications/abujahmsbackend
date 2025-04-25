@@ -499,12 +499,42 @@ export const reportsummary = async (req:any,res:any) =>{
         $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
+/*
+{
+    $group: {
+      _id: "$userId",
+      emails: {
+        $push: {
+          $cond: [{ $ne: ["$email", null] }, "$email", "$$REMOVE"]
+        }
+      }
+    }
+  },
+  {
+    $addFields: {
+      firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
+    }
+  },
+  {
+    $project: { emails: 0 }
+  }
+*/
       {
         $group: {
           _id: "$cashieremail",                // Group by product
           totalAmount: { $sum: "$amount" },
           cashierid:{$first:"$cashierid"},
-          cashiername:{$first:"$cashiername"}
+          tempcashiername: {
+           $push: {
+          $cond: [{ $ne: ["$cashiername", null] }, "$cashiername", "$$REMOVE"]
+           }
+          },
+          //cashiername:{$first:"$cashiername"}
+        }
+      },
+      {
+        $addFields: {
+          cashiername: { $arrayElemAt: ["$tempcashiername", 0] }
         }
       },
       {
