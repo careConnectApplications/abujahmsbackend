@@ -18,6 +18,12 @@ const theatreadmissionSchema = new Schema({
     ref: "Theatremanagement",
     default: null,
   },
+  conscent:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Conscenttooperation",
+    default: null,
+  },
   previoustheatre:
   {
     type: Schema.Types.ObjectId,

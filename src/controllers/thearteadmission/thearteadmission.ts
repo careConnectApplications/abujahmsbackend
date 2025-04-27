@@ -14,8 +14,7 @@ const { ObjectId } = mongoose.Types;
 //refer for admission
 export var refertheatreadmission= async (req:any, res:any) =>{
     try{
-      
-      
+            
       const { firstName,lastName} = (req.user).user;
       const raiseby = `${firstName} ${lastName}`;
       const {id} = req.params;
@@ -101,7 +100,7 @@ export async function getallreferedfortheatreadmission(req:any, res:any){
     try{
        const {theatre} = req.params;
        const referedtheatre = new ObjectId(theatre);
-        const queryresult = await readallthearteadmission({referedtheatre},{},'referedtheatre','patient');
+        const queryresult = await readallthearteadmission({referedtheatre},{},'referedtheatre','patient','conscent');
         res.status(200).json({
             queryresult,
             status:true
@@ -120,7 +119,7 @@ export async function getalltheatreadmissionbypatient(req:any, res:any){
   try{
     
      const {patient} = req.params;
-      const queryresult = await readallthearteadmission({patient},{},'referedtheatre','patient');
+      const queryresult = await readallthearteadmission({patient},{},'referedtheatre','patient','conscent');
       res.status(200).json({
           queryresult,
           status:true
@@ -218,7 +217,7 @@ export async function gettheatreadmissiontoday(req:Request, res:any) {
    endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
 
   try {
-    const queryresult = await readallthearteadmission({appointmentdate: { $gte: startOfDay, $lte: endOfDay }},{},'referedtheatre','patient');
+    const queryresult = await readallthearteadmission({appointmentdate: { $gte: startOfDay, $lte: endOfDay }},{},'referedtheatre','patient','conscent');
     res.status(200).json({
       queryresult,
       status:true

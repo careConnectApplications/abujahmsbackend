@@ -1034,6 +1034,7 @@ allowedfilesize: 20000,
     errorpayment:"This service has not been paid for",
     errorreferrer: "You are not the preferred consultant for this referrer",
     errorgreaterthan:"Cannot be greater",
+    errorbase64:"Missing imageBase64",
     errorservicetray: "This service donot exist in your service tray"
 
   },
