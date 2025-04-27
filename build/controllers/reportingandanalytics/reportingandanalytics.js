@@ -167,6 +167,49 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             },
             {
                 $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            },
+            {
+                $addFields: {
+                    servicetype: {
+                        $ifNull: ["$testname", "$appointmenttype"]
+                    }
+                }
+            }
+        ];
+        const proceduresecondaryservice = [
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            },
+            {
+                $addFields: {
+                    servicetype: {
+                        $reduce: {
+                            input: { $ifNull: ["$procedure", []] },
+                            initialValue: "",
+                            in: {
+                                $cond: {
+                                    if: { $eq: ["$$value", ""] },
+                                    then: "$$this",
+                                    else: { $concat: ["$$value", ",", "$$this"] }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         ];
         const patientsecondaryservice = [
@@ -191,6 +234,11 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             },
             {
                 $match: { $and: [{ pharmacy: querygroup }, { "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
+            },
+            {
+                $addFields: {
+                    servicetype: "$prescription"
+                }
             }
         ];
         var queryresult;
@@ -242,7 +290,7 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[3]) {
             //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-            queryresult = yield (0, reports_1.readprocedureaggregate)(secondaryservice);
+            queryresult = yield (0, reports_1.readprocedureaggregate)(proceduresecondaryservice);
         }
         else if (querytype == reports[8].querytype) {
             //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
@@ -384,12 +432,42 @@ const reportsummary = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             {
                 $match: { $and: [{ status: config_1.default.status[3] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
             },
+            /*
+            {
+                $group: {
+                  _id: "$userId",
+                  emails: {
+                    $push: {
+                      $cond: [{ $ne: ["$email", null] }, "$email", "$$REMOVE"]
+                    }
+                  }
+                }
+              },
+              {
+                $addFields: {
+                  firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
+                }
+              },
+              {
+                $project: { emails: 0 }
+              }
+            */
             {
                 $group: {
                     _id: "$cashieremail", // Group by product
                     totalAmount: { $sum: "$amount" },
                     cashierid: { $first: "$cashierid" },
-                    cashiername: { $first: "$cashiername" }
+                    tempcashiername: {
+                        $push: {
+                            $cond: [{ $ne: ["$cashiername", null] }, "$cashiername", "$$REMOVE"]
+                        }
+                    },
+                    //cashiername:{$first:"$cashiername"}
+                }
+            },
+            {
+                $addFields: {
+                    cashiername: { $arrayElemAt: ["$tempcashiername", 0] }
                 }
             },
             {

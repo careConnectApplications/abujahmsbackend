@@ -167,9 +167,57 @@ const secondaryservice = [
   },
     {   
             $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    },
+    {
+      $addFields: {
+        servicetype: {
+          $ifNull: ["$testname", "$appointmenttype"]
+        }
+      }
     }
     
 ];
+const proceduresecondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    ,
+    {
+      $addFields: {
+        servicetype: {
+          $reduce: {
+            input: { $ifNull: ["$procedure", []] },
+            initialValue: "",
+            in: {
+              $cond: {
+                if: { $eq: ["$$value", ""] },
+                then: "$$this",
+                else: { $concat: ["$$value", ",", "$$this"] }
+              }
+            }
+          }
+        }
+      }
+    }
+      
+    
+];
+
 const patientsecondaryservice = [
  
     {   
@@ -195,6 +243,11 @@ const pharmacysecondaryservice = [
   },
     {   
             $match:{$and:[{pharmacy: querygroup},{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    },
+    {
+      $addFields: {
+        servicetype:"$prescription"
+      }
     }
     
 ];
@@ -263,7 +316,7 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
 }
 else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[3]){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readprocedureaggregate(secondaryservice);
+  queryresult= await readprocedureaggregate(proceduresecondaryservice);
 
 }
 else if(querytype == reports[8].querytype){
@@ -446,12 +499,43 @@ export const reportsummary = async (req:any,res:any) =>{
         $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
+/*
+{
+    $group: {
+      _id: "$userId",
+      emails: {
+        $push: {
+          $cond: [{ $ne: ["$email", null] }, "$email", "$$REMOVE"]
+        }
+      }
+    }
+  },
+  {
+    $addFields: {
+      firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
+    }
+  },
+  {
+    $project: { emails: 0 }
+  }
+*/
       {
         $group: {
           _id: "$cashieremail",                // Group by product
           totalAmount: { $sum: "$amount" },
           cashierid:{$first:"$cashierid"},
-          cashiername:{$first:"$cashiername"}
+          tempcashiername: {
+           $push: {
+          $cond: [{ $ne: ["$cashiername", null] }, "$cashiername", "$$REMOVE"]
+           }
+          },
+          
+          //cashiername:{$first:"$cashiername"}
+        }
+      },
+      {
+        $addFields: {
+          cashiername: { $arrayElemAt: ["$tempcashiername", 0] }
         }
       },
       {
