@@ -27,6 +27,7 @@ import reports  from '../routes/reportsandanalytics';
 import { readicdeleven } from '../controllers/icdten/icdten';
 
 
+
 import {protect} from "../utils/middleware";
 
 
@@ -65,12 +66,14 @@ function createServer(){
   app.use('/api/v1/radiology',protect, radiology);
   app.use('/api/v1/familyplanning',protect, familyplanning);
   app.use('/api/v1/referrer',protect, referrer);
-  app.use('/api/v1/deliverynote', protect, deliverynote);  app.use('/api/v1/procedure', protect, procedure);
+  app.use('/api/v1/deliverynote', protect, deliverynote);  
+  app.use('/api/v1/procedure', protect, procedure);
   app.use('/api/v1/dashboard', protect, dashboard);
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
   app.use('/api/v1/reports',protect,  reports);
   app.use('/api/v1/readicdten',  readicdeleven);
+ 
 
   
 

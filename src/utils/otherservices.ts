@@ -1,3 +1,5 @@
+import fs from 'fs/promises';
+const {v4 : uuidv4} = require('uuid');
 import bcrypt from "bcryptjs";
 import  jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
@@ -125,7 +127,25 @@ export function generateRandomNumber(n:number) {
  }
 }    
 }
+export const uploadbase64image = async (imageBase64:any) => {
 
+const filename= uuidv4();
+if (!imageBase64) {
+     throw new Error(configuration.error.errorbase64);
+  }
+
+  // Extract the actual base64 string (strip metadata if present)
+  const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+  const buffer = Buffer.from(base64Data, 'base64');
+
+  // Optional: Get file extension from base64 header
+  const ext = imageBase64.match(/^data:image\/(\w+);base64/);
+  const fileExt = ext ? ext[1] : 'png';
+  const filePath = path.join(process.cwd(), `${configuration.useruploaddirectory}`, `${filename}.${fileExt}`);
+  // Save the image
+  await fs.writeFile(filePath, buffer);
+  return filename;
+}
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
  
   const fileName = file.name;
