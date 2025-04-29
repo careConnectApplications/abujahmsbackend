@@ -1,7 +1,7 @@
 import express from 'express';
 import {protect} from "../utils/middleware";
 import {refertheatreadmission,getallreferedfortheatreadmission,updatetheatreadmissionstatus,getalltheatreadmissionbypatient,gettheatreadmissiontoday} from '../controllers/thearteadmission/thearteadmission';
-import {fillconscentform,readconscentformbytheatreadmission} from '../controllers/conscentodoperations/conscenttodoperations';
+import {fillconscentform,readconscentformbytheatreadmission,updatefillconscentform} from '../controllers/conscentodoperations/conscenttodoperations';
 const router = express.Router();
 
 
@@ -14,6 +14,7 @@ router.get('/gettheatreadmissiontoday', gettheatreadmissiontoday);
 //conscent
 router.post('/fillconscentform/:theatreadmission', fillconscentform);
 router.get('/readconscentformbytheatreadmission/:theatreadmission', readconscentformbytheatreadmission);
+router.put('/updatefillconscentform/:id', updatefillconscentform);
 //readconscentformbytheatreadmission
 
 

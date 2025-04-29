@@ -1,7 +1,8 @@
 import configuration from '../../config';
 import {uploadbase64image,validateinputfaulsyvalue} from "../../utils/otherservices";
 import {updatethearteadmission,readonethearteadmission} from  "../../dao/theatreadmission";
-import {createconscentooperation,readoneconscentooperation} from "../../dao/conscenttooperation";
+import {createconscentooperation,readoneconscentooperation,updateconscentooperation} from "../../dao/conscenttooperation";
+
 export const fillconscentform = async (req:any, res:any) => {
 try{
 const { imageBase64,nameofexplainer,nameofrepresentive,conscentdate} = req.body;
@@ -19,7 +20,7 @@ const filename = await uploadbase64image(imageBase64);
 }
 //const queryresult:any =await updatethearteadmission(id,{status});
 //create conscent
-const conscentresult = await createconscentooperation({theatreadmission,imageBase64,nameofexplainer,nameofrepresentive,conscentdate,filename})
+const conscentresult = await createconscentooperation({theatreadmission,nameofexplainer,nameofrepresentive,conscentdate,filename})
 //update theatre admission
 const queryresult:any =await updatethearteadmission(theatreadmission,{conscent:conscentresult});
 res.status(200).json({
@@ -54,3 +55,36 @@ catch(e:any){
       res.status(403).json({ status: false, msg: error.message });
     }
   };
+
+
+  export const updatefillconscentform = async (req:any, res:any) => {
+    try{
+    const { nameofexplainer,nameofrepresentive,conscentdate} = req.body;
+    const {id} = req.params;
+    validateinputfaulsyvalue({id,nameofexplainer,nameofrepresentive,conscentdate});
+          
+    //theatre
+    //const filename = await uploadbase64image(imageBase64);
+    //validate theatre admission
+      var  findAdmission = await readoneconscentooperation({_id:id},{},'');
+      if(!findAdmission){
+        throw new Error(`Conscent Form ${configuration.error.erroralreadyexit}`);
+    
+    }
+    //const queryresult:any =await updatethearteadmission(id,{status});
+    //create conscent
+    const queryresult = await updateconscentooperation(id,{nameofexplainer,nameofrepresentive,conscentdate})
+   
+    res.status(200).json({
+        queryresult,
+        status:true
+      }); 
+   
+    }
+    catch(e:any){
+        res.status(403).json({ status: false, msg: e.message });
+    
+    }
+    
+    
+    }
