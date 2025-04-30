@@ -2,6 +2,7 @@ import express from 'express';
 import {protect} from "../utils/middleware";
 import {refertheatreadmission,getallreferedfortheatreadmission,updatetheatreadmissionstatus,getalltheatreadmissionbypatient,gettheatreadmissiontoday} from '../controllers/thearteadmission/thearteadmission';
 import {fillconscentform,readconscentformbytheatreadmission,updatefillconscentform} from '../controllers/conscentodoperations/conscenttodoperations';
+import {fillpreoperativeprevisitform, readpreoperativeprevisitformbytheatreadmission,updatefillpreoperativeprevisitform} from "../controllers/preoperativeprevisit/preoperativeprevisit";
 const router = express.Router();
 
 
@@ -15,7 +16,10 @@ router.get('/gettheatreadmissiontoday', gettheatreadmissiontoday);
 router.post('/fillconscentform/:theatreadmission', fillconscentform);
 router.get('/readconscentformbytheatreadmission/:theatreadmission', readconscentformbytheatreadmission);
 router.put('/updatefillconscentform/:id', updatefillconscentform);
-//readconscentformbytheatreadmission
+//preoperative
+router.post('/fillpreoperativeprevisitform/:theatreadmission', fillpreoperativeprevisitform);
+router.get('/readpreoperativeprevisitformbytheatreadmission/:theatreadmission', readpreoperativeprevisitformbytheatreadmission);
+router.put('/updatepreoperativeprevisitform/:id', updatefillpreoperativeprevisitform);
 
 
 export default router;
