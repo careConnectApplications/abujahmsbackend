@@ -3,17 +3,15 @@ import {uploadbase64image,validateinputfaulsyvalue} from "../../utils/otherservi
 import {updatethearteadmission,readonethearteadmission} from  "../../dao/theatreadmission";
 import {createconscentooperation,readoneconscentooperation,updateconscentooperation} from "../../dao/conscenttooperation";
 
-export const fillconscentform = async (req:any, res:any) => {
+export const fillhistologyrequestform = async (req:any, res:any) => {
 try{
 const { imageBase64,nameofexplainer,nameofrepresentive,conscentdate} = req.body;
 const {theatreadmission} = req.params;
-validateinputfaulsyvalue({theatreadmission,imageBase64,nameofexplainer,nameofrepresentive,conscentdate});
-      
+validateinputfaulsyvalue({theatreadmission,imageBase64,nameofexplainer,nameofrepresentive,conscentdate});      
 //theatre
 const filename = await uploadbase64image(imageBase64);
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
-
   if(!findAdmission){
     throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
 
@@ -22,11 +20,14 @@ const filename = await uploadbase64image(imageBase64);
 //create conscent
 const conscentresult = await createconscentooperation({theatreadmission,nameofexplainer,nameofrepresentive,conscentdate,filename})
 //update theatre admission
-const queryresult:any =await updatethearteadmission(theatreadmission,{conscent:conscentresult._id});
+const queryresult:any =await updatethearteadmission(theatreadmission,{conscent:conscentresult});
 res.status(200).json({
     queryresult,
     status:true
   }); 
+
+console.log(filename);
+res.status(200).json({ message: 'Image saved successfully'});
 }
 catch(e:any){
     res.status(403).json({ status: false, msg: e.message });

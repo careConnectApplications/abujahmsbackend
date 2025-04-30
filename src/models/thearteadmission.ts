@@ -24,6 +24,12 @@ const theatreadmissionSchema = new Schema({
     ref: "Conscenttooperation",
     default: null,
   },
+  preoperativeprevisit:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Preoperativeprevisit",
+    default: null,
+  },
   previoustheatre:
   {
     type: Schema.Types.ObjectId,
