@@ -108,7 +108,106 @@ dosageform:String,
     }
   
   }
+  //get price of drug
+  export async function readdrugprice(req: any, res: any) {
+    //
+    try {
+      const {id} = req.params;
+      const {drug,pharmacy,qty} = req.body;
+      validateinputfaulsyvalue({drug,pharmacy,qty});
+      var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
+    
+      if(!patient){
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+  
+      }
+      var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
+     
+      if(!orderPrice){
+        throw new Error(`${configuration.error.errornopriceset} ${drug}`);
+    }
+    var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+    
+        
+      
+     
+      res.json({
+        queryresult:amount,
+        status: true,
+      });
+    } catch (e: any) {
+      console.log(e);
+      res.status(403).json({status: false, msg:e.message});
+    }
+  }
 
+
+//pharmacy order
+export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
+  try{
+   
+    const { firstName,lastName} = (req.user).user;
+    //accept _id from request
+    const {id} = req.params;
+    var {products} = req.body;
+    var orderid:any=String(Date.now());
+    var pharcyorderid =[];
+    var paymentids =[];
+      validateinputfaulsyvalue({id, products});
+    //search patient
+    var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
+    
+    if(!patient){
+      throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+
+    }
+  var appointment:any={
+      _id:id,
+      appointmentid:String(Date.now())
+      
+    };
+  
+    //loop through all test and create record in lab order
+    for(var i =0; i < products.length; i++){
+      let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote,duration,qty} = products[i];
+      validateinputfaulsyvalue({qty});
+      //    console.log(testname[i]);
+      //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+    
+      var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
+     
+      if(!orderPrice){
+        throw new Error(`${configuration.error.errornopriceset} ${drug}`);
+    }
+    var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+    let paymentreference; 
+    //validate the status
+      //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+      var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+      if(findAdmission){
+        paymentreference = findAdmission.admissionid;
+    
+    }
+    else{
+      paymentreference = orderid;
+    }
+    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+    //create 
+   // console.log("got here");
+    var prescriptionrecord:any = await createprescription({dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+    pharcyorderid.push(prescriptionrecord ._id);
+    paymentids.push(createpaymentqueryresult._id);
+    }
+    var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
+    res.status(200).json({queryresult, status: true});
+  }
+  
+  catch(error:any){
+    res.status(403).json({ status: false, msg: error.message });
+
+  }
+
+}
 
   export async function readpharmacybyorderid(req: any, res: any) {
     //
