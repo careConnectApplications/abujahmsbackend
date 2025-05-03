@@ -17,7 +17,7 @@ router.put('/updatestocks/:id', updatestocks);
 router.post('/pharmacyorder/:id', pharmacyorder);
 router.post('/pharmacyorderwithoutconfirmation/:id', pharmacyorderwithoutconfirmation);
 router.put('/confirmpharmacyorder/:id', confirmpharmacyorder);
-router.get('/readdrugprice/:id', readdrugprice);
+router.post('/readdrugprice/:id', readdrugprice);
 //readdrugprice
 //confirmpharmacyorder
 router.get('/readallpharmacytransaction', readallpharmacytransaction);
