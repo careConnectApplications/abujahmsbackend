@@ -113,7 +113,9 @@ dosageform:String,
     //
     try {
       const {id} = req.params;
+      console.log(req.body);
       const {drug,pharmacy,qty} = req.body;
+      console.log("drug", drug);
       validateinputfaulsyvalue({drug,pharmacy,qty});
       var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
     
