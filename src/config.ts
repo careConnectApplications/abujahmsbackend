@@ -71,6 +71,16 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        ageinmonths:["0-5 Months","6-23 Months","24 - 59 Months"],
+        typeofvisit:["N","R"],
+       infactandyoungchildfeeding:["Exclusive BF","BF and Water","BF with other Foods"],
+       complementaryfeeding:["Not BF","BF and Other Foods","Other Foods only","Not started CF"],
+       counsellingprovided:["Maternal Nutrition","Exclusive Breadstfeeding","Complementary Feeding","Water","Sanitation and Hygiene"],
+       referedtosupportgroup:["Yes","No"],
+       growthaccordingtothechildhealthcard:["Growing well","Not Growing well"],
+       vitaminasupplement:["6 -11 months","12 - 59 months"],
+       deworming:["12 - 23 months", "24 - 59 months"],
+
 
         bookingstatus:["booked","unbooked"],
         cptcodes:["Anesthesia for Procedure ans Services on the head","Anesthesia for Procedure ans Services on the neck"],
