@@ -22,6 +22,7 @@ import configuration from "../../config";
 export const createnutritions = async (req:any, res:any) => {
     try {
       const {id} = req.params;
+      console.log('id',id);
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       var { date,ageinmonths,typeofvisit,infactandyoungchildfeeding,complementaryfeeding,counsellingprovided,referedtosupportgroup,anthropometryheight,anthropometryweight,anthropometrybilateraloedema,muacred,muacyellow,muacgreen,growthaccordingtothechildhealthcard,vitaminasupplement,deworming,staffname} = req.body;
