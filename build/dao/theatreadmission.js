@@ -20,10 +20,10 @@ exports.updatethearteadmissionbyquery = updatethearteadmissionbyquery;
 const thearteadmission_1 = __importDefault(require("../models/thearteadmission"));
 const config_1 = __importDefault(require("../config"));
 //read all patient history
-function readallthearteadmission(query, selectquery, populatequery, populatesecondquery) {
+function readallthearteadmission(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const thearteadmissiondetails = yield thearteadmission_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery);
+            const thearteadmissiondetails = yield thearteadmission_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
             const totalthearteadmissiondetails = yield thearteadmission_1.default.find(query).countDocuments();
             return { thearteadmissiondetails, totalthearteadmissiondetails };
         }

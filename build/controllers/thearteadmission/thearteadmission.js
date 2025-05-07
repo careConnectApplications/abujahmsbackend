@@ -104,7 +104,7 @@ function getallreferedfortheatreadmission(req, res) {
         try {
             const { theatre } = req.params;
             const referedtheatre = new ObjectId(theatre);
-            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ referedtheatre }, {}, 'referedtheatre', 'patient');
+            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ referedtheatre }, {}, 'referedtheatre', 'patient', 'conscent');
             res.status(200).json({
                 queryresult,
                 status: true
@@ -121,7 +121,7 @@ function getalltheatreadmissionbypatient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { patient } = req.params;
-            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ patient }, {}, 'referedtheatre', 'patient');
+            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ patient }, {}, 'referedtheatre', 'patient', 'conscent');
             res.status(200).json({
                 queryresult,
                 status: true
@@ -204,7 +204,7 @@ function gettheatreadmissiontoday(req, res) {
         const endOfDay = new Date(startOfDay);
         endOfDay.setHours(23, 59, 59, 999); // Set the time to 23:59:59  
         try {
-            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ appointmentdate: { $gte: startOfDay, $lte: endOfDay } }, {}, 'referedtheatre', 'patient');
+            const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ appointmentdate: { $gte: startOfDay, $lte: endOfDay } }, {}, 'referedtheatre', 'patient', 'conscent');
             res.status(200).json({
                 queryresult,
                 status: true

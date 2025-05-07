@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getpriceofdrug = exports.dispense = exports.confirmpharmacyorder = exports.confirmpharmacygrouporder = exports.readallpharmacytransactionbypartient = exports.readallpharmacytransaction = exports.pharmacyorder = void 0;
+exports.getpriceofdrug = exports.dispense = exports.confirmpharmacyorder = exports.confirmpharmacygrouporder = exports.readallpharmacytransactionbypartient = exports.readallpharmacytransaction = exports.pharmacyorderwithoutconfirmation = exports.pharmacyorder = void 0;
+exports.readdrugprice = readdrugprice;
 exports.readpharmacybyorderid = readpharmacybyorderid;
 exports.groupreadallpharmacytransaction = groupreadallpharmacytransaction;
 exports.groupreadallpharmacytransactionoptimized = groupreadallpharmacytransactionoptimized;
@@ -109,6 +110,92 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.pharmacyorder = pharmacyorder;
+//get price of drug
+function readdrugprice(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        //
+        try {
+            const { id } = req.params;
+            console.log(req.body);
+            const { drug, pharmacy, qty } = req.body;
+            console.log("drug", drug);
+            (0, otherservices_1.validateinputfaulsyvalue)({ drug, pharmacy, qty });
+            var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
+            if (!patient) {
+                throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            }
+            var orderPrice = yield (0, price_1.readoneprice)({ servicetype: drug, servicecategory: config_1.default.category[1], pharmacy });
+            if (!orderPrice) {
+                throw new Error(`${config_1.default.error.errornopriceset} ${drug}`);
+            }
+            var amount = patient.isHMOCover == config_1.default.ishmo[1] ? Number(orderPrice.amount) * config_1.default.hmodrugpayment * qty : Number(orderPrice.amount) * qty;
+            res.json({
+                queryresult: amount,
+                status: true,
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+//pharmacy order
+var pharmacyorderwithoutconfirmation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { firstName, lastName } = (req.user).user;
+        //accept _id from request
+        const { id } = req.params;
+        var { products } = req.body;
+        var orderid = String(Date.now());
+        var pharcyorderid = [];
+        var paymentids = [];
+        (0, otherservices_1.validateinputfaulsyvalue)({ id, products });
+        //search patient
+        var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
+        if (!patient) {
+            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+        }
+        var appointment = {
+            _id: id,
+            appointmentid: String(Date.now())
+        };
+        //loop through all test and create record in lab order
+        for (var i = 0; i < products.length; i++) {
+            let { dosageform, strength, dosage, frequency, route, drug, pharmacy, prescriptionnote, duration, qty } = products[i];
+            (0, otherservices_1.validateinputfaulsyvalue)({ qty });
+            //    console.log(testname[i]);
+            //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+            var orderPrice = yield (0, price_1.readoneprice)({ servicetype: drug, servicecategory: config_1.default.category[1], pharmacy });
+            if (!orderPrice) {
+                throw new Error(`${config_1.default.error.errornopriceset} ${drug}`);
+            }
+            var amount = patient.isHMOCover == config_1.default.ishmo[1] ? Number(orderPrice.amount) * config_1.default.hmodrugpayment * qty : Number(orderPrice.amount) * qty;
+            let paymentreference;
+            //validate the status
+            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+            if (findAdmission) {
+                paymentreference = findAdmission.admissionid;
+            }
+            else {
+                paymentreference = orderid;
+            }
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: drug, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+            //create 
+            // console.log("got here");
+            var prescriptionrecord = yield (0, prescription_1.createprescription)({ dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, qty, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid });
+            pharcyorderid.push(prescriptionrecord._id);
+            paymentids.push(createpaymentqueryresult._id);
+        }
+        var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { prescription: pharcyorderid, payment: paymentids } });
+        res.status(200).json({ queryresult, status: true });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.pharmacyorderwithoutconfirmation = pharmacyorderwithoutconfirmation;
 function readpharmacybyorderid(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         //

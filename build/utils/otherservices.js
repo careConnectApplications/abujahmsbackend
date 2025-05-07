@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isObjectAvailable = exports.mail = exports.sendTokenResponse = exports.isValidPassword = exports.encrypt = void 0;
+exports.isObjectAvailable = exports.uploadbase64image = exports.mail = exports.sendTokenResponse = exports.isValidPassword = exports.encrypt = void 0;
 exports.storeUniqueNumber = storeUniqueNumber;
 exports.generateRandomNumber = generateRandomNumber;
 exports.validateinputfaulsyvalue = validateinputfaulsyvalue;
@@ -53,6 +53,8 @@ exports.validateinputyesno = validateinputyesno;
 exports.validateinputfornumber = validateinputfornumber;
 exports.uploaddocument = uploaddocument;
 exports.convertexceltojson = convertexceltojson;
+const promises_1 = __importDefault(require("fs/promises"));
+const { v4: uuidv4 } = require('uuid');
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -173,6 +175,23 @@ function validateinputfornumber(input) {
         }
     }
 }
+const uploadbase64image = (imageBase64) => __awaiter(void 0, void 0, void 0, function* () {
+    const filename = uuidv4();
+    if (!imageBase64) {
+        throw new Error(config_1.default.error.errorbase64);
+    }
+    // Extract the actual base64 string (strip metadata if present)
+    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    // Optional: Get file extension from base64 header
+    const ext = imageBase64.match(/^data:image\/(\w+);base64/);
+    const fileExt = ext ? ext[1] : 'png';
+    const filePath = path.join(process.cwd(), `${config_1.default.useruploaddirectory}`, `${filename}.${fileExt}`);
+    // Save the image
+    yield promises_1.default.writeFile(filePath, buffer);
+    return filename;
+});
+exports.uploadbase64image = uploadbase64image;
 function uploaddocument(file, filename, allowedextension, uploadpath) {
     const fileName = file.name;
     const size = file.data.length / 1024;
