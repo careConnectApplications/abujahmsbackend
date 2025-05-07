@@ -18,6 +18,25 @@ const theatreadmissionSchema = new Schema({
     ref: "Theatremanagement",
     default: null,
   },
+  conscent:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Conscenttooperation",
+    default: null,
+  },
+  preoperativeprevisit:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Preoperativeprevisit",
+    default: null,
+  },
+  preanathetics:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Preanathetics",
+    default: null,
+  },
+  //preanathetics
   previoustheatre:
   {
     type: Schema.Types.ObjectId,
