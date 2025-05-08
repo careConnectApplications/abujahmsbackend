@@ -18,7 +18,10 @@ router.post('/createstock', stock_1.createstock);
 router.put('/updatestocks/:id', stock_1.updatestocks);
 //pharmacy
 router.post('/pharmacyorder/:id', pharmacy_1.pharmacyorder);
+router.post('/pharmacyorderwithoutconfirmation/:id', pharmacy_1.pharmacyorderwithoutconfirmation);
 router.put('/confirmpharmacyorder/:id', pharmacy_1.confirmpharmacyorder);
+router.post('/readdrugprice/:id', pharmacy_1.readdrugprice);
+//readdrugprice
 //confirmpharmacyorder
 router.get('/readallpharmacytransaction', pharmacy_1.readallpharmacytransaction);
 router.put('/dispense/:id', pharmacy_1.dispense);

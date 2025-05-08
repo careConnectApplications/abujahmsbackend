@@ -1,0 +1,11 @@
+"use strict";
+/*
+diagnosis
+operative
+surgeon
+assistants
+preoperativenurse
+anestheticnurse
+typeofanesthetic
+findings:[]
+*/ 

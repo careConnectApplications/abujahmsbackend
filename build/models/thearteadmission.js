@@ -17,6 +17,22 @@ const theatreadmissionSchema = new mongoose_1.Schema({
         ref: "Theatremanagement",
         default: null,
     },
+    conscent: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Conscenttooperation",
+        default: null,
+    },
+    preoperativeprevisit: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Preoperativeprevisit",
+        default: null,
+    },
+    preanathetics: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Preanathetics",
+        default: null,
+    },
+    //preanathetics
     previoustheatre: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Theatremanagement",

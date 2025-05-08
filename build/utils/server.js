@@ -18,6 +18,7 @@ const pharmacy_1 = __importDefault(require("../routes/pharmacy"));
 const admission_1 = __importDefault(require("../routes/admission"));
 const nursingcare_1 = __importDefault(require("../routes/nursingcare"));
 const immunization_1 = __importDefault(require("../routes/immunization"));
+const nutrition_1 = __importDefault(require("../routes/nutrition"));
 const radiology_1 = __importDefault(require("../routes/radiology"));
 const pathograph_1 = __importDefault(require("../routes/pathograph"));
 const familyplanning_1 = __importDefault(require("../routes/familyplanning"));
@@ -61,6 +62,7 @@ function createServer() {
     app.use('/api/v1/admission', middleware_1.protect, admission_1.default);
     app.use('/api/v1/nursingcare', middleware_1.protect, nursingcare_1.default);
     app.use('/api/v1/immunization', middleware_1.protect, immunization_1.default);
+    app.use('/api/v1/nutrition', middleware_1.protect, nutrition_1.default);
     app.use('/api/v1/pathogragh', middleware_1.protect, pathograph_1.default);
     app.use('/api/v1/radiology', middleware_1.protect, radiology_1.default);
     app.use('/api/v1/familyplanning', middleware_1.protect, familyplanning_1.default);
