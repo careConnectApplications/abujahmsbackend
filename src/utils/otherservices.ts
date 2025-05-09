@@ -144,7 +144,7 @@ if (!imageBase64) {
   const filePath = path.join(process.cwd(), `${configuration.useruploaddirectory}`, `${filename}.${fileExt}`);
   // Save the image
   await fs.writeFile(filePath, buffer);
-  return filename;
+  return `${filename}.${fileExt}`;
 }
  export function uploaddocument(file:any,filename:any,allowedextension:any,uploadpath:any){
  

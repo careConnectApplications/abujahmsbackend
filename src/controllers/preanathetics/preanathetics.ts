@@ -132,7 +132,7 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readonepreanathetics({_id:id},{},'');
       if(!findAdmission){
-        throw new Error(`Preanathetics Form ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Preanathetics Form donot  ${configuration.error.erroralreadyexit}`);
     
     }
     //const queryresult:any =await updatethearteadmission(id,{status});
