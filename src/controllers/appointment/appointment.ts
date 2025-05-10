@@ -171,6 +171,7 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
              appointmentcategory:1,
              firstName:"$patient.firstName",
              lastName:"$patient.lastName",
+             
              MRN:"$patient.MRN",
              HMOId:"$patient.HMOId",
              HMOName:"$patient.HMOName",
@@ -528,6 +529,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         firstName:"$patient.firstName",
         lastName:"$patient.lastName",
         MRN:"$patient.MRN",
+        patient:"$patient",
         HMOId:"$patient.HMOId",
         HMOName:"$patient.HMOName",
         vitalstatus:"$vitals.status",
