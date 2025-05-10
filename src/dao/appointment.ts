@@ -29,6 +29,24 @@ catch(err:any){
 
 
 }
+export async function optimizedreadallappointment(query:any, aggregatequery:any,page:any,size:any){
+
+  try{
+    const skip = (page - 1) * size;
+   var appointmentdetails = await Appointment.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });;
+  const totalappointmentdetails = (await Appointment.aggregate(aggregatequery)).length;
+  const totalPages = Math.ceil(totalappointmentdetails / size);
+  return { appointmentdetails, totalPages,totalappointmentdetails, size, page};
+  
+  }
+  catch(err:any){
+    console.log(err);
+        throw new Error(configuration.error.erroruserread);
+  
+  }
+  
+  
+  }
 
 export async function readallappointmentfirstfive(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
   try {
