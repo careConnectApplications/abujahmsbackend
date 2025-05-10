@@ -119,6 +119,60 @@ export var radiologyorder= async (req:any, res:any) =>{
      //get lab order 
      export const readAllRadiology = async (req:any, res:any) => {
       try {
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        const filter:any = {};
+        /*
+        //apply pagination
+              const page = parseInt(req.query.page) || 1;
+              const size = parseInt(req.query.size) || 150;
+              const filter:any = {};
+              
+            // Add filters based on query parameters
+            if (req.query.firstName) {
+              //console.log(req.query.firstName)
+              filter.firstName = new RegExp(req.query.firstName, 'i'); // Case-insensitive search for name
+            }
+            if (req.query.MRN) {
+            
+              filter.MRN = new RegExp(req.query.MRN, 'i');
+            }
+            if (req.query.HMOId) {
+              filter.HMOId = new RegExp(req.query.HMOId, 'i'); // Case-insensitive search for email
+            }
+            if (req.query.lastName) {
+              filter.lastName = new RegExp(req.query.lastName, 'i'); // Case-insensitive search for email
+            }
+            if (req.query.phoneNumber) {
+              filter.phoneNumber = new RegExp(req.query.phoneNumber, 'i'); // Case-insensitive search for email
+            }
+            if (req.query.email) {
+              filter.email = new RegExp(req.query.email, 'i'); // Case-insensitive search for email
+            }
+           
+          
+        
+              //var settings = await configuration.settings();
+                var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
+                    "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1,"authorizationcode":1,"patienttype":1};
+                    //var populatequery="payment";
+                   
+                     var populatequery ={
+                    path: "payment",
+                   // match: { paymentcategory: { $eq: settings.servicecategory[0].category } },
+                   match: { paymentcategory: { $eq: configuration.category[3] } },
+                    select: {
+                      status: 1,
+                      paymentype:1
+                    },
+                  };
+                  var populateappointmentquery="appointment";
+                const queryresult = await readallpatientpaginated(filter,selectquery,populatequery,populateappointmentquery,page,size);
+                res.status(200).json({
+                    queryresult,
+                    status:true
+                  });
+        */
         const queryresult = await readallradiology({},{},'patient','payment');
         res.status(200).json({
           queryresult,
