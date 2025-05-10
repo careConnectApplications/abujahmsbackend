@@ -528,6 +528,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         appointmentcategory:1,
         firstName:"$patient.firstName",
         lastName:"$patient.lastName",
+        phoneNumber:"$patient.phoneNumber",
         MRN:"$patient.MRN",
         patient:"$patient",
         HMOId:"$patient.HMOId",
@@ -544,7 +545,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
       $match:filter
     },
   ]; 
-    const queryresult = await optimizedreadallappointment({clinic},aggregatequery,page,size);
+    const queryresult = await optimizedreadallappointment(aggregatequery,page,size);
     console.log('allresult', queryresult);
     
     //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});

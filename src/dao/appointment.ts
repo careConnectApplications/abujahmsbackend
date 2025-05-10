@@ -29,7 +29,7 @@ catch(err:any){
 
 
 }
-export async function optimizedreadallappointment(query:any, aggregatequery:any,page:any,size:any){
+export async function optimizedreadallappointment(aggregatequery:any,page:any,size:any){
 
   try{
     const skip = (page - 1) * size;

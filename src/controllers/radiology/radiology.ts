@@ -3,7 +3,7 @@ import { validateinputfaulsyvalue,uploaddocument } from "../../utils/otherservic
 import  {readonepatient,updatepatient}  from "../../dao/patientmanagement";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
 import  {readallservicetype}  from "../../dao/servicetype";
-import {createradiology, readallradiology,updateradiology,readoneradiology} from "../../dao/radiology";
+import {createradiology, readallradiology,updateradiology,readoneradiology,optimizedreadallradiology} from "../../dao/radiology";
 import {readoneprice} from "../../dao/price";
 import {createpayment,updatepayment,readonepayment} from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
@@ -119,65 +119,111 @@ export var radiologyorder= async (req:any, res:any) =>{
      //get lab order 
      export const readAllRadiology = async (req:any, res:any) => {
       try {
-        const page = parseInt(req.query.page) || 1;
-        const size = parseInt(req.query.size) || 150;
-        const filter:any = {};
-        /*
-        //apply pagination
-              const page = parseInt(req.query.page) || 1;
-              const size = parseInt(req.query.size) || 150;
-              const filter:any = {};
-              
-            // Add filters based on query parameters
-            if (req.query.firstName) {
-              //console.log(req.query.firstName)
-              filter.firstName = new RegExp(req.query.firstName, 'i'); // Case-insensitive search for name
-            }
-            if (req.query.MRN) {
-            
-              filter.MRN = new RegExp(req.query.MRN, 'i');
-            }
-            if (req.query.HMOId) {
-              filter.HMOId = new RegExp(req.query.HMOId, 'i'); // Case-insensitive search for email
-            }
-            if (req.query.lastName) {
-              filter.lastName = new RegExp(req.query.lastName, 'i'); // Case-insensitive search for email
-            }
-            if (req.query.phoneNumber) {
-              filter.phoneNumber = new RegExp(req.query.phoneNumber, 'i'); // Case-insensitive search for email
-            }
-            if (req.query.email) {
-              filter.email = new RegExp(req.query.email, 'i'); // Case-insensitive search for email
-            }
-           
-          
-        
-              //var settings = await configuration.settings();
-                var selectquery ={"title":1,"firstName":1,"status":1,"middleName":1,"lastName":1,"country":1, "stateOfResidence": 1,"LGA": 1,"address":1,"age":1,"dateOfBirth":1,"gender":1,"nin":1,"phoneNumber":1,"email":1,"oldMRN":1,"nextOfKinName":1,"nextOfKinRelationship":1,"nextOfKinPhoneNumber":1,"nextOfKinAddress":1,
-                    "maritalStatus":1, "disability":1,"occupation":1,"isHMOCover":1,"HMOName":1,"HMOId":1,"HMOPlan":1,"MRN":1,"createdAt":1, "passport":1,"authorizationcode":1,"patienttype":1};
-                    //var populatequery="payment";
-                   
-                     var populatequery ={
-                    path: "payment",
-                   // match: { paymentcategory: { $eq: settings.servicecategory[0].category } },
-                   match: { paymentcategory: { $eq: configuration.category[3] } },
-                    select: {
-                      status: 1,
-                      paymentype:1
-                    },
-                  };
-                  var populateappointmentquery="appointment";
-                const queryresult = await readallpatientpaginated(filter,selectquery,populatequery,populateappointmentquery,page,size);
-                res.status(200).json({
-                    queryresult,
-                    status:true
-                  });
-        */
+    
         const queryresult = await readallradiology({},{},'patient','payment');
         res.status(200).json({
           queryresult,
           status:true
         }); 
+      } catch (error:any) {
+        res.status(403).json({ status: false, msg: error.message });
+      }
+    };
+     //get lab order 
+     export const readAllRadiologyoptimized = async (req:any, res:any) => {
+      try {
+        var {status,firstName,MRN,HMOId,lastName,phoneNumber,testname,testid} = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        const filter:any = {};
+        var statusfilter:any =status?{status}:testname?{testname}:testid?{testid}:{};
+         // Add filters based on query parameters
+         if (firstName) {   
+          filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if(MRN) {
+          filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (HMOId) {
+          filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+        }
+        if (lastName) {
+          filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        if (phoneNumber) {
+          filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+        }
+           let aggregatequery = 
+           [ 
+             {
+               $match:statusfilter
+              },
+             {
+             $lookup: {
+               from: 'payments',       
+               localField: 'payment',    
+               foreignField: '_id',     
+               as: 'payment'     
+             }
+           },
+           {
+             $lookup: {
+               from: 'patientsmanagements',        
+               localField: 'patient',    
+               foreignField: '_id',      
+               as: 'patient'      
+             }
+           },
+           {
+             $unwind:{ 
+               path:'$payment' , // Deconstruct the payment array (from the lookup)
+             preserveNullAndEmptyArrays: true
+             }
+           },
+           {
+             $unwind: {
+               path: '$patient',
+               preserveNullAndEmptyArrays: true
+       
+             }  // Deconstruct the patient array (from the lookup)
+           },
+           {
+             $project:{
+               _id:1,
+               createdAt:1,
+               testname:1,
+               updatedAt:1,
+               testid:1,
+               testresult:1,
+               department:1,
+               raiseby:1,
+               firstName:"$patient.firstName",
+               lastName:"$patient.lastName",
+              phoneNumber:"$patient.phoneNumber",
+               MRN:"$patient.MRN",
+               patient:"$patient",
+               HMOId:"$patient.HMOId",
+               HMOName:"$patient.HMOName",
+               payment:"$payment",
+               status:1,
+             
+             }
+           },
+           {
+             $match:filter
+           },
+         ]; 
+           const queryresult = await optimizedreadallradiology(aggregatequery,page,size);
+         
+           
+          
+           res.status(200).json({
+             queryresult,
+             status:true
+           });
+        
+       
+      
       } catch (error:any) {
         res.status(403).json({ status: false, msg: error.message });
       }
