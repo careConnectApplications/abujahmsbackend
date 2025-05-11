@@ -23,6 +23,25 @@ export async function countradiology(query:any) {
       throw new Error(configuration.error.erroruserread);
     }
   };
+  export async function optimizedreadallradiology(aggregatequery:any,page:any,size:any){
+  
+    try{
+      const skip = (page - 1) * size;
+     var radiologydetails = await Radiology.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });;
+    const totalradiologydetails = (await Radiology.aggregate(aggregatequery)).length;
+    const totalPages = Math.ceil(totalradiologydetails / size);
+    return { radiologydetails, totalPages,totalradiologydetails, size, page};
+    
+    }
+    catch(err:any){
+      console.log(err);
+          throw new Error(configuration.error.erroruserread);
+    
+    }
+    
+    
+    }
+  
   export async function createradiology(input:any){
     try{
        const radiology = new Radiology(input);

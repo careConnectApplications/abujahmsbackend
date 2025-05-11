@@ -221,13 +221,10 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     var filter:any = {};
     var statusfilter:any = {};
     // Add filters based on query parameters
-    if (firstName) {
-      
+    if (firstName) {   
       filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
-      
     }
-    if (MRN) {
-    
+    if(MRN) {
       filter.MRN = new RegExp(MRN, 'i');
     }
     if (HMOId) {
@@ -239,22 +236,19 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     if (phoneNumber) {
       filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
     }
-    
+
     if (paymentreference) {
       filter.paymentreference = new RegExp(paymentreference, 'i'); // Case-insensitive search for email
     }
-    console.log('filter', filter);
+    //console.log('filter', filter);
   //payments status
     if(status == "paid"){
       statusfilter.status=configuration.status[3]
-
     }
     else{
       statusfilter.status=configuration.status[2];
 
     } 
-    
-
     const referencegroup = [
      //look up patient
      //add query
