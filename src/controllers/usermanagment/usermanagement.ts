@@ -162,6 +162,8 @@ export async function updatestatus(req:any, res:any){
               throw new Error(`${email} ${configuration.error.erroralreadyexit}`);
   
           }
+           var roleId = (configuration.roles).filter((e:any) => e.role == role )[0].roleId;
+          userslist[i].roleId = roleId;
           userslist[i].password=configuration.defaultPassword;
           //other validations
           await createuser(userslist[i]);
