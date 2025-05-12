@@ -2,9 +2,9 @@ name: Build and Deploy React App to Remote Server
 
 on:
   push:
-    branches: [staging] #trigger for push to staging
+    branches: [prod] #trigger for push to staging
   pull_request:
-    branches: [staging] # trigger for pull request to staging
+    branches: [prod] # trigger for pull request to staging
 
 jobs:
   build_and_deploy:
@@ -42,25 +42,25 @@ jobs:
       # Step 5: Deploy to remote server via SSH
       - name: Deploy to remote server
         env:
-          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME_LIVE }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
         run: |
           # Install SSH pass to use password for SSH
           sudo apt-get update
           sudo apt-get install -y sshpass
 
           # Deploy build to the server using SCP
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src ./downloads ./package.json ./tsconfig.json "$SSH_USERNAME"@"$SERVER_IP":/home/hms/hmsbackend
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./src ./downloads ./package.json ./tsconfig.json "$SSH_USERNAME"@"$SERVER_IP":/home/azureuser/apps/hmsbackend
 
           # Optionally restart your app after copying the build
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
             # Stop any existing server (optional)
-            pm2 stop 3
+            #pm2 stop 3
             # server commands (or your app, depending on your setup)
-            cd /home/hms/hmsbackend
+            cd /home/azureuser/apps/hmsbackend
             npm install
             npm run build
-            pm2 --name "kastina" start /home/hms/hmsbackend/build/index.js
+            #pm2 --name "kastina" start /home/hms/hmsbackend/build/index.js
 
           EOF
