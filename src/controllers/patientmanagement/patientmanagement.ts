@@ -178,10 +178,18 @@ export var createpatients = async (req:any,res:any) =>{
           req.body.isHMOCover=configuration.ishmo[0]
 
         } 
+        
+        
+           if(!(req.body.isHMOCover==configuration.ishmo[1] || req.body.isHMOCover == true)){
+           
+           delete req.body.authorizationcode ;
+        }
+          
         var {authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
         //validation
          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype,isHMOCover});
-        
+        //define the service type
+        /*
         if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
           console.log("here");
           //throw new Error(configuration.error.errorauthorizehmo);
@@ -190,6 +198,17 @@ export var createpatients = async (req:any,res:any) =>{
           validateinputfaulsyvalue({authorizationcode});
 
         }
+          */
+
+        if(authorizationcode){
+          req.body.patienttype = configuration.patienttype[1];
+
+        }
+        //define the service type
+        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
+          req.body.status = configuration.status[1];
+        }
+       
        
        
         //get token from header and extract clinic
@@ -222,7 +241,7 @@ export var createpatients = async (req:any,res:any) =>{
       
       var {isHMOCover} = req.body;
         var newRegistrationPrice:any = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
-        if(isHMOCover !== configuration.ishmo[1] && !newRegistrationPrice){
+        if(!(isHMOCover == configuration.ishmo[1] || isHMOCover == true) && !newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 
       }
@@ -238,7 +257,7 @@ export var createpatients = async (req:any,res:any) =>{
          let queryappointmentresult;
          let queryresult;
          let vitals =await createvitalcharts({status:configuration.status[8]});
-         if(isHMOCover == configuration.ishmo[1])
+         if(isHMOCover == configuration.ishmo[1] || isHMOCover == true)
          {
           queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
           queryresult =await updatepatient(createpatientqueryresult._id,{$push:{appointment:queryappointmentresult._id}});
