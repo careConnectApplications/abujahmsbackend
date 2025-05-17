@@ -38,7 +38,8 @@ jobs:
           else
             echo "src directory found."
           fi
-
+      - name: Random delay before deployment
+        run: sleep 300
       # Step 5: Deploy to remote server via SSH
       - name: Deploy to remote server
         env:
