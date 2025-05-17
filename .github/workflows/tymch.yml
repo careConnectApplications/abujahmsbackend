@@ -38,7 +38,8 @@ jobs:
           else
             echo "src directory found."
           fi
-
+      - name: Random delay before deployment
+        run: sleep 120
       # Step 5: Deploy to remote server via SSH
       - name: Deploy to remote server
         env:
@@ -46,7 +47,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           SERVER_IP: ${{ secrets.SERVER_IP_LIVE }}
         run: |
-          # Install SSH pass to use password for SSH
+          # Install SSH pass to use password for SSH.
           sudo apt-get update
           sudo apt-get install -y sshpass
 
