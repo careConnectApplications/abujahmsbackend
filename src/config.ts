@@ -924,7 +924,7 @@ main:[
   ],
 
   roles:[
-    {role: "Medical Director", roleId:"1"},
+    {role: "Medical Director", roleId:"1"}, 
     {role: "Pharmacist", roleId:"2"},
     {role: "HOD Cashier", roleId:"3"},
     {role: "General Nurse", roleId:"4"},
