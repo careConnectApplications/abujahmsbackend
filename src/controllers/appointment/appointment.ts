@@ -531,6 +531,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         phoneNumber:"$patient.phoneNumber",
         MRN:"$patient.MRN",
         patient:"$patient",
+        vitals:1,
         HMOId:"$patient.HMOId",
         HMOName:"$patient.HMOName",
         vitalstatus:"$vitals.status",
@@ -646,7 +647,35 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
       $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
       //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
     }
-      
+     ,{
+      $project:{
+        _id:1,
+        createdAt:1,
+        appointmentid:1,
+        admission: 1,
+        doctor: 1,
+        reason:1,
+        updatedAt:1,
+        appointmenttype:1,
+        appointmentdate:1,
+        clinic:1,
+        appointmentcategory:1,
+        vitalstatus:"$vitals.status",
+        vitals:1,
+        clinicalencounter:1,
+        status:1,
+        payment:"$payment",
+        policecase: 1,
+        physicalassault: 1,
+        sexualassault: 1,
+        policaename: 1,
+        servicenumber: 1,
+        policephonenumber: 1,
+
+       
+        
+      }
+    } 
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
    console.log('r', queryresult);
