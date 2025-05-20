@@ -22,6 +22,7 @@ export const readAllancfollowupByAncv2 = async (req:any, res:any) => {
 export const createancfollowupsv2 = async (req:any, res:any) => {
     try {
       const {anc} = req.params;
+      console.log('anc', anc);
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;    
       var {ga,sfh,wt,lie,presentation,position,fhr,urine,bp,remark,followup,riskidentified,currentmedication,staffname} = req.body;
