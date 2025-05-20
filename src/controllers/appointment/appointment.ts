@@ -631,9 +631,9 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         vitals:1,
         vitalstatus:"$vitals.status",
         status:1,
-        firstName:"$patient.firstName",
-        lastName:"$patient.lastName",
-        MRN:"$patient.MRN",
+        firstName:{$first: "$patient.firstName"},
+        lastName:{$first: "$patient.lastName"},
+        MRN:{$first: "$patient.MRN"},
       
 
      
