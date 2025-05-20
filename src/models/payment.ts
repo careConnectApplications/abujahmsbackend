@@ -69,6 +69,7 @@ const paymentSchema = new Schema(
   { timestamps: true }
 );
 
+paymentSchema.index({ status: 1 });
 
 //create a model
 const payment = model("Payment", paymentSchema);
