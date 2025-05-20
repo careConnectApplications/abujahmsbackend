@@ -659,6 +659,13 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
         appointmenttype:1,
         appointmentdate:1,
         clinic:1,
+        patient:1,
+        firstName:"$patient.firstName",
+        lastName:"$patient.lastName",
+        MRN:"$patient.MRN",
+        HMOId:"$patient.HMOId",
+        HMOName:"$patient.HMOName",
+
         appointmentcategory:1,
         vitalstatus:"$vitals.status",
         vitals:1,
