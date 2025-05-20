@@ -68,8 +68,9 @@ const paymentSchema = new Schema(
   },
   { timestamps: true }
 );
+paymentSchema.index({ status: 1, paymentreference: 1, createdAt: -1 })
+paymentSchema.index({ status: 1 });
 
-paymentSchema.index({ _id: 1, status: 1 });
 
 //create a model
 const payment = model("Payment", paymentSchema);
