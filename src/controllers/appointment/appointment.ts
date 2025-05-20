@@ -589,9 +589,8 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
       as: 'payment'
     }
   },
-  { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
-
-  {
+   { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
+   {
     $match: {
       $or: [
         { 'payment.status': configuration.status[3] },
@@ -599,6 +598,24 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
       ]
     }
   },
+   {
+      $lookup: {
+        from: 'vitalcharts',        
+        localField: 'vitals',    
+        foreignField: '_id',      
+        as: 'vitals'     
+      }
+    },
+ 
+   {
+      $unwind: {
+        path: '$vitals',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
+    },
+
+ 
 
   {
     $project: {
@@ -614,8 +631,12 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         vitals:1,
         vitalstatus:"$vitals.status",
         status:1,
-        paymentstatus:"$payment.status",
-        paymentreference:"$payment.paymentreference",
+        firstName:"$patient.firstName",
+        lastName:"$patient.lastName",
+        MRN:"$patient.MRN",
+      
+
+     
         //doctorsfirstName:"$doctor.firstName",
         //doctorslastName:"$doctor.lastName"
         
