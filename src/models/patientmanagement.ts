@@ -191,7 +191,7 @@ patientSchema.pre("save", async function(next){
   }
 });
 
-
+patientSchema.index({ _id: 1, firstName: 1, MRN: 1, HMOId: 1, lastName: 1, phoneNumber: 1 });
 //create a model
 const patientsmanagement = model("Patientsmanagement", patientSchema);
 //export the model
