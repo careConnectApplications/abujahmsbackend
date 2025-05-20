@@ -309,10 +309,11 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
           HMOPlan:{$first: "$patient.HMOPlan"}, 
         },
       },
-      
+      /*
       {
         $match:filter
       },
+      */
       {
         $project:{
           _id:0,
