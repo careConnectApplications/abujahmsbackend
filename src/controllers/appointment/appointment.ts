@@ -438,6 +438,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
     var {status,firstName,MRN,HMOId,lastName,phoneNumber} = req.query;
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 150;
+    // var statusfilter:any =status?{status,clinic}:{clinic};
     /*
     var filter:any = {};
         var statusfilter:any =status?{status,clinic}:{clinic};
@@ -555,10 +556,25 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
     */
    { $match: { clinic, ...(status && { status }) } },
 
-  // Optional pagination early (if possible)
-  // { $skip: (page - 1) * size },
-  // { $limit: size },
-
+ {
+  $lookup: {
+    from: 'patientsmanagements',
+    localField: 'patient',
+    foreignField: '_id',
+    as: 'patient'
+  }
+},
+{ $unwind: '$patient' },
+{
+  $match: {
+    ...(firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {}),
+    ...(MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}),
+    ...(HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {}),
+    ...(lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {}),
+    ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}),
+  }
+},
+/*
   {
     $lookup: {
       from: 'patientsmanagements',
@@ -578,6 +594,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
       as: 'patient'
     }
   },
+  */
   //{ $unwind: { path: '$patient', preserveNullAndEmptyArrays: false } },
 
   // Repeat lookup structure for payments, doctor, vitals (but skip if not needed)
@@ -627,7 +644,8 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         appointmentdate:1,
         clinic:1,
         appointmentcategory:1,
-        patient:{ $arrayElemAt: ["$patient", 0] },
+        //patient:{ $arrayElemAt: ["$patient", 0] },
+        patient:1,
         vitals:1,
         vitalstatus:"$vitals.status",
         status:1,
@@ -640,6 +658,7 @@ export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
         
     }
   },
+  { $sort: { createdAt: -1 } },
   ]; 
     const queryresult = await optimizedreadallappointment(aggregatequery,page,size);
    
@@ -777,7 +796,8 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
        
         
       }
-    } 
+    } ,
+        { $sort: { createdAt: -1 } },
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
    console.log('r', queryresult);

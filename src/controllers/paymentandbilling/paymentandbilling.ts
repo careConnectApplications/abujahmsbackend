@@ -256,6 +256,26 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       $match:statusfilter
      },
      {
+  $lookup: {
+    from: "patientsmanagements",
+    let: { patientId: "$patient" },
+    pipeline: [
+      {
+        $match: {
+          $expr: { $eq: ["$_id", "$$patientId"] },
+          ...(firstName ? { firstName: new RegExp(`^${firstName}`, 'i') } : {}),
+          ...(lastName ? { lastName: new RegExp(`^${lastName}`, 'i') } : {}),
+          ...(MRN ? { MRN: new RegExp(`^${MRN}`, 'i') } : {}),
+          ...(HMOId ? { HMOId: new RegExp(`^${HMOId}`, 'i') } : {}),
+          ...(phoneNumber ? { phoneNumber: new RegExp(`^${phoneNumber}`, 'i') } : {}),
+        }
+      }
+    ],
+    as: "patient"
+  }
+},
+     /*
+     {
       $lookup: {
         from: "patientsmanagements",
         localField: "patient",
@@ -263,6 +283,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
         as: "patient",
       },
     },
+    */
     {
       $unwind: {
         path: "$patient",
