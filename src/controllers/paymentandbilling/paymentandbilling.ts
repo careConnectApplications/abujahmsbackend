@@ -257,6 +257,26 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
      },
      {
   $lookup: {
+    from: 'patientsmanagements',
+    localField: 'patient',
+    foreignField: '_id',
+    as: 'patient'
+  }
+},
+{ $unwind: '$patient' },
+{
+  $match: {
+    ...(firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {}),
+    ...(MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}),
+    ...(HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {}),
+    ...(lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {}),
+    ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}),
+  }
+},
+
+/*
+     {
+  $lookup: {
     from: "patientsmanagements",
     let: { patientId: "$patient" },
     pipeline: [
@@ -274,6 +294,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     as: "patient"
   }
 },
+*/
      /*
      {
       $lookup: {
@@ -309,10 +330,11 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
           HMOPlan:{$first: "$patient.HMOPlan"}, 
         },
       },
-      
+      /*
       {
         $match:filter
       },
+      */
       {
         $project:{
           _id:0,

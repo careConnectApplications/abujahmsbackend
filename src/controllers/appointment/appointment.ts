@@ -797,7 +797,7 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
         
       }
     } ,
-        { $sort: { createdAt: -1 } },
+        { $sort: { createdAt: 1 } },
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
    console.log('r', queryresult);
