@@ -31,7 +31,9 @@ export var referadmission= async (req:any, res:any) =>{
          var appointment:any;
                 if(appointmentid){
                   appointmentid = new ObjectId(appointmentid);
+                  console.log("appoitmentid",appointmentid);
                   appointment = await readoneappointment({_id:appointmentid},{},'');
+                   console.log("appointment",appointment);
                         if(!appointment){
                           //create an appointment
                           throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
