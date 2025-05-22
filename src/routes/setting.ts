@@ -52,7 +52,7 @@ router.put('/updateinsurance/:id',updatehmo);
 router.post('/createtestcomponents',createtestcomponents);
 router.get('/getalltestcomponent',getalltestcomponent);
 router.put('/updatetestcomponents/:id',updatetestcomponents);
-router.get('/gettestcomponentbytestname/:testname',gettestcomponentbytestname);
+router.get('/gettestcomponentbytestname/:testname(*)',gettestcomponentbytestname);
 //audit
 router.get('/readallaudit',readAllaudit);
 
