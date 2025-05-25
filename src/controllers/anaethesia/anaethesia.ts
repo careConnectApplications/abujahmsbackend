@@ -2,6 +2,11 @@ import configuration from '../../config';
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import {readonethearteadmission} from  "../../dao/theatreadmission";
 import {createanaethesia,readoneanaethesia,updateanaethesia} from "../../dao/anaethesia";
+import {createdruggiven,readalldruggivens,updatedruggiven} from "../../dao/druggiven";
+import {createfoodgiven, readallfoodgivens, updatefoodgiven} from "../../dao/foodgiven"
+
+
+
 
 export const fillanaethesiaform = async (req:any, res:any) => {
 try{
@@ -84,6 +89,139 @@ catch(e:any){
     }
 
     //////////////////////////drugs given //////////////////////////////////////////////
+    export const readalldruggivenByTheatreAdmission = async (req:any, res:any) => {
+        try {
+         const {anathesia} = req.params;
+          const queryresult = await readalldruggivens({anathesia},{});
+          res.status(200).json({
+            queryresult,
+            status:true
+          }); 
+        } catch (error:any) {
+          res.status(403).json({ status: false, msg: error.message });
+        }
+      };
+     
+      // Create a drug given
+    export const createdruggivens = async (req:any, res:any) => {
+        try {
+          const {anathesia} = req.params;
+          const { firstName,lastName} = (req.user).user;
+          req.body.staffname = `${firstName} ${lastName}`;
+          
+          //blood sugar monitoring chart (contents: Date, Time, Test Type (drop down, RBS FBS), Value (mmol/l) , done by user acct.
+          var {staffname,druggiven,timegiven,bp,pulse,temp} = req.body;
+          validateinputfaulsyvalue({druggiven,timegiven,bp,pulse,temp});
+           //frequency must inlcude
+           //route must contain allowed options
+          
+  var  findanathesia = await readoneanaethesia({_id:anathesia},{},'','');
+  if(!findanathesia){
+    throw new Error(`Anathesia record ${configuration.error.erroralreadyexit}`);
+
+}
+        const queryresult=await createdruggiven({druggiven,timegiven,bp,pulse,temp,staffname,anathesia:findanathesia._id});
+        res.status(200).json({queryresult, status: true});
+        }
+        catch(e:any){
+            res.status(403).json({status: false, msg:e.message});
+    
+        }
+    }
+    
+    
+
+    
+    export async function updatedruggivens(req:any, res:any){
+        try{
+        //get id
+        const {id} = req.params;
+        const { firstName,lastName} = (req.user).user;
+        req.body.staffname = `${firstName} ${lastName}`;
+       var {staffname,druggiven,timegiven,bp,pulse,temp} = req.body;
+        validateinputfaulsyvalue({druggiven,timegiven,bp,pulse,temp});
+
+        var queryresult = await updatedruggiven(id, {druggiven,timegiven,bp,pulse,temp,staffname});
+        res.status(200).json({
+            queryresult,
+            status:true
+          }); 
+        }catch(e:any){
+          console.log(e);
+          res.status(403).json({status: false, msg:e.message});
+    
+        }
+    
+      }
+    
+      
+    
 
 
     ///////////////////////////////food given //////////////////////////////////////////
+
+    export const readallfoodgivenByTheatreAdmission = async (req:any, res:any) => {
+        try {
+         const {anathesia} = req.params;
+          const queryresult = await readallfoodgivens({anathesia},{});
+          res.status(200).json({
+            queryresult,
+            status:true
+          }); 
+        } catch (error:any) {
+          res.status(403).json({ status: false, msg: error.message });
+        }
+      };
+     
+      // Create a drug given
+    export const createfoodgivens = async (req:any, res:any) => {
+        try {
+          const {anathesia} = req.params;
+          const { firstName,lastName} = (req.user).user;
+          req.body.staffname = `${firstName} ${lastName}`;
+          
+          //blood sugar monitoring chart (contents: Date, Time, Test Type (drop down, RBS FBS), Value (mmol/l) , done by user acct.
+          var {staffname,foodgiven,timegiven,bp,pulse,temp} = req.body;
+          validateinputfaulsyvalue({foodgiven,timegiven,bp,pulse,temp});
+           //frequency must inlcude
+           //route must contain allowed options
+          
+          var  findanathesia = await readoneanaethesia({_id:anathesia},{},'','');
+          if(!findanathesia){
+            throw new Error(`Anathesia record ${configuration.error.erroralreadyexit}`);
+
+        }
+        const queryresult=await createfoodgiven({ foodgiven,timegiven,bp,pulse,temp,staffname,anathesia:findanathesia._id});
+        res.status(200).json({queryresult, status: true});
+        }
+        catch(e:any){
+            res.status(403).json({status: false, msg:e.message});
+    
+        }
+    }
+    
+    
+    
+    export async function updatefoodgivens(req:any, res:any){
+        try{
+        //get id
+        const {id} = req.params;
+        const { firstName,lastName} = (req.user).user;
+        req.body.staffname = `${firstName} ${lastName}`;
+       var {staffname, foodgiven,timegiven,bp,pulse,temp} = req.body;
+        validateinputfaulsyvalue({foodgiven,timegiven,bp,pulse,temp});
+
+        var queryresult = await updatefoodgiven(id, { foodgiven,timegiven,bp,pulse,temp,staffname});
+        res.status(200).json({
+            queryresult,
+            status:true
+          }); 
+        }catch(e:any){
+          console.log(e);
+          res.status(403).json({status: false, msg:e.message});
+    
+        }
+    
+      }
+    
+    
