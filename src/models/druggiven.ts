@@ -24,6 +24,16 @@ const druggivenSchema = new Schema({
         type: String,
         required: true,
     },
+    anathesia: 
+    {
+        type: Schema.Types.ObjectId,
+        ref: "Anathesia",
+        default: null,
+    },
+       
+    staffname:{
+        type:String
+    }
    
  
 },
