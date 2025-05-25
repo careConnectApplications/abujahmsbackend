@@ -56,10 +56,14 @@ catch(e:any){
 
   export const updatefillconscentform = async (req:any, res:any) => {
     try{
-    const { nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness} = req.body;
+    const {imageBase64, nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness} = req.body;
     const {id} = req.params;
     validateinputfaulsyvalue({id,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness});
-          
+      //theatre
+     let filename;
+     if(imageBase64){
+     filename=await uploadbase64image(imageBase64); 
+     }
     //theatre
     //const filename = await uploadbase64image(imageBase64);
     //validate theatre admission
@@ -70,7 +74,7 @@ catch(e:any){
     }
     //const queryresult:any =await updatethearteaadmission(id,{status});
     //create conscent
-    const queryresult = await updateconscentooperation(id,{nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness})
+    const queryresult = await updateconscentooperation(id,{filename,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness})
    
     res.status(200).json({
         queryresult,
