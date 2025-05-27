@@ -43,7 +43,7 @@ catch(e:any){
       //const {clinic} = (req.user).user;
       const {theatreadmission} = req.params;
       //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-      const queryresult = await readoneconscentooperation({theatreadmission},{},'');
+      const queryresult = await readoneconscentooperation({theatreadmission},{},'theatreadmission');
       res.status(200).json({
         queryresult,
         status:true
