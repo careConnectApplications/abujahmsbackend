@@ -5,7 +5,7 @@ import {fillconscentform,readconscentformbytheatreadmission,updatefillconscentfo
 import {fillpreoperativeprevisitform, readpreoperativeprevisitformbytheatreadmission,updatefillpreoperativeprevisitform} from "../controllers/preoperativeprevisit/preoperativeprevisit";
 import {fillpreanatheticsform,readpreanatheticsformbytheatreadmission,updatepreanatheticsconscentform} from "../controllers/preanathetics/preanathetics";
 import {fillanaethesiaform, readreadoneanaethesiaformbytheatreadmission,updateanaethesiaform,readallfoodgivenByTheatreAdmission,createfoodgivens,updatefoodgivens,readalldruggivenByTheatreAdmission,createdruggivens,updatedruggivens } from '../controllers/anaethesia/anaethesia'
-
+import {fillpostanaetheticrecoverychartform, readonepostanaetheticrecoverychartformbytheatreadmission,updatepostanaetheticrecoverychartform, createvitalsignscores, updatevitalsignscores,readallvitalsignscoreByTheatreAdmission} from '../controllers/postanaetheticrecoverychart/postanaetheticrecoverychart'
 const router = express.Router();
 
 
@@ -39,6 +39,14 @@ router.put('/updatedruggivens/:id', updatedruggivens);
 router.post('/createfoodgivens/:anathesia', createfoodgivens);
 router.get('/readallfoodgivenByTheatreAdmission/:anathesia', readallfoodgivenByTheatreAdmission);
 router.put('/updatefoodgivens/:id', updatefoodgivens);
+//postanaethetic
+router.post('/fillpostanaetheticrecoverychartform/:theatreadmission', fillpostanaetheticrecoverychartform);
+router.get('/readonepostanaetheticrecoverychartformbytheatreadmission/:theatreadmission', readonepostanaetheticrecoverychartformbytheatreadmission);
+router.put('/updatepostanaetheticrecoverychartform/:id', updatepostanaetheticrecoverychartform);
 
+//food given ////
+router.post('/createvitalsignscores/:postanaetheticrecoverychart', createvitalsignscores);
+router.get('/readallvitalsignscoreByTheatreAdmission/:postanaetheticrecoverychart', readallvitalsignscoreByTheatreAdmission);
+router.put('/updatevitalsignscores/:id', updatevitalsignscores);
 export default router;
 
