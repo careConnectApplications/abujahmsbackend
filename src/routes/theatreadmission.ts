@@ -6,6 +6,7 @@ import {fillpreoperativeprevisitform, readpreoperativeprevisitformbytheatreadmis
 import {fillpreanatheticsform,readpreanatheticsformbytheatreadmission,updatepreanatheticsconscentform} from "../controllers/preanathetics/preanathetics";
 import {fillanaethesiaform, readreadoneanaethesiaformbytheatreadmission,updateanaethesiaform,readallfoodgivenByTheatreAdmission,createfoodgivens,updatefoodgivens,readalldruggivenByTheatreAdmission,createdruggivens,updatedruggivens } from '../controllers/anaethesia/anaethesia'
 import {fillpostanaetheticrecoverychartform, readonepostanaetheticrecoverychartformbytheatreadmission,updatepostanaetheticrecoverychartform, createvitalsignscores, updatevitalsignscores,readallvitalsignscoreByTheatreAdmission} from '../controllers/postanaetheticrecoverychart/postanaetheticrecoverychart'
+import {filloperationnote, readoperationnotebytheatreadmission, updatefilloperationnote} from "../controllers/operationnotes/operationnotes"
 const router = express.Router();
 
 
@@ -44,9 +45,14 @@ router.post('/fillpostanaetheticrecoverychartform/:theatreadmission', fillpostan
 router.get('/readonepostanaetheticrecoverychartformbytheatreadmission/:theatreadmission', readonepostanaetheticrecoverychartformbytheatreadmission);
 router.put('/updatepostanaetheticrecoverychartform/:id', updatepostanaetheticrecoverychartform);
 
-//food given ////
+//vital signs score ////
 router.post('/createvitalsignscores/:postanaetheticrecoverychart', createvitalsignscores);
 router.get('/readallvitalsignscoreByTheatreAdmission/:postanaetheticrecoverychart', readallvitalsignscoreByTheatreAdmission);
 router.put('/updatevitalsignscores/:id', updatevitalsignscores);
+//operation note
+router.post('/filloperationnote/:theatreadmission', filloperationnote);
+router.get('/readoperationnotebytheatreadmission/:theatreadmission', readoperationnotebytheatreadmission);
+router.put('/updatefilloperationnote/:id', updatefilloperationnote);
+
 export default router;
 
