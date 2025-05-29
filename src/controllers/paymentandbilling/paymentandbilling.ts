@@ -263,14 +263,14 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     as: 'patient'
   }
 },
-{ $unwind: '$patient' },
+{ $unwind: '$patient',preserveNullAndEmptyArrays: true },
 {
   $match: {
-    ...(firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {}),
-    ...(MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}),
-    ...(HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {}),
-    ...(lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {}),
-    ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}),
+    ...(firstName ? { 'patient.firstName': new RegExp(`^${firstName}`, 'i') } : {}),
+      ...(MRN ? { 'patient.MRN': new RegExp(`^${MRN}`, 'i') } : {}),
+      ...(HMOId ? { 'patient.HMOId': new RegExp(`^${HMOId}`, 'i') } : {}),
+      ...(lastName ? { 'patient.lastName': new RegExp(`^${lastName}`, 'i') } : {}),
+      ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(`^${phoneNumber}`, 'i') } : {}),
   }
 },
 
@@ -305,6 +305,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       },
     },
     */
+   /*
     {
       $unwind: {
         path: "$patient",
@@ -312,6 +313,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       }
       
     },
+    */
  
       {
         $group: {
