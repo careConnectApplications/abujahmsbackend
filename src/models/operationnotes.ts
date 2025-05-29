@@ -2,10 +2,11 @@ import { Schema, model } from "mongoose";
 
 // Define the Clinic Schema
 const preoperationnoteSchema = new Schema({
-    diagnosis:String,
+    diagnosispreop:String,
+    diagnosisoperative:String,
     operative:String,
     surgeon:String,
-    assistants:String,
+    assistants:[],
     preoperativenurse:String,
     anestheticnurse:String,
     typeofanesthetic:String,

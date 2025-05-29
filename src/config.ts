@@ -71,6 +71,12 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        consciousness:["Unconscious,Unresponsive","Drowsy but responsive"],
+        ventilation:["Needs Attention","Breathing Adequetly","Can Cough/Cry"],
+        movement:["Not Moving","Movements Involuntary","Purposeful Movements"],
+        colorvitalsignsscore:["Pink","Blue"],
+        timevitalsignscore:["0","10","20","30","40","60","90","120","Discharge"],
+        score:["0","1","2","3","4","5","6"],
         ageinmonths:["0-5 Months","6-23 Months","24 - 59 Months"],
         typeofvisit:["N","R"],
        infactandyoungchildfeeding:["Exclusive BF","BF and Water","BF with other Foods"],
