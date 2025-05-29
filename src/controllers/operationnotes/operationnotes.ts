@@ -5,22 +5,26 @@ import {createoperationnote, readoneoperationnote, updateoperationnote} from "..
 
 export const filloperationnote = async (req:any, res:any) => {
 try{
+
+    
 const {theatreadmission} = req.params;
-validateinputfaulsyvalue({theatreadmission});      
+const {  diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings} = req.body; 
+const { firstName, lastName } = (req.user).user;
+var filledby=`${firstName} ${lastName}`;
+
+validateinputfaulsyvalue({theatreadmission, diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings});
+     
 //theatre
 
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
-    throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Theatre Admission donot ${configuration.error.erroralreadyexit}`);
 
 }
-req.body.theatreadmission=theatreadmission;
-//const queryresult:any =await updatethearteadmission(id,{status});
-//create conscent
-const queryresult = await createoperationnote(req.body);
-//update theatre admission
-//const queryresult:any =await updatethearteadmission(theatreadmission,{preoperativeprevisit:preoperativeprevisit._id});
+
+const queryresult = await createoperationnote({theatreadmission, diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings,filledby});
+
 res.status(200).json({
     queryresult,
     status:true
@@ -54,21 +58,22 @@ catch(e:any){
 
   export const updatefilloperationnote = async (req:any, res:any) => {
     try{
-    //const { nameofexplainer,nameofrepresentive,conscentdate} = req.body;
-    const {id} = req.params;
-    //validateinputfaulsyvalue({id,nameofexplainer,nameofrepresentive,conscentdate});
-          
-    //theatre
-    //const filename = await uploadbase64image(imageBase64);
-    //validate theatre admission
-      var  findAdmission = await readoneoperationnote({_id:id},{},'');
-      if(!findAdmission){
-        throw new Error(`Preoperative previsit Form ${configuration.error.erroralreadyexit}`);
+
+const {id} = req.params; 
+const {  diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings} = req.body; 
+const { firstName, lastName } = (req.user).user;
+var filledby=`${firstName} ${lastName}`;
+
+validateinputfaulsyvalue({diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings});
+
+ 
+      var  findoperationnote = await readoneoperationnote({_id:id},{},'');
+      if(!findoperationnote){
+        throw new Error(`Operation Note ${configuration.error.erroralreadyexit}`);
     
     }
-    //const queryresult:any =await updatethearteadmission(id,{status});
-    //create conscent
-    const queryresult = await updateoperationnote(id,req.body)
+  
+    const queryresult = await updateoperationnote(id,{diagnosispreop,diagnosisoperative,operative,surgeon,assistants,preoperativenurse,anestheticnurse,typeofanesthetic,findings,filledby})
    
     res.status(200).json({
         queryresult,
