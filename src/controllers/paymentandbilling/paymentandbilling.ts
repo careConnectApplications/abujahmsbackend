@@ -215,12 +215,103 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
   try {
     //const { paymentreference } = req.params;
     var {status,firstName,MRN,HMOId,lastName,phoneNumber,email,paymentreference} = req.query;
+     //var filter:any = {};
+    var statusfilter:any = {};
     console.log('/////query//', req.query);
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 150;
-    var filter:any = {};
-    var statusfilter:any = {};
+        if(status == "paid"){
+      statusfilter.status=configuration.status[3]
+    }
+    else{
+      statusfilter.status=configuration.status[2];
+
+    } 
+////////////////////////////////////
+const pipeline = [];
+
+// Add status filter
+pipeline.push({ $match: statusfilter });
+
+// Lookup patient
+pipeline.push({
+  $lookup: {
+    from: 'patientsmanagements',
+    localField: 'patient',
+    foreignField: '_id',
+    as: 'patient',
+  },
+});
+
+pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
+
+// Build patient match condition dynamically
+const patientMatch:any = {};
+
+if (firstName) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
+if (lastName) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
+if (MRN) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
+if (HMOId) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
+if (phoneNumber) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
+
+if (Object.keys(patientMatch).length > 0) {
+  pipeline.push({ $match: patientMatch });
+}
+
+// Grouping
+pipeline.push({
+  $group: {
+    _id: "$paymentreference",
+    paymentreference: { $first: "$paymentreference" },
+    createdAt: { $first: "$createdAt" },
+    updatedAt: { $first: "$updatedAt" },
+    amount: { $sum: "$amount" },
+    firstName: { $first: "$patient.firstName" },
+    phoneNumber: { $first: "$patient.phoneNumber" },
+    lastName: { $first: "$patient.lastName" },
+    MRN: { $first: "$patient.MRN" },
+    isHMOCover: { $first: "$patient.isHMOCover" },
+    HMOName: { $first: "$patient.HMOName" },
+    HMOId: { $first: "$patient.HMOId" },
+    HMOPlan: { $first: "$patient.HMOPlan" },
+  },
+});
+
+// Projection
+pipeline.push({
+  $project: {
+    _id: 0,
+    paymentreference: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    amount: 1,
+    firstName: 1,
+    phoneNumber: 1,
+    lastName: 1,
+    MRN: 1,
+    isHMOCover: 1,
+    HMOName: 1,
+    HMOId: 1,
+    HMOPlan: 1,
+  },
+});
+
+// Sorting
+pipeline.push({ $sort: { createdAt: -1 } });
+
+// Now run it
+//const results = await YourModel.aggregate(pipeline);
+
+//////////////////////////////////
+
+
+
+
+
+
+   
     // Add filters based on query parameters
+    /*
     if (firstName) {   
       filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
     }
@@ -240,15 +331,10 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     if (paymentreference) {
       filter.paymentreference = new RegExp(paymentreference, 'i'); // Case-insensitive search for email
     }
+      */
     //console.log('filter', filter);
   //payments status
-    if(status == "paid"){
-      statusfilter.status=configuration.status[3]
-    }
-    else{
-      statusfilter.status=configuration.status[2];
-
-    } 
+/*
     const referencegroup = [
      //look up patient
      //add query
@@ -314,6 +400,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       
     },
     */
+   /*
  
       {
         $group: {
@@ -337,6 +424,7 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
         $match:filter
       },
       */
+     /*
       {
         $project:{
           _id:0,
@@ -360,8 +448,9 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       
       
     ];
+    */
 
-    const queryresult = await readpaymentaggregateoptimized(referencegroup, page, size);
+    const queryresult = await readpaymentaggregateoptimized(pipeline, page, size);
     console.log('*******', queryresult);
     res.json({
       queryresult,
