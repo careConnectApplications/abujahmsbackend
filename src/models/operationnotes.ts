@@ -11,6 +11,7 @@ const preoperationnoteSchema = new Schema({
     anestheticnurse:String,
     typeofanesthetic:String,
     findings:[],
+    filledby:String,
     theatreadmission: {
        type: Schema.Types.ObjectId,
        ref: "Theatreadmission",

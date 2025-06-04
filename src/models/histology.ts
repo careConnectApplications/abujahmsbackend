@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 // Define the Clinic Schema
 const histologyrequestSchema = new Schema({
-    africannonafrican:[],
+    africannonafrican:String,
     historyofpresentillness:[],
     presentingcomplaint:[],
     findingonphysicalexamination:[],
