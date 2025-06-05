@@ -174,6 +174,13 @@ const secondaryservice = [
           $ifNull: ["$testname", "$appointmenttype"]
         }
       }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
     }
     
 ];
@@ -213,6 +220,13 @@ const proceduresecondaryservice = [
           }
         }
       }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
     }
       
     
@@ -247,6 +261,13 @@ const pharmacysecondaryservice = [
     {
       $addFields: {
         servicetype:"$prescription"
+      }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
       }
     }
     
@@ -319,6 +340,21 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
   queryresult= await readprocedureaggregate(proceduresecondaryservice);
 
 }
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
+
+  const [result1, result2, result3] = await Promise.all([
+    readprocedureaggregate(proceduresecondaryservice),
+    readradiologyaggregate(secondaryservice),
+    readlabaggregate(secondaryservice),
+    readappointmentaggregate(secondaryservice)
+  ]);
+
+  queryresult = [...result1, ...result2, ...result3];
+
+  //queryresult= await readprocedureaggregate(proceduresecondaryservice);
+
+}
+
 else if(querytype == reports[8].querytype){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readprescriptionaggregate(pharmacysecondaryservice);

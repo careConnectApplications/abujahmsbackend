@@ -183,10 +183,11 @@ export var createpatients = async (req:any,res:any) =>{
            if(!(req.body.isHMOCover==configuration.ishmo[1] || req.body.isHMOCover == true)){
            
            delete req.body.authorizationcode ;
+           delete req.body.facilitypateintreferedfrom;
         }
         req.body.appointmentcategory=configuration.category[3];
         req.body.appointmenttype =configuration.category[3];
-        var {authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+        var {facilitypateintreferedfrom,authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
         //validation
          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype,isHMOCover});
         //define the service type

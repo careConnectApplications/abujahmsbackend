@@ -23,6 +23,7 @@ const patientSchema = new Schema(
       default:configuration.patienttype[0]
     },
     authorizationcode:String,
+    facilitypateintreferedfrom:String,
     middleName: {
       type: String,
     },
