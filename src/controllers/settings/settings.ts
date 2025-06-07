@@ -98,7 +98,7 @@ export const settings = async function () {
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
             {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Radiology","Procedure","All",...pharmacyNames]},
-            {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
+           // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
 
 
           ];
