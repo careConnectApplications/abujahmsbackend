@@ -102,7 +102,7 @@ export const settings = async function () {
 
 
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate"];
           return {reports,summary};
     }
     catch (error: any) {

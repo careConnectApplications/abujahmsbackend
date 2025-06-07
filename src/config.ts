@@ -5,6 +5,11 @@ const configuration:any = {
   //clinic name
   //wardname  
   patienttype:["primary","secondary"],
+  counsellingprovided:["Maternal Nutrition","Exclusive Breadstfeeding","Complementary Feeding","Water","Sanitation and Hygiene"],
+  growthaccordingtothechildhealthcard:["Growing well","Not Growing well"],
+  infactandyoungchildfeeding:["Exclusive BF","BF and Water","BF with other Foods"],
+  ageinmonths:["0-5 Months","6-23 Months","24 - 59 Months"],
+  vitaminasupplement:["6 -11 months","12 - 59 months"],
   reports:[
     {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
   ],
