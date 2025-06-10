@@ -234,7 +234,7 @@ const pipeline = [];
 pipeline.push({ $match: statusfilter });
 
 // Lookup patient
-pipeline.push({
+ statusfilter.status==configuration.status[2] && pipeline.push({
   $lookup: {
     from: 'patientsmanagements',
     localField: 'patient',
@@ -243,23 +243,23 @@ pipeline.push({
   },
 });
 
-pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
+statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
 
 // Build patient match condition dynamically
 const patientMatch:any = {};
 
-if (firstName) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
-if (lastName) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
-if (MRN) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
-if (HMOId) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
-if (phoneNumber) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
+if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
+if (lastName && statusfilter.status==configuration.status[2]) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
+if (MRN && statusfilter.status==configuration.status[2]) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
+if (HMOId && statusfilter.status==configuration.status[2]) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
+if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
 
 if (Object.keys(patientMatch).length > 0) {
   pipeline.push({ $match: patientMatch });
 }
 
 // Grouping
-pipeline.push({
+statusfilter.status==configuration.status[2]?pipeline.push({
   $group: {
     _id: "$paymentreference",
     paymentreference: { $first: "$paymentreference" },
@@ -275,10 +275,26 @@ pipeline.push({
     HMOId: { $first: "$patient.HMOId" },
     HMOPlan: { $first: "$patient.HMOPlan" },
   },
+}):pipeline.push({
+  $group: {
+    _id: "$paymentreference",
+    paymentreference: { $first: "$paymentreference" },
+    createdAt: { $first: "$createdAt" },
+    updatedAt: { $first: "$updatedAt" },
+    amount: { $sum: "$amount" },
+   // firstName: { $first: "$patient.firstName" },
+    //phoneNumber: { $first: "$patient.phoneNumber" },
+    //lastName: { $first: "$patient.lastName" },
+    //MRN: { $first: "$patient.MRN" },
+    //isHMOCover: { $first: "$patient.isHMOCover" },
+    //HMOName: { $first: "$patient.HMOName" },
+    //HMOId: { $first: "$patient.HMOId" },
+    //HMOPlan: { $first: "$patient.HMOPlan" },
+  },
 });
 
 // Projection
-pipeline.push({
+statusfilter.status==configuration.status[2]?pipeline.push({
   $project: {
     _id: 0,
     paymentreference: 1,
@@ -294,161 +310,28 @@ pipeline.push({
     HMOId: 1,
     HMOPlan: 1,
   },
+}):pipeline.push({
+  $project: {
+    _id: 0,
+    paymentreference: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    amount: 1,
+  //  firstName: 1,
+   // phoneNumber: 1,
+   // lastName: 1,
+    //MRN: 1,
+    //isHMOCover: 1,
+    //HMOName: 1,
+    //HMOId: 1,
+    //HMOPlan: 1,
+  },
 });
 
 // Sorting
 pipeline.push({ $sort: { createdAt: -1 } });
 
-// Now run it
-//const results = await YourModel.aggregate(pipeline);
 
-//////////////////////////////////
-
-
-
-
-
-
-   
-    // Add filters based on query parameters
-    /*
-    if (firstName) {   
-      filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
-    }
-    if(MRN) {
-      filter.MRN = new RegExp(MRN, 'i');
-    }
-    if (HMOId) {
-      filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
-    }
-    if (lastName) {
-      filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
-    }
-    if (phoneNumber) {
-      filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
-    }
-
-    if (paymentreference) {
-      filter.paymentreference = new RegExp(paymentreference, 'i'); // Case-insensitive search for email
-    }
-      */
-    //console.log('filter', filter);
-  //payments status
-/*
-    const referencegroup = [
-     //look up patient
-     //add query
-     {
-      $match:statusfilter
-     },
-     {
-  $lookup: {
-    from: 'patientsmanagements',
-    localField: 'patient',
-    foreignField: '_id',
-    as: 'patient'
-  }
-},
-{ $unwind: '$patient',preserveNullAndEmptyArrays: true },
-{
-  $match: {
-    ...(firstName ? { 'patient.firstName': new RegExp(`^${firstName}`, 'i') } : {}),
-      ...(MRN ? { 'patient.MRN': new RegExp(`^${MRN}`, 'i') } : {}),
-      ...(HMOId ? { 'patient.HMOId': new RegExp(`^${HMOId}`, 'i') } : {}),
-      ...(lastName ? { 'patient.lastName': new RegExp(`^${lastName}`, 'i') } : {}),
-      ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(`^${phoneNumber}`, 'i') } : {}),
-  }
-},
-
-/*
-     {
-  $lookup: {
-    from: "patientsmanagements",
-    let: { patientId: "$patient" },
-    pipeline: [
-      {
-        $match: {
-          $expr: { $eq: ["$_id", "$$patientId"] },
-          ...(firstName ? { firstName: new RegExp(`^${firstName}`, 'i') } : {}),
-          ...(lastName ? { lastName: new RegExp(`^${lastName}`, 'i') } : {}),
-          ...(MRN ? { MRN: new RegExp(`^${MRN}`, 'i') } : {}),
-          ...(HMOId ? { HMOId: new RegExp(`^${HMOId}`, 'i') } : {}),
-          ...(phoneNumber ? { phoneNumber: new RegExp(`^${phoneNumber}`, 'i') } : {}),
-        }
-      }
-    ],
-    as: "patient"
-  }
-},
-*/
-     /*
-     {
-      $lookup: {
-        from: "patientsmanagements",
-        localField: "patient",
-        foreignField: "_id",
-        as: "patient",
-      },
-    },
-    */
-   /*
-    {
-      $unwind: {
-        path: "$patient",
-        preserveNullAndEmptyArrays: true
-      }
-      
-    },
-    */
-   /*
- 
-      {
-        $group: {
-          _id: "$paymentreference",
-          paymentreference: {$first: "$paymentreference"},
-          createdAt: { $first: "$createdAt" },
-          updatedAt: { $first: "$updatedAt" },
-          amount: { $sum: "$amount" },
-          firstName:{$first: "$patient.firstName"},
-          phoneNumber:{$first: "$patient.phoneNumber"},
-          lastName:{$first: "$patient.lastName"},
-          MRN:{$first: "$patient.MRN"},
-          isHMOCover:{$first: "$patient.isHMOCover"},
-          HMOName:{$first: "$patient.HMOName"},
-          HMOId:{$first: "$patient.HMOId"},
-          HMOPlan:{$first: "$patient.HMOPlan"}, 
-        },
-      },
-      /*
-      {
-        $match:filter
-      },
-      */
-     /*
-      {
-        $project:{
-          _id:0,
-          paymentreference:1,
-          createdAt:1,
-          updatedAt:1,
-          amount:1,
-          firstName:1,
-          phoneNumber:1,
-          lastName:1,
-          MRN:1,
-          isHMOCover:1,
-          HMOName:1,
-          HMOId:1,
-          HMOPlan:1
-
-        }
-      },
-      
-      { $sort: { createdAt: -1 } },
-      
-      
-    ];
-    */
 
     const queryresult = await readpaymentaggregateoptimized(pipeline, page, size);
     console.log('*******', queryresult);
