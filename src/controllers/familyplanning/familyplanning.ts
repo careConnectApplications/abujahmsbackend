@@ -26,6 +26,7 @@ import configuration from "../../config";
   // Create a new schedule
 export const createfamilyplanning = async (req:any, res:any) => {
     try {
+      console.log("request body", req.body);
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
