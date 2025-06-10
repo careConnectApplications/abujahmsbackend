@@ -42,7 +42,8 @@ const configuration:any = {
     {role: "HOD Dental", roleId:"24"},
     {role: "HOD Lab", roleId:"25"},
     {role: "Lab Scientist", roleId:"26"},
-    {role: "HOD A&E", roleId:"27"}
+    {role: "HOD A&E", roleId:"27"},
+    {role: "Cashier/Record Officers", roleId:"28"},
     //General Nurse
 
     //Head of Clinical Services
@@ -962,7 +963,8 @@ main:[
     {role: "HOD Dental", roleId:"24"},
     {role: "HOD Lab", roleId:"25"},
     {role: "Lab Scientist", roleId:"26"},
-    {role: "HOD A&E", roleId:"27"}
+    {role: "HOD A&E", roleId:"27"},
+    {role: "Cashier/Record Officers", roleId:"28"},
   ],
   clinics: clinicdetails,
   /*
