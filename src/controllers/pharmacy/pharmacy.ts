@@ -193,7 +193,8 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
     else{
       paymentreference = orderid;
     }
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+   
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
     //create 
    // console.log("got here");
     var prescriptionrecord:any = await createprescription({dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
@@ -535,7 +536,7 @@ export const confirmpharmacygrouporder = async (req:any, res:any) =>{
         paymentreference = orderid;
       }
       if(option == true){
-        var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+        var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
       queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
         await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
         
@@ -602,7 +603,7 @@ else{
 }
   let queryresult;
   if(option == true){
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
   queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     

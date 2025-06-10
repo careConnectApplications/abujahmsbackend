@@ -13,6 +13,11 @@ export interface paymentinterface {
 //create schema
 const paymentSchema = new Schema(
   {
+    firstName:String,
+    lastName:String,
+    MRN:String,
+    HMOId:String,
+    phoneNumber:String,
     paymentype: {
       required: true,
       type: String,
