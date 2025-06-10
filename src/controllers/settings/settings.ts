@@ -97,12 +97,12 @@ export const settings = async function () {
             {querytype:"hmoappointmentreport",querygroup:hmoNames},
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
 
-            {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Radiology","Procedure",...pharmacyNames]},
-            {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
+            {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Radiology","Procedure","All",...pharmacyNames]},
+           // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
 
 
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate"];
           return {reports,summary};
     }
     catch (error: any) {

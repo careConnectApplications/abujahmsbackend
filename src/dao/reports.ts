@@ -9,6 +9,7 @@ import Lab from "../models/lab";
 import Radiology from "../models/radiology";
 import Prescription from "../models/prescription";
 import Patientsmanagement from "../models/patientmanagement";
+import Nutrition from "../models/nutrition";
 import configuration from "../config";
 export async function readpatientsmanagementaggregate(input:any) {
   try{
@@ -117,6 +118,17 @@ export async function readpaymentaggregate(input:any) {
                   export async function readprescriptionaggregate(input:any) {
                     try{
                     return await Prescription.aggregate(input);
+                    }
+                    catch(e:any){
+                      console.log(e);
+                      throw new Error(configuration.error.erroruserupdate);
+                    }
+                    }
+
+                    //nutrition
+                      export async function readnutritionaggregate(input:any) {
+                    try{
+                    return await Nutrition.aggregate(input);
                     }
                     catch(e:any){
                       console.log(e);
