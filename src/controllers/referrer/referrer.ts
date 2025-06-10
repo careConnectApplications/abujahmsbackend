@@ -146,6 +146,12 @@ export const scheduleappointment = async (req:any, res:any) => {
       var { reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
       validateinputfaulsyvalue({ reason, appointmentdate, appointmentcategory, appointmenttype,patient});
       //search for price if available
+       var patients = await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
+            
+            if(!patients){
+              throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+      
+            }
       var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
       
       if(!appointmentPrice){
@@ -153,7 +159,7 @@ export const scheduleappointment = async (req:any, res:any) => {
   
     }
   
-  const createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
+  const createpaymentqueryresult =await createpayment({firstName:patients?.firstName,lastName:patients?.lastName,MRN:patients?.MRN,phoneNumber:patients?.phoneNumber,paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)})
   
   const queryresult = await createappointment({appointmentid,payment:createpaymentqueryresult._id ,patient,clinic:receivingclinic,reason, appointmentdate, appointmentcategory, appointmenttype,encounter:{vitals: {status:configuration.status[8]}}});
   console.log(queryresult);    

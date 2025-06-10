@@ -79,7 +79,7 @@ else{
          //create payment
          if(foundPatient?.isHMOCover ==  configuration.ishmo[0]){
         
-          var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:configuration.category[5],patient:id,amount:Number(testPrice.amount)})
+          var createpaymentqueryresult =await createpayment({firstName:foundPatient?.firstName,lastName:foundPatient?.lastName,MRN:foundPatient?.MRN,phoneNumber:foundPatient?.phoneNumber,paymentreference,paymentype:procedure[i],paymentcategory:configuration.category[5],patient:id,amount:Number(testPrice.amount)})
      
           //create testrecordn 
           var procedurerecord = await createprocedure({procedure:procedure[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});

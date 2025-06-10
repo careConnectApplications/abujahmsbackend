@@ -57,7 +57,7 @@ await updatepatient(patient,{$push: {appointment:queryresult._id}});
 
 }
 else{
-  createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
+  createpaymentqueryresult =await createpayment({firstName:patientrecord?.firstName,lastName:patientrecord?.lastName,MRN:patientrecord?.MRN,phoneNumber:patientrecord?.phoneNumber,paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
   let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
   queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
 //create vitals
