@@ -227,6 +227,10 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
       statusfilter.status=configuration.status[2];
 
     } 
+      if(paymentreference){
+      statusfilter.paymentreference=paymentreference
+    }
+    //paymentreference
 ////////////////////////////////////
 const pipeline = [];
 
