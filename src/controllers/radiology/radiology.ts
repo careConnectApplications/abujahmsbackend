@@ -389,7 +389,7 @@ else{
   paymentreference = testid;
 }
   if(option == true && patient.isHMOCover == configuration.ishmo[0]){
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:testname,paymentcategory:configuration.category[4],patient,amount});
   queryresult= await updateradiology({_id:id},{status:configuration.status[9],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id}});
     

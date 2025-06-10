@@ -220,24 +220,55 @@ export async function groupreadallpaymentoptimized(req: any, res: any) {
     console.log('/////query//', req.query);
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 150;
-        if(status == "paid"){
+    if(status == "paid"){
       statusfilter.status=configuration.status[3]
     }
     else{
       statusfilter.status=configuration.status[2];
 
     } 
-      if(paymentreference){
-      statusfilter.paymentreference=paymentreference
-    }
+if(paymentreference) statusfilter.paymentreference=paymentreference;
+if (firstName) statusfilter.firstName = new RegExp(`^${firstName}`, 'i');
+if (lastName)  statusfilter.lastName = new RegExp(`^${lastName}`, 'i');
+if (MRN) statusfilter.MRN = new RegExp(`^${MRN}`, 'i');
+if (phoneNumber) statusfilter.phoneNumber= new RegExp(`^${phoneNumber}`, 'i');
+
     //paymentreference
 ////////////////////////////////////
 const pipeline = [];
 
 // Add status filter
 pipeline.push({ $match: statusfilter });
+pipeline.push({
+  $group: {
+    _id: "$paymentreference",
+    paymentreference: { $first: "$paymentreference" },
+    createdAt: { $first: "$createdAt" },
+    updatedAt: { $first: "$updatedAt" },
+    amount: { $sum: "$amount" },
+    firstName: { $first: "$firstName" },
+    phoneNumber: { $first: "$phoneNumber" },
+    lastName: { $first: "$lastName" },
+    MRN: { $first: "$MRN" }
+  },
+});
+pipeline.push({
+  $project: {
+    _id: 0,
+    paymentreference: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    amount: 1,
+    firstName: 1,
+    phoneNumber: 1,
+    lastName: 1,
+    MRN: 1,
+  },
+})
+
 
 // Lookup patient
+/*
  statusfilter.status==configuration.status[2] && pipeline.push({
   $lookup: {
     from: 'patientsmanagements',
@@ -246,10 +277,12 @@ pipeline.push({ $match: statusfilter });
     as: 'patient',
   },
 });
+*/
 
-statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
+//statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
 
 // Build patient match condition dynamically
+/*
 const patientMatch:any = {};
 
 if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
@@ -261,8 +294,10 @@ if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['p
 if (Object.keys(patientMatch).length > 0) {
   pipeline.push({ $match: patientMatch });
 }
+  */
 
 // Grouping
+/*
 statusfilter.status==configuration.status[2]?pipeline.push({
   $group: {
     _id: "$paymentreference",
@@ -296,6 +331,7 @@ statusfilter.status==configuration.status[2]?pipeline.push({
     //HMOPlan: { $first: "$patient.HMOPlan" },
   },
 });
+
 
 // Projection
 statusfilter.status==configuration.status[2]?pipeline.push({
@@ -331,6 +367,7 @@ statusfilter.status==configuration.status[2]?pipeline.push({
     //HMOPlan: 1,
   },
 });
+*/
 
 // Sorting
 pipeline.push({ $sort: { createdAt: -1 } });

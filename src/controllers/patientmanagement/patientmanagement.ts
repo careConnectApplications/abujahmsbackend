@@ -267,7 +267,7 @@ export var createpatients = async (req:any,res:any) =>{
         
          }
          else{
-          const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
+          const createpaymentqueryresult =await createpayment({firstName,lastName,MRN:req.body.MRN,phoneNumber,paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
           // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
            payment.push(createpaymentqueryresult._id);
            //payment.push(createappointmentpaymentqueryresult._id);
