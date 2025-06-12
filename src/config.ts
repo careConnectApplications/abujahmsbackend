@@ -84,37 +84,37 @@ for(var i =0; i < servicetypedetail.length ; i++){
         adverseeffectseverity:["Moderate","Severe","Acute"],
         vacinationmapping:[
           {
-          schedule: "birth", vacccinetype:["BCG","Hep BO","OPV 0"]
+          schedule: "birth", vaccination:["BCG","Hep BO","OPV 0"]
           },
           {
-          schedule:"6weeks",   vacccinetype:["OPV 1","Penta 1","PCV 1","Rota 1","IPV 1"]
+          schedule:"6weeks",   vaccination:["OPV 1","Penta 1","PCV 1","Rota 1","IPV 1"]
           },
            {
-          schedule:"10weeks",   vacccinetype:["OPV 2","Penta 2","PCV 2","Rota 2"]
+          schedule:"10weeks",   vaccination:["OPV 2","Penta 2","PCV 2","Rota 2"]
           },
           {
-          schedule:"14weeks",   vacccinetype:["OPV 3","Penta 3","PCV 3","Rota 3","IPV 2"]
+          schedule:"14weeks",   vaccination:["OPV 3","Penta 3","PCV 3","Rota 3","IPV 2"]
           },
           {
-          schedule:"5months",   vacccinetype:["Malaria 1"]
+          schedule:"5months",   vaccination:["Malaria 1"]
           },
           {
-          schedule:"6months",   vacccinetype:["Malaria 2","Vitamine A1"]
+          schedule:"6months",   vaccination:["Malaria 2","Vitamine A1"]
           },
           {
-          schedule:"7months",   vacccinetype:["Malaria 3"]
+          schedule:"7months",   vaccination:["Malaria 3"]
           },
           {
-          schedule:"9months",   vacccinetype:["Measles 1","Yellow Fever","Meningitis"]
+          schedule:"9months",   vaccination:["Measles 1","Yellow Fever","Meningitis"]
           },
           {
-          schedule:"12months",   vacccinetype:["Vitamine A2"]
+          schedule:"12months",   vaccination:["Vitamine A2"]
           },
           {
-          schedule:"15months",   vacccinetype:["Malaria 4","Measles 2"]
+          schedule:"15months",   vaccination:["Malaria 4","Measles 2"]
           },
            {
-          schedule:"9years",   vacccinetype:["HPV"]
+          schedule:"9years",   vaccination:["HPV"]
           },
 
 
