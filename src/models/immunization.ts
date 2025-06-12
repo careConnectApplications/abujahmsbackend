@@ -10,7 +10,7 @@ default: null,
 },
 anynotedadverseeffect:{
 type: String,
-default: configuration.isadverseeffect[1],
+default: configuration.anynotedadverseeffect[1],
 },
 adverseeffectseverity:String,
 medicationgiventomanageadverseeffect:String,
