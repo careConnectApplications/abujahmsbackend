@@ -78,6 +78,8 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        tetanustoxoid:["TT 1","TT 2","TT 3","TT 4","TT 5"],
+        sulfadoxinepyrimethamine:["SP 1","SP 3","SP 3","RVS"],
         anynotedadverseeffect:["Yes","No"],
         adverseeffectseverity:["Moderate","Severe","Acute"],
         vacinationmapping:[
