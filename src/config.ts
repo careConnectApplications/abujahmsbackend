@@ -4,6 +4,7 @@
 const configuration:any = {
   //clinic name
   //wardname  
+  anynotedadverseeffect:["Yes","No"],
   patienttype:["primary","secondary"],
   counsellingprovided:["Maternal Nutrition","Exclusive Breadstfeeding","Complementary Feeding","Water","Sanitation and Hygiene"],
   growthaccordingtothechildhealthcard:["Growing well","Not Growing well"],
@@ -77,6 +78,46 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        anynotedadverseeffect:["Yes","No"],
+        adverseeffectseverity:["Moderate","Severe","Acute"],
+        vacinationmapping:[
+          {
+          schedule: "birth", vacccinetype:["BCG","Hep BO","OPV 0"]
+          },
+          {
+          schedule:"6weeks",   vacccinetype:["OPV 1","Penta 1","PCV 1","Rota 1","IPV 1"]
+          },
+           {
+          schedule:"10weeks",   vacccinetype:["OPV 2","Penta 2","PCV 2","Rota 2"]
+          },
+          {
+          schedule:"14weeks",   vacccinetype:["OPV 3","Penta 3","PCV 3","Rota 3","IPV 2"]
+          },
+          {
+          schedule:"5months",   vacccinetype:["Malaria 1"]
+          },
+          {
+          schedule:"6months",   vacccinetype:["Malaria 2","Vitamine A1"]
+          },
+          {
+          schedule:"7months",   vacccinetype:["Malaria 3"]
+          },
+          {
+          schedule:"9months",   vacccinetype:["Measles 1","Yellow Fever","Meningitis"]
+          },
+          {
+          schedule:"12months",   vacccinetype:["Vitamine A2"]
+          },
+          {
+          schedule:"15months",   vacccinetype:["Malaria 4","Measles 2"]
+          },
+           {
+          schedule:"9years",   vacccinetype:["HPV"]
+          },
+
+
+
+        ],
         consciousness:["Unconscious,Unresponsive","Drowsy but responsive"],
         ventilation:["Needs Attention","Breathing Adequetly","Can Cough/Cry"],
         movement:["Not Moving","Movements Involuntary","Purposeful Movements"],
