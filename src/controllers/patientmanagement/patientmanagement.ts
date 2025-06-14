@@ -8,6 +8,7 @@ import {createpayment} from "../../dao/payment";
 import {createvitalcharts} from "../../dao/vitalcharts";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson,storeUniqueNumber } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
+import {readonepricemodel} from "../../dao/pricingmodel";
 import { AnyObject } from "mongoose";
 import {createaudit} from "../../dao/audit";
 //Insurance upload
@@ -242,7 +243,40 @@ export var createpatients = async (req:any,res:any) =>{
         //console.log('appointmentprice', appointmentPrice);
       
       var {isHMOCover} = req.body;
-        var newRegistrationPrice:any = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
+      var newRegistrationPrice:any;
+       
+      const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
+      if(foundPricingmodel){
+        //check for error
+
+        //confirm the type of pricing model
+        if( foundPricingmodel.exactnameofancclinic == clinic ){
+          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:clinic});
+        }
+        else if(Number(req.body.age) >= 18){
+           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforadult});
+        }
+        else if(Number(req.body.age) < 18){
+          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforchild});
+        }
+        else{
+          //return error
+          throw new Error(`${configuration.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}` );
+
+        }
+        //find pricing model
+
+
+      }
+      else{
+         newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover});
+
+      }
+       
+        //use age to calculate price
+
+       
+        
         if(!(isHMOCover == configuration.ishmo[1] || isHMOCover == true) && !newRegistrationPrice){
           throw new Error(configuration.error.errornopriceset);
 

@@ -44,8 +44,8 @@ export const createimmunizations = async (req:any, res:any) => {
       const { firstName,lastName} = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
      
-      var { vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname} = req.body;
-      validateinputfaulsyvalue({vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
+      var { vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname} = req.body;
+      validateinputfaulsyvalue({vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
        //frequency must inlcude
        //route must contain allowed options
       
@@ -55,7 +55,7 @@ export const createimmunizations = async (req:any, res:any) => {
            throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
   
        }
-    const queryresult=await createimmunization({patient:patientrecord._id,vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
+    const queryresult=await createimmunization({patient:patientrecord._id,vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
@@ -73,10 +73,10 @@ export async function updateimmunizations(req:any, res:any){
     const {id} = req.params;
     const { firstName,lastName} = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
-    var { vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname} = req.body;
-    validateinputfaulsyvalue({vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
+    var { vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname} = req.body;
+    validateinputfaulsyvalue({vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
     
-    var queryresult = await updateimmunization(id, {vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,adverseeventdescription,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
+    var queryresult = await updateimmunization(id, {vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
     res.status(200).json({
         queryresult,
         status:true
