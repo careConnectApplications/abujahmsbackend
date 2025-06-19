@@ -374,17 +374,25 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
       const { firstName,MRN,HMOId,lastName,orderid } = req.query;  // Get query parameters from the request
        // Add filters based on query parameters
   
-    const matchPosts = firstName ? { firstName: new RegExp(firstName, 'i') } :MRN ? { MRN: new RegExp(MRN, 'i') }:HMOId ? { HMOId: new RegExp(HMOId, 'i') }: lastName ? { lastName: new RegExp(lastName, 'i') }:orderid ? { orderid: new RegExp(orderid, 'i') }:{}; // Case-insensitive search
+    let matchPosts:any = firstName ? { firstName: new RegExp(firstName, 'i') } :MRN ? { MRN: new RegExp(MRN, 'i') }:HMOId ? { HMOId: new RegExp(HMOId, 'i') }: lastName ? { lastName: new RegExp(lastName, 'i') }:orderid ? { orderid: new RegExp(orderid, 'i') }:{}; // Case-insensitive search
     //const matchPosts = MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}; // Case-insensitive search 
    console.log('matchpost', matchPosts);
    console.log('clinic', clinic);
-    const query ={pharmacy:clinic,dispensestatus:status};
-    console.log("query", query);
+    //const query ={pharmacy:clinic,dispensestatus:status};
+    matchPosts.pharmacy=clinic;
+    matchPosts.dispensestatus=status;
+
+    //console.log("query", query);
       const ordergroup = [
        //look up patient
+       /*
        {
         $match:query
       },
+      */
+       {
+          $match:matchPosts
+        },
 /*
        {
         $lookup: {
@@ -439,9 +447,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
           },
           
         },
-        {
-          $match:matchPosts
-        },
+       
         {
           $project:{
             _id:0,
