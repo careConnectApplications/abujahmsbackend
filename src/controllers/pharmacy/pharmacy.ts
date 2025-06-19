@@ -434,7 +434,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
             HMOId:{$first: "$HMOId"},
             HMOPlan:{$first: "$HMOPlan"},
             appointmentdate:{$first: "$appointmentdate"},
-            clinic:{$first: "$apclinic"},
+            clinic:{$first: "$clinic"},
             appointmentid:{$first: "$appointmentid"}   
           },
           
