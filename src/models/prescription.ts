@@ -5,7 +5,17 @@ import configuration from "../config";
 
 
 const prescriptionSchema = new Schema({
+  firstName:String,
+   lastName:String,
+   MRN:String,
+   HMOId:String,
+   HMOName:String,
+   HMOPlan:String,
+   isHMOCover:String,
   
+   appointmentdate:Date,
+   clinic:String,
+
   prescription:
   {
     type: String, 
