@@ -84,7 +84,11 @@ dosageform:String,
       //create 
      // console.log("got here");
       //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
-      var prescriptionrecord:any = await createprescription({pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+   /*
+   appointmentdate:Date,
+   clinic:String,
+   */
+      var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
       pharcyorderid.push(prescriptionrecord ._id);
       //paymentids.push(createpaymentqueryresult._id);
       }
@@ -197,7 +201,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
     var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
     //create 
    // console.log("got here");
-    var prescriptionrecord:any = await createprescription({dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+    var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
     pharcyorderid.push(prescriptionrecord ._id);
     paymentids.push(createpaymentqueryresult._id);
     }
@@ -343,6 +347,36 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
   export async function groupreadallpharmacytransactionoptimized(req: any, res: any) {
     try {
       console.log('/////query//', req.query);
+      /*
+ 
+
+
+
+appointmentdate
+: 
+null
+appointmentid
+: 
+"1750329921140"
+clinic
+: 
+null
+createdAt
+: 
+"2025-06-19T10:45:21.164Z"
+
+
+
+orderid
+: 
+"1750329921136"
+prescribersname
+: 
+"Abubakar Abba"
+updatedAt
+: 
+"2025-06-19T10:45:21.164Z"
+      */
       const { clinic} = (req.user).user;
       const page = parseInt(req.query.page) || 1;
       const size = parseInt(req.query.size) || 150;
