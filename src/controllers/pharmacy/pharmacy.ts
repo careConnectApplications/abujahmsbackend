@@ -385,6 +385,9 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
        {
         $match:query
       },
+       {
+          $match:matchPosts
+        },
 /*
        {
         $lookup: {
@@ -439,9 +442,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
           },
           
         },
-        {
-          $match:matchPosts
-        },
+       
         {
           $project:{
             _id:0,
