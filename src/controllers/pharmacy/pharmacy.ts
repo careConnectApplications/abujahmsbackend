@@ -347,36 +347,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
   export async function groupreadallpharmacytransactionoptimized(req: any, res: any) {
     try {
       console.log('/////query//', req.query);
-      /*
- 
-
-
-
-appointmentdate
-: 
-null
-appointmentid
-: 
-"1750329921140"
-clinic
-: 
-null
-createdAt
-: 
-"2025-06-19T10:45:21.164Z"
-
-
-
-orderid
-: 
-"1750329921136"
-prescribersname
-: 
-"Abubakar Abba"
-updatedAt
-: 
-"2025-06-19T10:45:21.164Z"
-      */
+     
       const { clinic} = (req.user).user;
       const page = parseInt(req.query.page) || 1;
       const size = parseInt(req.query.size) || 150;
@@ -414,7 +385,7 @@ updatedAt
        {
         $match:query
       },
-
+/*
        {
         $lookup: {
           from: "patientsmanagements",
@@ -446,6 +417,7 @@ updatedAt
         }
         
       },
+      */
       
         {
           $group: {
@@ -454,15 +426,15 @@ updatedAt
             createdAt: { $first: "$createdAt" },
             updatedAt: { $first: "$updatedAt" },
             prescribersname: { $first: "$prescribersname" },
-            firstName:{$first: "$patient.firstName"},
-            lastName:{$first: "$patient.lastName"},
-            MRN:{$first: "$patient.MRN"},
-            isHMOCover:{$first: "$patient.isHMOCover"},
-            HMOName:{$first: "$patient.HMOName"},
-            HMOId:{$first: "$patient.HMOId"},
-            HMOPlan:{$first: "$patient.HMOPlan"},
-            appointmentdate:{$first: "$appointment.appointmentdate"},
-            clinic:{$first: "$appointment.clinic"},
+            firstName:{$first: "$firstName"},
+            lastName:{$first: "$lastName"},
+            MRN:{$first: "$MRN"},
+            isHMOCover:{$first: "$isHMOCover"},
+            HMOName:{$first: "$HMOName"},
+            HMOId:{$first: "$HMOId"},
+            HMOPlan:{$first: "$HMOPlan"},
+            appointmentdate:{$first: "$appointmentdate"},
+            clinic:{$first: "$apclinic"},
             appointmentid:{$first: "$appointmentid"}   
           },
           
