@@ -4,6 +4,8 @@
 const configuration:any = {
   //clinic name
   //wardname  
+  pricingtype:["Standard","Age and Clinic Aware"],
+  anynotedadverseeffect:["Yes","No"],
   patienttype:["primary","secondary"],
   counsellingprovided:["Maternal Nutrition","Exclusive Breadstfeeding","Complementary Feeding","Water","Sanitation and Hygiene"],
   growthaccordingtothechildhealthcard:["Growing well","Not Growing well"],
@@ -77,6 +79,49 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        pricingtype:["Age and Clinic Aware"],
+        tetanustoxoid:["TT 1","TT 2","TT 3","TT 4","TT 5"],
+        sulfadoxinepyrimethamine:["SP 1","SP 3","SP 3","RVS"],
+        anynotedadverseeffect:["Yes","No"],
+        adverseeffectseverity:["Moderate","Severe","Acute"],
+        vacinationmapping:[
+          {
+          schedule: "birth", vaccination:["BCG","Hep BO","OPV 0"]
+          },
+          {
+          schedule:"6weeks",   vaccination:["OPV 1","Penta 1","PCV 1","Rota 1","IPV 1"]
+          },
+           {
+          schedule:"10weeks",   vaccination:["OPV 2","Penta 2","PCV 2","Rota 2"]
+          },
+          {
+          schedule:"14weeks",   vaccination:["OPV 3","Penta 3","PCV 3","Rota 3","IPV 2"]
+          },
+          {
+          schedule:"5months",   vaccination:["Malaria 1"]
+          },
+          {
+          schedule:"6months",   vaccination:["Malaria 2","Vitamine A1"]
+          },
+          {
+          schedule:"7months",   vaccination:["Malaria 3"]
+          },
+          {
+          schedule:"9months",   vaccination:["Measles 1","Yellow Fever","Meningitis"]
+          },
+          {
+          schedule:"12months",   vaccination:["Vitamine A2"]
+          },
+          {
+          schedule:"15months",   vaccination:["Malaria 4","Measles 2"]
+          },
+           {
+          schedule:"9years",   vaccination:["HPV"]
+          },
+
+
+
+        ],
         consciousness:["Unconscious,Unresponsive","Drowsy but responsive"],
         ventilation:["Needs Attention","Breathing Adequetly","Can Cough/Cry"],
         movement:["Not Moving","Movements Involuntary","Purposeful Movements"],
@@ -1061,7 +1106,7 @@ allowedfilesize: 20000,
     errorservicetray: "This service donot exist in your service tray"
 
   },
-   // environment: "test",
+    //environment: "test",
  environment: "prod",
 
 }
