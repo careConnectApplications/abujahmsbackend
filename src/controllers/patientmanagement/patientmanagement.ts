@@ -246,6 +246,11 @@ export var createpatients = async (req:any,res:any) =>{
       var newRegistrationPrice:any;
        
       const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
+      console.log(foundPricingmodel.exactnameofancclinic);
+      console.log(Number(req.body.age));
+      console.log(Number(req.body.age) >= 18);
+      console.log(Number(req.body.age));
+      console.log(Number(req.body.age) < 18);
       if(foundPricingmodel){
         //check for error
 
