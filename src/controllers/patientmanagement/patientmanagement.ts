@@ -247,7 +247,7 @@ export var createpatients = async (req:any,res:any) =>{
        
       const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
       console.log(foundPricingmodel.exactnameofancclinic);
-      console.log(Number(req.body.age));
+      console.log(clinic);
       console.log(Number(req.body.age) >= 18);
       console.log(Number(req.body.age));
       console.log(Number(req.body.age) < 18);
@@ -256,12 +256,15 @@ export var createpatients = async (req:any,res:any) =>{
 
         //confirm the type of pricing model
         if( foundPricingmodel.exactnameofancclinic == clinic ){
+          console.log("clinic");
           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:clinic});
         }
         else if(Number(req.body.age) >= 18){
+          console.log("greater than 18")
            newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforadult});
         }
         else if(Number(req.body.age) < 18){
+          console.log("less than 18");
           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforchild});
         }
         else{
