@@ -79,7 +79,8 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
-        pricingtype:["Age and Clinic Aware"],
+        
+        pricingtype:["Standard","Age and Clinic Aware"],
         tetanustoxoid:["TT 1","TT 2","TT 3","TT 4","TT 5"],
         sulfadoxinepyrimethamine:["SP 1","SP 3","SP 3","RVS"],
         anynotedadverseeffect:["Yes","No"],
@@ -1107,7 +1108,7 @@ allowedfilesize: 20000,
 
   },
     environment: "test",
-    
+
  //environment: "prod",
 
 }
