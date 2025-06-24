@@ -2,6 +2,7 @@ import configuration from "../../config";
 import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
 import { validateinputfaulsyvalue} from "../../utils/otherservices";
 import {createaudit} from "../../dao/audit";
+import {readonepricemodel} from "../../dao/pricingmodel";
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    
@@ -23,7 +24,9 @@ export var createprices = async (req:any,res:any) =>{
 
         //get token from header
        // var settings =await configuration.settings();
-        if(req.body.servicecategory == configuration.category[3]){
+       const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
+
+        if(req.body.servicecategory == configuration.category[3] && !foundPricingmodel){
           req.body.servicetype=configuration.category[3]
         }
        
