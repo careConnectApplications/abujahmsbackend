@@ -39,6 +39,7 @@ export const scheduleappointment = async (req:any, res:any) => {
        if(!patientrecord){
          throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
      }
+     var { firstName,lastName, MRN,HMOId,HMOName}=patientrecord;
     //search for price if available
     var appointmentPrice:any = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype, isHMOCover:configuration.ishmo[0]});
     if(patientrecord.isHMOCover ==  configuration.ishmo[0] && !appointmentPrice){
@@ -52,14 +53,14 @@ let createpaymentqueryresult:any;
 let queryresult;
 if(patientrecord.isHMOCover ==  configuration.ishmo[1]){
 let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
-queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN,HMOId,HMOName});
 await updatepatient(patient,{$push: {appointment:queryresult._id}});
 
 }
 else{
   createpaymentqueryresult =await createpayment({firstName:patientrecord?.firstName,lastName:patientrecord?.lastName,MRN:patientrecord?.MRN,phoneNumber:patientrecord?.phoneNumber,paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
   let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
-  queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+  queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN,HMOId,HMOName});
 //create vitals
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
 }
@@ -79,7 +80,7 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 150;
     let filter:any = {};
-    var otherfilter:any = {};
+    //var otherfilter:any = {};
     //appointment, type, MRN,patient name, 
      // Add filters based on query parameters
      if (firstName) {
@@ -96,7 +97,7 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
    
   
    if (appointmenttype) {
-    otherfilter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
+    filter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
   }
   /*
     if(status == "paid"){
@@ -111,55 +112,10 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
        const referencegroup = [
         //look up patient
         //add query
-        {
-         $match:otherfilter
+           {
+          $match:filter
         },
-        {
-         $lookup: {
-           from: "patientsmanagements",
-           localField: "patient",
-           foreignField: "_id",
-           as: "patient",
-         },
-       },
-       {
-        $lookup: {
-          from: "payments",
-          localField: "payment",
-          foreignField: "_id",
-          as: "payment",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "doctor",
-          foreignField: "_id",
-          as: "doctor",
-        },
-      },
-       {
-         $unwind: {
-           path: "$patient",
-           preserveNullAndEmptyArrays: true
-         }
-         
-       },
-       {
-        $unwind: {
-          path: "$doctor",
-          preserveNullAndEmptyArrays: true
-        }
-        
-      },
-      {
-        $unwind: {
-          path: "$payment",
-          preserveNullAndEmptyArrays: true
-        }
-        
-      },
-        
+      
          {
            $project:{
              _id:0,
@@ -169,17 +125,16 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
              appointmentdate:1,
              clinic:1,
              appointmentcategory:1,
-             firstName:"$patient.firstName",
-             lastName:"$patient.lastName",
-             
-             MRN:"$patient.MRN",
-             HMOId:"$patient.HMOId",
-             HMOName:"$patient.HMOName",
+             firstName:1,
+             lastName:1,
+             MRN:1,
+             HMOId:1,
+             HMOName:1,
              status:1,
-             paymentstatus:"$payment.status",
-             paymentreference:"$payment.paymentreference",
-             doctorsfirstName:"$doctor.firstName",
-             doctorslastName:"$doctor.lastName"
+             paymentstatus:1,
+             paymentreference:1,
+             doctorsfirstName:1,
+             doctorslastName:1
 
              //phoneNumber
              //isHMOCover
@@ -191,9 +146,6 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
    
            }
          },
-         {
-          $match:filter
-        },
          
          { $sort: { createdAt: -1 } },
          
@@ -972,7 +924,8 @@ export async function addclinicalencounter(req:any, res:any){
     queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
     
   }else{
-  queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
+   
+  queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,doctorsfirstName:user?.firstName,doctorslastName:user?.lastName,fromclinicalencounter:true});
   const { firstName,lastName} = (req.user).user;
   req.body.staffname = `${firstName} ${lastName}`; 
   const {height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname} = req.body;
