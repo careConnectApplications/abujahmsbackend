@@ -268,7 +268,8 @@ export var createpatients = async (req:any,res:any) =>{
         }
         else if(isChild){
           console.log("less than 18");
-          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforchild});
+          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:{$regex: foundPricingmodel.exactnameofservicetypeforchild,$options: 'i'}});
+       
         }
         else{
           console.log("errror /////");
