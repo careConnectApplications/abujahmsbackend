@@ -282,7 +282,7 @@ export var createpatients = async (req:any,res:any) =>{
 
       }
       else{
-         newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover});
+         newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:configuration.category[3]});
 
       }
        
