@@ -58,9 +58,7 @@ export async function confirmgrouppayment(req:any, res:any){
       //for patient registration
       if(paymentcategory == configuration.category[3]){
         //update patient registration status
-        await updatepatientbyanyquery({_id:patient},{status:configuration.status[1]});
-
-
+        await updatepatientbyanyquery({_id:patient},{status:configuration.status[1], paymentstatus:status,paymentreference});
       }
       /*
       
