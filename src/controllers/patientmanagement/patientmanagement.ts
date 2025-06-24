@@ -248,24 +248,25 @@ export var createpatients = async (req:any,res:any) =>{
       const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
       
       if(foundPricingmodel){
+          const age = Number(req.body.age);
+          const isAdult = age >= 18;
+          const isChild = age < 18;
         //check for error
-        console.log(foundPricingmodel.exactnameofancclinic);
-        console.log(foundPricingmodel.exactnameofancclinic == clinic);
-      console.log(clinic);
-      console.log(Number(req.body.age) >= 18);
-      console.log(Number(req.body.age));
-      console.log(Number(req.body.age) < 18);
+        console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
+        console.log("Clinic from request:", clinic);
+        console.log("Is adult:", isAdult);
+        console.log("Age:", age);
 
         //confirm the type of pricing model
         if( foundPricingmodel.exactnameofancclinic == clinic ){
           console.log("clinic");
           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:clinic});
         }
-        else if(Number(req.body.age) >= 18){
+        else if(isAdult){
           console.log("greater than 18")
            newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforadult});
         }
-        else if(Number(req.body.age) < 18){
+        else if(isChild){
           console.log("less than 18");
           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:foundPricingmodel.exactnameofservicetypeforchild});
         }
@@ -286,9 +287,10 @@ export var createpatients = async (req:any,res:any) =>{
        
         //use age to calculate price
 
-       
+       console.log("newRegistrationPrice",newRegistrationPrice);
         
         if(!(isHMOCover == configuration.ishmo[1] || isHMOCover == true) && !newRegistrationPrice){
+          console.log("second errror /////");
           throw new Error(configuration.error.errornopriceset);
 
       }
