@@ -5,7 +5,7 @@ import {protect} from "../utils/middleware";
 import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient,getAllCompletedEncounter,getAllInProgressEncounter,getAllPreviousEncounter,addclinicalencounter,getAllCompletedClinicalEncounter,getAllPreviousClininicalEncounter,getAllInProgressClinicalEncounter,readallvitalchartByAppointment,getAllSchedulesoptimized,getAllPaidSchedulesoptimized} from '../controllers/appointment/appointment';
 const router = express.Router();
 
-
+router.get('/getallmedicalhistoryoptimized/:clinic', getAllPaidSchedulesoptimized);
 router.post('/scheduleappointment', scheduleappointment);
 router.get('/getallschedules', getAllSchedules);
 router.get('/getallschedulesoptimized', getAllSchedulesoptimized);
@@ -17,7 +17,6 @@ router.put('/updateappointment/:id', updateappointments);
 //////////doctors end ///////////////////
 //getAllPaidSchedules
 router.get('/getallmedicalhistory/:clinic', getAllPaidSchedules);
-router.get('/getallmedicalhistoryoptimized/:clinic', getAllPaidSchedulesoptimized);
 router.get('/singlepatientmedicalhistory/:id', getAllPaidSchedulesByPatient);
 router.get('/queue/:clinic', getAllPaidQueueSchedules);
 router.put('/examinepatient/:id', examinepatient);
