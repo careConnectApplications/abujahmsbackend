@@ -7,6 +7,11 @@ const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../config"));
 //create schema
 const paymentSchema = new mongoose_1.Schema({
+    firstName: String,
+    lastName: String,
+    MRN: String,
+    HMOId: String,
+    phoneNumber: String,
     paymentype: {
         required: true,
         type: String,
@@ -54,6 +59,10 @@ const paymentSchema = new mongoose_1.Schema({
         default: config_1.default.status[2],
     }
 }, { timestamps: true });
+paymentSchema.index({ status: 1, paymentreference: 1, createdAt: -1 });
+paymentSchema.index({ paymentreference: 1 });
+paymentSchema.index({ status: 1 });
+paymentSchema.index({ patient: 1 });
 //create a model
 const payment = (0, mongoose_1.model)("Payment", paymentSchema);
 //export the model

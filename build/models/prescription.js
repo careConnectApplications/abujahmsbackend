@@ -6,6 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../config"));
 const prescriptionSchema = new mongoose_1.Schema({
+    firstName: String,
+    lastName: String,
+    MRN: String,
+    HMOId: String,
+    HMOName: String,
+    HMOPlan: String,
+    isHMOCover: String,
+    appointmentdate: Date,
+    clinic: String,
     prescription: {
         type: String,
         required: true

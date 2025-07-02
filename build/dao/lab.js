@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.countlab = countlab;
 exports.readalllablimitfive = readalllablimitfive;
 exports.readalllab = readalllab;
+exports.optimizedreadalllab = optimizedreadalllab;
 exports.createlab = createlab;
 exports.readonelab = readonelab;
 exports.updatelab = updatelab;
@@ -62,6 +63,22 @@ function readalllab(query, selectquery, populatequery, populatesecondquery, popu
     });
 }
 ;
+function optimizedreadalllab(aggregatequery, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
+            ;
+            const totallabdetails = (yield lab_1.default.aggregate(aggregatequery)).length;
+            const totalPages = Math.ceil(totallabdetails / size);
+            return { labdetails, totalPages, totallabdetails, size, page };
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
 function createlab(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

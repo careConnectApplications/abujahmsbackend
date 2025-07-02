@@ -23,6 +23,7 @@ exports.readprocedureaggregate = readprocedureaggregate;
 exports.readlabaggregate = readlabaggregate;
 exports.readradiologyaggregate = readradiologyaggregate;
 exports.readprescriptionaggregate = readprescriptionaggregate;
+exports.readnutritionaggregate = readnutritionaggregate;
 const payment_1 = __importDefault(require("../models/payment"));
 const admission_1 = __importDefault(require("../models/admission"));
 const appointment_1 = __importDefault(require("../models/appointment"));
@@ -34,6 +35,7 @@ const lab_1 = __importDefault(require("../models/lab"));
 const radiology_1 = __importDefault(require("../models/radiology"));
 const prescription_1 = __importDefault(require("../models/prescription"));
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
+const nutrition_1 = __importDefault(require("../models/nutrition"));
 const config_1 = __importDefault(require("../config"));
 function readpatientsmanagementaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -152,6 +154,18 @@ function readprescriptionaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             return yield prescription_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//nutrition
+function readnutritionaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield nutrition_1.default.aggregate(input);
         }
         catch (e) {
             console.log(e);

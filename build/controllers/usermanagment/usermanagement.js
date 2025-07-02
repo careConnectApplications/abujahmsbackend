@@ -175,6 +175,8 @@ function bulkuploadusers(req, res) {
                     if (foundUser) {
                         throw new Error(`${email} ${config_1.default.error.erroralreadyexit}`);
                     }
+                    var roleId = (config_1.default.roles).filter((e) => e.role == role)[0].roleId;
+                    userslist[i].roleId = roleId;
                     userslist[i].password = config_1.default.defaultPassword;
                     //other validations
                     yield (0, users_1.createuser)(userslist[i]);

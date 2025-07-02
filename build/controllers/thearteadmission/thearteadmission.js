@@ -80,7 +80,7 @@ var refertheatreadmission = (req, res) => __awaiter(void 0, void 0, void 0, func
                 throw new Error(`${procedures[i]} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
             }
             //create payment
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: id, paymentype: procedures[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference: id, paymentype: procedures[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
             //create testrecordn 
             var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedures[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
             proceduresid.push(procedurerecord._id);
