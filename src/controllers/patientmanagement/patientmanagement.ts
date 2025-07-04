@@ -309,7 +309,7 @@ export var createpatients = async (req:any,res:any) =>{
          let vitals =await createvitalcharts({status:configuration.status[8]});
          if(isHMOCover == configuration.ishmo[1] || isHMOCover == true)
          {
-          queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+          queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN:createpatientqueryresult?.MRN,HMOId:createpatientqueryresult?.HMOId,HMOName:createpatientqueryresult?.HMOName});
           queryresult =await updatepatient(createpatientqueryresult._id,{$push:{appointment:queryappointmentresult._id}});
          
         
@@ -320,7 +320,7 @@ export var createpatients = async (req:any,res:any) =>{
            payment.push(createpaymentqueryresult._id);
            //payment.push(createappointmentpaymentqueryresult._id);
            //update createpatientquery
-           queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+           queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,MRN:createpatientqueryresult?.MRN,HMOId:createpatientqueryresult?.HMOId,HMOName:createpatientqueryresult?.HMOName});
            queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
           
 

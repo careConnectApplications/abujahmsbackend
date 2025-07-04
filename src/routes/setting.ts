@@ -7,6 +7,7 @@ import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/
 import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestcomponentbytestname} from '../controllers/setting/testscomponent';
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
 import {createpricingmodel, updatepricingmodel, getpricingmodel} from "../controllers/setting/pricemodel";
+import {createoutreachmedications, getalloutreachmedications, updateoutreachmedications} from "../controllers/setting/outreachmedication";
 import {readAllaudit} from "../controllers/audit/audit";
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
@@ -60,6 +61,10 @@ router.get('/getpricingmodel',getpricingmodel);
 router.put('/updatepricingmodel/:id', updatepricingmodel);
 //audit
 router.get('/readallaudit',readAllaudit);
+//outreachmedication
+router.post('/createoutreachmedication',createoutreachmedications);
+router.get('/getalloutreachmedication',getalloutreachmedications);
+router.put('/updateoutreachmedication/:id',updateoutreachmedications);
 
     
 

@@ -1,6 +1,5 @@
   import {readallclinics} from "./dao/clinics";
   import  {readallservicetype}  from "./dao/servicetype";
-  import {readwardaggregate,readclinicaggregate}  from "./dao/reports";
 const configuration:any = {
   //clinic name
   //wardname  
@@ -79,7 +78,7 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
-        
+        vaccinationlocation:['fixed', 'outreach'],
         pricingtype:["Standard","Age and Clinic Aware"],
         tetanustoxoid:["TT 1","TT 2","TT 3","TT 4","TT 5"],
         sulfadoxinepyrimethamine:["SP 1","SP 3","SP 3","RVS"],
@@ -1107,9 +1106,9 @@ allowedfilesize: 20000,
     errorservicetray: "This service donot exist in your service tray"
 
   },
-   // environment: "test",
+    environment: "test",
 
- environment: "prod",
+ //environment: "prod",
 
 }
 export default configuration;
