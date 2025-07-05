@@ -14,7 +14,31 @@ default: configuration.anynotedadverseeffect[1],
 },
 adverseeffectseverity:String,
 medicationgiventomanageadverseeffect:String,
-vaccination:String,
+//
+vaccination:{
+ type: [String], // Array of vaccinations
+},
+vaccinationlocation: {
+  type: String,
+  enum: ['fixed', 'outreach'],
+  required: true
+},
+outreachMedications: {
+  type: [String], // Array of medication names or IDs from dropdown
+  default: []
+},
+isFullyImmunized: {
+  type: Boolean,
+  required: true,
+  default: false
+},
+adverseEffectVaccine:String,
+isZeroDoseChild: {
+  type: Boolean,
+  required: true,
+  default: false
+},
+//
 schedule:String,
 vaccinecode:String,
 vaccinename:String,
@@ -29,7 +53,6 @@ administrationroute:String,
 consent:String,
 immunizationstatus:String,
 comment:String,
-//adverseeventdescription:String,
 onsetdateofreaction:Date,
 reactcode:String,
 reporter:String,

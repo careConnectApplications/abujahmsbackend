@@ -189,7 +189,7 @@ const uploadbase64image = (imageBase64) => __awaiter(void 0, void 0, void 0, fun
     const filePath = path.join(process.cwd(), `${config_1.default.useruploaddirectory}`, `${filename}.${fileExt}`);
     // Save the image
     yield promises_1.default.writeFile(filePath, buffer);
-    return filename;
+    return `${filename}.${fileExt}`;
 });
 exports.uploadbase64image = uploadbase64image;
 function uploaddocument(file, filename, allowedextension, uploadpath) {

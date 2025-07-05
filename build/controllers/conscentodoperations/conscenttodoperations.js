@@ -19,9 +19,9 @@ const theatreadmission_1 = require("../../dao/theatreadmission");
 const conscenttooperation_1 = require("../../dao/conscenttooperation");
 const fillconscentform = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { imageBase64, nameofexplainer, nameofrepresentive, conscentdate } = req.body;
+        const { imageBase64, nameofexplainer, nameofrepresentive, conscentdate, addressofrepresentaive, fullnameofwitness } = req.body;
         const { theatreadmission } = req.params;
-        (0, otherservices_1.validateinputfaulsyvalue)({ theatreadmission, imageBase64, nameofexplainer, nameofrepresentive, conscentdate });
+        (0, otherservices_1.validateinputfaulsyvalue)({ theatreadmission, imageBase64, nameofexplainer, nameofrepresentive, conscentdate, addressofrepresentaive, fullnameofwitness });
         //theatre
         const filename = yield (0, otherservices_1.uploadbase64image)(imageBase64);
         //validate theatre admission
@@ -31,7 +31,7 @@ const fillconscentform = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }
         //const queryresult:any =await updatethearteadmission(id,{status});
         //create conscent
-        const conscentresult = yield (0, conscenttooperation_1.createconscentooperation)({ theatreadmission, nameofexplainer, nameofrepresentive, conscentdate, filename });
+        const conscentresult = yield (0, conscenttooperation_1.createconscentooperation)({ theatreadmission, nameofexplainer, nameofrepresentive, conscentdate, filename, addressofrepresentaive, fullnameofwitness });
         //update theatre admission
         const queryresult = yield (0, theatreadmission_1.updatethearteadmission)(theatreadmission, { conscent: conscentresult._id });
         res.status(200).json({
@@ -50,7 +50,7 @@ const readconscentformbytheatreadmission = (req, res) => __awaiter(void 0, void 
         //const {clinic} = (req.user).user;
         const { theatreadmission } = req.params;
         //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-        const queryresult = yield (0, conscenttooperation_1.readoneconscentooperation)({ theatreadmission }, {}, '');
+        const queryresult = yield (0, conscenttooperation_1.readoneconscentooperation)({ theatreadmission }, {}, 'theatreadmission');
         res.status(200).json({
             queryresult,
             status: true
@@ -63,9 +63,14 @@ const readconscentformbytheatreadmission = (req, res) => __awaiter(void 0, void 
 exports.readconscentformbytheatreadmission = readconscentformbytheatreadmission;
 const updatefillconscentform = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { nameofexplainer, nameofrepresentive, conscentdate } = req.body;
+        const { imageBase64, nameofexplainer, nameofrepresentive, conscentdate, addressofrepresentaive, fullnameofwitness } = req.body;
         const { id } = req.params;
-        (0, otherservices_1.validateinputfaulsyvalue)({ id, nameofexplainer, nameofrepresentive, conscentdate });
+        (0, otherservices_1.validateinputfaulsyvalue)({ id, nameofexplainer, nameofrepresentive, conscentdate, addressofrepresentaive, fullnameofwitness });
+        //theatre
+        let filename;
+        if (imageBase64) {
+            filename = yield (0, otherservices_1.uploadbase64image)(imageBase64);
+        }
         //theatre
         //const filename = await uploadbase64image(imageBase64);
         //validate theatre admission
@@ -73,9 +78,9 @@ const updatefillconscentform = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!findAdmission) {
             throw new Error(`Conscent Form ${config_1.default.error.erroralreadyexit}`);
         }
-        //const queryresult:any =await updatethearteadmission(id,{status});
+        //const queryresult:any =await updatethearteaadmission(id,{status});
         //create conscent
-        const queryresult = yield (0, conscenttooperation_1.updateconscentooperation)(id, { nameofexplainer, nameofrepresentive, conscentdate });
+        const queryresult = yield (0, conscenttooperation_1.updateconscentooperation)(id, { filename, nameofexplainer, nameofrepresentive, conscentdate, addressofrepresentaive, fullnameofwitness });
         res.status(200).json({
             queryresult,
             status: true

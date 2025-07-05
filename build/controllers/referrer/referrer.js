@@ -144,11 +144,15 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         var { reason, appointmentdate, appointmentcategory, appointmenttype } = req.body;
         (0, otherservices_1.validateinputfaulsyvalue)({ reason, appointmentdate, appointmentcategory, appointmenttype, patient });
         //search for price if available
+        var patients = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
+        if (!patients) {
+            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+        }
         var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
         if (!appointmentPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
-        const createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
+        const createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patients === null || patients === void 0 ? void 0 : patients.firstName, lastName: patients === null || patients === void 0 ? void 0 : patients.lastName, MRN: patients === null || patients === void 0 ? void 0 : patients.MRN, phoneNumber: patients === null || patients === void 0 ? void 0 : patients.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
         const queryresult = yield (0, appointment_1.createappointment)({ appointmentid, payment: createpaymentqueryresult._id, patient, clinic: receivingclinic, reason, appointmentdate, appointmentcategory, appointmenttype, encounter: { vitals: { status: config_1.default.status[8] } } });
         console.log(queryresult);
         //update patient

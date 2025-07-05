@@ -11,6 +11,7 @@ const router = express_1.default.Router();
 router.post('/radiologyorder/:id', radiology_1.radiologyorder);
 router.get('/readallradiologybypatient/:id', radiology_1.readAllRadiologyByPatient);
 router.get('/readallradiology', radiology_1.readAllRadiology);
+router.get('/readallradiologyoptimized', radiology_1.readAllRadiologyoptimized);
 router.put('/updateradiology/:id', radiology_1.updateradiologys);
 router.put('/confirmradiologyorder/:id', radiology_1.confirmradiologyorder);
 //confirmradiologyorder

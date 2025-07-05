@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -112,6 +112,79 @@ const readallscheduledlab = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.readallscheduledlab = readallscheduledlab;
+const readallscheduledlaboptimized = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        var { status, firstName, MRN, HMOId, lastName, phoneNumber, testname } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        const filter = {};
+        var statusfilter = status ? { status } : testname ? { testname } : {};
+        if (firstName) {
+            filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if (MRN) {
+            filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (HMOId) {
+            filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+        }
+        if (lastName) {
+            filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        if (phoneNumber) {
+            filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+        }
+        let aggregatequery = [
+            {
+                $match: statusfilter
+            },
+            {
+                $lookup: {
+                    from: 'patientsmanagements',
+                    localField: 'patient',
+                    foreignField: '_id',
+                    as: 'patient'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
+            },
+            {
+                $project: {
+                    _id: 1,
+                    createdAt: 1,
+                    testname: 1,
+                    updatedAt: 1,
+                    testid: 1,
+                    department: 1,
+                    firstName: "$patient.firstName",
+                    lastName: "$patient.lastName",
+                    phoneNumber: "$patient.phoneNumber",
+                    MRN: "$patient.MRN",
+                    patient: "$patient",
+                    HMOId: "$patient.HMOId",
+                    HMOName: "$patient.HMOName",
+                    status: 1,
+                }
+            },
+            {
+                $match: filter
+            },
+        ];
+        const queryresult = yield (0, lab_1.optimizedreadalllab)(aggregatequery, page, size);
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.readallscheduledlaboptimized = readallscheduledlaboptimized;
 //lab reports
 const listlabreport = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -280,7 +353,7 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
             //status=configuration.status[2];
         }
         if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
             queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
             yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
         }

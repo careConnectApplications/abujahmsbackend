@@ -9,6 +9,7 @@ const lab_1 = require("../controllers/lab/lab");
 const router = express_1.default.Router();
 router.get('/readalllabb', lab_1.readalllabb);
 router.get('/readallscheduledlab', lab_1.readallscheduledlab);
+router.get('/readallscheduledlaboptimized', lab_1.readallscheduledlaboptimized);
 router.get('/readlabbypatientid/:id', lab_1.readAllLabByPatient);
 router.put('/labresultprocessing/:id', lab_1.labresultprocessing);
 router.put('/confirmlaborder/:id', lab_1.confirmlaborder);

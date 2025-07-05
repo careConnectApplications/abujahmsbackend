@@ -12,6 +12,14 @@ const conscenttooperationSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    addressofrepresentaive: {
+        type: String,
+        required: true,
+    },
+    fullnameofwitness: {
+        type: String,
+        required: true,
+    },
     conscentdate: Date,
     theatreadmission: {
         type: mongoose_1.Schema.Types.ObjectId,

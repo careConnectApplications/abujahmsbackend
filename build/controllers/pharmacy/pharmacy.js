@@ -93,7 +93,11 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             //create 
             // console.log("got here");
             //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
-            var prescriptionrecord = yield (0, prescription_1.createprescription)({ pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid });
+            /*
+            appointmentdate:Date,
+            clinic:String,
+            */
+            var prescriptionrecord = yield (0, prescription_1.createprescription)({ isHMOCover: patient === null || patient === void 0 ? void 0 : patient.isHMOCover, HMOPlan: patient === null || patient === void 0 ? void 0 : patient.HMOPlan, HMOName: patient === null || patient === void 0 ? void 0 : patient.HMOName, HMOId: patient === null || patient === void 0 ? void 0 : patient.HMOId, firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid, appointmentdate: appointment === null || appointment === void 0 ? void 0 : appointment.appointmentdate, clinic: appointment === null || appointment === void 0 ? void 0 : appointment.clinic });
             pharcyorderid.push(prescriptionrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -181,10 +185,10 @@ var pharmacyorderwithoutconfirmation = (req, res) => __awaiter(void 0, void 0, v
             else {
                 paymentreference = orderid;
             }
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: drug, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: drug, paymentcategory: pharmacy, patient: patient._id, amount, qty });
             //create 
             // console.log("got here");
-            var prescriptionrecord = yield (0, prescription_1.createprescription)({ dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, qty, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid });
+            var prescriptionrecord = yield (0, prescription_1.createprescription)({ isHMOCover: patient === null || patient === void 0 ? void 0 : patient.isHMOCover, HMOPlan: patient === null || patient === void 0 ? void 0 : patient.HMOPlan, HMOName: patient === null || patient === void 0 ? void 0 : patient.HMOName, HMOId: patient === null || patient === void 0 ? void 0 : patient.HMOId, firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, qty, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid, appointmentdate: appointment === null || appointment === void 0 ? void 0 : appointment.appointmentdate, clinic: appointment === null || appointment === void 0 ? void 0 : appointment.clinic });
             pharcyorderid.push(prescriptionrecord._id);
             paymentids.push(createpaymentqueryresult._id);
         }
@@ -336,45 +340,57 @@ function groupreadallpharmacytransactionoptimized(req, res) {
             //const size = parseInt(req.query.size) || 150;
             const { firstName, MRN, HMOId, lastName, orderid } = req.query; // Get query parameters from the request
             // Add filters based on query parameters
-            const matchPosts = firstName ? { firstName: new RegExp(firstName, 'i') } : MRN ? { MRN: new RegExp(MRN, 'i') } : HMOId ? { HMOId: new RegExp(HMOId, 'i') } : lastName ? { lastName: new RegExp(lastName, 'i') } : orderid ? { orderid: new RegExp(orderid, 'i') } : {}; // Case-insensitive search
+            let matchPosts = firstName ? { firstName: new RegExp(firstName, 'i') } : MRN ? { MRN: new RegExp(MRN, 'i') } : HMOId ? { HMOId: new RegExp(HMOId, 'i') } : lastName ? { lastName: new RegExp(lastName, 'i') } : orderid ? { orderid: new RegExp(orderid, 'i') } : {}; // Case-insensitive search
             //const matchPosts = MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}; // Case-insensitive search 
             console.log('matchpost', matchPosts);
             console.log('clinic', clinic);
-            const query = { pharmacy: clinic, dispensestatus: status };
-            console.log("query", query);
+            //const query ={pharmacy:clinic,dispensestatus:status};
+            matchPosts.pharmacy = clinic;
+            matchPosts.dispensestatus = status;
+            //console.log("query", query);
             const ordergroup = [
                 //look up patient
+                /*
                 {
-                    $match: query
-                },
+                 $match:query
+               },
+               */
                 {
-                    $lookup: {
-                        from: "patientsmanagements",
-                        localField: "patient",
-                        foreignField: "_id",
-                        as: "patient",
-                    },
+                    $match: matchPosts
                 },
-                {
-                    $lookup: {
-                        from: "appointments",
-                        localField: "appointment",
-                        foreignField: "_id",
-                        as: "appointment",
-                    },
-                },
-                {
-                    $unwind: {
-                        path: "$appointment",
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
-                {
-                    $unwind: {
-                        path: "$patient",
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
+                /*
+                       {
+                        $lookup: {
+                          from: "patientsmanagements",
+                          localField: "patient",
+                          foreignField: "_id",
+                          as: "patient",
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: "appointments",
+                          localField: "appointment",
+                          foreignField: "_id",
+                          as: "appointment",
+                        },
+                      },
+                      {
+                        $unwind: {
+                          path: "$appointment",
+                          preserveNullAndEmptyArrays: true
+                        }
+                        
+                      },
+                      
+                      {
+                        $unwind: {
+                          path: "$patient",
+                          preserveNullAndEmptyArrays: true
+                        }
+                        
+                      },
+                      */
                 {
                     $group: {
                         _id: "$orderid",
@@ -382,20 +398,17 @@ function groupreadallpharmacytransactionoptimized(req, res) {
                         createdAt: { $first: "$createdAt" },
                         updatedAt: { $first: "$updatedAt" },
                         prescribersname: { $first: "$prescribersname" },
-                        firstName: { $first: "$patient.firstName" },
-                        lastName: { $first: "$patient.lastName" },
-                        MRN: { $first: "$patient.MRN" },
-                        isHMOCover: { $first: "$patient.isHMOCover" },
-                        HMOName: { $first: "$patient.HMOName" },
-                        HMOId: { $first: "$patient.HMOId" },
-                        HMOPlan: { $first: "$patient.HMOPlan" },
-                        appointmentdate: { $first: "$appointment.appointmentdate" },
-                        clinic: { $first: "$appointment.clinic" },
+                        firstName: { $first: "$firstName" },
+                        lastName: { $first: "$lastName" },
+                        MRN: { $first: "$MRN" },
+                        isHMOCover: { $first: "$isHMOCover" },
+                        HMOName: { $first: "$HMOName" },
+                        HMOId: { $first: "$HMOId" },
+                        HMOPlan: { $first: "$HMOPlan" },
+                        appointmentdate: { $first: "$appointmentdate" },
+                        clinic: { $first: "$clinic" },
                         appointmentid: { $first: "$appointmentid" }
                     },
-                },
-                {
-                    $match: matchPosts
                 },
                 {
                     $project: {
@@ -490,7 +503,7 @@ const confirmpharmacygrouporder = (req, res) => __awaiter(void 0, void 0, void 0
                 paymentreference = orderid;
             }
             if (option == true) {
-                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
                 queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
                 yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
             }
@@ -542,7 +555,7 @@ const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
         let queryresult;
         if (option == true) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
             queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
             yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
         }
