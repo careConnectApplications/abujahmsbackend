@@ -93,7 +93,7 @@ export const createancsv3 = async (req:any, res:any) => {
       const {lmp,edd,gravidity,breasts,height,cvs,rs,pelvis,abdomen} = req.body;      
        const pregnancysummary={lmp,edd,gravidity};
        const generalexamination={breasts,height,cvs,rs,pelvis,abdomen};
-       /////////// validati0on for anc followup /////////////////////////
+       /////////// validation for anc followup /////////////////////////
        var {heightoffundus,presentationandposition,presentingpart,foetalheight,bp,hb,protein,glucose,weight,oedema,tetanustoxoid,sulfadoxinepyrimethamine,albendazole,remark} = req.body;
       validateinputfaulsyvalue({heightoffundus,presentationandposition,presentingpart,foetalheight,bp,hb,protein,glucose,weight,oedema,tetanustoxoid,sulfadoxinepyrimethamine,albendazole,remark,staffname});
    
