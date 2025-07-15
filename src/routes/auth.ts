@@ -9,5 +9,4 @@ router.post('/signup',protect, signup);
 router.post('/signin',signin);
 router.get('/settings',settings);
 
-
 export default router;

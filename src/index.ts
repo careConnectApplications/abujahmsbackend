@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
-import createServer from './utils/server';
 import configuration from './config';
 import databaseconnection from './utils/dbconnection';
-import moment from "moment";
+import createServer from './utils/server';
 
 
 //const currentMilliseconds = moment().valueOf();
@@ -10,8 +9,10 @@ import moment from "moment";
 
 dotenv.config();
 databaseconnection();
-const app=createServer();
-const port = configuration.environment === "test"?process.env.TESTPORT:process.env.PORT ;
-app.listen(port,()=>{
+
+const port = configuration.environment === "test" ? process.env.TESTPORT : process.env.PORT;
+const app = createServer(port);
+
+app.listen(port, () => {
     console.log(`Server is listening on Port ${port}`)
 })
