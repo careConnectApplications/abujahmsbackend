@@ -3,6 +3,7 @@ import configuration from "../../config";
 import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
+import { financialreports } from "../../utils/reporting/financial";
 export const reports = async (req:any, res:any) => {
 try{
 
@@ -459,102 +460,14 @@ export const reportsummary = async (req:any,res:any) =>{
     }
     
     let {summary}:any = await settings();
-    const financialaggregatepaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: "$paymentcategory",                // Group by product
-          totalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          paymentcategory:"$_id",
-          totalAmount:1,
-          status:configuration.status[3],
-          _id:0
-
-        }
-
-      }
-        
-    ];
-    const financialaggregategrandtotalpaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: null,                // Group by product
-          grandtotalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          grandtotalAmount:1,
-          _id:0
-
-        }
-
-      }
-        
-    ];
-    const financialaggregatependingpaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[2]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: "$paymentcategory",                // Group by product
-          totalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          paymentcategory:"$_id",
-          totalAmount:1,
-          status:configuration.status[2],
-          _id:0
-
-        }
-
-      }
-        
-    ];
+    const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate)
+   
     const cashieraggregatepaid = [
       {   
       
         $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
-/*
-{
-    $group: {
-      _id: "$userId",
-      emails: {
-        $push: {
-          $cond: [{ $ne: ["$email", null] }, "$email", "$$REMOVE"]
-        }
-      }
-    }
-  },
-  {
-    $addFields: {
-      firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
-    }
-  },
-  {
-    $project: { emails: 0 }
-  }
-*/
       {
         $group: {
           _id: "$cashieremail",                // Group by product
