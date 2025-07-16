@@ -15,8 +15,8 @@ export const permissionsList = [
 ];
 
 export const roles = [
-    { id: 1, name: "Medical Director", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13] },
-    { id: 2, name: "Medical Doctor", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12] },
+    { id: 1, name: "Medical Director", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 9, 10, 13] },
+    { id: 2, name: "Medical Doctor", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 10] },
     { id: 3, name: "General Nurse", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12] },
     { id: 4, name: "Nurse/Midwife", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12] },
     { id: 5, name: "Theatre Nurse", defaultPermissions: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12] },
