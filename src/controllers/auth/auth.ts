@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import  {readone,createuser,updateuser}  from "../../dao/users";
 import {readallclinics} from "../../dao/clinics";
 import { isValidPassword, sendTokenResponse, mail,validateinputfaulsyvalue } from "../../utils/otherservices";
+import { getRolesById } from "../../dao/roles";
 
 
 //sign in
@@ -73,6 +74,11 @@ export var signup = async (req:any,res:any) =>{
         }
        
         req.body.password=configuration.defaultPassword;
+
+        //get user permissions
+        const permissions = getRolesById(+roleId)?.defaultPermissions || [];
+        req.body.specialPermissions = permissions;
+
         //other validations
          const queryresult=await createuser(req.body)
         //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;

@@ -119,6 +119,10 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
       type: String,
     },
+    specialPermissions: {
+      type: [Number],
+      default: []
+    },
     status:{
       required: true,
       type: String,
