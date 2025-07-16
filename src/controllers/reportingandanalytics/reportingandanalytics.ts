@@ -1,5 +1,6 @@
 
 import configuration from "../../config";
+import { NextFunction, Request, Response } from "express";
 import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
@@ -10,7 +11,9 @@ import { admissionaggregatereports } from "../../utils/reporting/admission";
 import { procedureaggregatereports } from "../../utils/reporting/procedure";
 import { nutritionaggregatereports } from "../../utils/reporting/nutrition";
 import { hmoaggregatereports } from "../../utils/reporting/hmo";
-import {heathfacilityattendancereports} from "../../utils/reporting/healthfacilityattendance"
+import {heathfacilityattendancereports} from "../../utils/reporting/healthfacilityattendance";
+import { ApiError } from "../../errors";
+import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
 try{
 
@@ -429,10 +432,9 @@ if (!startdate || !enddate) {
 
 }
 //report summary
-export const reportsummary = async (req:any,res:any) =>{
-  try{
-    console.log("////////////////////////");
-    var { querytype,startdate, enddate }: any = req.params;
+export const reportsummary = catchAsync(async (req:Request,res:Response,next: NextFunction) =>{
+
+    var  {querytype,startdate, enddate }:any = req.params;
     if (!startdate || !enddate) {
       var todaydate = new Date();
       enddate = todaydate;
@@ -512,7 +514,8 @@ export const reportsummary = async (req:any,res:any) =>{
 
       }
     else{
-      throw new Error(`querytype ${configuration.error.errorisrequired}`);
+      //throw new Error(`querytype ${configuration.error.errorisrequired}`);
+      return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
     
 
@@ -520,12 +523,9 @@ export const reportsummary = async (req:any,res:any) =>{
     
 
 
-  }
-  catch(e:any){
-    res.json({status: false, msg:e.message});
-
-  }
-}
+  
+ 
+})
 
 
 //add pharmacy 1 , pharmacy 2
