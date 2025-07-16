@@ -73,7 +73,8 @@ function createServer(){
   app.use('/api/v1/dashboard', protect, dashboard);
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
-  app.use('/api/v1/reports',protect,  reports);
+  //app.use('/api/v1/reports',protect,  reports);
+  app.use('/api/v1/reports',  reports);
   app.use('/api/v1/readicdten',  readicdeleven);
  
 
