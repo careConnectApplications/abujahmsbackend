@@ -26,10 +26,10 @@ import anc from '../routes/anc';
 import theatreadmission from '../routes/theatreadmission';
 import reports  from '../routes/reportsandanalytics';
 import { readicdeleven } from '../controllers/icdten/icdten';
+import {protect,globalErrorHandler} from "../utils/middleware";
 
 
 
-import {protect} from "../utils/middleware";
 
 
 function createServer(){
@@ -98,7 +98,7 @@ app.post('/api/v1/webhook', (req, res) => {
   res.status(200).send('Event received');
 });
 */
-  
+  app.use(globalErrorHandler); 
     return app;
 
 }
