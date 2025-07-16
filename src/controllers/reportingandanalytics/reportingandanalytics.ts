@@ -1,8 +1,9 @@
 
 import configuration from "../../config";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
+import { financialreports } from "../../utils/reporting/financial";
 export const reports = async (req:any, res:any) => {
 try{
 
@@ -174,6 +175,13 @@ const secondaryservice = [
           $ifNull: ["$testname", "$appointmenttype"]
         }
       }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
     }
     
 ];
@@ -213,6 +221,13 @@ const proceduresecondaryservice = [
           }
         }
       }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
     }
       
     
@@ -247,6 +262,13 @@ const pharmacysecondaryservice = [
     {
       $addFields: {
         servicetype:"$prescription"
+      }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
       }
     }
     
@@ -319,6 +341,21 @@ else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[
   queryresult= await readprocedureaggregate(proceduresecondaryservice);
 
 }
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
+
+  const [result1, result2, result3] = await Promise.all([
+    readprocedureaggregate(proceduresecondaryservice),
+    readradiologyaggregate(secondaryservice),
+    readlabaggregate(secondaryservice),
+    readappointmentaggregate(secondaryservice)
+  ]);
+
+  queryresult = [...result1, ...result2, ...result3];
+
+  //queryresult= await readprocedureaggregate(proceduresecondaryservice);
+
+}
+
 else if(querytype == reports[8].querytype){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readprescriptionaggregate(pharmacysecondaryservice);
@@ -423,102 +460,14 @@ export const reportsummary = async (req:any,res:any) =>{
     }
     
     let {summary}:any = await settings();
-    const financialaggregatepaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: "$paymentcategory",                // Group by product
-          totalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          paymentcategory:"$_id",
-          totalAmount:1,
-          status:configuration.status[3],
-          _id:0
-
-        }
-
-      }
-        
-    ];
-    const financialaggregategrandtotalpaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: null,                // Group by product
-          grandtotalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          grandtotalAmount:1,
-          _id:0
-
-        }
-
-      }
-        
-    ];
-    const financialaggregatependingpaid = [
-      {   
-      
-        $match:{$and:[{status:configuration.status[2]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-
-},
-      {
-        $group: {
-          _id: "$paymentcategory",                // Group by product
-          totalAmount: { $sum: "$amount" }
-        }
-      },
-      {
-        $project:{
-          paymentcategory:"$_id",
-          totalAmount:1,
-          status:configuration.status[2],
-          _id:0
-
-        }
-
-      }
-        
-    ];
+    const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate)
+   
     const cashieraggregatepaid = [
       {   
       
         $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
-/*
-{
-    $group: {
-      _id: "$userId",
-      emails: {
-        $push: {
-          $cond: [{ $ne: ["$email", null] }, "$email", "$$REMOVE"]
-        }
-      }
-    }
-  },
-  {
-    $addFields: {
-      firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
-    }
-  },
-  {
-    $project: { emails: 0 }
-  }
-*/
       {
         $group: {
           _id: "$cashieremail",                // Group by product
@@ -1015,6 +964,224 @@ export const reportsummary = async (req:any,res:any) =>{
 
       }
     ];
+    
+const nutritionaggregatechildren0to59thatreceivednutirtion = [
+    {   
+      
+        $match:{createdAt:{ $gt: startdate, $lt: enddate } }
+
+    },
+     {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+    {
+      $group: {
+        _id: {
+          ageinmonths: "$ageinmonths",
+          typeofvisit: "$typeofvisit",
+          gender: "$patient.gender"
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 } // Optional: sort descending by count
+    },
+    {
+    $project:{
+      parameters: "$_id",
+      count: 1,
+      _id: 0
+
+    }
+  }
+  ];
+  const nutritionaggregatechildren0to59growingwell =[
+    {   
+      
+        $match:{$and:[{createdAt:{ $gt: startdate, $lt: enddate }},{growthaccordingtothechildhealthcard:configuration.growthaccordingtothechildhealthcard[0]} ]}
+        //growthaccordingtothechildhealthcard
+
+    },
+     {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+    {
+      $group: {
+        _id: {
+          gender: "$patient.gender"
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 } // Optional: sort descending by count
+    },
+    {
+    $project:{
+      parameters: "$_id",
+      count: 1,
+      _id: 0
+
+    }
+  }
+  ];
+  const nutritionaggregatechildren0to5exclusivebreadstfeeding =[
+    {   
+      
+        $match:{$and:[{createdAt:{ $gt: startdate, $lt: enddate }},{infactandyoungchildfeeding:configuration.infactandyoungchildfeeding[0]},{ageinmonths:configuration.ageinmonths[0]} ]}
+      
+
+    },
+     {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+    {
+      $group: {
+        _id: {
+          gender: "$patient.gender"
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 } // Optional: sort descending by count
+    },
+    {
+    $project:{
+      parameters: "$_id",
+      count: 1,
+      _id: 0
+
+    }
+  }
+  ];
+  const nutritionaggregatechildren0to59givenvitaminasupplement=[
+    {   
+      
+        $match:{$and:[{createdAt:{ $gt: startdate, $lt: enddate }} ]}
+      
+
+    },
+     {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+    {
+      $group: {
+        _id: {
+          gender: "$patient.gender",
+          vitaminasupplement: "$vitaminasupplement"
+
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 } // Optional: sort descending by count
+    },
+    {
+    $project:{
+      parameters: "$_id",
+      count: 1,
+      _id: 0
+
+    }
+  }
+  ];
+  const nutritionaggregatechildren12to59receiveddeworming = [
+    {   
+      
+        $match:{$and:[{createdAt:{ $gt: startdate, $lt: enddate }},{  deworming: { $ne: null }} ]}
+      
+
+    },
+     {
+        $lookup: {
+          from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: {
+          path: "$patient",
+          preserveNullAndEmptyArrays: true
+        }
+        
+      },
+    {
+      $group: {
+        _id: {
+          gender: "$patient.gender"
+
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 } // Optional: sort descending by count
+    },
+    {
+    $project:{
+      parameters: "$_id",
+      count: 1,
+      _id: 0
+
+    }
+  }
+  ];
+//children12to59receiveddeworming
+    
+  //console.log("//////////", querytype);
    
 
     let queryresult:any; 
@@ -1057,6 +1224,23 @@ export const reportsummary = async (req:any,res:any) =>{
          hmoradiologysummary: await readradiologyaggregate(aggregatebyhmo),
          hmsappointmentsummary: await readappointmentaggregate(appointmentaggregatebyhmo)
         };
+
+    }
+    else if(querytype == summary[7]){
+      
+   const [children0to59thatreceivednutirtion,children0to59growingwell,children0to5exclusivebreadstfeeding,children0to59givenvitaminasupplement,children12to59receiveddeworming]  = await Promise.all([
+    readnutritionaggregate(nutritionaggregatechildren0to59thatreceivednutirtion),
+    readnutritionaggregate(nutritionaggregatechildren0to59growingwell),
+    readnutritionaggregate(nutritionaggregatechildren0to5exclusivebreadstfeeding),
+    readnutritionaggregate(nutritionaggregatechildren0to59givenvitaminasupplement),
+    readnutritionaggregate(nutritionaggregatechildren12to59receiveddeworming)
+   
+  ]);
+  queryresult = {children0to59thatreceivednutirtion,children0to59growingwell,children0to5exclusivebreadstfeeding,children0to59givenvitaminasupplement,children12to59receiveddeworming};
+  
+
+ 
+        
 
     }
     else{

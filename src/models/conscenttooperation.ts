@@ -12,6 +12,14 @@ const conscenttooperationSchema = new Schema({
         type: String,
         required: true,
     },
+    addressofrepresentaive:{
+        type: String,
+        required: true,
+    },
+    fullnameofwitness:{
+        type: String,
+        required: true,
+    },
    conscentdate: Date,
    theatreadmission: {
        type: Schema.Types.ObjectId,

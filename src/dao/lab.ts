@@ -34,6 +34,24 @@ import configuration from "../config";
       throw new Error(configuration.error.erroruserread);
     }
   };
+  export async function optimizedreadalllab(aggregatequery:any,page:any,size:any){
+    
+      try{
+        const skip = (page - 1) * size;
+       var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });;
+      const totallabdetails = (await Lab.aggregate(aggregatequery)).length;
+      const totalPages = Math.ceil(totallabdetails / size);
+      return { labdetails, totalPages,totallabdetails, size, page};
+      
+      }
+      catch(err:any){
+        console.log(err);
+            throw new Error(configuration.error.erroruserread);
+      
+      }
+      
+      
+      }
   export async function createlab(input:any){
     try{
        const lab = new Lab(input);

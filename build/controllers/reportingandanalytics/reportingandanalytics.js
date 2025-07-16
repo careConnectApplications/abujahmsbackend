@@ -174,6 +174,12 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         $ifNull: ["$testname", "$appointmenttype"]
                     }
                 }
+            },
+            {
+                $project: {
+                    servicetype: 1,
+                    patient: 1
+                }
             }
         ];
         const proceduresecondaryservice = [
@@ -210,6 +216,12 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         }
                     }
                 }
+            },
+            {
+                $project: {
+                    servicetype: 1,
+                    patient: 1
+                }
             }
         ];
         const patientsecondaryservice = [
@@ -238,6 +250,12 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             {
                 $addFields: {
                     servicetype: "$prescription"
+                }
+            },
+            {
+                $project: {
+                    servicetype: 1,
+                    patient: 1
                 }
             }
         ];
@@ -291,6 +309,16 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[3]) {
             //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
             queryresult = yield (0, reports_1.readprocedureaggregate)(proceduresecondaryservice);
+        }
+        else if (querytype == reports[8].querytype && querygroup == reports[8].querygroup[4]) {
+            const [result1, result2, result3] = yield Promise.all([
+                (0, reports_1.readprocedureaggregate)(proceduresecondaryservice),
+                (0, reports_1.readradiologyaggregate)(secondaryservice),
+                (0, reports_1.readlabaggregate)(secondaryservice),
+                (0, reports_1.readappointmentaggregate)(secondaryservice)
+            ]);
+            queryresult = [...result1, ...result2, ...result3];
+            //queryresult= await readprocedureaggregate(proceduresecondaryservice);
         }
         else if (querytype == reports[8].querytype) {
             //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
@@ -865,6 +893,197 @@ const reportsummary = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 }
             }
         ];
+        const nutritionaggregatechildren0to59thatreceivednutirtion = [
+            {
+                $match: { createdAt: { $gt: startdate, $lt: enddate } }
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        ageinmonths: "$ageinmonths",
+                        typeofvisit: "$typeofvisit",
+                        gender: "$patient.gender"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 } // Optional: sort descending by count
+            },
+            {
+                $project: {
+                    parameters: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+        const nutritionaggregatechildren0to59growingwell = [
+            {
+                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { growthaccordingtothechildhealthcard: config_1.default.growthaccordingtothechildhealthcard[0] }] }
+                //growthaccordingtothechildhealthcard
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        gender: "$patient.gender"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 } // Optional: sort descending by count
+            },
+            {
+                $project: {
+                    parameters: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+        const nutritionaggregatechildren0to5exclusivebreadstfeeding = [
+            {
+                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { infactandyoungchildfeeding: config_1.default.infactandyoungchildfeeding[0] }, { ageinmonths: config_1.default.ageinmonths[0] }] }
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        gender: "$patient.gender"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 } // Optional: sort descending by count
+            },
+            {
+                $project: {
+                    parameters: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+        const nutritionaggregatechildren0to59givenvitaminasupplement = [
+            {
+                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }] }
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        gender: "$patient.gender",
+                        vitaminasupplement: "$vitaminasupplement"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 } // Optional: sort descending by count
+            },
+            {
+                $project: {
+                    parameters: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+        const nutritionaggregatechildren12to59receiveddeworming = [
+            {
+                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { deworming: { $ne: null } }] }
+            },
+            {
+                $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patient",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$patient",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        gender: "$patient.gender"
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 } // Optional: sort descending by count
+            },
+            {
+                $project: {
+                    parameters: "$_id",
+                    count: 1,
+                    _id: 0
+                }
+            }
+        ];
+        //children12to59receiveddeworming
+        //console.log("//////////", querytype);
         let queryresult;
         if (querytype == summary[0]) {
             //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -901,6 +1120,16 @@ const reportsummary = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 hmoradiologysummary: yield (0, reports_1.readradiologyaggregate)(aggregatebyhmo),
                 hmsappointmentsummary: yield (0, reports_1.readappointmentaggregate)(appointmentaggregatebyhmo)
             };
+        }
+        else if (querytype == summary[7]) {
+            const [children0to59thatreceivednutirtion, children0to59growingwell, children0to5exclusivebreadstfeeding, children0to59givenvitaminasupplement, children12to59receiveddeworming] = yield Promise.all([
+                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59thatreceivednutirtion),
+                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59growingwell),
+                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to5exclusivebreadstfeeding),
+                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59givenvitaminasupplement),
+                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren12to59receiveddeworming)
+            ]);
+            queryresult = { children0to59thatreceivednutirtion, children0to59growingwell, children0to5exclusivebreadstfeeding, children0to59givenvitaminasupplement, children12to59receiveddeworming };
         }
         else {
             throw new Error(`querytype ${config_1.default.error.errorisrequired}`);

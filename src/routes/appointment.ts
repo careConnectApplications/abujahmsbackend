@@ -2,10 +2,10 @@
 import express from 'express';
 import {protect} from "../utils/middleware";
 //import {registration,login,updatestatus,getallusers,getusertypes} from '../controllers/user';
-import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient,getAllCompletedEncounter,getAllInProgressEncounter,getAllPreviousEncounter,addclinicalencounter,getAllCompletedClinicalEncounter,getAllPreviousClininicalEncounter,getAllInProgressClinicalEncounter,readallvitalchartByAppointment,getAllSchedulesoptimized} from '../controllers/appointment/appointment';
+import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesByPatient,getAllPaidSchedules,getAllPaidSchedulesByPatient,getAllPaidQueueSchedules,examinepatient, laborder,addencounter,getAllVtalsByPatient,getAllCompletedEncounter,getAllInProgressEncounter,getAllPreviousEncounter,addclinicalencounter,getAllCompletedClinicalEncounter,getAllPreviousClininicalEncounter,getAllInProgressClinicalEncounter,readallvitalchartByAppointment,getAllSchedulesoptimized,getAllPaidSchedulesoptimized} from '../controllers/appointment/appointment';
 const router = express.Router();
 
-
+router.get('/getallmedicalhistoryoptimized/:clinic', getAllPaidSchedulesoptimized);
 router.post('/scheduleappointment', scheduleappointment);
 router.get('/getallschedules', getAllSchedules);
 router.get('/getallschedulesoptimized', getAllSchedulesoptimized);

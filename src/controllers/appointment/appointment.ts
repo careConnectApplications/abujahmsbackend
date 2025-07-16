@@ -1,4 +1,4 @@
-import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery,readallappointmentpaginated} from "../../dao/appointment";
+import {createappointment,readallappointment,updateappointment,readoneappointment,modifiedreadallappointment,updateappointmentbyquery,readallappointmentpaginated,optimizedreadallappointment} from "../../dao/appointment";
 import {readoneadmission} from "../../dao/admissions";
 import {createvitalcharts} from "../../dao/vitalcharts";
 import {readonevitalcharts,updatevitalcharts} from "../../dao/vitalcharts";
@@ -39,6 +39,7 @@ export const scheduleappointment = async (req:any, res:any) => {
        if(!patientrecord){
          throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
      }
+     var { firstName,lastName, MRN,HMOId,HMOName}=patientrecord;
     //search for price if available
     var appointmentPrice:any = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype, isHMOCover:configuration.ishmo[0]});
     if(patientrecord.isHMOCover ==  configuration.ishmo[0] && !appointmentPrice){
@@ -52,14 +53,14 @@ let createpaymentqueryresult:any;
 let queryresult;
 if(patientrecord.isHMOCover ==  configuration.ishmo[1]){
 let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
-queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN,HMOId,HMOName});
 await updatepatient(patient,{$push: {appointment:queryresult._id}});
 
 }
 else{
-  createpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
+  createpaymentqueryresult =await createpayment({firstName:patientrecord?.firstName,lastName:patientrecord?.lastName,MRN:patientrecord?.MRN,phoneNumber:patientrecord?.phoneNumber,paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient,amount:Number(appointmentPrice.amount)});
   let vitals =await createvitalcharts({status:configuration.status[8],patient:patientrecord._id});
-  queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+  queryresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,payment:createpaymentqueryresult._id ,patient:patientrecord._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN,HMOId,HMOName});
 //create vitals
 await updatepatient(patient,{$push: {payment:createpaymentqueryresult._id,appointment:queryresult._id}});
 }
@@ -79,7 +80,7 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 150;
     let filter:any = {};
-    var otherfilter:any = {};
+    //var otherfilter:any = {};
     //appointment, type, MRN,patient name, 
      // Add filters based on query parameters
      if (firstName) {
@@ -94,9 +95,9 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
       filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
     }
    
-   console.log("filter", filter);
+  
    if (appointmenttype) {
-    otherfilter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
+    filter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
   }
   /*
     if(status == "paid"){
@@ -111,55 +112,10 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
        const referencegroup = [
         //look up patient
         //add query
-        {
-         $match:otherfilter
+           {
+          $match:filter
         },
-        {
-         $lookup: {
-           from: "patientsmanagements",
-           localField: "patient",
-           foreignField: "_id",
-           as: "patient",
-         },
-       },
-       {
-        $lookup: {
-          from: "payments",
-          localField: "payment",
-          foreignField: "_id",
-          as: "payment",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "doctor",
-          foreignField: "_id",
-          as: "doctor",
-        },
-      },
-       {
-         $unwind: {
-           path: "$patient",
-           preserveNullAndEmptyArrays: true
-         }
-         
-       },
-       {
-        $unwind: {
-          path: "$doctor",
-          preserveNullAndEmptyArrays: true
-        }
-        
-      },
-      {
-        $unwind: {
-          path: "$payment",
-          preserveNullAndEmptyArrays: true
-        }
-        
-      },
-        
+      
          {
            $project:{
              _id:0,
@@ -169,16 +125,16 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
              appointmentdate:1,
              clinic:1,
              appointmentcategory:1,
-             firstName:"$patient.firstName",
-             lastName:"$patient.lastName",
-             MRN:"$patient.MRN",
-             HMOId:"$patient.HMOId",
-             HMOName:"$patient.HMOName",
+             firstName:1,
+             lastName:1,
+             MRN:1,
+             HMOId:1,
+             HMOName:1,
              status:1,
-             paymentstatus:"$payment.status",
-             paymentreference:"$payment.paymentreference",
-             doctorsfirstName:"$doctor.firstName",
-             doctorslastName:"$doctor.lastName"
+             paymentstatus:1,
+             paymentreference:1,
+             doctorsfirstName:1,
+             doctorslastName:1
 
              //phoneNumber
              //isHMOCover
@@ -190,9 +146,6 @@ export const getAllSchedulesoptimized = async (req:any, res:any) => {
    
            }
          },
-         {
-          $match:filter
-        },
          
          { $sort: { createdAt: -1 } },
          
@@ -351,12 +304,14 @@ export const getAllInProgressClinicalEncounter = async (req:any, res:any) => {
 export const getAllPaidSchedules = async (req:any, res:any) => {
   try {
     //const {clinic} = (req.user).user;
-    const {clinic} = req.params
-    console.log(clinic);
-    //
+    const {clinic} = req.params;
     // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
     let aggregatequery = 
-    [ {
+    [
+      {
+      $match: {  clinic }  // Filter payment
+    },
+      {
       $lookup: {
         from: 'payments',       
         localField: 'payment',    
@@ -411,11 +366,254 @@ export const getAllPaidSchedules = async (req:any, res:any) => {
     },
    
     {
-      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], clinic }  // Filter payment
+      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}] }  // Filter payment
     }
   ]; 
     const queryresult = await modifiedreadallappointment({clinic},aggregatequery);
     console.log('allresult', queryresult);
+    
+    //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
+    //'payment.status':configuration.status[3]
+    res.status(200).json({
+      queryresult,
+      status:true
+    }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+export const getAllPaidSchedulesoptimized = async (req:any, res:any) => {
+  try {
+   
+    //const {clinic} = (req.user).user;
+    const {clinic} = req.params;
+    var {status,firstName,MRN,HMOId,lastName,phoneNumber} = req.query;
+    var page = parseInt(req.query.page) || 1;
+    var size = parseInt(req.query.size) || 150;
+    // var statusfilter:any =status?{status,clinic}:{clinic};
+    /*
+    var filter:any = {};
+        var statusfilter:any =status?{status,clinic}:{clinic};
+        // Add filters based on query parameters
+        if (firstName) {   
+          filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if(MRN) {
+          filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (HMOId) {
+          filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+        }
+        if (lastName) {
+          filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        if (phoneNumber) {
+          filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+        }
+      
+    */
+    // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
+    let aggregatequery = 
+    [ 
+      /*
+      {
+        $match:statusfilter
+       },
+      {
+      $lookup: {
+        from: 'payments',       
+        localField: 'payment',    
+        foreignField: '_id',     
+        as: 'payment'     
+      }
+    },
+    {
+      $lookup: {
+        from: 'patientsmanagements',        
+        localField: 'patient',    
+        foreignField: '_id',      
+        as: 'patient'      
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',        
+        localField: 'doctor',    
+        foreignField: '_id',      
+        as: 'doctor'     
+      }
+    },
+    {
+      $lookup: {
+        from: 'vitalcharts',        
+        localField: 'vitals',    
+        foreignField: '_id',      
+        as: 'vitals'     
+      }
+    },
+    //vitals
+    {
+      $unwind:{ 
+        path:'$payment' , // Deconstruct the payment array (from the lookup)
+      preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $unwind: {
+        path: '$patient',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
+    },
+    {
+      $unwind: {
+        path: '$vitals',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
+    },
+   
+    {
+      $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}] }  // Filter payment
+    },
+    {
+      $project:{
+        _id:1,
+        createdAt:1,
+        reason:1,
+        updatedAt:1,
+        appointmenttype:1,
+        appointmentdate:1,
+        clinic:1,
+        appointmentcategory:1,
+        firstName:"$patient.firstName",
+        lastName:"$patient.lastName",
+        phoneNumber:"$patient.phoneNumber",
+        MRN:"$patient.MRN",
+        patient:"$patient",
+        vitals:1,
+        HMOId:"$patient.HMOId",
+        HMOName:"$patient.HMOName",
+        vitalstatus:"$vitals.status",
+        status:1,
+        paymentstatus:"$payment.status",
+        paymentreference:"$payment.paymentreference",
+        doctorsfirstName:"$doctor.firstName",
+        doctorslastName:"$doctor.lastName"
+      }
+    },
+    {
+      $match:filter
+    },
+    */
+   { $match: { clinic, ...(status && { status }) } },
+
+ {
+  $lookup: {
+    from: 'patientsmanagements',
+    localField: 'patient',
+    foreignField: '_id',
+    as: 'patient'
+  }
+},
+{ $unwind: '$patient' },
+{
+  $match: {
+    ...(firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {}),
+    ...(MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {}),
+    ...(HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {}),
+    ...(lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {}),
+    ...(phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}),
+  }
+},
+/*
+  {
+    $lookup: {
+      from: 'patientsmanagements',
+      let: { patientId: '$patient' },
+      pipeline: [
+        {
+          $match: {
+            $expr: { $eq: ['$_id', '$$patientId'] },
+            ...(firstName ? { firstName: new RegExp(firstName, 'i') } : {}),
+            ...(MRN ? { MRN: new RegExp(MRN, 'i') } : {}),
+            ...(HMOId ? { HMOId: new RegExp(HMOId, 'i') } : {}),
+            ...(lastName ? { lastName: new RegExp(lastName, 'i') } : {}),
+            ...(phoneNumber ? { phoneNumber: new RegExp(phoneNumber, 'i') } : {}),
+          }
+        }
+      ],
+      as: 'patient'
+    }
+  },
+  */
+  //{ $unwind: { path: '$patient', preserveNullAndEmptyArrays: false } },
+
+  // Repeat lookup structure for payments, doctor, vitals (but skip if not needed)
+  {
+    $lookup: {
+      from: 'payments',
+      localField: 'payment',
+      foreignField: '_id',
+      as: 'payment'
+    }
+  },
+   { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
+   {
+    $match: {
+      $or: [
+        { 'payment.status': configuration.status[3] },
+        { 'patient.isHMOCover': configuration.ishmo[1] }
+      ]
+    }
+  },
+   {
+      $lookup: {
+        from: 'vitalcharts',        
+        localField: 'vitals',    
+        foreignField: '_id',      
+        as: 'vitals'     
+      }
+    },
+ 
+   {
+      $unwind: {
+        path: '$vitals',
+        preserveNullAndEmptyArrays: true
+
+      }  // Deconstruct the patient array (from the lookup)
+    },
+
+ 
+
+  {
+    $project: {
+         _id:1,
+        createdAt:1,
+        reason:1,
+        updatedAt:1,
+        appointmenttype:1,
+        appointmentdate:1,
+        clinic:1,
+        appointmentcategory:1,
+        //patient:{ $arrayElemAt: ["$patient", 0] },
+        patient:1,
+        vitals:1,
+        vitalstatus:"$vitals.status",
+        status:1,
+       
+      
+
+     
+        //doctorsfirstName:"$doctor.firstName",
+        //doctorslastName:"$doctor.lastName"
+        
+    }
+  },
+  { $sort: { createdAt: -1 } },
+  ]; 
+    const queryresult = await optimizedreadallappointment(aggregatequery,page,size);
+   
     
     //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
     //'payment.status':configuration.status[3]
@@ -515,7 +713,43 @@ export const getAllPaidQueueSchedules = async (req:any, res:any) => {
       $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
       //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
     }
-      
+     ,{
+      $project:{
+        _id:1,
+        createdAt:1,
+        appointmentid:1,
+        admission: 1,
+        doctor: 1,
+        reason:1,
+        updatedAt:1,
+        appointmenttype:1,
+        appointmentdate:1,
+        clinic:1,
+        patient:1,
+        firstName:"$patient.firstName",
+        lastName:"$patient.lastName",
+        MRN:"$patient.MRN",
+        HMOId:"$patient.HMOId",
+        HMOName:"$patient.HMOName",
+
+        appointmentcategory:1,
+        vitalstatus:"$vitals.status",
+        vitals:1,
+        clinicalencounter:1,
+        status:1,
+        payment:"$payment",
+        policecase: 1,
+        physicalassault: 1,
+        sexualassault: 1,
+        policaename: 1,
+        servicenumber: 1,
+        policephonenumber: 1,
+
+       
+        
+      }
+    } ,
+        { $sort: { createdAt: 1 } },
   ]; 
     const queryresult = await modifiedreadallappointment({status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay }},aggregatequery);
    console.log('r', queryresult);
@@ -690,7 +924,8 @@ export async function addclinicalencounter(req:any, res:any){
     queryresult = await updateappointment(id, {clinicalencounter,status,doctor:user?._id,admission:checkadimmison._id,patient:checkadimmison.patient,fromclinicalencounter:true});
     
   }else{
-  queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,fromclinicalencounter:true});
+   
+  queryresult = await updateappointmentbyquery({$or:[{appointmentid:id},{_id:id}]}, {clinicalencounter,status,doctor:user?._id,doctorsfirstName:user?.firstName,doctorslastName:user?.lastName,fromclinicalencounter:true});
   const { firstName,lastName} = (req.user).user;
   req.body.staffname = `${firstName} ${lastName}`; 
   const {height,weight,temperature,heartrate,bloodpressuresystolic,bloodpressurediastolic,respiration,saturation,staffname} = req.body;

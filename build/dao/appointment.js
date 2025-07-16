@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.countappointment = countappointment;
 exports.modifiedreadallappointment = modifiedreadallappointment;
+exports.optimizedreadallappointment = optimizedreadallappointment;
 exports.readallappointmentfirstfive = readallappointmentfirstfive;
 exports.readallappointmentpaginated = readallappointmentpaginated;
 exports.readallappointment = readallappointment;
@@ -41,6 +42,22 @@ function modifiedreadallappointment(query, aggregatequery) {
             var appointmentdetails = yield appointment_1.default.aggregate(aggregatequery);
             const totalappointmentdetails = yield appointment_1.default.find(query).countDocuments();
             return { appointmentdetails, totalappointmentdetails };
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
+function optimizedreadallappointment(aggregatequery, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            var appointmentdetails = yield appointment_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
+            ;
+            const totalappointmentdetails = (yield appointment_1.default.aggregate(aggregatequery)).length;
+            const totalPages = Math.ceil(totalappointmentdetails / size);
+            return { appointmentdetails, totalPages, totalappointmentdetails, size, page };
         }
         catch (err) {
             console.log(err);

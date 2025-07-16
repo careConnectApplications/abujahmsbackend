@@ -63,6 +63,7 @@ const payment_1 = require("../../dao/payment");
 const vitalcharts_1 = require("../../dao/vitalcharts");
 const otherservices_1 = require("../../utils/otherservices");
 const appointment_1 = require("../../dao/appointment");
+const pricingmodel_1 = require("../../dao/pricingmodel");
 const audit_1 = require("../../dao/audit");
 //Insurance upload
 //get hmo patient 
@@ -216,15 +217,32 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
-        var { authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
+        if (!(req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true)) {
+            delete req.body.authorizationcode;
+            delete req.body.facilitypateintreferedfrom;
+        }
+        req.body.appointmentcategory = config_1.default.category[3];
+        req.body.appointmenttype = config_1.default.category[3];
+        var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
         //validation
         (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype, isHMOCover });
-        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            console.log("here");
-            //throw new Error(configuration.error.errorauthorizehmo);
+        //define the service type
+        /*
+        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
+          console.log("here");
+          //throw new Error(configuration.error.errorauthorizehmo);
+          req.body.patienttype = configuration.patienttype[1];
+          req.body.status = configuration.status[1];
+          validateinputfaulsyvalue({authorizationcode});
+
+        }
+          */
+        if (authorizationcode) {
             req.body.patienttype = config_1.default.patienttype[1];
+        }
+        //define the service type
+        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
             req.body.status = config_1.default.status[1];
-            (0, otherservices_1.validateinputfaulsyvalue)({ authorizationcode });
         }
         //get token from header and extract clinic
         //check for 11 digit
@@ -250,8 +268,44 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
         //console.log('appointmentprice', appointmentPrice);
         var { isHMOCover } = req.body;
-        var newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover });
-        if (isHMOCover !== config_1.default.ishmo[1] && !newRegistrationPrice) {
+        var newRegistrationPrice;
+        const foundPricingmodel = yield (0, pricingmodel_1.readonepricemodel)({ pricingtype: config_1.default.pricingtype[1] });
+        if (foundPricingmodel) {
+            const age = Number(req.body.age);
+            const isAdult = age >= 18;
+            const isChild = age < 18;
+            //check for error
+            console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
+            console.log("Clinic from request:", clinic);
+            console.log("Is adult:", isAdult);
+            console.log("Age:", age);
+            //confirm the type of pricing model
+            if (foundPricingmodel.exactnameofancclinic == clinic) {
+                console.log("clinic");
+                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: clinic });
+            }
+            else if (isAdult) {
+                console.log("greater than 18");
+                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforadult, $options: 'i' } });
+            }
+            else if (isChild) {
+                console.log("less than 18");
+                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforchild, $options: 'i' } });
+            }
+            else {
+                console.log("errror /////");
+                //return error
+                throw new Error(`${config_1.default.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}`);
+            }
+            //find pricing model
+        }
+        else {
+            newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: config_1.default.category[3] });
+        }
+        //use age to calculate price
+        console.log("newRegistrationPrice", newRegistrationPrice);
+        if (!(isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) && !newRegistrationPrice) {
+            console.log("second errror /////");
             throw new Error(config_1.default.error.errornopriceset);
         }
         var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
@@ -266,17 +320,17 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         let queryappointmentresult;
         let queryresult;
         let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
-        if (isHMOCover == config_1.default.ishmo[1]) {
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
+        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
+            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
             queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
         }
         else {
-            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
+            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
             // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
             payment.push(createpaymentqueryresult._id);
             //payment.push(createappointmentpaymentqueryresult._id);
             //update createpatientquery
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id });
+            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
             queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
         }
         res.status(200).json({ queryresult, status: true });

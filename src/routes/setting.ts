@@ -6,6 +6,8 @@ import {createward,getallward,updateward} from '../controllers/setting/wardmanag
 import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/theatremanagement';
 import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestcomponentbytestname} from '../controllers/setting/testscomponent';
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
+import {createpricingmodel, updatepricingmodel, getpricingmodel} from "../controllers/setting/pricemodel";
+import {createoutreachmedications, getalloutreachmedications, updateoutreachmedications} from "../controllers/setting/outreachmedication";
 import {readAllaudit} from "../controllers/audit/audit";
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
@@ -52,9 +54,17 @@ router.put('/updateinsurance/:id',updatehmo);
 router.post('/createtestcomponents',createtestcomponents);
 router.get('/getalltestcomponent',getalltestcomponent);
 router.put('/updatetestcomponents/:id',updatetestcomponents);
-router.get('/gettestcomponentbytestname/:testname',gettestcomponentbytestname);
+router.get('/gettestcomponentbytestname/:testname(*)',gettestcomponentbytestname);
+//pricing model
+router.post('/createpricingmodel',createpricingmodel);
+router.get('/getpricingmodel',getpricingmodel);
+router.put('/updatepricingmodel/:id', updatepricingmodel);
 //audit
 router.get('/readallaudit',readAllaudit);
+//outreachmedication
+router.post('/createoutreachmedication',createoutreachmedications);
+router.get('/getalloutreachmedication',getalloutreachmedications);
+router.put('/updateoutreachmedication/:id',updateoutreachmedications);
 
     
 

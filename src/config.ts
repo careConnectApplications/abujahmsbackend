@@ -1,10 +1,16 @@
   import {readallclinics} from "./dao/clinics";
   import  {readallservicetype}  from "./dao/servicetype";
-  import {readwardaggregate,readclinicaggregate}  from "./dao/reports";
 const configuration:any = {
   //clinic name
   //wardname  
+  pricingtype:["Standard","Age and Clinic Aware"],
+  anynotedadverseeffect:["Yes","No"],
   patienttype:["primary","secondary"],
+  counsellingprovided:["Maternal Nutrition","Exclusive Breadstfeeding","Complementary Feeding","Water","Sanitation and Hygiene"],
+  growthaccordingtothechildhealthcard:["Growing well","Not Growing well"],
+  infactandyoungchildfeeding:["Exclusive BF","BF and Water","BF with other Foods"],
+  ageinmonths:["0-5 Months","6-23 Months","24 - 59 Months"],
+  vitaminasupplement:["6 -11 months","12 - 59 months"],
   reports:[
     {querytype:"financialreport",querygroup:[ "Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"]}
   ],
@@ -37,7 +43,8 @@ const configuration:any = {
     {role: "HOD Dental", roleId:"24"},
     {role: "HOD Lab", roleId:"25"},
     {role: "Lab Scientist", roleId:"26"},
-    {role: "HOD A&E", roleId:"27"}
+    {role: "HOD A&E", roleId:"27"},
+    {role: "Cashier/Record Officers", roleId:"28"},
     //General Nurse
 
     //Head of Clinical Services
@@ -52,14 +59,14 @@ const configuration:any = {
   servedstatus:["served","unserved"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure"],
+  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure","Histology"],
   ishmo:["No","Yes"],
   settings: async function(){
 const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
 const {servicetypedetails} = await readallservicetype({},{type:1,category:1,department:1,_id:0});
    
 const servicetypedetail:any = servicetypedetails.filter((item:any)=>item.category == this.category[2]);
-console.log('service', servicetypedetail);
+//console.log('service', servicetypedetail);
 var service:any=[];
 for(var i =0; i < servicetypedetail.length ; i++){
  // var temp:any =(servicetypedetail.servicetypedetails)[i].type;
@@ -71,6 +78,56 @@ for(var i =0; i < servicetypedetail.length ; i++){
     
     return (
       {
+        vaccinationlocation:['fixed', 'outreach'],
+        pricingtype:["Standard","Age and Clinic Aware"],
+        tetanustoxoid:["TT 1","TT 2","TT 3","TT 4","TT 5"],
+        sulfadoxinepyrimethamine:["SP 1","SP 3","SP 3","RVS"],
+        anynotedadverseeffect:["Yes","No"],
+        adverseeffectseverity:["Moderate","Severe","Acute"],
+        vacinationmapping:[
+          {
+          schedule: "birth", vaccination:["BCG","Hep BO","OPV 0"]
+          },
+          {
+          schedule:"6weeks",   vaccination:["OPV 1","Penta 1","PCV 1","Rota 1","IPV 1"]
+          },
+           {
+          schedule:"10weeks",   vaccination:["OPV 2","Penta 2","PCV 2","Rota 2"]
+          },
+          {
+          schedule:"14weeks",   vaccination:["OPV 3","Penta 3","PCV 3","Rota 3","IPV 2"]
+          },
+          {
+          schedule:"5months",   vaccination:["Malaria 1"]
+          },
+          {
+          schedule:"6months",   vaccination:["Malaria 2","Vitamine A1"]
+          },
+          {
+          schedule:"7months",   vaccination:["Malaria 3"]
+          },
+          {
+          schedule:"9months",   vaccination:["Measles 1","Yellow Fever","Meningitis"]
+          },
+          {
+          schedule:"12months",   vaccination:["Vitamine A2"]
+          },
+          {
+          schedule:"15months",   vaccination:["Malaria 4","Measles 2"]
+          },
+           {
+          schedule:"9years",   vaccination:["HPV"]
+          },
+
+
+
+        ],
+        consciousness:["Unconscious,Unresponsive","Drowsy but responsive"],
+        ventilation:["Needs Attention","Breathing Adequetly","Can Cough/Cry"],
+        movement:["Not Moving","Movements Involuntary","Purposeful Movements"],
+        colorvitalsignsscore:["Pink","Blue"],
+        timevitalsignscore:["0","10","20","30","40","60","90","120","Discharge"],
+        score:["0","1","2","3","4","5","6"],
         ageinmonths:["0-5 Months","6-23 Months","24 - 59 Months"],
         typeofvisit:["N","R"],
        infactandyoungchildfeeding:["Exclusive BF","BF and Water","BF with other Foods"],
@@ -924,7 +981,7 @@ main:[
   ],
 
   roles:[
-    {role: "Medical Director", roleId:"1"},
+    {role: "Medical Director", roleId:"1"}, 
     {role: "Pharmacist", roleId:"2"},
     {role: "HOD Cashier", roleId:"3"},
     {role: "General Nurse", roleId:"4"},
@@ -951,7 +1008,8 @@ main:[
     {role: "HOD Dental", roleId:"24"},
     {role: "HOD Lab", roleId:"25"},
     {role: "Lab Scientist", roleId:"26"},
-    {role: "HOD A&E", roleId:"27"}
+    {role: "HOD A&E", roleId:"27"},
+    {role: "Cashier/Record Officers", roleId:"28"},
   ],
   clinics: clinicdetails,
   /*
@@ -1048,8 +1106,9 @@ allowedfilesize: 20000,
     errorservicetray: "This service donot exist in your service tray"
 
   },
-   // environment: "test",
- environment: "prod",
+    environment: "test",
+
+ //environment: "prod",
 
 }
 export default configuration;

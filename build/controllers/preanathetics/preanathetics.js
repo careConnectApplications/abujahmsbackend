@@ -109,7 +109,7 @@ const updatepreanatheticsconscentform = (req, res) => __awaiter(void 0, void 0, 
         //validate theatre admission
         var findAdmission = yield (0, preanathetics_1.readonepreanathetics)({ _id: id }, {}, '');
         if (!findAdmission) {
-            throw new Error(`Preanathetics Form ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Preanathetics Form donot  ${config_1.default.error.erroralreadyexit}`);
         }
         //const queryresult:any =await updatethearteadmission(id,{status});
         //create conscent

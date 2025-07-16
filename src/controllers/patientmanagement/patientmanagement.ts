@@ -8,6 +8,7 @@ import {createpayment} from "../../dao/payment";
 import {createvitalcharts} from "../../dao/vitalcharts";
 import { mail, generateRandomNumber,validateinputfaulsyvalue,uploaddocument,convertexceltojson,storeUniqueNumber } from "../../utils/otherservices";
 import {createappointment} from "../../dao/appointment";
+import {readonepricemodel} from "../../dao/pricingmodel";
 import { AnyObject } from "mongoose";
 import {createaudit} from "../../dao/audit";
 //Insurance upload
@@ -178,10 +179,20 @@ export var createpatients = async (req:any,res:any) =>{
           req.body.isHMOCover=configuration.ishmo[0]
 
         } 
-        var {authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
+        
+        
+           if(!(req.body.isHMOCover==configuration.ishmo[1] || req.body.isHMOCover == true)){
+           
+           delete req.body.authorizationcode ;
+           delete req.body.facilitypateintreferedfrom;
+        }
+        req.body.appointmentcategory=configuration.category[3];
+        req.body.appointmenttype =configuration.category[3];
+        var {facilitypateintreferedfrom,authorizationcode,policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,dateOfBirth,phoneNumber,firstName,lastName,gender,clinic, reason, appointmentdate, appointmentcategory, appointmenttype,isHMOCover} = req.body;
         //validation
          validateinputfaulsyvalue({phoneNumber,firstName,lastName,gender,clinic,appointmentdate, appointmentcategory, appointmenttype,isHMOCover});
-        
+        //define the service type
+        /*
         if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
           console.log("here");
           //throw new Error(configuration.error.errorauthorizehmo);
@@ -190,6 +201,17 @@ export var createpatients = async (req:any,res:any) =>{
           validateinputfaulsyvalue({authorizationcode});
 
         }
+          */
+
+        if(authorizationcode){
+          req.body.patienttype = configuration.patienttype[1];
+
+        }
+        //define the service type
+        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
+          req.body.status = configuration.status[1];
+        }
+       
        
        
         //get token from header and extract clinic
@@ -221,8 +243,55 @@ export var createpatients = async (req:any,res:any) =>{
         //console.log('appointmentprice', appointmentPrice);
       
       var {isHMOCover} = req.body;
-        var newRegistrationPrice:any = await readoneprice({servicecategory:configuration.category[3],isHMOCover});
-        if(isHMOCover !== configuration.ishmo[1] && !newRegistrationPrice){
+      var newRegistrationPrice:any;
+       
+      const foundPricingmodel:any =  await readonepricemodel({pricingtype:configuration.pricingtype[1]});
+      
+      if(foundPricingmodel){
+          const age = Number(req.body.age);
+          const isAdult = age >= 18;
+          const isChild = age < 18;
+        //check for error
+        console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
+        console.log("Clinic from request:", clinic);
+        console.log("Is adult:", isAdult);
+        console.log("Age:", age);
+
+        //confirm the type of pricing model
+        if( foundPricingmodel.exactnameofancclinic == clinic ){
+          console.log("clinic");
+          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:clinic});
+        }
+        else if(isAdult){
+          console.log("greater than 18")
+           newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:{$regex:foundPricingmodel.exactnameofservicetypeforadult,$options: 'i'}});
+        }
+        else if(isChild){
+          console.log("less than 18");
+          newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:{$regex: foundPricingmodel.exactnameofservicetypeforchild,$options: 'i'}});
+       
+        }
+        else{
+          console.log("errror /////");
+          //return error
+          throw new Error(`${configuration.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}` );
+
+        }
+        //find pricing model
+
+
+      }
+      else{
+         newRegistrationPrice= await readoneprice({servicecategory:configuration.category[3],isHMOCover,servicetype:configuration.category[3]});
+
+      }
+       
+        //use age to calculate price
+
+       console.log("newRegistrationPrice",newRegistrationPrice);
+        
+        if(!(isHMOCover == configuration.ishmo[1] || isHMOCover == true) && !newRegistrationPrice){
+          console.log("second errror /////");
           throw new Error(configuration.error.errornopriceset);
 
       }
@@ -238,20 +307,20 @@ export var createpatients = async (req:any,res:any) =>{
          let queryappointmentresult;
          let queryresult;
          let vitals =await createvitalcharts({status:configuration.status[8]});
-         if(isHMOCover == configuration.ishmo[1])
+         if(isHMOCover == configuration.ishmo[1] || isHMOCover == true)
          {
-          queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+          queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,appointmentid,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,firstName,lastName, MRN:createpatientqueryresult?.MRN,HMOId:createpatientqueryresult?.HMOId,HMOName:createpatientqueryresult?.HMOName});
           queryresult =await updatepatient(createpatientqueryresult._id,{$push:{appointment:queryappointmentresult._id}});
          
         
          }
          else{
-          const createpaymentqueryresult =await createpayment({paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
+          const createpaymentqueryresult =await createpayment({firstName,lastName,MRN:req.body.MRN,phoneNumber,paymentreference:req.body.MRN,paymentype:newRegistrationPrice.servicetype,paymentcategory:newRegistrationPrice.servicecategory,patient:createpatientqueryresult._id,amount:Number(newRegistrationPrice.amount)})
           // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
            payment.push(createpaymentqueryresult._id);
            //payment.push(createappointmentpaymentqueryresult._id);
            //update createpatientquery
-           queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id});
+           queryappointmentresult = await createappointment({policecase,physicalassault,sexualassault,policaename,servicenumber,policephonenumber,division,status:configuration.status[5],appointmentid,payment:createpaymentqueryresult._id ,patient:createpatientqueryresult._id,clinic,reason, appointmentdate, appointmentcategory, appointmenttype,vitals:vitals._id,MRN:createpatientqueryresult?.MRN,HMOId:createpatientqueryresult?.HMOId,HMOName:createpatientqueryresult?.HMOName});
            queryresult =await updatepatient(createpatientqueryresult._id,{payment,$push:{appointment:queryappointmentresult._id}});
           
 

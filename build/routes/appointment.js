@@ -8,6 +8,7 @@ const express_1 = __importDefault(require("express"));
 //import {registration,login,updatestatus,getallusers,getusertypes} from '../controllers/user';
 const appointment_1 = require("../controllers/appointment/appointment");
 const router = express_1.default.Router();
+router.get('/getallmedicalhistoryoptimized/:clinic', appointment_1.getAllPaidSchedulesoptimized);
 router.post('/scheduleappointment', appointment_1.scheduleappointment);
 router.get('/getallschedules', appointment_1.getAllSchedules);
 router.get('/getallschedulesoptimized', appointment_1.getAllSchedulesoptimized);

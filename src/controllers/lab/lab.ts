@@ -1,4 +1,4 @@
-import {readalllab,updatelab,readonelab,readlabaggregate} from "../../dao/lab";
+import {readalllab,updatelab,readonelab,readlabaggregate,optimizedreadalllab} from "../../dao/lab";
 import  {updatepatient}  from "../../dao/patientmanagement";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
 import {createpayment} from "../../dao/payment";
@@ -92,6 +92,85 @@ export const readallscheduledlab = async (req:any, res:any) => {
       queryresult,
       status:true
     }); 
+  } catch (error:any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
+export const readallscheduledlaboptimized = async (req:any, res:any) => {
+  try {
+    var {status,firstName,MRN,HMOId,lastName,phoneNumber,testname} = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        const filter:any = {};
+        var statusfilter:any =status?{status}:testname?{testname}:{};
+        if (firstName) {   
+          filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if(MRN) {
+          filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (HMOId) {
+          filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+        }
+        if (lastName) {
+          filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        if (phoneNumber) {
+          filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+        }
+        let aggregatequery = 
+        [ 
+          {
+            $match:statusfilter
+           },
+         
+        {
+          $lookup: {
+            from: 'patientsmanagements',        
+            localField: 'patient',    
+            foreignField: '_id',      
+            as: 'patient'      
+          }
+        },
+       
+        {
+          $unwind: {
+            path: '$patient',
+            preserveNullAndEmptyArrays: true
+    
+          }  // Deconstruct the patient array (from the lookup)
+        },
+        {
+          $project:{
+            _id:1,
+            createdAt:1,
+            testname:1,
+            updatedAt:1,
+            testid:1,
+            department:1,
+            firstName:"$patient.firstName",
+            lastName:"$patient.lastName",
+            phoneNumber:"$patient.phoneNumber",
+            MRN:"$patient.MRN",
+            patient:"$patient",
+            HMOId:"$patient.HMOId",
+            HMOName:"$patient.HMOName",
+            status:1,
+          
+          }
+        },
+        {
+          $match:filter
+        },
+      ];
+       
+      const queryresult = await optimizedreadalllab(aggregatequery,page,size);          
+      res.status(200).json({
+        queryresult,
+        status:true
+      });
+
+
   } catch (error:any) {
     res.status(403).json({ status: false, msg: error.message });
   }
@@ -299,7 +378,7 @@ else{
   //status=configuration.status[2];
 }
   if(option == true && patient.isHMOCover == configuration.ishmo[0]){
-    var createpaymentqueryresult =await createpayment({paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
     queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     

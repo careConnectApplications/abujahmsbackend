@@ -23,6 +23,7 @@ const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
+const pricingmodel_1 = require("../../dao/pricingmodel");
 //add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -39,7 +40,8 @@ var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
           */
         //get token from header
         // var settings =await configuration.settings();
-        if (req.body.servicecategory == config_1.default.category[3]) {
+        const foundPricingmodel = yield (0, pricingmodel_1.readonepricemodel)({ pricingtype: config_1.default.pricingtype[1] });
+        if (req.body.servicecategory == config_1.default.category[3] && !foundPricingmodel) {
             req.body.servicetype = config_1.default.category[3];
         }
         //validation

@@ -544,6 +544,15 @@ const appointmentSchema = new Schema({
     ref: "Users",
     default: null,
   },
+  firstName:String,
+  lastName:String, 
+  MRN:String,
+  HMOId:String,
+  HMOName:String,
+  paymentstatus:String,
+  paymentreference:String,
+  doctorsfirstName:String,
+  doctorslastName:String,
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
@@ -638,7 +647,18 @@ const appointmentSchema = new Schema({
 { timestamps: true }
 
 );
+// Indexes to optimize common queries
+appointmentSchema.index({ appointmentid: 1 }, { unique: true }); // Ensure unique ID
+appointmentSchema.index({ patient: 1 });                          // Lookup by patient
+appointmentSchema.index({ doctor: 1 });                           // Lookup by doctor
+appointmentSchema.index({ clinic: 1 });                           // Filter by clinic
+appointmentSchema.index({ appointmentdate: -1 });                // Sort/filter by date (descending)
+appointmentSchema.index({ appointmentcategory: 1 });             // Filter by category
+appointmentSchema.index({ appointmenttype: 1 });                 // Filter by type
+appointmentSchema.index({ status: 1 });                           // Filter by status
+appointmentSchema.index({ createdAt: -1 }); // Sort by creation time
 
+appointmentSchema.index({ clinic: 1, status:1 }); 
 const appointment = model('Appointment', appointmentSchema);
 export default appointment;
 

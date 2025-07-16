@@ -112,7 +112,7 @@ var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
             }
             //create payment
             if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: procedure[i], paymentcategory: config_1.default.category[5], patient: id, amount: Number(testPrice.amount) });
+                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.firstName, lastName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.lastName, MRN: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.MRN, phoneNumber: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.phoneNumber, paymentreference, paymentype: procedure[i], paymentcategory: config_1.default.category[5], patient: id, amount: Number(testPrice.amount) });
                 //create testrecordn 
                 var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
                 proceduresid.push(procedurerecord._id);

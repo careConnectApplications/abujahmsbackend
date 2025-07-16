@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.countradiology = countradiology;
 exports.readallradiology = readallradiology;
+exports.optimizedreadallradiology = optimizedreadallradiology;
 exports.createradiology = createradiology;
 exports.readoneradiology = readoneradiology;
 exports.updateradiology = updateradiology;
@@ -48,6 +49,22 @@ function readallradiology(query, selectquery, populatequery, populatesecondquery
     });
 }
 ;
+function optimizedreadallradiology(aggregatequery, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            var radiologydetails = yield radiology_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
+            ;
+            const totalradiologydetails = (yield radiology_1.default.aggregate(aggregatequery)).length;
+            const totalPages = Math.ceil(totalradiologydetails / size);
+            return { radiologydetails, totalPages, totalradiologydetails, size, page };
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.erroruserread);
+        }
+    });
+}
 function createradiology(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
