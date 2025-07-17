@@ -12,6 +12,7 @@ import { procedureaggregatereports } from "../../utils/reporting/procedure";
 import { nutritionaggregatereports } from "../../utils/reporting/nutrition";
 import { hmoaggregatereports } from "../../utils/reporting/hmo";
 import {heathfacilityattendancereports} from "../../utils/reporting/healthfacilityattendance";
+import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -457,7 +458,9 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {nutritionaggregatechildren12to59receiveddeworming,nutritionaggregatechildren0to59givenvitaminasupplement,nutritionaggregatechildren0to5exclusivebreadstfeeding,nutritionaggregatechildren0to59growingwell,nutritionaggregatechildren0to59thatreceivednutirtion} =nutritionaggregatereports(startdate, enddate);
     const {appointmentaggregatebyhmo,aggregatebyhmo} =hmoaggregatereports(startdate, enddate);
     const {heathfacilityoutpatientattendance,heathfacilitygeneralattendance} = heathfacilityattendancereports(startdate, enddate);
+    const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
     let queryresult:any; 
+
     
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -512,6 +515,9 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
         const [outpatientattendance,generalattendance] = await Promise.all([readappointmentaggregate(heathfacilityoutpatientattendance),readappointmentaggregate(heathfacilitygeneralattendance)]);
         queryresult={outpatientattendance,generalattendance};
 
+      }
+      else if(querytype == summary[9]){
+          queryresult = await readadmissionaggregate(inpatientdischarges);
       }
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))

@@ -100,7 +100,7 @@ export const settings = async function () {
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","healthfacilityattendance"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","healthfacilityattendance","inpatientcare"];
           return {reports,summary};
     }
     catch (error: any) {
