@@ -42,11 +42,21 @@ const heathfacilityoutpatientattendance = [
   },
 
   {
-    // Convert DOB to Date if needed and calculate age
     $addFields: {
-      dob: { $toDate: "$patientDetails.dateOfBirth" },
-      gender: "$patientDetails.gender"
+  dob: {
+    $cond: {
+      if: {
+        $and: [
+          { $ne: ["$patientDetails.dateOfBirth", null] },
+          { $ne: ["$patientDetails.dateOfBirth", ""] }
+        ]
+      },
+      then: { $toDate: "$patientDetails.dateOfBirth" },
+      else: null
     }
+  },
+  gender: "$patientDetails.gender"
+}
   },
     {
     $addFields: {
@@ -147,11 +157,21 @@ const heathfacilitygeneralattendance = [
   },
 
   {
-    // Convert DOB to Date if needed and calculate age
     $addFields: {
-      dob: { $toDate: "$patientDetails.dateOfBirth" },
-      gender: "$patientDetails.gender"
+  dob: {
+    $cond: {
+      if: {
+        $and: [
+          { $ne: ["$patientDetails.dateOfBirth", null] },
+          { $ne: ["$patientDetails.dateOfBirth", ""] }
+        ]
+      },
+      then: { $toDate: "$patientDetails.dateOfBirth" },
+      else: null
     }
+  },
+  gender: "$patientDetails.gender"
+}
   },
     {
     $addFields: {

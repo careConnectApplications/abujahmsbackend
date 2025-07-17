@@ -514,7 +514,6 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
 
       }
     else{
-      //throw new Error(`querytype ${configuration.error.errorisrequired}`);
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
     
