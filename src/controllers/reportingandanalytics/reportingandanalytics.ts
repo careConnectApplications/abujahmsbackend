@@ -1,7 +1,7 @@
 
 import configuration from "../../config";
 import { NextFunction, Request, Response } from "express";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 import { financialreports } from "../../utils/reporting/financial";
@@ -13,6 +13,7 @@ import { nutritionaggregatereports } from "../../utils/reporting/nutrition";
 import { hmoaggregatereports } from "../../utils/reporting/hmo";
 import {heathfacilityattendancereports} from "../../utils/reporting/healthfacilityattendance";
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
+import {immunizationaggregatereports} from "../../utils/reporting/immunization"
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -459,9 +460,12 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {appointmentaggregatebyhmo,aggregatebyhmo} =hmoaggregatereports(startdate, enddate);
     const {heathfacilityoutpatientattendance,heathfacilitygeneralattendance} = heathfacilityattendancereports(startdate, enddate);
     const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
+    const {immunizationpipeline} = immunizationaggregatereports(startdate, enddate);
     let queryresult:any; 
-
     
+   
+
+  
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
      queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), grandtotal: await readpaymentaggregate(financialaggregategrandtotalpaid)};
@@ -518,6 +522,9 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       }
       else if(querytype == summary[9]){
           queryresult = await readadmissionaggregate(inpatientdischarges);
+      }
+      else if(querytype == summary[10]){
+        queryresult = await readimmunizationaggregate(immunizationpipeline);
       }
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
