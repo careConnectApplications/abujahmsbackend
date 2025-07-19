@@ -1,11 +1,8 @@
 export const immunizationaggregatereports=(startdate:any,enddate:any)=>{
 const immunizationpipeline = [
-     {   
-      
-        $match:{createdAt:{ $gt: startdate, $lt: enddate } }
-
-    },
-  // 1. Join Patientsmanagement
+  {   
+    $match: { createdAt: { $gt: startdate, $lt: enddate } }
+  },
   {
     $lookup: {
       from: "patientsmanagements",
@@ -14,11 +11,9 @@ const immunizationpipeline = [
       as: "patientInfo"
     }
   },
-  {
-    $unwind: "$patientInfo"
-  },
+  { $unwind: "$patientInfo" },
 
-  // 2. Calculate age in YEARS
+  // Safely handle DOB
   {
     $addFields: {
       dob: {
@@ -35,42 +30,42 @@ const immunizationpipeline = [
       }
     }
   },
-  {
-    $match: {
-      dob: { $ne: null }
-    }
-  },
+
+  // Conditionally calculate ageInYears
   {
     $addFields: {
       ageInYears: {
-        $dateDiff: {
-          startDate: "$dob",
-          endDate: "$$NOW",
-          unit: "year"
+        $cond: {
+          if: { $ne: ["$dob", null] },
+          then: {
+            $dateDiff: {
+              startDate: "$dob",
+              endDate: "$$NOW",
+              unit: "year"
+            }
+          },
+          else: null
         }
       }
     }
   },
 
-  // 3. Create two age groups: <1 year, >=1 year
+  // Define ageGroup including unknowns
   {
     $addFields: {
       ageGroup: {
-        $cond: [
-          { $lt: ["$ageInYears", 1] },
-          "<1 year",
-          ">=1 year"
-        ]
+        $switch: {
+          branches: [
+            { case: { $lt: ["$ageInYears", 1] }, then: "<1 year" },
+            { case: { $gte: ["$ageInYears", 1] }, then: ">=1 year" }
+          ],
+          default: "Unknown"
+        }
       }
     }
   },
 
-  // 4. Unwind vaccination array
-  {
-    $unwind: "$vaccination"
-  },
-
-  // 5. Group by vaccine, location, and age group
+  { $unwind: "$vaccination" },
 
   {
     $group: {
@@ -82,8 +77,6 @@ const immunizationpipeline = [
       uniquePatients: { $addToSet: "$patient" }
     }
   },
-
-  // 6. Project the result
   {
     $project: {
       _id: 0,
@@ -93,9 +86,6 @@ const immunizationpipeline = [
       patientCount: { $size: "$uniquePatients" }
     }
   },
-  
-
-  // 7. Sort (optional)
   {
     $sort: {
       vaccine: 1,
@@ -104,5 +94,27 @@ const immunizationpipeline = [
     }
   }
 ];
-   return {immunizationpipeline}
+
+const AEFIcasesreported = [
+  {
+    $match: {
+      adverseeffectseverity: { $exists: true, $ne: null }
+    }
+  },
+  {
+    $group: {
+      _id: "$adverseeffectseverity", // Groups by severity type
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $project: {
+      severity: "$_id",
+      count: 1,
+      _id: 0
+    }
+  }
+];
+
+   return {immunizationpipeline,AEFIcasesreported}
 }

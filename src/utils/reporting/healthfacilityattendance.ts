@@ -59,16 +59,23 @@ const heathfacilityoutpatientattendance = [
 }
   },
     {
-    $addFields: {
-      age: {
-        $dateDiff: {
-          startDate: "$dob",
-          endDate: "$$NOW",
-          unit: "day"
-        }
+  $addFields: {
+    age: {
+      $cond: {
+        if: { $ne: ["$dob", null] },
+        then: {
+          $dateDiff: {
+            startDate: "$dob",
+            endDate: "$$NOW",
+            unit: "day"
+          }
+        },
+        else: null
       }
     }
-  },
+  }
+},
+
   {
     // Assign age group
     $addFields: {
@@ -174,16 +181,23 @@ const heathfacilitygeneralattendance = [
 }
   },
     {
-    $addFields: {
-      age: {
-        $dateDiff: {
-          startDate: "$dob",
-          endDate: "$$NOW",
-          unit: "day"
-        }
+  $addFields: {
+    age: {
+      $cond: {
+        if: { $ne: ["$dob", null] },
+        then: {
+          $dateDiff: {
+            startDate: "$dob",
+            endDate: "$$NOW",
+            unit: "day"
+          }
+        },
+        else: null
       }
     }
-  },
+  }
+},
+
   {
     // Assign age group
     $addFields: {

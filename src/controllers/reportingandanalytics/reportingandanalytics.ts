@@ -1,7 +1,7 @@
 
 import configuration from "../../config";
 import { NextFunction, Request, Response } from "express";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 import { financialreports } from "../../utils/reporting/financial";
@@ -13,7 +13,8 @@ import { nutritionaggregatereports } from "../../utils/reporting/nutrition";
 import { hmoaggregatereports } from "../../utils/reporting/hmo";
 import {heathfacilityattendancereports} from "../../utils/reporting/healthfacilityattendance";
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
-import {immunizationaggregatereports} from "../../utils/reporting/immunization"
+import {immunizationaggregatereports} from "../../utils/reporting/immunization";
+import {familyplanningreports} from "../../utils/reporting/familyplanning";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -460,12 +461,9 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {appointmentaggregatebyhmo,aggregatebyhmo} =hmoaggregatereports(startdate, enddate);
     const {heathfacilityoutpatientattendance,heathfacilitygeneralattendance} = heathfacilityattendancereports(startdate, enddate);
     const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
-    const {immunizationpipeline} = immunizationaggregatereports(startdate, enddate);
+    const {immunizationpipeline,AEFIcasesreported} = immunizationaggregatereports(startdate, enddate);
+    const {newfamilyplanningacceptorsByGender,counselCountByGender,moderncontraceptionbyagegroup,clientsgivenoralpills,totaloralpillcyclesdispensed,emergencyContraceptiveDispensed,injectablesByName,implantsInsertedByType,iudInserted,sterilizationByGender,maleCondomsDistributed,femaleCondomsDistributed,postpartumCounsellingCount,postPartumImplanonInsertions,postPartumJadelleInsertions,postPartumIUDInsertions}=familyplanningreports(startdate, enddate);
     let queryresult:any; 
-    
-   
-
-  
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
      queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), grandtotal: await readpaymentaggregate(financialaggregategrandtotalpaid)};
@@ -525,6 +523,14 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       }
       else if(querytype == summary[10]){
         queryresult = await readimmunizationaggregate(immunizationpipeline);
+      }
+      else if(querytype == summary[11]){
+        const [aeficasesreport]=await Promise.all([readimmunizationaggregate(AEFIcasesreported)]);
+        queryresult = {aeficasesreport};
+      }
+      else if(querytype == summary[12]){
+        const [newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted]=await Promise.all([readfamilyaggregate(newfamilyplanningacceptorsByGender),readfamilyaggregate(counselCountByGender),readfamilyaggregate(moderncontraceptionbyagegroup),readfamilyaggregate(clientsgivenoralpills),readfamilyaggregate(totaloralpillcyclesdispensed),readfamilyaggregate(emergencyContraceptiveDispensed),readfamilyaggregate(injectablesByName),readfamilyaggregate(implantsInsertedByType),readfamilyaggregate(iudInserted),readfamilyaggregate(sterilizationByGender),readfamilyaggregate(maleCondomsDistributed),readfamilyaggregate(femaleCondomsDistributed),readfamilyaggregate(postpartumCounsellingCount),readfamilyaggregate(postPartumImplanonInsertions),readfamilyaggregate(postPartumJadelleInsertions),readfamilyaggregate(postPartumIUDInsertions)]);
+       queryresult={newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted};
       }
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
