@@ -1,17 +1,20 @@
 export const permissionsList = [
-    { id: 1, name: 'isOutPatientParent' },
-    { id: 2, name: 'isOutPatient' },
-    { id: 3, name: 'isInPatient' },
-    { id: 4, name: 'isLabStaff' },
-    { id: 5, name: 'isRadiologyStaff' },
-    { id: 6, name: 'isScheduleAppointmentStaff' },
-    { id: 7, name: 'isScheduleProcedureStaff' },
-    { id: 8, name: 'isPharmacyStaff' },
-    { id: 9, name: 'isBillingStaff' },
-    { id: 10, name: 'isAdminStaff' },
-    { id: 11, name: 'isClinicalReport' },
-    { id: 12, name: 'isUserManagerStaff' },
-    { id: 13, name: 'isPaymentStaff' }
+    { id: 1, name: 'OutPatientParent' },
+    { id: 2, name: 'OutPatient' },
+    { id: 3, name: 'InPatient' },
+    { id: 4, name: 'LabStaff' },
+    { id: 5, name: 'RadiologyStaff' },
+    { id: 6, name: 'ScheduleAppointmentStaff' },
+    { id: 7, name: 'ScheduleProcedureStaff' },
+    { id: 8, name: 'PharmacyStaff' },
+    { id: 9, name: 'BillingStaff' },
+    { id: 10, name: 'AdminStaff' },
+    { id: 11, name: 'ClinicalReport' },
+    { id: 12, name: 'UserManagerStaff' },
+    { id: 13, name: 'TheatreStaff' },
+    { id: 14, name: "InventoryStaff" },
+    { id: 15, name: "BillingStaffHOD" },
+    { id: 16, name: "Histopathology" }
 ];
 
 export const roles = [
