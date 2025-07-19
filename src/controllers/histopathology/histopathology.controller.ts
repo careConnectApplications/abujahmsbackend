@@ -3,13 +3,20 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import configuration from "../../config";
 import { readoneappointment } from "../../dao/appointment";
-import { CreateHistopatholgyDao, getHistopathologyById, getAllHistopathologyRecords, queryHistopathologyRecord } from "../../dao/histopathology.dao";
+import {
+    CreateHistopatholgyDao,
+    getHistopathologyById, getAllHistopathologyRecords,
+    queryHistopathologyRecord,
+    queryDocs
+} from "../../dao/histopathology.dao";
 import { readonepatient } from "../../dao/patientmanagement";
 import { createpayment } from "../../dao/payment";
 import { readoneprice } from "../../dao/price";
 import { readallservicetype } from "../../dao/servicetype";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
+import { IOptions } from "../../paginate/paginate";
+import pick from "../../utils/pick";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -17,7 +24,7 @@ const generateRefNumber = () => {
 }
 
 export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
-    const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
+    //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
 
     const {
         appointmentId,
@@ -51,13 +58,13 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
     if (!patientId) return next(new ApiError(400, "Patient Id is not provided!"));
     if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0) {
-        return next(new ApiError(400, "Exam types are required and must be an array!"));
+        return next(new ApiError(400, configuration.error.errorMustBeAnArray));
     }
     if (doctorId && !mongoose.Types.ObjectId.isValid(doctorId)) return next(new ApiError(404, "Invalid doctor id"));
     const _doctorId = doctorId ? new mongoose.Types.ObjectId(doctorId) : null;
 
-    if (biopsyType && !validBiopsyType.includes(biopsyType)) {
-        return next(new ApiError(400, `Invalid biopsy type. Valid types are: ${validBiopsyType.join(', ')}`));
+    if (biopsyType && !configuration.validBiopsyType.includes(biopsyType)) {
+        return next(new ApiError(400, `Invalid biopsy type. Valid types are: ${configuration.validBiopsyType.join(', ')}`));
     }
 
     const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
@@ -200,4 +207,30 @@ export const getAllHistopathology = catchAsync(async (req: Request | any, res: R
         length: docs.length,
         data: docs
     })
-})
+});
+
+export const getAllHistopathologyPaginatedHandler = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const options: IOptions = pick(req.query, [
+        "sortBy",
+        "limit",
+        "page",
+        "projectBy",
+    ]);
+
+    let { status } = req.query;
+
+    let queryCriteria: any = {}
+
+    if (status) queryCriteria.status = status;
+
+    const result = await queryDocs(queryCriteria, options);
+
+    res.status(200).json({
+        status: true,
+        data: result,
+    });
+});
+
+export const CreateMultipleTestReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+});
