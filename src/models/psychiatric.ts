@@ -1,0 +1,38 @@
+const mongoose = require('mongoose');
+const psychiatricEvaluationSchema = new mongoose.Schema({
+  patientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Patientsmanagement',
+    required: true
+  },
+  appointmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Appointment',
+    required: true
+  },
+  presentingcomplaints: [String],
+  historyofpresentingcomplaints: [String],
+  pastpsychiatrichistory: [String],
+  pastmedicalandsurgicalhistory: [String],
+  familyhistory: [String],
+  personaldevelopmenthistory: [String],
+  educationhistory: [String],
+  occupationhistory: [String],
+  psychosocialhistory: [String],
+  substanceusehistory: [String],
+  forensichistory: [String],
+  premorbidhistory: [String],
+  assessmentdiagnosis: [String],
+  planmanagement: [String],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // or 'Doctor'
+    required: true
+  },
+ 
+},
+{ timestamps: true }
+);
+
+const psychiatric = mongoose.model('PsychiatricEvaluation', psychiatricEvaluationSchema);
+export default psychiatric;

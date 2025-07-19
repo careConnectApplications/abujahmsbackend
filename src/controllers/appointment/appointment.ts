@@ -789,23 +789,13 @@ export var examinepatient = async (req:any,res:any) =>{
 //lab order
 export var laborder= async (req:any, res:any) =>{
   try{
-    
-    //accept _id from request.
     const {id} = req.params;
-    console.log('////lab order request body////',req.body);
-    console.log('////lab order request params////',id);
     const {testname,appointmentunderscoreid,department} = req.body;
     var testid:any=String(Date.now());
     var testsid =[];
     //var paymentids =[];
     validateinputfaulsyvalue({id, testname,department});
-    //find the record in appointment and validate
-
-    //find patient
     const foundPatient:any =  await readonepatient({_id:id},{},'','');
-// check is patient is under inssurance
-//var isHMOCover;
-
 // Create a new ObjectId
     var appointment:any;
     let patientappointment:any;
@@ -816,10 +806,6 @@ export var laborder= async (req:any, res:any) =>{
         appointmentid:patientappointment?patientappointment.appointmentid:String(Date.now()),
         _id:patientappointment?patientappointment._id:new ObjectId()
       }
-      //update appoint with lab order
-      
-     // isHMOCover = foundPatient.isHMOCover;
-
     }
     else{
     appointment = await readoneappointment({_id:id},{},'patient');
@@ -828,17 +814,8 @@ export var laborder= async (req:any, res:any) =>{
               throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
           }
-          //update appoint with lab order
-
-        //  isHMOCover = appointment.patient.isHMOCover;
+        
     }
-
-   
-   
- 
-
-  //console.log(testname);
-
 const {servicetypedetails} = await readallservicetype({category: configuration.category[2]},{type:1,category:1,department:1,_id:0});
     //loop through all test and create record in lab order
     for(var i =0; i < testname.length; i++){
@@ -849,25 +826,15 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
       if((foundPatient?.isHMOCover ==  configuration.ishmo[0] || (appointment.patient).isHMOCover ==  configuration.ishmo[0]) && !testPrice){
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
     }
-    //var setting  = await configuration.settings();
-    //search testname in setting
-    //var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-       //create payment
-    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-   //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
-   
    //create testrecord
    let testrecord:any;
     //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
    if(foundPatient?.isHMOCover ==  configuration.ishmo[0] || (appointment.patient).isHMOCover ==  configuration.ishmo[0]){
-
     testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department,amount:Number(testPrice.amount)}); 
   }
    else{
     testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,appointmentid:appointment.appointmentid,testid,department}); 
-
    }
-   
     testsid.push(testrecord._id);
     //paymentids.push(createpaymentqueryresult._id);
     }
@@ -877,9 +844,7 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
     if(patientappointment){
       await updateappointment(patientappointment._id,{$push: {lab:testsid}});
     }
-
     res.status(200).json({queryresult, status: true});
-    
    
   }
   catch(error:any){
@@ -891,19 +856,13 @@ const {servicetypedetails} = await readallservicetype({category: configuration.c
 }
 export async function addclinicalencounter(req:any, res:any){
   try{
-    const {id} = req.params;
+  const {id} = req.params;
   const {email, staffId} = (req.user).user;
-
   //find doctor and add doctor who examined
   const user = await readone({email, staffId});
-   
-  //validate id
-  //validate other input paramaters
-  //search appoint where appoint id = id
   //extract vitals id
   if(req.body.status == 1){
     req.body.status = configuration.status[6];
-
   }
   else if(req.body.status == 2){
     req.body.status = configuration.status[5];
@@ -1135,10 +1094,6 @@ export const getAllVtalsByPatient = async (req:any, res:any) => {
       let appointments:any = await readoneappointment({_id:id},{},'');
       console.log(appointments);
       const {vitals} = appointments;
-      
-      
-     //find appointment
-  
       const queryresult = await readonevitalcharts({_id:vitals[0]},{});
       res.status(200).json({
         queryresult,

@@ -567,7 +567,6 @@ const appointmentSchema = new Schema({
       history:history
     },
     clinicalencounter:{
-     
       diagnosisnote:[],
       diagnosisicd10: String,
       assessmentnote:[],
