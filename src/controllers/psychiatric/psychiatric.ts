@@ -1,16 +1,22 @@
+import { NextFunction, Request, Response } from "express";
+import { validateinputfaulsyvalue, uploaddocument } from "../../utils/otherservices";
+import mongoose from 'mongoose';
 import {
   readAllPsychiatricEvaluations,
   createPsychiatricEvaluation,
   readOnePsychiatricEvaluation,
   updatePsychiatricEvaluationById
 } from "../../dao/psychiatric";
-
 import { readonepatient } from "../../dao/patientmanagement";
 import configuration from "../../config";
+import { readoneappointment } from "../../dao/appointment";
+import catchAsync from "../../utils/catchAsync";
+const { ObjectId } = mongoose.Types;
+
 
 // 🔍 Read all evaluations by patient
-export const readAllPsychiatricByPatient = async (req: any, res: any) => {
-  try {
+export const readAllPsychiatricByPatient = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+ 
     const { patient } = req.params;
     const query = { patientId: patient };
     const select = {};
@@ -20,20 +26,19 @@ export const readAllPsychiatricByPatient = async (req: any, res: any) => {
     const queryresult = await readAllPsychiatricEvaluations(query, select, populate, secondpopulate);
 
     res.status(200).json({ queryresult, status: true });
-  } catch (error: any) {
-    res.status(403).json({ status: false, msg: error.message });
-  }
-};
+ 
+});
 
 // ➕ Create new psychiatric evaluation
-export const createPsychiatricEvaluationController = async (req: any, res: any) => {
-  try {
+export const createPsychiatricEvaluationController = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+//export const createPsychiatricEvaluationController = async (req: any, res: any) => {
+  
     const { id } = req.params; // patient ID
     const { firstName, lastName } = (req.user).user;
     const staffname = `${firstName} ${lastName}`;
 
     const {
-      presentingcomplains,
+      presentingcomplaints,
       historyofpresentingcomplaints,
       pastpsychiatrichistory,
       pastmedicalandsurgicalhistory,
@@ -47,18 +52,27 @@ export const createPsychiatricEvaluationController = async (req: any, res: any) 
       premorbidhistory,
       assessmentdiagnosis,
       planmanagement,
-      appointmentId
+      appointmentunderscoreid
     } = req.body;
-
-    const patient = await readonepatient({ _id: id }, {}, '', '');
+    validateinputfaulsyvalue({ id, appointmentunderscoreid});
+    const patient:any = await readonepatient({ _id: id }, {}, '', '');
     if (!patient) {
-      throw new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`);
+      next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
     }
+    var appointmentId=new ObjectId(appointmentunderscoreid);
+    //validate appointment id
+    var appointment:any = await readoneappointment({ _id:appointmentId }, {}, '');
+    if (!appointment) {
+            //create an appointment
+        next(Error(`Appointment donot ${configuration.error.erroralreadyexit}`));
+    
+    }
+
 
     const input = {
       patientId: patient._id,
       appointmentId,
-      presentingcomplains,
+      presentingcomplaints,
       historyofpresentingcomplaints,
       pastpsychiatrichistory,
       pastmedicalandsurgicalhistory,
@@ -78,21 +92,18 @@ export const createPsychiatricEvaluationController = async (req: any, res: any) 
     const queryresult = await createPsychiatricEvaluation(input);
     res.status(200).json({ queryresult, status: true });
 
-  } catch (e: any) {
-    console.log(e);
-    res.status(403).json({ status: false, msg: e.message });
-  }
-};
+  
+});
 
 // 🔄 Update psychiatric evaluation by ID
-export const updatePsychiatricEvaluationController = async (req: any, res: any) => {
-  try {
+export const updatePsychiatricEvaluationController = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+
     const { id } = req.params;
     const { firstName, lastName } = (req.user).user;
     const staffname = `${firstName} ${lastName}`;
 
     const {
-      presentingcomplains,
+      presentingcomplaints,
       historyofpresentingcomplaints,
       pastpsychiatrichistory,
       pastmedicalandsurgicalhistory,
@@ -109,7 +120,7 @@ export const updatePsychiatricEvaluationController = async (req: any, res: any) 
     } = req.body;
 
     const updates = {
-      presentingcomplains,
+      presentingcomplaints,
       historyofpresentingcomplaints,
       pastpsychiatrichistory,
       pastmedicalandsurgicalhistory,
@@ -129,19 +140,13 @@ export const updatePsychiatricEvaluationController = async (req: any, res: any) 
     const queryresult = await updatePsychiatricEvaluationById(id, updates);
     res.status(200).json({ queryresult, status: true });
 
-  } catch (e: any) {
-    console.log(e);
-    res.status(403).json({ status: false, msg: e.message });
-  }
-};
+ 
+});
 
 // Optional: Read one by ID
-export const readOnePsychiatricEvaluationController = async (req: any, res: any) => {
-  try {
+export const readOnePsychiatricEvaluationController = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const queryresult = await readOnePsychiatricEvaluation({ _id: id }, {});
     res.status(200).json({ queryresult, status: true });
-  } catch (e: any) {
-    res.status(403).json({ status: false, msg: e.message });
-  }
-};
+ 
+});

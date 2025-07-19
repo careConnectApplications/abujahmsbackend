@@ -26,6 +26,7 @@ import anc from '../routes/anc';
 import theatreadmission from '../routes/theatreadmission';
 import reports  from '../routes/reportsandanalytics';
 import histopathologyRoute from "../routes/histopathology.route";
+import psychiatricRoute from "../routes/psychiatric";
 import { readicdeleven } from '../controllers/icdten/icdten';
 import {protect,globalErrorHandler} from "../utils/middleware";
 
@@ -78,6 +79,7 @@ function createServer(){
   app.use('/api/v1/reports',  reports);
   app.use('/api/v1/readicdten',  readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
+  app.use("/api/v1/psychiatric", protect, psychiatricRoute)
  
   
 
