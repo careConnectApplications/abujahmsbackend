@@ -27,10 +27,10 @@ import theatreadmission from '../routes/theatreadmission';
 import reports  from '../routes/reportsandanalytics';
 import histopathologyRoute from "../routes/histopathology.route";
 import { readicdeleven } from '../controllers/icdten/icdten';
+import {protect,globalErrorHandler} from "../utils/middleware";
 
 
 
-import {protect} from "../utils/middleware";
 
 
 function createServer(){
@@ -74,7 +74,8 @@ function createServer(){
   app.use('/api/v1/dashboard', protect, dashboard);
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
-  app.use('/api/v1/reports',protect,  reports);
+  //app.use('/api/v1/reports',protect,  reports);
+  app.use('/api/v1/reports',  reports);
   app.use('/api/v1/readicdten',  readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
  
@@ -98,7 +99,7 @@ app.post('/api/v1/webhook', (req, res) => {
   res.status(200).send('Event received');
 });
 */
-  
+  app.use(globalErrorHandler); 
     return app;
 
 }
