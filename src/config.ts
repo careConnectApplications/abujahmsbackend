@@ -63,7 +63,7 @@ const configuration:any = {
   servedstatus:["served","unserved"],
   clinictype: ["department","clinic","pharmacy","radiology","procedure"],
   defaultPassword: "HMSB",
-  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure","Histology"],
+  category:["Appointment","Pharmacy", "Lab","Patient Registration","Radiology","Procedure","Histopathology"],
   ishmo:["No","Yes"],
   settings: async function(){
 const {clinicdetails} = await readallclinics({},{"clinic":1, "id":1,"_id":0});
