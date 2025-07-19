@@ -24,11 +24,8 @@ const psychiatricEvaluationSchema = new mongoose.Schema({
   premorbidhistory: [String],
   assessmentdiagnosis: [String],
   planmanagement: [String],
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // or 'Doctor'
-    required: true
-  },
+  updatedBy:String,
+  createdBy: String
  
 },
 { timestamps: true }
