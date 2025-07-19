@@ -2,7 +2,11 @@
   import  {readallservicetype}  from "./dao/servicetype";
 const configuration:any = {
   //clinic name
-  //wardname  
+  //wardname 
+  typeofimplants:["Implanon(IMP)","Jadelle(JD)","Others"], 
+   gender:["Male", "Female"],
+  typeofbarriermethods: ["Internal Condom","External Condom","Spermicide","Sponge","Diaphragm","Cervical Cap","Male Condom",],
+  familyplanningyesnooption: ["Yes","No"],
   pricingtype:["Standard","Age and Clinic Aware"],
   anynotedadverseeffect:["Yes","No"],
   patienttype:["primary","secondary"],
@@ -147,12 +151,12 @@ for(var i =0; i < servicetypedetail.length ; i++){
         diagnosis:["A04.9 Bacterial intestinal infection, unspecified","A05 Other bacterial foodborne intoxications, not elsewhere classified","A05.1 Botulism food poisoning"],
         voluntorysterilization:["Male","Female"],
         typeofiud:["Hormonal", "Copper"],
-        typeofimplants:["Implanon(IMP)","Jadelle(JD)","Others"],
+        typeofimplants:configuration.typeofimplants,
         nursingdiagnosis: ["Acute Confusion","Acute Substance Withdrawal","Adult Pressure Injury","Anxiety","Autonomic Dysreflexia",""],
-        familyplanningyesnooption: ["Yes","No"],
+        familyplanningyesnooption:configuration.familyplanningyesnooption,
         typeoffamilyplanningclient: ["Post Abortion Care (PAC)","Post-Partum Family Planning(PPFP)","Routine"],
         nameofinjectable: ["Depo medroxyprogrsterone ","Noristerat(NOR)","Others"],
-        typeofbarriermethods: ["Internal Condom","External Condom","Spermicide","Sponge","Diaphragm","Cervical Cap"],
+        typeofbarriermethods: configuration.typeofbarriermethods,
         liquor:["0","+1","+2","+3"],
         moulding:["0","+1","+2","+3"],
         cervicaldilationb:["3.0","4.0","5.0","5.5","6.0","6.5","7.0","7.5","8.0","8.5","9.0","9.5","10.0"],
@@ -1036,7 +1040,7 @@ main:[
 
   ],
   */
-  gender:["Male", "Female"],
+  gender:configuration.gender,
 }
 )
   },
