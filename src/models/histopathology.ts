@@ -108,6 +108,13 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
     }
 );
 
+histopathologySchema.virtual('examForms', {
+    ref: 'HistopathologyExamForm',
+    localField: '_id',
+    foreignField: 'histopathologyId',
+    justOne: false
+});
+
 histopathologySchema.pre<IHistopathologyDoc>(/^find/, function (next) {
     this.populate({
         path: "patient staffInfo diagnosisForm.requestingDoctor",

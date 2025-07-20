@@ -1,41 +1,45 @@
-import express, { Application } from 'express';
 import cors from 'cors';
+import express, { Application } from 'express';
 import fileUpload from "express-fileupload";
-import auth from "../routes/auth";
-import users from "../routes/usermanagement";
-import patientsmanagement from '../routes/patientmanagement';
-import billingandpayment from '../routes/billingandpayment';
-import appointment from '../routes/appointment';
-import inventory from '../models/inventory';
-import settings from '../routes/setting';
-import downloads from "../routes/downloads";
-import lab from '../routes/lab';
-import pharmacy from '../routes/pharmacy';
-import admission from '../routes/admission';
-import nursingcare from '../routes/nursingcare';
-import immunization from '../routes/immunization';
-import nutrition from '../routes/nutrition';
-import radiology from '../routes/radiology';
-import pathogragh from '../routes/pathograph';
-import familyplanning from '../routes/familyplanning';
-import referrer from '../routes/referrer';
-import deliverynote from '../routes/deliverynote';
-import procedure from '../routes/procedure';
-import dashboard from '../routes/dashboard';
-import anc from '../routes/anc';
-import theatreadmission from '../routes/theatreadmission';
-import reports from '../routes/reportsandanalytics';
-import histopathologyRoute from "../routes/histopathology.route";
-import histopathologyTestRoute from "../routes/histopathology-tests.route";
+import httpStatus from "http-status";
 import { readicdeleven } from '../controllers/icdten/icdten';
-
-
-
+import { ApiError, errorConverter, errorHandler } from '../errors';
+import { morgan } from '../logger';
+import admission from '../routes/admission';
+import anc from '../routes/anc';
+import appointment from '../routes/appointment';
+import auth from "../routes/auth";
+import billingandpayment from '../routes/billingandpayment';
+import dashboard from '../routes/dashboard';
+import deliverynote from '../routes/deliverynote';
+import downloads from "../routes/downloads";
+import familyplanning from '../routes/familyplanning';
+import histopathologyTestRoute from "../routes/histopathology-tests.route";
+import histopathologyRoute from "../routes/histopathology.route";
+import immunization from '../routes/immunization';
+import lab from '../routes/lab';
+import nursingcare from '../routes/nursingcare';
+import nutrition from '../routes/nutrition';
+import pathogragh from '../routes/pathograph';
+import patientsmanagement from '../routes/patientmanagement';
+import pharmacy from '../routes/pharmacy';
+import procedure from '../routes/procedure';
+import radiology from '../routes/radiology';
+import referrer from '../routes/referrer';
+import reports from '../routes/reportsandanalytics';
+import settings from '../routes/setting';
+import theatreadmission from '../routes/theatreadmission';
+import users from "../routes/usermanagement";
 import { protect } from "../utils/middleware";
 
 
 function createServer() {
   const app: Application = express();
+
+  if (process.env.NODE_ENV !== "test") {
+    app.use(morgan.successHandler);
+    app.use(morgan.errorHandler);
+  }
   //cross origin sharing
   app.use(cors({
     origin: "*",
@@ -75,7 +79,8 @@ function createServer() {
   app.use('/api/v1/dashboard', protect, dashboard);
   app.use('/api/v1/anc', protect, anc);
   app.use('/api/v1/theatreadmission', protect, theatreadmission);
-  app.use('/api/v1/reports', protect, reports);
+  //app.use('/api/v1/reports',protect,  reports);
+  app.use('/api/v1/reports', reports);
   app.use('/api/v1/readicdten', readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyTestRoute)
@@ -99,7 +104,16 @@ app.post('/api/v1/webhook', (req, res) => {
   res.status(200).send('Event received');
 });
 */
+  // Send back a 404 error for any unknown API request
+  app.use((_req, _res, next) => {
+    next(new ApiError(httpStatus.NOT_FOUND, "Request Endpoint Not found"));
+  });
 
+  // Convert errors to ApiError, if needed
+  app.use(errorConverter);
+
+  // Handle errors
+  app.use(errorHandler);
   return app;
 
 }

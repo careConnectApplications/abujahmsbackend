@@ -13,9 +13,4 @@ router.post('/passwordreset/:id', passwordreset);
 router.get("/roles", getAllRoles);
 router.put("/:id/permissions", updateUserPermissions);
 router.get("/:id/permissions", getUserPermissions);
-//updatepassword
-
-//updateusers
-
-
 export default router;

@@ -9,6 +9,7 @@ import {
     queryHistopathologyRecord,
     queryDocs
 } from "../../dao/histopathology.dao";
+import { queryHistopathologyTestFilter, updateHistopathologyById, CreateHistopatholgyTestDao } from "../../dao/histopathology-tests.dao";
 import { readonepatient } from "../../dao/patientmanagement";
 import { createpayment } from "../../dao/payment";
 import { readoneprice } from "../../dao/price";
@@ -185,7 +186,7 @@ export const getHistopathologyRecordById = catchAsync(async (req: Request | any,
     if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
     if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
 
-    const doc = await getHistopathologyById(id);
+    const doc = await queryHistopathologyRecord({_id: id}, {}, 'examForms');
 
     if (!doc) {
         return next(new ApiError(404, `histopathology report ${configuration.error.errornotfound}`))
@@ -232,5 +233,67 @@ export const getAllHistopathologyPaginatedHandler = catchAsync(async (req: Reque
 });
 
 export const CreateMultipleTestReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { testResults } = req.body;
 
+    if (!id) return next(new ApiError(400, `${configuration.error.errorIdIsRequired}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+
+    const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+
+    const histopathology = await getHistopathologyById(_id);
+
+    if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
+
+    if (!Array.isArray(testResults) || testResults.length === 0) {
+        return next(new ApiError(400, configuration.error.errorMustBeAnArray));
+    }
+
+    const existingTest: any = await queryHistopathologyTestFilter({ histopathologyId: _id }, {}, '');
+    let existingTestTypesMap = new Map();
+
+    if (existingTest) {
+        existingTestTypesMap = new Map(
+            existingTest.map((exam: any) => [exam.testTypeId, exam])
+        );
+    }
+
+
+    const results = {
+        created: [] as any[],
+        updated: [] as any[],
+        errors: [] as any[]
+    };
+
+    for (const test of testResults) {
+        if (!test.testTypeId) {
+            results.errors.push({
+                test,
+                error: "testTypeId is required"
+            });
+            continue;
+        }
+
+        const existingExam: any = existingTestTypesMap.get(test.testTypeId);
+
+        try {
+            if (existingExam) {
+                // Update existing record
+                const { histopathologyId: _, ...updateData } = test;
+                const updatedTestRecord = await updateHistopathologyById(existingExam._id, updateData);
+                results.updated.push(updatedTestRecord);
+            } else {
+                // Create new record
+                const newTest = await CreateHistopatholgyTestDao({ ...test, histopathologyId: _id }, next);
+                results.created.push(newTest);
+            }
+        } catch (err: any) {
+            results.errors.push({ test, error: err.message });
+        }
+    }
+
+    res.status(201).json({
+        status: true,
+        data: results
+    })
 });
