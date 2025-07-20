@@ -450,10 +450,11 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       startdate = new Date(startdate);
       enddate = new Date(enddate);
     }
-    
+     
     let {summary}:any = await settings();
-    const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate)
-    const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate)
+    
+    const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
+    const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
     const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate} = appointmentaggregatereports(startdate,enddate)
     const {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions} = admissionaggregatereports(startdate,enddate);
     const {procedureaggregatepaid,totalprocedureaggregate} = procedureaggregatereports(startdate, enddate);
@@ -463,7 +464,9 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
     const {immunizationpipeline,AEFIcasesreported} = immunizationaggregatereports(startdate, enddate);
     const {newfamilyplanningacceptorsByGender,counselCountByGender,moderncontraceptionbyagegroup,clientsgivenoralpills,totaloralpillcyclesdispensed,emergencyContraceptiveDispensed,injectablesByName,implantsInsertedByType,iudInserted,sterilizationByGender,maleCondomsDistributed,femaleCondomsDistributed,postpartumCounsellingCount,postPartumImplanonInsertions,postPartumJadelleInsertions,postPartumIUDInsertions}=familyplanningreports(startdate, enddate);
+  
     let queryresult:any; 
+   
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
      queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), grandtotal: await readpaymentaggregate(financialaggregategrandtotalpaid)};
@@ -529,9 +532,11 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
         queryresult = {aeficasesreport};
       }
       else if(querytype == summary[12]){
+        
         const [newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted]=await Promise.all([readfamilyaggregate(newfamilyplanningacceptorsByGender),readfamilyaggregate(counselCountByGender),readfamilyaggregate(moderncontraceptionbyagegroup),readfamilyaggregate(clientsgivenoralpills),readfamilyaggregate(totaloralpillcyclesdispensed),readfamilyaggregate(emergencyContraceptiveDispensed),readfamilyaggregate(injectablesByName),readfamilyaggregate(implantsInsertedByType),readfamilyaggregate(iudInserted),readfamilyaggregate(sterilizationByGender),readfamilyaggregate(maleCondomsDistributed),readfamilyaggregate(femaleCondomsDistributed),readfamilyaggregate(postpartumCounsellingCount),readfamilyaggregate(postPartumImplanonInsertions),readfamilyaggregate(postPartumJadelleInsertions),readfamilyaggregate(postPartumIUDInsertions)]);
        queryresult={newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted};
-      }
+      
+       }
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
