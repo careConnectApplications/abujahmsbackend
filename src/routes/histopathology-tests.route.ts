@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.post("", CreateReportTest);
 router.get("/:id", getHistopathologyTestById);
+
 export default router;

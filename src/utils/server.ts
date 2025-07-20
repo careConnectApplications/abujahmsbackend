@@ -14,7 +14,6 @@ import dashboard from '../routes/dashboard';
 import deliverynote from '../routes/deliverynote';
 import downloads from "../routes/downloads";
 import familyplanning from '../routes/familyplanning';
-import histopathologyTestRoute from "../routes/histopathology-tests.route";
 import histopathologyRoute from "../routes/histopathology.route";
 import immunization from '../routes/immunization';
 import lab from '../routes/lab';
@@ -24,6 +23,7 @@ import pathogragh from '../routes/pathograph';
 import patientsmanagement from '../routes/patientmanagement';
 import pharmacy from '../routes/pharmacy';
 import procedure from '../routes/procedure';
+import psychiatricRoute from "../routes/psychiatric";
 import radiology from '../routes/radiology';
 import referrer from '../routes/referrer';
 import reports from '../routes/reportsandanalytics';
@@ -83,8 +83,9 @@ function createServer() {
   app.use('/api/v1/reports', reports);
   app.use('/api/v1/readicdten', readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
-  app.use("/api/v1/histopathology-test", protect, histopathologyTestRoute)
-
+  app.use("/api/v1/psychiatric", protect, psychiatricRoute)
+ 
+  
 
   // Handle POST requests to /webhook
   /*
