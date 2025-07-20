@@ -141,6 +141,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         staffInfo: userId,
         amount: totalAmount,
         status: configuration.status[5],
+        paymentStatus: configuration.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {
             provisionalDiagnosis: diagnosis,

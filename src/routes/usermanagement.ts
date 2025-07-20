@@ -1,5 +1,5 @@
 import express from 'express';
-import { bulkuploadusers, getAllRoles, getUserPermissions, getallusers, passwordreset, updatepassword, updatestatus, updateUserPermissions, updateusers } from '../controllers/usermanagment/usermanagement';
+import { bulkuploadusers, getAllRoles, getUserPermissions, getallusers, passwordreset, updatepassword, updatestatus, updateUserPermissions, updateusers, setUserDefaultPermission } from '../controllers/usermanagment/usermanagement';
 const router = express.Router();
 
 
@@ -13,4 +13,6 @@ router.post('/passwordreset/:id', passwordreset);
 router.get("/roles", getAllRoles);
 router.put("/:id/permissions", updateUserPermissions);
 router.get("/:id/permissions", getUserPermissions);
+router.put("/:id/default-permissions", setUserDefaultPermission);
+
 export default router;
