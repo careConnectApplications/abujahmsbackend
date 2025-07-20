@@ -1,7 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import configuration from "../config";
+import { IHistopathologyDoc, IHistopathologyModel } from "../interface/histopathology.interface";
+import { paginate } from "../paginate";
 
-const histopathologySchema = new Schema(
+const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel>(
     {
         patient: {
             type: Schema.Types.ObjectId,
@@ -32,10 +34,14 @@ const histopathologySchema = new Schema(
             type: Number,
             min: [0, "Amount cannot be negative"],
         },
+        paymentStatus: {
+            type: String,
+            default: configuration.status[2],
+        },
         status: {
             required: true,
             type: String,
-            default: configuration.status[2],
+            default: configuration.status[5],
         },
         testRequired: [{
             name: { type: String, required: true, trim: true },
@@ -102,12 +108,21 @@ const histopathologySchema = new Schema(
     }
 );
 
-histopathologySchema.pre<any>(/^find/, function (next) {
+histopathologySchema.virtual('examForms', {
+    ref: 'HistopathologyExamForm',
+    localField: '_id',
+    foreignField: 'histopathologyId',
+    justOne: false
+});
+
+histopathologySchema.pre<IHistopathologyDoc>(/^find/, function (next) {
     this.populate({
         path: "patient staffInfo diagnosisForm.requestingDoctor",
     });
     next();
 });
 
-const Histopathology = mongoose.model("Histopathology", histopathologySchema);
+histopathologySchema.plugin(paginate as any);
+
+const Histopathology = mongoose.model<IHistopathologyDoc, IHistopathologyModel>("Histopathology", histopathologySchema);
 export default Histopathology;

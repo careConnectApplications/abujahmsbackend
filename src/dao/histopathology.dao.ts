@@ -1,6 +1,7 @@
 import { NextFunction } from "express";
 import mongoose from "mongoose";
 import Histopathology from "../models/histopathology";
+import { IOptions, QueryResult } from "../paginate/paginate";
 
 export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
     try {
@@ -24,3 +25,17 @@ export const getAllHistopathologyRecords = async (query: any) => {
 export const queryHistopathologyRecord = async (query: any, selectquery: any, populatequery: any) => {
     return await Histopathology.findOne(query).select(selectquery).populate(populatequery);
 }
+
+/**
+ * Query for histopathology records
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @returns {Promise<QueryResult>}
+ */
+export const queryDocs = async (
+    filter: Record<string, any>,
+    options: IOptions
+): Promise<QueryResult> => {
+    const docs = await Histopathology.paginate(filter, options);
+    return docs;
+};

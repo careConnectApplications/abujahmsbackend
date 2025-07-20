@@ -1104,8 +1104,11 @@ const configuration: any = {
     errorgreaterthan: "Cannot be greater",
     errorbase64: "Missing imageBase64",
     errorservicetray: "This service donot exist in your service tray",
-    errorInvalidObjectId: "Invalid Object Id"
+    errorInvalidObjectId: "Invalid Object Id",
+    errorMustBeAnArray: "Exam types are required and must be an array!",
+    errorIdIsRequired: "Id not found in params!"
   },
+  validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   environment: "test",
 
   //environment: "prod",
