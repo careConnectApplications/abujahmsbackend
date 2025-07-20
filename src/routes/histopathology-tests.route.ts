@@ -1,7 +1,8 @@
 import express from 'express';
-import { CreateReportText } from '../controllers/histopathology/histopathologytest.controller';
+import { CreateReportTest, getHistopathologyTestById } from '../controllers/histopathology/histopathologytest.controller';
 
 const router = express.Router();
 
-router.post("", CreateReportText);
+router.post("", CreateReportTest);
+router.get("/:id", getHistopathologyTestById);
 export default router;

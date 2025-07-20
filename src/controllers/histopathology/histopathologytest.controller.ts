@@ -6,7 +6,7 @@ import { getHistopathologyById } from "../../dao/histopathology.dao";
 import { ApiError } from "../../errors";
 import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter } from "../../dao/histopathology-tests.dao";
 
-export const CreateReportText = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const CreateReportTest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { testTypeId } = req.body;
 
@@ -40,3 +40,21 @@ export const CreateReportText = catchAsync(async (req: Request, res: Response, n
         data: newReportTest
     });
 })
+
+export const getHistopathologyTestById = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+
+    const doc = await queryOneHistopathologyTestFilter({ _id: id }, {}, '');
+
+    if (!doc) {
+        return next(new ApiError(404, `histopathology test ${configuration.error.errornotfound}`))
+    }
+
+    res.status(200).json({
+        status: true,
+        data: doc
+    })
+});
