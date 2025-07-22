@@ -2,13 +2,16 @@ import PsychiatricEvaluation from "../models/psychiatric";
 import configuration from "../config";
 
 // 🔍 Read all psychiatric evaluations
-export async function readAllPsychiatricEvaluations(query: any, selectquery: any, populatequery: any, populatesecondquery: any) {
+export async function readAllPsychiatricEvaluations(query: any, selectquery: any, populatequery: any, populatesecondquery: any, skip:number=0, limit:number=150) {
   try {
     const evaluations = await PsychiatricEvaluation.find(query)
       .select(selectquery)
       .populate(populatequery)
       .populate(populatesecondquery)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+      ;
 
     const total = await PsychiatricEvaluation.countDocuments(query);
 
