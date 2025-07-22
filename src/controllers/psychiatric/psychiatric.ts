@@ -17,13 +17,15 @@ const { ObjectId } = mongoose.Types;
 // 🔍 Read all evaluations by patient
 export const readAllPsychiatricByPatient = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
  
-    const { patient } = req.params;
+    const { patient } = req.params; 
+    const { page = 1, limit = 150} = req.query;
+     const skip = (parseInt(page) - 1) * parseInt(limit);
     const query = { patientId: patient };
     const select = {};
     const populate = "patientId";
     const secondpopulate = "appointmentId";
 
-    const queryresult = await readAllPsychiatricEvaluations(query, select, populate, secondpopulate);
+    const queryresult = await readAllPsychiatricEvaluations(query, select, populate, secondpopulate,skip, parseInt(limit));
 
     res.status(200).json({ queryresult, status: true });
  
