@@ -24,39 +24,27 @@ const generateRefNumber = () => {
     return `histo-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
 }
 
+const generateLabNumber = () => {
+    const uniqueHistopathologyId = uuidv4();
+    return `Lab-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
+}
+
 export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
 
     const {
-        appointmentId,
         patientId,
         examTypes, /// this is the service types
         doctorId,
-        clinicalDetails,
         lmp,
-        parity,
         biopsyType,
-        others,
         wholeOrgan,
-        operationalOrEndoscopyFinding,
-        radiologicalResults,
-        otherLabResults,
         previousBiopsy,
-        diagnosis,
-        labNo,
-        DateReceived,
-        DateInspected,
-        DateGrossed,
-        DatePassed,
-        NumberOfBlocks,
-        Action,
-        DateRequested,
-        DateReported,
+        diagnosis
     } = req.body;
 
-
-    if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
-    if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
+    // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
+    //if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
     if (!patientId) return next(new ApiError(400, "Patient Id is not provided!"));
     if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0) {
         return next(new ApiError(400, configuration.error.errorMustBeAnArray));
@@ -68,13 +56,13 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         return next(new ApiError(400, `Invalid biopsy type. Valid types are: ${configuration.validBiopsyType.join(', ')}`));
     }
 
-    const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
+    //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
 
-    let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
-    if (!appointment) {
-        return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
-    }
+    // let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
+    // if (!appointment) {
+    //     return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
+    // }
 
     // check if patient still has a pending record
     let pendingHistopathologyRecord = await queryHistopathologyRecord({ patient: _patientId, status: configuration.status[2] }, null, null);
@@ -85,13 +73,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
 
     ///Step 2: Read the Appointment and populate the patient field.
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
-    const { isHMOCover } = foundPatient;
 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
 
-    const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
+    //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
 
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
@@ -134,41 +121,26 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
     }
 
+    const labNo = generateLabNumber();
+
     const newHistopathology = {
         patient: _patientId,
-        appointment: _appointmentId,
-        appointmentid: appointmentId,
         staffInfo: userId,
         amount: totalAmount,
         status: configuration.status[5],
+        paymentStatus: configuration.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {
-            provisionalDiagnosis: diagnosis,
-            clinicalDetails: clinicalDetails || '',
             lmp: lmp || '',
-            parity: parity || '',
             biopsyType: biopsyType || null,
-            others: others || '',
             wholeOrgan: wholeOrgan || '',
-            operationalOrEndoscopyFinding: operationalOrEndoscopyFinding || '',
-            radiologicalResults: radiologicalResults || '',
-            otherLabResults: otherLabResults || '',
             previousBiopsy: previousBiopsy,
             diagnosis: diagnosis || '',
             labNo: labNo || '',
             requestingDoctor: _doctorId,
             phoneNumber: foundPatient.phoneNumber || null
         },
-        LabUse: {
-            DateReceived: DateReceived ? new Date(DateReceived) : new Date(),
-            DateInspected: DateInspected ? new Date(DateInspected) : undefined,
-            DateGrossed: DateGrossed ? new Date(DateGrossed) : undefined,
-            DatePassed: DatePassed ? new Date(DatePassed) : undefined,
-            NumberOfBlocks: NumberOfBlocks || undefined,
-            Action: Action || '',
-            DateRequested: DateRequested ? new Date(DateRequested) : undefined,
-            DateReported: DateReported ? new Date(DateReported) : undefined,
-        },
+
     };
 
     const savedHistopathology = await CreateHistopatholgyDao(newHistopathology, next);
@@ -186,7 +158,7 @@ export const getHistopathologyRecordById = catchAsync(async (req: Request | any,
     if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
     if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
 
-    const doc = await queryHistopathologyRecord({_id: id}, {}, 'examForms');
+    const doc = await queryHistopathologyRecord({ _id: id }, {}, 'examForms');
 
     if (!doc) {
         return next(new ApiError(404, `histopathology report ${configuration.error.errornotfound}`))

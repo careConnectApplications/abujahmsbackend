@@ -341,3 +341,21 @@ export const updateUserPermissions = catchAsync(async (req: Request, res: Respon
   })
 });
 
+export const setUserDefaultPermission = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  if (!id) return next(new ApiError(400, "id is not provided!"))
+  if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+  const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+  const user = await getUserById(_id);
+  if (!user) return next(new ApiError(404, `no user found with id: ${id}`));
+  const { roleId } = user;
+  const permissions = getRolesById(+roleId)?.defaultPermissions || [];
+
+  const queryresult: any = await updateuser(_id, { specialPermissions: permissions });
+
+  res.status(200).json({
+    status: true,
+    data: queryresult
+  });
+})
