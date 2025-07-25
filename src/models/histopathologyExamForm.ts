@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
+import { IHistopathologyExamFormDoc, IHistopathologyExamFormModel } from "../interface/histopathologyExamForm.interface";
+import { paginate } from "../paginate";
 
-const histopathologyExamFormSchema = new Schema(
+const histopathologyExamFormSchema = new Schema<IHistopathologyExamFormDoc, IHistopathologyExamFormModel>(
     {
         histopathologyId: {
             type: Schema.Types.ObjectId,
@@ -41,12 +43,14 @@ const histopathologyExamFormSchema = new Schema(
     { timestamps: true }
 );
 
-histopathologyExamFormSchema.pre<any>(/^find/, function (next) {
+histopathologyExamFormSchema.pre<IHistopathologyExamFormDoc>(/^find/, function (next) {
     this.populate({
         path: "histopathologyId",
     });
     next();
 });
 
-const HistopathologyExamForm = mongoose.model("HistopathologyExamForm", histopathologyExamFormSchema);
+histopathologyExamFormSchema.plugin(paginate as any);
+
+const HistopathologyExamForm = mongoose.model<IHistopathologyExamFormDoc, IHistopathologyExamFormModel>("HistopathologyExamForm", histopathologyExamFormSchema);
 export default HistopathologyExamForm;
