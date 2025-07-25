@@ -10,16 +10,16 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             ref: "Patientsmanagement",
             required: [true, "Patient id is required"]
         },
-        appointment: {
-            type: Schema.Types.ObjectId,
-            ref: "Appointment",
-            default: null,
-        },
-        appointmentid:
-        {
-            type: String,
-            required: true
-        },
+        // appointment: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: "Appointment",
+        //     default: null,
+        // },
+        // appointmentid:
+        // {
+        //     type: String,
+        //     required: true
+        // },
         staffInfo: {
             type: Schema.Types.ObjectId,
             ref: "Users",
@@ -53,10 +53,10 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             paymentStatus: { type: String, default: configuration.status[2] }
         }],
         diagnosisForm: {
-            provisionalDiagnosis: { type: String, required: true },
-            clinicalDetails: { type: String },
+            //provisionalDiagnosis: { type: String, required: true },
+            //clinicalDetails: { type: String },
             lmp: { type: String },
-            parity: { type: String },
+            // parity: { type: String },
             biopsyType: { type: String, enum: ["Excision", "Incision", "Endoscopy", "Trucut"], default: null },
             others: { type: String, trim: true },
             wholeOrgan: { type: String, trim: true },
@@ -77,31 +77,31 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 default: null
             }
         },
-        LabUse: {
-            DateReceived: {
-                type: Date,
-                default: Date.now
-            },
-            DateInspected: {
-                type: Date,
-            },
-            DateGrossed: {
-                type: Date,
-            },
-            DatePassed: {
-                type: Date,
-            },
-            NumberOfBlocks: {
-                type: Number
-            },
-            Action: { type: String, trim: true },
-            DateRequested: {
-                type: Date,
-            },
-            DateReported: {
-                type: Date,
-            },
-        }
+        // LabUse: {
+        //     DateReceived: {
+        //         type: Date,
+        //         default: Date.now
+        //     },
+        //     DateInspected: {
+        //         type: Date,
+        //     },
+        //     DateGrossed: {
+        //         type: Date,
+        //     },
+        //     DatePassed: {
+        //         type: Date,
+        //     },
+        //     NumberOfBlocks: {
+        //         type: Number
+        //     },
+        //     Action: { type: String, trim: true },
+        //     DateRequested: {
+        //         type: Date,
+        //     },
+        //     DateReported: {
+        //         type: Date,
+        //     },
+        // }
     },
     {
         timestamps: true,
