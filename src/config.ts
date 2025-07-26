@@ -6,6 +6,8 @@ const configuration: any = {
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
   familyplanningyesnooption: ["Yes", "No"],
+  labcategory:["hematology", "chemicalpathology"],
+  labreporttypehematologychemicalpathology:["peripheralbloodfilmreport","ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
   gender:["Male", "Female"],
   pricingtype: ["Standard", "Age and Clinic Aware"],
   anynotedadverseeffect: ["Yes", "No"],
@@ -59,6 +61,7 @@ const configuration: any = {
     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
   defaultphonenumber: "11111111111",
   status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+  hematologyandchemicalpathologystatus:["hemathologyscheduled","chemicalpathologyscheduled","hemathologychemicalpathologyprocessed"],
   admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
   servedstatus: ["served", "unserved"],
   clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
@@ -82,6 +85,8 @@ const configuration: any = {
 
     return (
       {
+        labcategory:configuration.labcategory,
+        labreporttypehematologychemicalpathology:configuration.labreporttypehematologychemicalpathology,
         vaccinationlocation: ['fixed', 'outreach'],
         pricingtype: ["Standard", "Age and Clinic Aware"],
         tetanustoxoid: ["TT 1", "TT 2", "TT 3", "TT 4", "TT 5"],

@@ -879,10 +879,7 @@ export var laborder = async (req: any, res: any) => {
     if (patientappointment) {
       await updateappointment(patientappointment._id, { $push: { lab: testsid } });
     }
-
     res.status(200).json({ queryresult, status: true });
-
-
   }
   catch (error: any) {
     console.log("error", error);
