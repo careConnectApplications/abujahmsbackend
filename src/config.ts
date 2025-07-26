@@ -3,6 +3,7 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardname  
+  labpriority:["urgent", "routine"],
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
   familyplanningyesnooption: ["Yes", "No"],
@@ -85,6 +86,7 @@ const configuration: any = {
 
     return (
       {
+        labpriority:configuration.labpriority,
         labcategory:configuration.labcategory,
         labreporttypehematologychemicalpathology:configuration.labreporttypehematologychemicalpathology,
         vaccinationlocation: ['fixed', 'outreach'],

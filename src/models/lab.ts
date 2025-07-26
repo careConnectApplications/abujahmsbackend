@@ -105,8 +105,10 @@ const labSchema = new Schema({
 
   },
   sortby:String,
+  note: String,
+  priority:{type:String, enum: ["urgent", "routine"]},
   sortbydate:Date,
-    amount: Number,
+  amount: Number,
   status:{
     required: true,
     type: String,

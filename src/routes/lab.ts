@@ -1,7 +1,7 @@
 //scheduleappointment
 import express from 'express';
 import {protect} from "../utils/middleware";
-import {readalllabb,readAllLabByPatient,labresultprocessing,readallscheduledlab,listlabreport,printlabreport,listlabreportbypatient,confirmlaborder,readallscheduledlaboptimized,sorthemathologyandchemicalpathology,readallscheduledlaboptimizedhemathologyandchemicalpathology} from '../controllers/lab/lab';
+import {readalllabb,readAllLabByPatient,labresultprocessing,readallscheduledlab,listlabreport,printlabreport,listlabreportbypatient,confirmlaborder,readallscheduledlaboptimized,sorthemathologyandchemicalpathology,readallscheduledlaboptimizedhemathologyandchemicalpathology,labresultprocessinghemathologychemicalpathology} from '../controllers/lab/lab';
 const router = express.Router();
 
 
@@ -20,7 +20,7 @@ router.get('/listlabreportbypatient/:id', listlabreportbypatient);
 router.put('/sortbyhemathologyandchemicalpathology/:id', sorthemathologyandchemicalpathology);
 //readallscheduledlaboptimizedhemathologyandchemicalpathology
 router.get('/readallscheduledlaboptimizedhemathologyandchemicalpathology', readallscheduledlaboptimizedhemathologyandchemicalpathology);
-
+router.put('/labresultprocessinghemathologychemicalpathology/:id', labresultprocessinghemathologychemicalpathology);
 
 
 

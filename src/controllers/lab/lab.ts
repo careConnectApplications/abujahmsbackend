@@ -412,7 +412,7 @@ else{
 
 
 // differentiate hemathology and histopathology
-export const sorthemathologyandchemicalpathology =catchAsync(async (req:any,res:Response,next: NextFunction) =>{
+export const sorthemathologyandchemicalpathology:any =catchAsync(async (req:any,res:Response,next: NextFunction) =>{
   const {id} = req.params;
   const {labcategory} = req.body;
   const {email} = (req.user).user;
@@ -545,7 +545,7 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
   //if not lab or status !== scheduled return error
-  if(!lab || lab.status !== configuration.status[5]){
+  if(!lab || !(lab.status == configuration.hematologyandchemicalpathologystatus[0] || lab.status == configuration.hematologyandchemicalpathologystatus[1])){
     throw new Error(configuration.error.errorservicetray);
 
   }
@@ -555,20 +555,24 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   var processeddate:any=new Date();
   var queryresult;
   validateinputfaulsyvalue({lab});
+ 
   if(labreporttypehematologychemicalpathology==configuration.labreporttypehematologychemicalpathology[0]){
     queryresult=await updatelab({_id:id},{peripheralbloodfilmreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
 
   }
-  else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathologya[1]){
-     queryresult=await updatelab({_id:id},{ADHbonemarrowaspirationreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
+  
+  else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathology[1]){
+    queryresult=await updatelab({_id:id},{ADHbonemarrowaspirationreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
 
   }
+    
   else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathology[2]){
     queryresult=await updatelab({_id:id},{chemicalpathologyreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
 
   }
 
 else{
+  
    throw new Error("Wrong Lab Category report detected");
 
 }
