@@ -18,6 +18,7 @@ import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
+import Histopathology from "../../models/histopathology";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -268,4 +269,81 @@ export const CreateMultipleTestReport = catchAsync(async (req: Request, res: Res
         status: true,
         data: results
     })
+});
+
+export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const page = parseInt((req.query.page as string) || '1') || 1;
+    const limit = parseInt((req.query.limit as string) || '100') || 100;
+    const skip = (page - 1) * limit;
+    const status = req.query.status;
+
+    const baseMatch: any = {};
+    if (status) {
+        baseMatch.status = status;
+    }
+
+    const results = await Histopathology.aggregate([
+        { $match: baseMatch },
+        { $unwind: "$testRequired" },
+        {
+            $lookup: {
+                from: "users",
+                localField: "staffInfo",
+                foreignField: "_id",
+                as: "staff"
+            }
+        },
+        { $unwind: { path: "$staff", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "patientsmanagements",
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientDetails"
+            }
+        },
+        { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 0,
+                histopathologyId: "$_id",
+                testName: "$testRequired.name",
+                testPaymentStatus: "$testRequired.paymentStatus",
+                testPaymentRef: "$testRequired.PaymentRef",
+                amount: "$amount",
+                status: "$status",
+                createdAt: "$createdAt",
+                diagnosisForm: "$diagnosisForm",
+                staff: {
+                    name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    email: "$staff.email",
+                    staffId: "$staff.staffId",
+                    role: "$staff.role"
+                },
+                patient: {
+                    name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    age: "$patientDetails.age",
+                    phone: "$patientDetails.phoneNumber",
+                    gender: "$patientDetails.gender",
+                    mrn: "$patientDetails.MRN"
+                }
+            }
+        },
+        { $skip: skip },
+        { $limit: limit }
+    ]);
+
+    const totalCount = results.length || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.status(200).json({
+        status: true,
+        data: {
+            results,
+            page,
+            limit,
+            totalCount,
+            totalPages
+        },
+    });
 });
