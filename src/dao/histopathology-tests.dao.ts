@@ -1,6 +1,7 @@
 import { NextFunction } from "express";
 import HistopathologyExamForm from "../models/histopathologyExamForm";
 import mongoose from "mongoose";
+import { IOptions, QueryResult } from "../paginate/paginate";
 
 export async function CreateHistopatholgyTestDao(body: any, next: NextFunction) {
     try {
@@ -28,4 +29,23 @@ export const updateHistopathologyById = async (
     );
 
     return updatedTestRecord;
-}
+};
+
+export const getAllHistopathologyTestRecords = async (query: any) => {
+    const docs = await HistopathologyExamForm.find(query).sort({ createdAt: -1 });
+    return docs;
+};
+
+/**
+ * Query for histopathology Test records
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @returns {Promise<QueryResult>}
+ */
+export const queryDocs = async (
+    filter: Record<string, any>,
+    options: IOptions
+): Promise<QueryResult> => {
+    const docs = await HistopathologyExamForm.paginate(filter, options);
+    return docs;
+};

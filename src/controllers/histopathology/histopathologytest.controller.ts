@@ -4,7 +4,9 @@ import configuration from "../../config";
 import mongoose from "mongoose";
 import { getHistopathologyById } from "../../dao/histopathology.dao";
 import { ApiError } from "../../errors";
-import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter } from "../../dao/histopathology-tests.dao";
+import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs } from "../../dao/histopathology-tests.dao";
+import { IOptions } from "../../paginate/paginate";
+import pick from "../../utils/pick";
 
 export const CreateReportTest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -57,4 +59,26 @@ export const getHistopathologyTestById = catchAsync(async (req: Request | any, r
         status: true,
         data: doc
     })
+});
+
+export const getAllHistopathologyExamRecordPaginatedHandler = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const options: IOptions = pick(req.query, [
+        "sortBy",
+        "limit",
+        "page",
+        "projectBy",
+    ]);
+
+    let { status } = req.query;
+
+    let queryCriteria: any = {}
+
+    if (status) queryCriteria.status = status;
+
+    const result = await queryDocs(queryCriteria, options);
+
+    res.status(200).json({
+        status: true,
+        data: result,
+    });
 });
