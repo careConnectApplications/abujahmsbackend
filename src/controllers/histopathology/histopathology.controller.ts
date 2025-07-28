@@ -315,13 +315,17 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
                 createdAt: "$createdAt",
                 diagnosisForm: "$diagnosisForm",
                 staff: {
-                    name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    //name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    firstName: "$staff.firstName",
+                    lastName: "$staff.lastName",
                     email: "$staff.email",
                     staffId: "$staff.staffId",
                     role: "$staff.role"
                 },
                 patient: {
-                    name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    //name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    firstName: "$patientDetails.firstName",
+                    lastName: "$patientDetails.lastName",
                     age: "$patientDetails.age",
                     phone: "$patientDetails.phoneNumber",
                     gender: "$patientDetails.gender",
