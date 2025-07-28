@@ -39,3 +39,11 @@ export const queryDocs = async (
     const docs = await Histopathology.paginate(filter, options);
     return docs;
 };
+
+export const updateHistopathologyRecord = async (query: any, reqbody: any) => {
+    const doc = await Histopathology.findOneAndUpdate(query, reqbody, {
+        new: true
+    });
+
+    return doc;
+}

@@ -4,6 +4,7 @@ import configuration from "../../config";
 import mongoose from "mongoose";
 import { getHistopathologyById } from "../../dao/histopathology.dao";
 import { ApiError } from "../../errors";
+import { updateHistopathologyRecord } from "../../dao/histopathology.dao";
 import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs } from "../../dao/histopathology-tests.dao";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
@@ -34,6 +35,11 @@ export const CreateReportTest = catchAsync(async (req: Request, res: Response, n
     }
 
     const newReportTest = await CreateHistopatholgyTestDao(req.body, next);
+
+    // update histopathology testRequired record status to processed
+    await updateHistopathologyRecord({ _id, "testRequired.name": testTypeId },
+        { $set: { "testRequired.$.paymentStatus": configuration.status[7] } },
+    );
 
     res.status(201).json({
         status: true,
