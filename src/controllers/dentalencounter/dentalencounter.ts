@@ -10,8 +10,7 @@ import {
 import { readonepatient } from "../../dao/patientmanagement";
 import { readoneappointment } from "../../dao/appointment";
 import configuration from "../../config";
-import catchAsync from "../../utils/catchAsync";
-const { ObjectId } = mongoose.Types;
+import catchAsync from "../../utils/catchAsync";const { ObjectId } = mongoose.Types;
 
 // 🔍 Read all dental encounters by patient
 export const readAllDentalByPatient = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
