@@ -304,6 +304,15 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
         },
         { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
         {
+            $lookup: {
+                from: "payments",
+                localField: "testRequired.PaymentRef",
+                foreignField: "_id",
+                as: "testPayment"
+            }
+        },
+        { $unwind: { path: "$testPayment", preserveNullAndEmptyArrays: true } },
+        {
             $project: {
                 _id: 0,
                 histopathologyId: "$_id",
@@ -330,6 +339,15 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
                     phone: "$patientDetails.phoneNumber",
                     gender: "$patientDetails.gender",
                     mrn: "$patientDetails.MRN"
+                },
+                paymentInfo: {
+                    amount: "$testPayment.amount",
+                    paymentReference: "$testPayment.paymentreference",
+                    status: "$testPayment.status",
+                    paymentCategory: "$testPayment.paymentcategory",
+                    paymentType: "$testPayment.paymentype",
+                    cashierName:"$testPayment.cashiername",
+                    createdAt: "$testPayment.createdAt",
                 }
             }
         },
