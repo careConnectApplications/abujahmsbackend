@@ -84,6 +84,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
     const createdPayments = [];
+     const refNumber = generateRefNumber();
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
 
@@ -96,12 +97,17 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
 
-        const refNumber = generateRefNumber();
+        //const refNumber = generateRefNumber();
+        
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
             paymentcategory: configuration.category[6], // Histopathology category
             patient: _patientId,
+            firstName:foundPatient?.firstName,
+            lastName:foundPatient?.lastName,
+            MRN:foundPatient?.MRN,
+            phoneNumber:foundPatient?.phoneNumber,
             amount: Number(serviceAmount)
         }
 
@@ -115,6 +121,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     }
 
     for (let i = 0; i < createdPayments.length; i++) {
+        console.log("createdPayments[i]",createdPayments[i]);
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;

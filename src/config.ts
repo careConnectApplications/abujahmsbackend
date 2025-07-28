@@ -3,6 +3,13 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardname  
+  labpriority:["urgent", "routine"],
+  typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
+  typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
+  familyplanningyesnooption: ["Yes", "No"],
+  labcategory:["hematology", "chemicalpathology"],
+  labreporttypehematologychemicalpathology:["peripheralbloodfilmreport","ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
+  gender:["Male", "Female"],
   pricingtype: ["Standard", "Age and Clinic Aware"],
   anynotedadverseeffect: ["Yes", "No"],
   patienttype: ["primary", "secondary"],
@@ -55,6 +62,7 @@ const configuration: any = {
     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
   defaultphonenumber: "11111111111",
   status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+  hematologyandchemicalpathologystatus:["hemathologyscheduled","chemicalpathologyscheduled","hemathologychemicalpathologyprocessed"],
   admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
   servedstatus: ["served", "unserved"],
   clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
@@ -78,6 +86,9 @@ const configuration: any = {
 
     return (
       {
+        labpriority:configuration.labpriority,
+        labcategory:configuration.labcategory,
+        labreporttypehematologychemicalpathology:configuration.labreporttypehematologychemicalpathology,
         vaccinationlocation: ['fixed', 'outreach'],
         pricingtype: ["Standard", "Age and Clinic Aware"],
         tetanustoxoid: ["TT 1", "TT 2", "TT 3", "TT 4", "TT 5"],
@@ -147,12 +158,12 @@ const configuration: any = {
         diagnosis: ["A04.9 Bacterial intestinal infection, unspecified", "A05 Other bacterial foodborne intoxications, not elsewhere classified", "A05.1 Botulism food poisoning"],
         voluntorysterilization: ["Male", "Female"],
         typeofiud: ["Hormonal", "Copper"],
-        typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
+        typeofimplants: configuration.typeofimplants,
         nursingdiagnosis: ["Acute Confusion", "Acute Substance Withdrawal", "Adult Pressure Injury", "Anxiety", "Autonomic Dysreflexia", ""],
-        familyplanningyesnooption: ["Yes", "No"],
+        familyplanningyesnooption: configuration.familyplanningyesnooption,
         typeoffamilyplanningclient: ["Post Abortion Care (PAC)", "Post-Partum Family Planning(PPFP)", "Routine"],
         nameofinjectable: ["Depo medroxyprogrsterone ", "Noristerat(NOR)", "Others"],
-        typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
+        typeofbarriermethods: configuration.typeofbarriermethods,
         liquor: ["0", "+1", "+2", "+3"],
         moulding: ["0", "+1", "+2", "+3"],
         cervicaldilationb: ["3.0", "4.0", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0"],
@@ -1036,7 +1047,7 @@ const configuration: any = {
       
         ],
         */
-        gender: ["Male", "Female"],
+        gender: configuration.gender,
       }
     )
   },

@@ -6,6 +6,7 @@ const newfamilyplanningacceptorsByGender = [
           $match:{$and:[{createdAt:{ $gt: startdate, $lt: enddate }}]}   
   
   },
+ 
   {
     
     $match: {
@@ -18,9 +19,11 @@ const newfamilyplanningacceptorsByGender = [
         { barriernewacceptor: configuration.familyplanningyesnooption[0] },
         { naturalemthodsnewacceptorforcyclebeads: configuration.familyplanningyesnooption[0] },
         { naturalemthodsnewacceptorforothers: configuration.familyplanningyesnooption[0] }
+         
       ]
     }
   },
+   
   {
     $lookup: {
       from: "patientsmanagements",
@@ -53,6 +56,7 @@ const newfamilyplanningacceptorsByGender = [
       newAcceptorsCount: "$count"
     }
   }
+    
 ];
 
 
@@ -359,6 +363,7 @@ const iudInserted = [
     $sort: { iudType: 1 }
   }
 ];
+
 const sterilizationByGender = [
   {
     $match: {
@@ -412,6 +417,7 @@ const maleCondomsDistributed = [
     }
   }
 ];
+
 const femaleCondomsDistributed = [
   {
     $match: {
@@ -433,6 +439,7 @@ const femaleCondomsDistributed = [
     }
   }
 ];
+
 const postpartumCounsellingCount = [
   {
     $match: {
@@ -499,7 +506,9 @@ const postPartumIUDInsertions = [
     $count: "postPartumIUDInserted"
   }
 ];
+
 return {newfamilyplanningacceptorsByGender,counselCountByGender,moderncontraceptionbyagegroup,clientsgivenoralpills,totaloralpillcyclesdispensed,emergencyContraceptiveDispensed,injectablesByName,implantsInsertedByType,iudInserted,sterilizationByGender,maleCondomsDistributed,femaleCondomsDistributed,postpartumCounsellingCount,postPartumImplanonInsertions,postPartumJadelleInsertions,postPartumIUDInsertions}
+
 
 }
 

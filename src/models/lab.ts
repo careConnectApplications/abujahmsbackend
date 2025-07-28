@@ -12,6 +12,36 @@ const testresultSchema = new Schema({
   nranges: String,
   unit: String
 });
+const chemicalpathologyreportSchema=new Schema({
+  comment: String,
+  reportedby: { type: String }
+});
+const peripheralbloodfilmreportSchema = new Schema({
+  summary: [{ type: String }],
+  redbloodcell: [{ type: String }],
+  whitebloodcell: [{ type: String }],
+  platelet: [{ type: String }],
+  impression: [{ type: String }],
+  suggestion: [{ type: String }],
+  reportedby: { type: String }
+});
+const ADHbonemarrowaspirationreportSchema = new Schema({
+  clinicalnotes: [{ type: String }],
+  boneconsistency: { type: String },
+  aspiration: { type: String },
+  erythroidratio: { type: String },
+  erythropoiesis: [{ type: String }],
+  leucopoesis: [{ type: String }],
+  megakaryopoiesis: [{ type: String }],
+  plasmacells: [{ type: String }],
+  abnomalcells: { type: String },
+  ironstore: { type: String },
+  conclusion: [{ type: String }], // assuming this was a typo for "conclusion"
+  reportedby: { type: String }
+});
+
+
+
 
 const labSchema = new Schema({
   processeddate:{
@@ -34,8 +64,9 @@ const labSchema = new Schema({
     required: true
   },
   testresult:[testresultSchema ],
-  
- 
+  chemicalpathologyreport:chemicalpathologyreportSchema,
+  peripheralbloodfilmreport:peripheralbloodfilmreportSchema,
+  ADHbonemarrowaspirationreport:ADHbonemarrowaspirationreportSchema,
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
@@ -67,7 +98,17 @@ const labSchema = new Schema({
       ref: "Payment",
       default: null,
     },
-    amount: Number,
+  labcategory:{
+    required: true,
+    type: String,
+    default: "lab",
+
+  },
+  sortby:String,
+  note: String,
+  priority:{type:String, enum: ["urgent", "routine"]},
+  sortbydate:Date,
+  amount: Number,
   status:{
     required: true,
     type: String,
@@ -80,5 +121,3 @@ const labSchema = new Schema({
 
 const lab = model('Lab', labSchema);
 export default lab;
-
-

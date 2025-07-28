@@ -794,9 +794,8 @@ export var laborder = async (req: any, res: any) => {
 
     //accept _id from request.
     const { id } = req.params;
-    console.log('////lab order request body////', req.body);
-    console.log('////lab order request params////', id);
-    const { testname, appointmentunderscoreid, department } = req.body;
+    const { testname, appointmentunderscoreid, department,note,priority } = req.body;
+    
     var testid: any = String(Date.now());
     var testsid = [];
     //var paymentids =[];
@@ -863,10 +862,10 @@ export var laborder = async (req: any, res: any) => {
       //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
       if (foundPatient?.isHMOCover == configuration.ishmo[0] || (appointment.patient).isHMOCover == configuration.ishmo[0]) {
 
-        testrecord = await createlab({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
+        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
       }
       else {
-        testrecord = await createlab({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department });
+        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department });
 
       }
 
@@ -879,10 +878,7 @@ export var laborder = async (req: any, res: any) => {
     if (patientappointment) {
       await updateappointment(patientappointment._id, { $push: { lab: testsid } });
     }
-
     res.status(200).json({ queryresult, status: true });
-
-
   }
   catch (error: any) {
     console.log("error", error);
