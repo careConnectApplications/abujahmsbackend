@@ -9,13 +9,12 @@ import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 
 export const CreateReportTest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const { testTypeId } = req.body;
+    const { testTypeId, histopathologyId } = req.body;
 
-    if (!id) return next(new ApiError(400, `${configuration.error.errorIdIsRequired}`));
-    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+    if (!histopathologyId) return next(new ApiError(400, `${configuration.error.errorIdIsRequired}`));
+    if (!mongoose.Types.ObjectId.isValid(histopathologyId)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
 
-    const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+    const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(histopathologyId);
 
     const histopathology = await getHistopathologyById(_id);
 
@@ -38,7 +37,7 @@ export const CreateReportTest = catchAsync(async (req: Request, res: Response, n
 
     res.status(201).json({
         status: true,
-        message: `Test type '${testTypeId}' is valid and ready for report creation.`,
+        message: `Test type '${testTypeId}' created successfully`,
         data: newReportTest
     });
 })
