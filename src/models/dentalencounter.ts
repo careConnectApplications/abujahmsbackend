@@ -1,5 +1,131 @@
-import mongoose from "mongoose";
+//import mongoose from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
+const dentalEncounterSchema = new Schema({
+  // Chief Complaint & Dental History
+  chiefComplaint: [String],
+  dentalHistoryNotes: [String],
+  previousDentalProcedure: [String],
+  allergies: [String],
+  lastDentalVisit: Date,
+  currentMedications: String,
+  additionalComplaints: [String],
+  otherDentalHistory: String,
+
+  // Quadrant Notes
+  quadrant: {
+    firstQuadrantNote: [String],
+    secondQuadrantNote: [String],
+    thirdQuadrantNote: [String],
+    fourthQuadrantNote: [String],
+  },
+
+  // Medical History and Alerts
+  medicalHistory: {
+    medicalConditions: String,
+    alerts: String,
+  },
+
+  // Examinations and Findings
+  examinations: {
+    gingivalAssessment: {
+      type: String,
+      enum: ['Healthy', 'Inflamed', 'Receding', 'Bleeding', 'Periodontal Pockets'],
+    },
+    periodontalProbing: String,
+    xrayRadiographicFindings: String,
+    cariesDetection: String,
+    occlusalAnalysis: String,
+    oralCancerScreening: {
+      type: String,
+      enum: ['Normal', 'Abnormal', 'Biopsy Recommended'],
+    },
+    tmjAssessment: {
+      type: String,
+      enum: ['Normal', 'Clicking', 'Painful', 'Limited Movement', 'Other'],
+    },
+    teethPresent: String,
+    missingTeeth: String,
+    mobileTeeth: String,
+    cariousTeeth: String,
+    retainedRoots: String,
+    fracturedTeeth: String,
+    impactedTeeth: String,
+    tenderToPercussion: String,
+    filledTeeth: String,
+    periodontalPockets: String,
+    cervicalAbrasions: String,
+    crownBridgeRestoration: String,
+    dentures: String,
+    calculus: String,
+    otherFindings: [String],
+  },
+
+  // General Oral Examination
+  generalOralExam: {
+    
+    notes: [String],
+    intraOral: {
+      type: String,
+      enum: ['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
+    },
+    tongue: String,
+    mucosa: String,
+    otherIntraOral: [String],
+  },
+
+  // Impression
+  impression: {
+    overallImpression: [String],
+    provisionalDiagnosis: [String],
+  },
+
+  // Diagnosis
+  diagnosis: {
+    diagnosisList: [String],
+    diagnosisNotes: [String],
+  },
+
+  // Treatment Plan
+  treatmentPlan: {
+    proposedTreatments: [String],
+    priorityAndUrgency: {
+      type: String,
+      enum: ['Urgent', 'Routine', 'Elective'], // Can be adjusted
+    },
+  },
+
+  // Procedure Performed
+  procedurePerformed: {
+    procedureDate: Date,
+    descriptionOfProcedure: [String],
+    toothNumbersTreated: String,
+    anesthesiaDetails: String,
+    materialsUsed: String,
+    procedureNotes: String,
+    postProcedureCareInstructions: String,
+  },
+  createdBy:String,
+  updatedBy:String,
+  patientId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Patientsmanagement',
+      required: true
+    },
+    appointmentId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Appointment',
+    required: true
+  }
+}, {
+  timestamps: true
+});
+
+const DentalRecord = model("DentalEncounter", dentalEncounterSchema);
+export default DentalRecord;
+
+
+/*
 const dentalEncounterSchema = new mongoose.Schema({
   // Investigation Section
   investigations: {
@@ -120,3 +246,4 @@ const dentalEncounterSchema = new mongoose.Schema({
 });
 
 export default mongoose.model("DentalEncounter", dentalEncounterSchema);
+*/

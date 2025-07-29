@@ -24,6 +24,7 @@ import patientsmanagement from '../routes/patientmanagement';
 import pharmacy from '../routes/pharmacy';
 import procedure from '../routes/procedure';
 import psychiatricRoute from "../routes/psychiatric";
+import dentalRoute from "../routes/dental";
 import radiology from '../routes/radiology';
 import referrer from '../routes/referrer';
 import reports from '../routes/reportsandanalytics';
@@ -32,6 +33,7 @@ import theatreadmission from '../routes/theatreadmission';
 import users from "../routes/usermanagement";
 import { protect } from "../utils/middleware";
 import histopathologyText from  "../routes/histopathology-tests.route";
+
 
 
 function createServer() {
@@ -85,6 +87,7 @@ function createServer() {
   app.use('/api/v1/readicdten', readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
   app.use("/api/v1/psychiatric", protect, psychiatricRoute)
+  app.use("/api/v1/dental", protect, dentalRoute)
    app.use("/api/v1/histopathology-test", protect, histopathologyText);
   
 
