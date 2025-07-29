@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { getHistopathologyById } from "../../dao/histopathology.dao";
 import { ApiError } from "../../errors";
 import { updateHistopathologyRecord } from "../../dao/histopathology.dao";
-import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs } from "../../dao/histopathology-tests.dao";
+import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs, queryHistopathologyTestFilter } from "../../dao/histopathology-tests.dao";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 import { readonepayment } from "../../dao/payment";
@@ -101,4 +101,26 @@ export const getAllHistopathologyExamRecordPaginatedHandler = catchAsync(async (
         status: true,
         data: result,
     });
+});
+
+export const getHistopathologyTestDetails = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { servicename } = req.query;
+
+    if (!id) return next(new ApiError(400, `${configuration.error.errorIdIsRequired}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+    if (!servicename) return next(new ApiError(401, "serviceName query is required"));
+
+    const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+
+    const histopathology = await getHistopathologyById(_id);
+    if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
+    console.log(_id, servicename);
+
+    const existingTest: any = await queryHistopathologyTestFilter({ histopathologyId: _id, serviceName: servicename }, {}, '');
+
+    return res.status(200).json({
+        status: true,
+        data: existingTest
+    })
 });
