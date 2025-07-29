@@ -5,9 +5,10 @@ import mongoose from "mongoose";
 import { getHistopathologyById } from "../../dao/histopathology.dao";
 import { ApiError } from "../../errors";
 import { updateHistopathologyRecord } from "../../dao/histopathology.dao";
-import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs } from "../../dao/histopathology-tests.dao";
+import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs, queryHistopathologyTestFilter } from "../../dao/histopathology-tests.dao";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
+import { readonepayment } from "../../dao/payment";
 
 export const CreateReportTest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { testTypeId, histopathologyId } = req.body;
@@ -21,12 +22,26 @@ export const CreateReportTest = catchAsync(async (req: Request, res: Response, n
 
     if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
 
-    const hasMatchingTestType = histopathology.testRequired?.some(
+    const hasMatchingTestType = histopathology.testRequired?.find(
         (test: any) => test.name === testTypeId
     );
 
     if (!hasMatchingTestType) {
         return next(new ApiError(400, `Test type '${testTypeId}' is not in testRequired for this histopathology record`));
+    }
+
+    // then check if testRequired.PaymentRef.status is paid
+    ///if its not paid throw error
+    const payment = await readonepayment({ _id: hasMatchingTestType.PaymentRef });
+
+    if (!payment) {
+        return next(new ApiError(404, `Payment record not found for test type '${testTypeId}'`));
+    }
+
+    ///console.log(payment, "payment info");
+
+    if (payment.status !== configuration.status[3]) {
+        return next(new ApiError(400, `Payment for test type '${testTypeId}' is not completed.`));
     }
 
     const existingTest: any = await queryOneHistopathologyTestFilter({ histopathologyId: _id, testTypeId: req.body.testTypeId }, {}, '');
@@ -86,4 +101,26 @@ export const getAllHistopathologyExamRecordPaginatedHandler = catchAsync(async (
         status: true,
         data: result,
     });
+});
+
+export const getHistopathologyTestDetails = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { servicename } = req.query;
+
+    if (!id) return next(new ApiError(400, `${configuration.error.errorIdIsRequired}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+    if (!servicename) return next(new ApiError(401, "serviceName query is required"));
+
+    const _id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+
+    const histopathology = await getHistopathologyById(_id);
+    if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
+    console.log(_id, servicename);
+
+    const existingTest: any = await queryHistopathologyTestFilter({ histopathologyId: _id, serviceName: servicename }, {}, '');
+
+    return res.status(200).json({
+        status: true,
+        data: existingTest
+    })
 });

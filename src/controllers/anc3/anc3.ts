@@ -1,8 +1,121 @@
+import { NextFunction, Request, Response } from "express";
 import { updateanc, createanc, readallanc, readoneanc } from "../../dao/anc3";
 import { readallancfollowup, updateancfollowup, createancfollowup } from "../../dao/ancfollowup3";
 import { validateinputfaulsyvalue, isObjectAvailable } from "../../utils/otherservices";
 import { readonepatient } from "../../dao/patientmanagement";
 import configuration from "../../config";
+import catchAsync from "../../utils/catchAsync";
+import { ApiError } from "../../errors";
+import mongoose from "mongoose";
+
+
+///////////////////////////Abuja Anc/////////////////////////
+/**
+ * Create new Abuja ANC
+ * @param req 
+ * @param res 
+ * @param next
+ */
+
+export const createAbujaAnc = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const {
+    lmp,
+    edd,
+    gravida,
+    cycle,
+    breasts,
+    height,
+    weight,
+    cvs,
+    rs,
+    pelvis,
+    abdomen,
+    retroviral,
+    bp,
+    urine,
+    hb,
+    bloodGroup,
+    groupRh,
+    genotype,
+    VDRL,
+    others,
+    comments,
+    bleeding,
+    discharge,
+    swellingAnkles,
+    urinarySymptoms,
+    bookingDate,
+    indication,
+    specialPoint,
+    consultant,
+    postmedicalorsurgicalhistory,
+    previousPregnancy,
+    historyofpresentpregnancy
+  } = req.body;
+
+  const { firstName, lastName, _id: userId } = (req.user).user;
+  const staffname = `${firstName} ${lastName}`;
+
+  if (!id) return next(new ApiError(400, "Patient Id is not provided!"));
+  const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+  const patientrecord: any = await readonepatient({ _id: _patientId }, {}, '', '');
+  if (!patientrecord) return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+
+
+  const newAnc3 = {
+    patient: _patientId,
+    postmedicalorsurgicalhistory: postmedicalorsurgicalhistory || [],
+    bookingInformation: {
+      bookingDate,
+      lmp,
+      edd,
+      gravida,
+      indication,
+      specialPoint,
+      consultant,
+    },
+    previouspregnancy: previousPregnancy || [],
+    presentPregnancy: {
+      bleeding,
+      discharge,
+      swellingAnkles,
+      urinarySymptoms,
+    },
+    generalExamination: {
+      cycle,
+      breasts,
+      height,
+      weight,
+      cvs,
+      rs,
+      pelvis,
+      abdomen,
+      retroviral,
+      bp,
+      urine,
+      hb,
+      bloodGroup,
+      groupRh,
+      genotype,
+      VDRL,
+      others,
+      comments,
+    },
+    staffname,
+    staffInfo: userId,
+    historyofpresentpregnancy: historyofpresentpregnancy || []
+  };
+
+  const queryresult = await createanc(newAnc3);
+
+  res.status(201).json({
+    status: true,
+    message: "anc created successfully",
+    data: queryresult
+  })
+});
+
 //get lab order by patient
 ///////////////////////////anc followup/////////////////////////
 export const readAllancfollowupByAncv3 = async (req: any, res: any) => {
@@ -94,8 +207,26 @@ export const createancsv3 = async (req: any, res: any) => {
     const pregnancysummary = { lmp, edd, gravidity };
     const generalexamination = { breasts, height, cvs, rs, pelvis, abdomen };
     /////////// validation for anc followup /////////////////////////
-    var { heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark } = req.body;
-    validateinputfaulsyvalue({ heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
+    var {
+      //heightoffundus, 
+      presentationandposition,
+      presentingpart,
+      foetalheight,
+      bp,
+      hb,
+      protein,
+      glucose,
+      weight,
+      oedema,
+      tetanustoxoid,
+      sulfadoxinepyrimethamine,
+      albendazole,
+      remark } = req.body;
+
+    validateinputfaulsyvalue({
+      // heightoffundus, 
+      presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname
+    });
 
 
     //frequency must inlcude
@@ -109,7 +240,11 @@ export const createancsv3 = async (req: any, res: any) => {
     const queryresult = await createanc({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });
     /////////////////////////////create first followup ////////////////////////////
     //create first followup
-    await createancfollowup({ anc: queryresult._id, heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
+    await createancfollowup({
+      anc: queryresult._id,
+      // heightoffundus, 
+      presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname
+    });
     ///////////////////end first  follow up/////////////////////////////////
     res.status(200).json({ queryresult, status: true });
   }
