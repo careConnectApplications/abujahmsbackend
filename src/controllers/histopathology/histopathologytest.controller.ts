@@ -8,6 +8,7 @@ import { updateHistopathologyRecord } from "../../dao/histopathology.dao";
 import { CreateHistopatholgyTestDao, queryOneHistopathologyTestFilter, queryDocs } from "../../dao/histopathology-tests.dao";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
+import { readonepayment } from "../../dao/payment";
 
 export const CreateReportTest = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { testTypeId, histopathologyId } = req.body;
@@ -21,12 +22,26 @@ export const CreateReportTest = catchAsync(async (req: Request, res: Response, n
 
     if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
 
-    const hasMatchingTestType = histopathology.testRequired?.some(
+    const hasMatchingTestType = histopathology.testRequired?.find(
         (test: any) => test.name === testTypeId
     );
 
     if (!hasMatchingTestType) {
         return next(new ApiError(400, `Test type '${testTypeId}' is not in testRequired for this histopathology record`));
+    }
+
+    // then check if testRequired.PaymentRef.status is paid
+    ///if its not paid throw error
+    const payment = await readonepayment({ _id: hasMatchingTestType.PaymentRef });
+
+    if (!payment) {
+        return next(new ApiError(404, `Payment record not found for test type '${testTypeId}'`));
+    }
+
+    ///console.log(payment, "payment info");
+
+    if (payment.status !== configuration.status[3]) {
+        return next(new ApiError(400, `Payment for test type '${testTypeId}' is not completed.`));
     }
 
     const existingTest: any = await queryOneHistopathologyTestFilter({ histopathologyId: _id, testTypeId: req.body.testTypeId }, {}, '');

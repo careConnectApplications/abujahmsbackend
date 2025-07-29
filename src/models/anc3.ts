@@ -16,12 +16,12 @@ const anc3Schema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
-  postmedicalorsurgicalhistory: [],
+  postmedicalorsurgicalhistory: [], 
   pregnancysummary: {
     lmp: Date,
     edd: Date,
     gravidity: String
-  },
+  }, // update to booking
 
   previouspregnancy: [
     previouspregnancyschema
