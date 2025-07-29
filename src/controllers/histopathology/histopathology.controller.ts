@@ -121,7 +121,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     }
 
     for (let i = 0; i < createdPayments.length; i++) {
-        console.log("createdPayments[i]",createdPayments[i]);
+      
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
