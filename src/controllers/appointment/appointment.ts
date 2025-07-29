@@ -4,8 +4,9 @@ import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import { readallservicetype } from "../../dao/servicetype";
-import { readone } from "../../dao/users";
+import { readone,readall } from "../../dao/users";
 import { readoneprice } from "../../dao/price";
+import catchAsync from "../../utils/catchAsync";
 import { createpayment } from "../../dao/payment";
 import mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
@@ -648,6 +649,11 @@ export const getAllPaidSchedulesByPatient = async (req: any, res: any) => {
 //get all patient with paid schduled
 export const getAllPaidQueueSchedules = async (req: any, res: any) => {
   try {
+    //for doctors show only patient assigned to them
+    const { _id } = (req.user).user;
+    console.log('_id', _id);
+    //doctor
+    //for nursings 
     // Get today's date
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
@@ -658,7 +664,12 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
     const { clinic } = req.params;
 
     let aggregatequery =
-      [{
+      [
+         {
+        $match: {doctor:new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+        //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+      },
+        {
         $lookup: {
           from: 'payments',
           localField: 'payment',
@@ -712,7 +723,7 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
         ,
 
       {
-        $match: { $or: [{ 'payment.status': configuration.status[3] }, { 'patient.isHMOCover': configuration.ishmo[1] }], status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+        $match: { $or: [{ 'payment.status': configuration.status[3] }, { 'patient.isHMOCover': configuration.ishmo[1] }]}  // Filter payment
         //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
       }
         , {
@@ -846,7 +857,6 @@ export var laborder = async (req: any, res: any) => {
       //    console.log(testname[i]);
       //console.log(isHMOCover);
       var testPrice: any = await readoneprice({ servicetype: testname[i], isHMOCover: configuration.ishmo[0] });
-      console.log("oks");
       if ((foundPatient?.isHMOCover == configuration.ishmo[0] || (appointment.patient).isHMOCover == configuration.ishmo[0]) && !testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
@@ -923,7 +933,7 @@ export async function addclinicalencounter(req: any, res: any) {
 
     } else {
 
-      queryresult = await updateappointmentbyquery({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, doctor: user?._id, doctorsfirstName: user?.firstName, doctorslastName: user?.lastName, fromclinicalencounter: true });
+      queryresult = await updateappointmentbyquery({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status,  fromclinicalencounter: true });
       const { firstName, lastName } = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       const { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname } = req.body;
@@ -1146,3 +1156,64 @@ export const readallvitalchartByAppointment = async (req: any, res: any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 };
+
+
+export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) => {
+
+    const { appointmentId, doctorId } = req.body;
+  
+    //change both to objectid
+
+    // Validate inputs
+    if (!appointmentId || !doctorId) {
+       throw new Error("Appointment ID and Doctor ID are required.");
+    }
+  var _appointmentId=new ObjectId(appointmentId);
+   var _doctorId=new ObjectId(doctorId);
+    // Find appointment
+    const appointment= await readoneappointment({ _id: _appointmentId }, {}, 'patient');
+    if (!appointment) {
+      throw new Error("Appointment not found.");
+    }
+
+    // Find doctor
+     const doctor = await readone({ _id:_doctorId });
+    if (!doctor) {
+       throw new Error("Doctor not found.");
+    }
+
+    // Assign doctor
+    appointment.doctor = doctor._id;
+    appointment.doctorsfirstName = doctor.firstName;
+    appointment.doctorslastName = doctor.lastName;
+
+    await appointment.save();
+     res.status(200).json({
+      queryresult:appointment,
+      status: true
+    });
+
+   
+
+  
+});
+
+
+
+// Get all doctors in a specific clinic
+export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
+  const { clinic } = req.params;
+   // Validate inputs
+    if (!clinic) {
+       throw new Error("Clinic is required.");
+    }
+    const doctors = await readall({clinic: clinic,status:configuration.status[1],
+      roleId: configuration.roles[5].roleId});
+    
+
+    res.status(200).json({
+      status: true,
+      doctors
+    });
+ 
+});
