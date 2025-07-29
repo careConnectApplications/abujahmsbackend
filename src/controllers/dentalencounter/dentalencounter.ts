@@ -27,33 +27,68 @@ export const readAllDentalByPatient = catchAsync(async (req: Request | any, res:
   res.status(200).json({ queryresult, status: true });
 });
 
-// ➕ Create new dental encounter
+
 export const createDentalEncounterController = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { id } = req.params; // patient ID
   const { firstName, lastName } = req.user.user;
   const staffname = `${firstName} ${lastName}`;
 
   const {
-    appointmentunderscoreid,
-    investigations,
-    treatments,
-    presentingComplaints,
-    historyOfPresentingComplaints,
-    duration,
-    onset,
-    painSeverity,
-    radiationOfPain,
-    generalExamination,
-    extraOral,
+  chiefComplaint,
+  dentalHistoryNotes,
+  previousDentalProcedure,
+  allergies,
+  lastDentalVisit,
+  currentMedications,
+  additionalComplaints,
+  otherDentalHistory,
+  firstQuadrantNote,
+  secondQuadrantNote,
+  thirdQuadrantNote,
+  fourthQuadrantNote,
+  medicalConditions,
+  gingivalAssessment,
+  alerts,
+  periodontalProbing,
+  xrayRadiographicFindings,
+    cariesDetection,
+    occlusalAnalysis,
+    oralCancerScreening,
+    tmjAssessment,
+    teethPresent,
+    missingTeeth,
+    mobileTeeth,
+    cariousTeeth,
+    retainedRoots,
+    fracturedTeeth,
+    impactedTeeth,
+    tenderToPercussion,
+    filledTeeth,
+    periodontalPockets,
+    cervicalAbrasions,
+    crownBridgeRestoration,
+    dentures,
+    calculus,
+    otherFindings,
+    notes,
     intraOral,
-    diagnosisICD10,
-    diagnosisNonICD10,
-    treatmentPlan,
-    impressionICD10,
-    impressionNonICD10,
-    gum,
     tongue,
-    others
+    mucosa,
+    otherIntraOral,
+    overallImpression,
+    provisionalDiagnosis,
+    diagnosisList,
+    diagnosisNotes,
+    proposedTreatments,
+    priorityAndUrgency,
+    procedureDate,
+    descriptionOfProcedure,
+    toothNumbersTreated,
+    anesthesiaDetails,
+    materialsUsed,
+    procedureNotes,
+    postProcedureCareInstructions,
+    appointmentunderscoreid
   } = req.body;
 
   validateinputfaulsyvalue({ id, appointmentunderscoreid });
@@ -72,42 +107,84 @@ export const createDentalEncounterController = catchAsync(async (req: Request | 
   const input = {
     patientId: patient._id,
     appointmentId,
-    investigations,
-    treatments,
-    dentalChart: {
-      presentingComplaints,
-      historyOfPresentingComplaints,
-      duration,
-      onset,
-      painSeverity,
-      radiationOfPain
-    },
-    examination: {
-      generalExamination,
-      extraOral,
-      intraOral: {
-        softTissue: {
-          gum,
-          tongue,
-          others
-        }
-      }
-    },
-    diagnosis: {
-      diagnosisICD10,
-      diagnosisNonICD10
-    },
-    treatmentPlan,
-    impression: {
-      impressionICD10,
-      impressionNonICD10
-    },
+    chiefComplaint,
+  dentalHistoryNotes,
+  previousDentalProcedure,
+  allergies,
+  lastDentalVisit,
+  currentMedications,
+  additionalComplaints,
+  otherDentalHistory,
+  quadrant: {
+    firstQuadrantNote,
+    secondQuadrantNote,
+    thirdQuadrantNote,
+    fourthQuadrantNote
+  },
+   medicalHistory: {
+    medicalConditions,
+    alerts
+  },
+  examinations: {
+    gingivalAssessment,
+    periodontalProbing,
+    xrayRadiographicFindings,
+    cariesDetection,
+    occlusalAnalysis,
+    oralCancerScreening,
+    tmjAssessment,
+    teethPresent,
+    missingTeeth,
+    mobileTeeth,
+    cariousTeeth,
+    retainedRoots,
+    fracturedTeeth,
+    impactedTeeth,
+    tenderToPercussion,
+    filledTeeth,
+    periodontalPockets,
+    cervicalAbrasions,
+    crownBridgeRestoration,
+    dentures,
+    calculus,
+    otherFindings
+  },
+  generalOralExam: {
+      notes,
+    intraOral,
+    tongue,
+    mucosa,
+    otherIntraOral
+  },
+  impression: {
+    overallImpression,
+    provisionalDiagnosis
+  },
+  diagnosis: {
+    diagnosisList,
+    diagnosisNotes
+  },
+  treatmentPlan: {
+    proposedTreatments,
+    priorityAndUrgency
+  },
+   procedurePerformed: {
+    procedureDate,
+    descriptionOfProcedure,
+    toothNumbersTreated,
+    anesthesiaDetails,
+    materialsUsed,
+    procedureNotes,
+    postProcedureCareInstructions,
+    patientId:patient._id
+  },
     createdBy: staffname
   };
 
   const queryresult = await createDentalEncounter(input);
   res.status(200).json({ queryresult, status: true });
 });
+
 
 // 🔄 Update dental encounter by ID
 export const updateDentalEncounterController = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
@@ -116,60 +193,136 @@ export const updateDentalEncounterController = catchAsync(async (req: Request | 
   const staffname = `${firstName} ${lastName}`;
 
   const {
-    investigations,
-    treatments,
-    presentingComplaints,
-    historyOfPresentingComplaints,
-    duration,
-    onset,
-    painSeverity,
-    radiationOfPain,
-    generalExamination,
-    extraOral,
+    chiefComplaint,
+  dentalHistoryNotes,
+  previousDentalProcedure,
+  allergies,
+  lastDentalVisit,
+  currentMedications,
+  additionalComplaints,
+  otherDentalHistory,
+  firstQuadrantNote,
+  secondQuadrantNote,
+  thirdQuadrantNote,
+  fourthQuadrantNote,
+  medicalConditions,
+  gingivalAssessment,
+  alerts,
+  periodontalProbing,
+  xrayRadiographicFindings,
+    cariesDetection,
+    occlusalAnalysis,
+    oralCancerScreening,
+    tmjAssessment,
+    teethPresent,
+    missingTeeth,
+    mobileTeeth,
+    cariousTeeth,
+    retainedRoots,
+    fracturedTeeth,
+    impactedTeeth,
+    tenderToPercussion,
+    filledTeeth,
+    periodontalPockets,
+    cervicalAbrasions,
+    crownBridgeRestoration,
+    dentures,
+    calculus,
+    otherFindings,
+    notes,
     intraOral,
-    diagnosisICD10,
-    diagnosisNonICD10,
-    treatmentPlan,
-    impressionICD10,
-    impressionNonICD10,
-    gum,
     tongue,
-    others
+    mucosa,
+    otherIntraOral,
+    overallImpression,
+    provisionalDiagnosis,
+    diagnosisList,
+    diagnosisNotes,
+    proposedTreatments,
+    priorityAndUrgency,
+    procedureDate,
+    descriptionOfProcedure,
+    toothNumbersTreated,
+    anesthesiaDetails,
+    materialsUsed,
+    procedureNotes,
+    postProcedureCareInstructions
   } = req.body;
-
   const updates = {
-    investigations,
-    treatments,
-    dentalChart: {
-      presentingComplaints,
-      historyOfPresentingComplaints,
-      duration,
-      onset,
-      painSeverity,
-      radiationOfPain
-    },
-    examination: {
-      generalExamination,
-      extraOral,
-      intraOral: {
-        softTissue: {
-          gum,
-          tongue,
-          others
-        }
-      }
-    },
-    diagnosis: {
-      diagnosisICD10,
-      diagnosisNonICD10
-    },
-    treatmentPlan,
-    impression: {
-      impressionICD10,
-      impressionNonICD10
-    },
+  chiefComplaint,
+  dentalHistoryNotes,
+  previousDentalProcedure,
+  allergies,
+  lastDentalVisit,
+  currentMedications,
+  additionalComplaints,
+  otherDentalHistory,
+  quadrant: {
+    firstQuadrantNote,
+    secondQuadrantNote,
+    thirdQuadrantNote,
+    fourthQuadrantNote
+  },
+   medicalHistory: {
+    medicalConditions,
+    alerts
+  },
+  examinations: {
+    gingivalAssessment,
+    periodontalProbing,
+    xrayRadiographicFindings,
+    cariesDetection,
+    occlusalAnalysis,
+    oralCancerScreening,
+    tmjAssessment,
+    teethPresent,
+    missingTeeth,
+    mobileTeeth,
+    cariousTeeth,
+    retainedRoots,
+    fracturedTeeth,
+    impactedTeeth,
+    tenderToPercussion,
+    filledTeeth,
+    periodontalPockets,
+    cervicalAbrasions,
+    crownBridgeRestoration,
+    dentures,
+    calculus,
+    otherFindings
+  },
+  generalOralExam: {
+      notes,
+    intraOral,
+    tongue,
+    mucosa,
+    otherIntraOral
+  },
+  impression: {
+    overallImpression,
+    provisionalDiagnosis
+  },
+  diagnosis: {
+    diagnosisList,
+    diagnosisNotes
+  },
+  treatmentPlan: {
+    proposedTreatments,
+    priorityAndUrgency
+  },
+   procedurePerformed: {
+    procedureDate,
+    descriptionOfProcedure,
+    toothNumbersTreated,
+    anesthesiaDetails,
+    materialsUsed,
+    procedureNotes,
+    postProcedureCareInstructions
+  },
     updatedBy: staffname
   };
+
+ 
 
   const queryresult = await updateDentalEncounterById(id, updates);
   res.status(200).json({ queryresult, status: true });
