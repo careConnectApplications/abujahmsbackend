@@ -38,6 +38,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
     bloodGroup,
     groupRh,
     genotype,
+    ega,
     VDRL,
     others,
     comments,
@@ -74,6 +75,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
       indication,
       specialPoint,
       consultant,
+      ega
     },
     previouspregnancy: previousPregnancy || [],
     presentPregnancy: {
@@ -82,7 +84,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
       swellingAnkles,
       urinarySymptoms,
     },
-    generalExamination: {
+    generalexamination: {
       cycle,
       breasts,
       height,

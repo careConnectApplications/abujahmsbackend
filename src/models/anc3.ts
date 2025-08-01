@@ -28,7 +28,8 @@ const anc3Schema = new Schema({
     gravida: { type: String, trim: true },
     indication: { type: String, trim: true },
     specialPoint: { type: String, trim: true },
-    consultant: { type: String, trim: true }
+    consultant: { type: String, trim: true },
+    eda: { type: String, trim: true }
   },
   previouspregnancy: [
     previouspregnancyschema

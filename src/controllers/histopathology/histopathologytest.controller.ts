@@ -115,9 +115,8 @@ export const getHistopathologyTestDetails = catchAsync(async (req: Request, res:
 
     const histopathology = await getHistopathologyById(_id);
     if (!histopathology) return next(new ApiError(404, `histopathology record ${configuration.error.errornotfound}`));
-    console.log(_id, servicename);
 
-    const existingTest: any = await queryHistopathologyTestFilter({ histopathologyId: _id, serviceName: servicename }, {}, '');
+    const existingTest: any = await queryHistopathologyTestFilter({ histopathologyId: _id, testTypeId: servicename }, {}, '');
 
     return res.status(200).json({
         status: true,
