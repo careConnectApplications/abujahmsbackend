@@ -2,7 +2,12 @@ import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
-  //wardname  
+  //wardname
+  treatmentPlan:['Urgent', 'Routine', 'Elective'],
+  intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
+  tmjAssessment:['Normal', 'Clicking', 'Painful', 'Limited Movement', 'Other'],
+  oralCancerScreening:['Normal', 'Abnormal', 'Biopsy Recommended'],
+  examinations:['Healthy', 'Inflamed', 'Receding', 'Bleeding', 'Periodontal Pockets'],
   labpriority:["urgent", "routine"],
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
@@ -86,6 +91,11 @@ const configuration: any = {
 
     return (
       {
+        treatmentPlan:configuration.treatmentPlan,
+        intraOral:configuration.intraOral,
+        tmjAssessment:configuration.tmjAssessment,
+        oralCancerScreening:configuration.oralCancerScreening,
+        examinations: configuration.examinations,
         labpriority:configuration.labpriority,
         labcategory:configuration.labcategory,
         labreporttypehematologychemicalpathology:configuration.labreporttypehematologychemicalpathology,

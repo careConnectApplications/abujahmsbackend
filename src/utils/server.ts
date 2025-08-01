@@ -35,6 +35,7 @@ import { protect } from "../utils/middleware";
 import histopathologyText from "../routes/histopathology-tests.route";
 
 
+
 function createServer() {
   const app: Application = express();
 
@@ -86,7 +87,7 @@ function createServer() {
   app.use('/api/v1/reports', reports);
   app.use('/api/v1/readicdten', readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
-  app.use("/api/v1/psychiatric", protect, psychiatricRoute);
+  app.use("/api/v1/psychiatric", protect, psychiatricRoute)
   app.use("/api/v1/dental", protect, dentalRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
 
