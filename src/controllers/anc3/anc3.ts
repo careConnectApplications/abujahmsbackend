@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { updateanc, createanc, readallanc, readoneanc } from "../../dao/anc3";
 import { readallancfollowup, updateancfollowup, createancfollowup } from "../../dao/ancfollowup3";
-import { validateinputfaulsyvalue, isObjectAvailable } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, isObjectAvailable, parseDate } from "../../utils/otherservices";
 import { readonepatient } from "../../dao/patientmanagement";
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
@@ -67,9 +67,9 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
     patient: _patientId,
     postmedicalorsurgicalhistory: postmedicalorsurgicalhistory || [],
     bookingInformation: {
-      bookingDate,
-      lmp,
-      edd,
+      bookingDate: parseDate(bookingDate),
+      lmp: parseDate(lmp),
+      edd: parseDate(edd),
       gravida,
       indication,
       specialPoint,
