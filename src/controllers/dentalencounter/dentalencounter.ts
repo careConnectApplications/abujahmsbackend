@@ -193,7 +193,7 @@ export const updateDentalEncounterController = catchAsync(async (req: Request | 
   const staffname = `${firstName} ${lastName}`;
 
   const {
-    chiefComplaint,
+  chiefComplaint,
   dentalHistoryNotes,
   previousDentalProcedure,
   allergies,

@@ -32,7 +32,9 @@ import settings from '../routes/setting';
 import theatreadmission from '../routes/theatreadmission';
 import users from "../routes/usermanagement";
 import { protect } from "../utils/middleware";
-import histopathologyText from "../routes/histopathology-tests.route";
+import histopathologyText from  "../routes/histopathology-tests.route";
+import physiotherapyRoute from "../routes/phisiotherapy";
+
 
 
 
@@ -88,8 +90,11 @@ function createServer() {
   app.use('/api/v1/readicdten', readicdeleven);
   app.use("/api/v1/histopathology", protect, histopathologyRoute)
   app.use("/api/v1/psychiatric", protect, psychiatricRoute)
+  app.use("/api/v1/physiotherapy",protect, physiotherapyRoute);
   app.use("/api/v1/dental", protect, dentalRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
+
+  
 
 
   // Handle POST requests to /webhook
