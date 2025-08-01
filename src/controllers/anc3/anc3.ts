@@ -51,7 +51,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
     specialPoint,
     consultant,
     postmedicalorsurgicalhistory,
-    previousPregnancy,
+    previouspregnancy,
     historyofpresentpregnancy
   } = req.body;
 
@@ -77,7 +77,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
       consultant,
       ega
     },
-    previouspregnancy: previousPregnancy || [],
+    previouspregnancy: previouspregnancy || [],
     presentPregnancy: {
       bleeding,
       discharge,
