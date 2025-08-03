@@ -35,14 +35,7 @@ const wardmanagementSchema = new Schema({
     type: Number,
     required: true
   }, 
-  beds: [
-    {
-      bednumber: { type: String, required: true },
-      status: { type: String, enum: ['vacant', 'occupied'], default: 'vacant' },
-      assignedPatient: { type: Schema.Types.ObjectId, ref: 'Patient', default: null },
-      assignedDate: { type: Date }
-    }
-  ],
+
   status:{
     type: String,
     default: configuration.status[1],
