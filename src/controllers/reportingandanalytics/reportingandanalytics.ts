@@ -50,7 +50,7 @@ const reportbyfinancialreport = [
     },
   },
     {   
-            $match:{$and:[{paymentcategory: querygroup}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+            $match:{$and:[{paymentcategory: querygroup}, {updatedAt:{ $gt: startdate, $lt: enddate }}]}   
     }
     
 ];

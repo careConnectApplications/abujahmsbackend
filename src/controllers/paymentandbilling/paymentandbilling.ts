@@ -1,31 +1,38 @@
+import { NextFunction, Request, Response } from "express";
 import {readallpayment,readonepayment,updatepayment,updatepaymentbyquery,readallpaymentaggregate,readpaymentaggregate,readpaymentaggregateoptimized} from "../../dao/payment";
 import {updateappointmentbyquery} from "../../dao/appointment";
 import {updatepatientbyanyquery,readonepatient} from "../../dao/patientmanagement";
 import {updatelabbyquery} from "../../dao/lab";
 import configuration from "../../config";
 import {validateinputfaulsyvalue} from "../../utils/otherservices";
+import catchAsync from "../../utils/catchAsync";
 //deactivate a user
-/*
-export async function confirmpayment(req:any, res:any){
-    const {id} = req.params;
-    try{
-        const response = await readone({_id:id});
-       const status= response?.status == configuration.userstatus[0]? configuration.userstatus[1]: configuration.userstatus[0];
-        const queryresult:any =await updateuser(id,{status});
-        res.status(200).json({
-            queryresult,
-            status:true
-          }); 
+//show total for each login cashier
+export const getCashierTotal = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
 
-    }
-    catch(e:any){
-        console.log(e);
-      res.status(403).json({status: false, msg:e.message});
+       const { email} = (req.user).user;
+          // Get start and end of today (local time)
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-    }
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
 
-}
-    */
+      const total = await readallpaymentaggregate([
+      { $match: { status: configuration.status[3],cashieremail:email,updatedAt: { $gte: startOfDay, $lte: endOfDay } } }, // Filter only completed payments if needed
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: "$amount" }
+        }
+      }
+    ]);
+   
+
+    res.json({ queryresult: total[0]?.totalAmount || 0 ,status: true});
+  
+});
+//cashieremail:email,cashierid:staffId
    //confirm payment
 export async function confirmgrouppayment(req:any, res:any){
   //console.log(req.user);
@@ -60,15 +67,7 @@ export async function confirmgrouppayment(req:any, res:any){
         //update patient registration status
         await updatepatientbyanyquery({_id:patient},{status:configuration.status[1], paymentstatus:status,paymentreference});
       }
-      /*
-      
-      else if(paymentcategory == configuration.category[0]){
-        //schedule the patient
-        //payment
-        await updateappointmentbyquery({payment:_id},{status:configuration.status[5]});
-
-      }
-        */
+     
         
       //for lab test
       else if (paymentcategory == configuration.category[2]){
@@ -263,109 +262,6 @@ pipeline.push({
     MRN: 1,
   },
 })
-
-
-// Lookup patient
-/*
- statusfilter.status==configuration.status[2] && pipeline.push({
-  $lookup: {
-    from: 'patientsmanagements',
-    localField: 'patient',
-    foreignField: '_id',
-    as: 'patient',
-  },
-});
-*/
-
-//statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
-
-// Build patient match condition dynamically
-/*
-const patientMatch:any = {};
-
-if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
-if (lastName && statusfilter.status==configuration.status[2]) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
-if (MRN && statusfilter.status==configuration.status[2]) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
-if (HMOId && statusfilter.status==configuration.status[2]) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
-if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
-
-if (Object.keys(patientMatch).length > 0) {
-  pipeline.push({ $match: patientMatch });
-}
-  */
-
-// Grouping
-/*
-statusfilter.status==configuration.status[2]?pipeline.push({
-  $group: {
-    _id: "$paymentreference",
-    paymentreference: { $first: "$paymentreference" },
-    createdAt: { $first: "$createdAt" },
-    updatedAt: { $first: "$updatedAt" },
-    amount: { $sum: "$amount" },
-    firstName: { $first: "$patient.firstName" },
-    phoneNumber: { $first: "$patient.phoneNumber" },
-    lastName: { $first: "$patient.lastName" },
-    MRN: { $first: "$patient.MRN" },
-    isHMOCover: { $first: "$patient.isHMOCover" },
-    HMOName: { $first: "$patient.HMOName" },
-    HMOId: { $first: "$patient.HMOId" },
-    HMOPlan: { $first: "$patient.HMOPlan" },
-  },
-}):pipeline.push({
-  $group: {
-    _id: "$paymentreference",
-    paymentreference: { $first: "$paymentreference" },
-    createdAt: { $first: "$createdAt" },
-    updatedAt: { $first: "$updatedAt" },
-    amount: { $sum: "$amount" },
-   // firstName: { $first: "$patient.firstName" },
-    //phoneNumber: { $first: "$patient.phoneNumber" },
-    //lastName: { $first: "$patient.lastName" },
-    //MRN: { $first: "$patient.MRN" },
-    //isHMOCover: { $first: "$patient.isHMOCover" },
-    //HMOName: { $first: "$patient.HMOName" },
-    //HMOId: { $first: "$patient.HMOId" },
-    //HMOPlan: { $first: "$patient.HMOPlan" },
-  },
-});
-
-
-// Projection
-statusfilter.status==configuration.status[2]?pipeline.push({
-  $project: {
-    _id: 0,
-    paymentreference: 1,
-    createdAt: 1,
-    updatedAt: 1,
-    amount: 1,
-    firstName: 1,
-    phoneNumber: 1,
-    lastName: 1,
-    MRN: 1,
-    isHMOCover: 1,
-    HMOName: 1,
-    HMOId: 1,
-    HMOPlan: 1,
-  },
-}):pipeline.push({
-  $project: {
-    _id: 0,
-    paymentreference: 1,
-    createdAt: 1,
-    updatedAt: 1,
-    amount: 1,
-  //  firstName: 1,
-   // phoneNumber: 1,
-   // lastName: 1,
-    //MRN: 1,
-    //isHMOCover: 1,
-    //HMOName: 1,
-    //HMOId: 1,
-    //HMOPlan: 1,
-  },
-});
-*/
 
 // Sorting
 pipeline.push({ $sort: { createdAt: -1 } });

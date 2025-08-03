@@ -35,7 +35,18 @@ export var createward = async (req:any,res:any) =>{
             throw new Error(`Ward ${configuration.error.erroralreadyexit}`);
 
         }
-         const queryresult=await createwardmanagement({bedspecialization,vacantbed,wardname,totalbed,occupiedbed,wardid});
+        // Generate beds
+    const beds = [];
+    for (let i = 1; i <= totalbed; i++) {
+      beds.push({
+        bednumber: `B${i.toString().padStart(3, '0')}`, // e.g., B001, B002
+        status: i <= occupiedbed ? 'occupied' : 'vacant',
+        assignedPatient: null,
+        assignedDate: null
+      });
+    }
+
+         const queryresult=await createwardmanagement({bedspecialization,vacantbed,wardname,totalbed,occupiedbed,wardid,beds});
         const { firstName, lastName } = (req.user).user;
             var actor = `${firstName} ${lastName}`;    
             await createaudit({action:"Created Ward",actor,affectedentity:wardname}); 
