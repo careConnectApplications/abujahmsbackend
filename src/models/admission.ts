@@ -47,6 +47,12 @@ const admissionSchema = new Schema({
       default: null,
     }
   ,
+  bed:{
+     type: Schema.Types.ObjectId,
+      ref: "Bed",
+       required: true
+
+  },
   doctorname:
   {
     type: String, 
@@ -58,7 +64,7 @@ const admissionSchema = new Schema({
   }, 
   status:{
     type: String,
-    default: configuration.admissionstatus[0],
+    default: configuration.admissionstatus[1],
     required: true
 
   }
