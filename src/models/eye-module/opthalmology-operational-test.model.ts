@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 export const ophthalmologyOperationalTestSchema = new Schema({
     resultType: {
         type: String,
-        enum: ['CVF,', 'OCT', 'FundusPhotograph', 'FFA'],
+        enum: ['CVF', 'OCT', 'FundusPhotograph', 'FFA'],
         required: true
     },
     fileUrl: { type: String, required: true },
