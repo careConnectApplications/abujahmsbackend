@@ -114,9 +114,12 @@ const dentalEncounterSchema = new Schema({
     },
     appointmentId:{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Appointment',
-    required: true
-  }
+    ref: 'Appointment'
+  },
+  admissionId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admission'
+  },
 }, {
   timestamps: true
 });

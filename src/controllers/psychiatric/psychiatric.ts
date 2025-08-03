@@ -11,6 +11,7 @@ import { readonepatient } from "../../dao/patientmanagement";
 import configuration from "../../config";
 import { readoneappointment } from "../../dao/appointment";
 import catchAsync from "../../utils/catchAsync";
+import {readoneadmission} from  "../../dao/admissions";
 const { ObjectId } = mongoose.Types;
 
 
@@ -54,26 +55,33 @@ export const createPsychiatricEvaluationController = catchAsync(async (req: Requ
       premorbidhistory,
       assessmentdiagnosis,
       planmanagement,
-      appointmentunderscoreid
+      appointmentoradmissionunderscoreid
     } = req.body;
-    validateinputfaulsyvalue({ id, appointmentunderscoreid});
+    validateinputfaulsyvalue({ id, appointmentoradmissionunderscoreid});
     const patient:any = await readonepatient({ _id: id }, {}, '', '');
     if (!patient) {
       next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
     }
-    var appointmentId=new ObjectId(appointmentunderscoreid);
+    var checkappointmentId=new ObjectId(appointmentoradmissionunderscoreid);
     //validate appointment id
     var appointment:any = await readoneappointment({ _id:appointmentId }, {}, '');
-    if (!appointment) {
-            //create an appointment
-        next(Error(`Appointment donot ${configuration.error.erroralreadyexit}`));
-    
-    }
+     var checkadimmison = await readoneadmission({ _id: checkappointmentId }, {}, '');
+    var appointmentId;
+   var admissionId;
+    if (checkadimmison) {
+        admissionId =checkappointmentId;
+  
+      }
+       if (appointment) {
+    admissionId=checkappointmentId;
+  }
+   
 
 
     const input = {
       patientId: patient._id,
       appointmentId,
+      admissionId,
       presentingcomplaints,
       historyofpresentingcomplaints,
       pastpsychiatrichistory,
