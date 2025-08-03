@@ -1127,7 +1127,8 @@ const configuration: any = {
     errorservicetray: "This service donot exist in your service tray",
     errorInvalidObjectId: "Invalid Object Id",
     errorMustBeAnArray: "Exam types are required and must be an array!",
-    errorIdIsRequired: "Id not found in params!"
+    errorIdIsRequired: "Id not found in params!",
+    errorPatientIdIsRequired: "Patient Id is required!"
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   environment: "test",

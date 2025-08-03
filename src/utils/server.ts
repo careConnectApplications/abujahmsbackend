@@ -37,6 +37,7 @@ import physiotherapyRoute from "../routes/phisiotherapy";
 
 
 
+
 function createServer() {
   const app: Application = express();
 
@@ -52,6 +53,7 @@ function createServer() {
   app.use(express.static(__dirname + '/uploads'));
   //middleware to process json
   app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true }));
   /*
   app.use(fileUpload({
       useTempFiles: true,
@@ -91,7 +93,9 @@ function createServer() {
   app.use("/api/v1/physiotherapy",protect, physiotherapyRoute);
   app.use("/api/v1/dental", protect, dentalRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
+
   
+
 
   // Handle POST requests to /webhook
   /*

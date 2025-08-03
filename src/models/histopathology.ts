@@ -50,7 +50,7 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 ref: "Payment",
                 default: null
             },
-            paymentStatus: { type: String, default: configuration.status[2] }
+            paymentStatus: { type: String, default: configuration.status[5] }
         }],
         diagnosisForm: {
             //provisionalDiagnosis: { type: String, required: true },

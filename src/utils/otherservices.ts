@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import moment from 'moment';
 import exeltojson from 'convert-excel-to-json';
 import fs from 'fs/promises';
 import jwt from "jsonwebtoken";
@@ -213,4 +214,12 @@ export const isObjectAvailable = (objectName: any) => {
   //return Object.keys(objectName).length === 0;
   return Object.keys(objectName).length >= 0 && objectName.constructor === Object;
 
+}
+
+export function parseDate(input: string): Date | null {
+    if (!input || typeof input !== "string") return null;
+
+    const m = moment(input, "DD/MM/YYYY", true); // strict parsing
+
+    return m.isValid() ? m.toDate() : null;
 }

@@ -114,13 +114,11 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         testRequiredRecords.push({
             name: service,
             PaymentRef: null,
-            paymentStatus: configuration.status[2] // Pending status
+            paymentStatus: configuration.status[5] // Scheduled
         });
 
         createdPayments.push(paymentData);
     }
-
-
 
     for (let i = 0; i < createdPayments.length; i++) {
       
@@ -286,12 +284,12 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
 
     const baseMatch: any = {};
     if (status) {
-        baseMatch.status = status;
+        baseMatch["testRequired.paymentStatus"] = status;
     }
 
     const results = await Histopathology.aggregate([
-        { $match: baseMatch },
         { $unwind: "$testRequired" },
+        { $match: baseMatch },
         {
             $lookup: {
                 from: "users",
