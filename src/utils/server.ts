@@ -1,3 +1,4 @@
+import * as path from 'path';
 import cors from 'cors';
 import express, { Application } from 'express';
 import fileUpload from "express-fileupload";
@@ -33,7 +34,7 @@ import theatreadmission from '../routes/theatreadmission';
 import users from "../routes/usermanagement";
 import { protect } from "../utils/middleware";
 import histopathologyText from "../routes/histopathology-tests.route";
-
+import EyeModuleRoute from "../routes/eye-module.route";
 
 
 function createServer() {
@@ -48,10 +49,12 @@ function createServer() {
     origin: "*",
   }));
   app.use(express.static(__dirname + '/downloads'));
-  app.use(express.static(__dirname + '/uploads'));
+  app.use(express.static(path.join(__dirname, 'uploads')));
+
   //middleware to process json
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true }));
+  
   /*
   app.use(fileUpload({
       useTempFiles: true,
@@ -90,7 +93,7 @@ function createServer() {
   app.use("/api/v1/psychiatric", protect, psychiatricRoute)
   app.use("/api/v1/dental", protect, dentalRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
-
+  app.use("/api/v1/eye-module", protect, EyeModuleRoute);
 
   // Handle POST requests to /webhook
   /*
