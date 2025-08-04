@@ -4,7 +4,7 @@ export const OperationalNotesFileName = [
         label: "Central Visual Field  (CVF)"
     },
     { name: "OCT", label: "OCT" },
-    { name: "Fundus Photographs", label: "FundusPhotograph" },
+    { name: "FundusPhotographs", label: "Fundus Photograph" },
     { name: "FFA", label: "FFA" }
 ];
 
@@ -70,4 +70,53 @@ export const lensType = [
     "Varilux Ellipse",
     "Varilux Ellipse transition",
     "Varilux progressive white lenses"
+];
+
+export const slitLamp = [
+    "adnexa",
+    "lids",
+    "tearBreak",
+    "conjunctiva",
+    "cornea",
+    "antChamber",
+    "depth",
+    "cells",
+    "flare",
+    "iris",
+    "colour",
+    "angles",
+    "pupil",
+    "lens",
+    "clarity",
+    "antCaps",
+    "postCaps",
+    "cortex",
+    "nucleus"
+];
+
+export const opthalmoscopy = [
+    "opticDisc",
+    "size",
+    "ratio",
+    "appearance",
+    "nerveFiber",
+    "retina",
+    "macula",
+    "postRetina",
+    "vessels",
+    "periphery",
+    "vitreous"
+];
+
+export const refraction = [
+    "sphere",
+    "cyl",
+    "axis",
+    "add",
+    "hPrism",
+    "hBase",
+    "vPrism",
+    "vBase",
+    "vc",
+    "bcva"
 ]

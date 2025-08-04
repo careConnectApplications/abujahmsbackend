@@ -40,7 +40,6 @@ export const ophthalmologyExaminationSchema = new Schema({
         periphery: eyeSideSchema,
         vitreous: eyeSideSchema
     },
-
     refraction: {
         sphere: eyeSideSchema,
         cyl: eyeSideSchema,
