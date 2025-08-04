@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import { createappointment, readallappointment, updateappointment, readoneappointment, modifiedreadallappointment, updateappointmentbyquery, readallappointmentpaginated, optimizedreadallappointment } from "../../dao/appointment";
 import { readoneadmission } from "../../dao/admissions";
 import { createvitalcharts } from "../../dao/vitalcharts";
@@ -1213,7 +1214,63 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
 
     res.status(200).json({
       status: true,
-      doctors
+      queryresult:doctors
     });
  
 });
+
+
+//count number of patient assigment to each doctor
+// controllers/appointmentController.ts
+
+
+
+export const countPatientsPerDoctor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+   const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
+    // Get the start of tomorrow to set the range for "today"
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
+    //const {clinic} = (req.user).user;
+    const { clinic } = req.params;
+    const query={
+          doctor: { $ne: null },  // Only include appointments with assigned doctors
+          patient: { $ne: null },  // Only include appointments with assigned patients
+          status: configuration.status[5], 
+          clinic, 
+          appointmentdate: { $gte: startOfDay, $lt: endOfDay }
+        };
+    const countpatientsdoctoraggregate = [
+      {
+        $match: query
+      },
+      {
+        $group: {
+          _id: "$doctor",
+          uniquePatients: { $addToSet: "$patient" }
+        }
+      },
+      {
+        $project: {
+          doctor: "$_id",
+          _id: 0,
+          patientCount: { $size: "$uniquePatients" }
+        }
+      }
+    ];
+    const queryresult = await modifiedreadallappointment(query, countpatientsdoctoraggregate);
+      res.status(200).json({
+      status: true,
+      queryresult
+    });
+
+   
+
+ 
+});
+
+
+
+   
+
+ 
