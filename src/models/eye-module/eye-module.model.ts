@@ -4,8 +4,10 @@ import { optometryLensPrescriptionSchema } from "./optometrylens-prescription.mo
 import { preliminaryTestSchema } from "./preliminary-test.model";
 import { ophthalmologyExaminationSchema } from "./opthalamology-examination.model";
 import { ophthalmologyOperationalTestSchema } from "./opthalmology-operational-test.model";
+import { IEyeModel, IEyeModuleDoc } from "../../interface/eye-module.interface";
+import { paginate } from "../../paginate";
 
-const eyeModuleSchema = new Schema({
+const eyeModuleSchema = new Schema<IEyeModuleDoc, IEyeModel>({
     patient: {
         type: Schema.Types.ObjectId,
         ref: "Patientsmanagement",
@@ -16,7 +18,22 @@ const eyeModuleSchema = new Schema({
         unique: true,
         trim: true,
     },
+    appointment: {
+        type: Schema.Types.ObjectId,
+        ref: "Appointment",
+        default: null,
+    },
+    appointmentid:
+    {
+        type: String,
+        required: true
+    },
     createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+    updatedBy: {
         type: Schema.Types.ObjectId,
         ref: "Users",
         default: null,
@@ -49,7 +66,16 @@ const eyeModuleSchema = new Schema({
     }
 }, { timestamps: true });
 
-const EyeModule = mongoose.model("EyeModule", eyeModuleSchema);
+eyeModuleSchema.pre<IEyeModuleDoc>(/^find/, function (next) {
+    this.populate({
+        path: "patient createdBy appointment",
+    });
+    next();
+});
+
+eyeModuleSchema.plugin(paginate as any);
+
+const EyeModule = mongoose.model<IEyeModuleDoc, IEyeModel>("EyeModule", eyeModuleSchema);
 export default EyeModule;
 
 //   optometryLensPrescriptionId: {
