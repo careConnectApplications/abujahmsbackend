@@ -27,6 +27,12 @@ const validatePatientAndAppointment = async (patientId: string, appointmentId: s
     return { patient, appointment };
 };
 
+const generateRefNumber = () => {
+    const uniqueId = uuidv4();
+    return `Eye-${new Date().getFullYear()}-${uniqueId}`;
+}
+
+
 export const createEyeModule = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { patientId, lensPrescription, examination, preliminaryTest, operationalTest } = req.body;
 
@@ -133,8 +139,10 @@ export const createLensPrescription = catchAsync(async (req: Request | any, res:
             next
         );
     } else {
+        const refNumber = generateRefNumber();
         const newEyeModule = {
             patient: patientId,
+            ref: refNumber,
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             optometryLensPrescription: lensPrescriptionData,
@@ -321,9 +329,11 @@ export const createExamination = catchAsync(async (req: Request | any, res: Resp
             updatedBy: userId
         }, next);
     } else {
+        const refNumber = generateRefNumber();
         // Create new EyeModule
         const newEyeModule = {
             patient: _patientId,
+            ref: refNumber,
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             examination: examinationData,
@@ -502,9 +512,11 @@ export const createPreliminaryTest = catchAsync(async (req: Request | any, res: 
             updatedBy: userId
         }, next);
     } else {
+        const refNumber = generateRefNumber();
         // Create new EyeModule
         const newEyeModule = {
             patient: _patientId,
+            ref: refNumber,
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             preliminaryTest: preliminaryTestData,
@@ -627,9 +639,11 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
         }, next);
 
     } else {
+        const refNumber = generateRefNumber();
         // Create new EyeModule
         updatedDoc = await createEyeService({
             patient: _patientId,
+            ref: refNumber,
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             operationalTest: uploadedTests,
@@ -732,6 +746,7 @@ export const getAllEyeUtilData = catchAsync(async (req: Request | any, res: Resp
         }
     });
 });
+
 export const getAllEyeRecordsPaginatedHandler = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const options: IOptions = pick(req.query, [
         "sortBy",
@@ -753,3 +768,416 @@ export const getAllEyeRecordsPaginatedHandler = catchAsync(async (req: Request, 
         data: result,
     });
 });
+
+export const updateLensPrescription = catchAsync(
+    async (req: Request | any, res: Response, next: NextFunction) => {
+        const { eyeModuleId } = req.params;
+        const {
+            rightsphere, rightcyl, rightaxis, rightprism, rightva,
+            leftsphere, leftcyl, leftaxis, leftprism, leftva,
+            addright, addleft,
+            ipdnear, ipddist,
+            lensTint, lensSize, segHt, temple, lensType, frame, colour, remarks,
+            nextExamDate, nextAppointmentDate
+        } = req.body;
+
+        const { _id: userId } = (req.user).user;
+
+        // Validate ID
+        if (!mongoose.Types.ObjectId.isValid(eyeModuleId)) {
+            return next(new ApiError(400, "Invalid EyeModule ID"));
+        }
+
+        // Build update object
+        const updateData = {
+            optometryLensPrescription: {
+                distance: {
+                    right: { sphere: rightsphere, cyl: rightcyl, axis: rightaxis, prism: rightprism, va: rightva },
+                    left: { sphere: leftsphere, cyl: leftcyl, axis: leftaxis, prism: leftprism, va: leftva }
+                },
+                add: { right: addright, left: addleft },
+                ipd: { near: ipdnear, dist: ipddist },
+                lensTint,
+                lensSize,
+                segHt,
+                temple,
+                lensType,
+                frame,
+                colour,
+                remarks,
+                nextExamDate: nextExamDate ? parseDate(nextExamDate) : null,
+                nextAppointmentDate: nextAppointmentDate ? parseDate(nextAppointmentDate) : null
+            },
+            updatedBy: userId
+        };
+
+        const updatedDoc = await updateEyeModule(eyeModuleId, updateData, next);
+
+        if (!updatedDoc) {
+            return next(new ApiError(404, "EyeModule not found"));
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Lens prescription updated successfully",
+            data: updatedDoc
+        });
+    }
+);
+
+export const updatePreliminaryTest = catchAsync(
+    async (req: Request | any, res: Response, next: NextFunction) => {
+        const { eyeModuleId } = req.params;
+
+        const {
+            // Visual Acuity Unaided - Far
+            vaFarDist, vaFarOd, vaFarOs, vaFarOu,
+            // Visual Acuity Unaided - Near
+            vaNearDist, vaNearOd, vaNearOs, vaNearOu,
+            // Visual Acuity Unaided - pH
+            vaPhDist, vaPhOd, vaPhOs, vaPhOu,
+
+            // Visual Acuity Aided - Far
+            vaAidedFarOd, vaAidedFarOs, vaAidedFarOu,
+            // Visual Acuity Aided - Near
+            vaAidedNearOd, vaAidedNearOs, vaAidedNearOu,
+            // Visual Acuity Aided - pH
+            vaAidedPhOd, vaAidedPhOs, vaAidedPhOu,
+
+            // Counting Fingers
+            cfOd, cfOs,
+            // Hand Movement
+            hmOd, hmOs,
+            // Light Perception
+            lpOd, lpOs,
+            // No Light Perception
+            nlpOd, nlpOs,
+
+            // Light Projection - OD
+            lpTopOd, lpBottomOd, lpLeftOd, lpRightOd,
+            // Light Projection - OS
+            lpTopOs, lpBottomOs, lpLeftOs, lpRightOs,
+
+            // Pachymetry
+            pachymetryOdName, pachymetryOdDate,
+            pachymetryOsName, pachymetryOsDate,
+
+            // Tonometry
+            tonometryOdName, tonometryOdMethodOrTime,
+            tonometryOsName, tonometryOsMethodOrTime,
+
+            // Glaucoma Flow Sheet
+            glaucomaVisualFieldsOd, glaucomaVisualFieldsOs,
+            glaucomaCupDiskRatioOd, glaucomaCupDiskRatioOs,
+            glaucomaIopOd, glaucomaIopOs,
+
+            // Pupillary Distance
+            pdFarOd, pdFarOs, pdFarOu,
+            pdNearOd, pdNearOs, pdNearOu,
+
+            // Fields
+            fieldsFullOd, fieldsFullOs,
+            fieldsRestrictedOd, fieldsRestrictedOs,
+
+            // Distance
+            distanceReading, distanceWork,
+
+            // Other fields
+            eyeColour,
+            hyperEye,
+            npc,
+            stereopsis,
+
+            // Dates
+            nextAppointmentDate
+        } = req.body;
+        const { _id: userId } = (req.user).user;
+
+        if (!mongoose.Types.ObjectId.isValid(eyeModuleId)) {
+            return next(new ApiError(400, "Invalid EyeModule ID"));
+        }
+
+        const updateData = {
+            preliminaryTest: {
+                visualAcuityUnaided: {
+                    far: { DIST: vaFarDist, OD: vaFarOd, OS: vaFarOs, OU: vaFarOu },
+                    near: { DIST: vaNearDist, OD: vaNearOd, OS: vaNearOs, OU: vaNearOu },
+                    pH: { DIST: vaPhDist, OD: vaPhOd, OS: vaPhOs, OU: vaPhOu },
+                },
+                visualAcuityAided: {
+                    far: { OD: vaAidedFarOd, OS: vaAidedFarOs, OU: vaAidedFarOu },
+                    near: { OD: vaAidedNearOd, OS: vaAidedNearOs, OU: vaAidedNearOu },
+                    pH: { OD: vaAidedPhOd, OS: vaAidedPhOs, OU: vaAidedPhOu },
+                },
+                countingFingers: { OD: cfOd, OS: cfOs },
+                handMovement: { OD: hmOd, OS: hmOs },
+                lightPerception: { OD: lpOd, OS: lpOs },
+                noLightPerception: { OD: nlpOd, OS: nlpOs },
+                lightProjection: {
+                    OD: { top: lpTopOd, bottom: lpBottomOd, left: lpLeftOd, right: lpRightOd },
+                    OS: { top: lpTopOs, bottom: lpBottomOs, left: lpLeftOs, right: lpRightOs }
+                },
+                pachymetry: {
+                    OD: { name: pachymetryOdName, date: pachymetryOdDate ? parseDate(pachymetryOdDate) : null },
+                    OS: { name: pachymetryOsName, date: pachymetryOsDate ? parseDate(pachymetryOsDate) : null }
+                },
+                tonometry: {
+                    OD: { name: tonometryOdName, methodOrTime: tonometryOdMethodOrTime ? tonometryOdMethodOrTime : null },
+                    OS: { name: tonometryOsName, methodOrTime: tonometryOsMethodOrTime ? tonometryOsMethodOrTime : null }
+                },
+                glaucomaFlowsheet: {
+                    visualFields: { OD: glaucomaVisualFieldsOd, OS: glaucomaVisualFieldsOs },
+                    cupDiskRatio: { OD: glaucomaCupDiskRatioOd, OS: glaucomaCupDiskRatioOs },
+                    iop: { OD: glaucomaIopOd, OS: glaucomaIopOs }
+                },
+                pupillaryDistance: {
+                    far: { OD: pdFarOd, OS: pdFarOs, OU: pdFarOu },
+                    near: { OD: pdNearOd, OS: pdNearOs, OU: pdNearOu }
+                },
+                fieldsFull: { OD: fieldsFullOd, OS: fieldsFullOs },
+                fieldsRestricted: { OD: fieldsRestrictedOd, OS: fieldsRestrictedOs },
+                distance: {
+                    reading: distanceReading,
+                    work: distanceWork
+                },
+                eyeColour,
+                hyperEye,
+                npc,
+                stereopsis,
+                nextAppointmentDate: nextAppointmentDate ? parseDate(nextAppointmentDate) : null
+            },
+            updatedBy: userId
+        };
+
+        const updatedDoc = await updateEyeModule(eyeModuleId, updateData, next);
+
+        if (!updatedDoc) {
+            return next(new ApiError(404, "EyeModule not found"));
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Preliminary test updated successfully",
+            data: updatedDoc
+        });
+    }
+);
+
+export const updateExamination = catchAsync(
+    async (req: Request | any, res: Response, next: NextFunction) => {
+        const { eyeModuleId } = req.params;
+        const {
+            // Slit Lamp
+            adnexaOd, adnexaOs,
+            lidsOd, lidsOs,
+            tearBreakOd, tearBreakOs,
+            conjunctivaOd, conjunctivaOs,
+            corneaOd, corneaOs,
+            antChamberOd, antChamberOs,
+            depthOd, depthOs,
+            cellsOd, cellsOs,
+            flareOd, flareOs,
+            irisOd, irisOs,
+            colourOd, colourOs,
+            anglesOd, anglesOs,
+            pupilOd, pupilOs,
+            lensOd, lensOs,
+            clarityOd, clarityOs,
+            antCapsOd, antCapsOs,
+            postCapsOd, postCapsOs,
+            cortexOd, cortexOs,
+            nucleusOd, nucleusOs,
+
+            // Ophthalmoscopy
+            opticDiscOd, opticDiscOs,
+            sizeOd, sizeOs,
+            ratioOd, ratioOs,
+            appearanceOd, appearanceOs,
+            nerveFiberOd, nerveFiberOs,
+            retinaOd, retinaOs,
+            maculaOd, maculaOs,
+            postRetinaOd, postRetinaOs,
+            vesselsOd, vesselsOs,
+            peripheryOd, peripheryOs,
+            vitreousOd, vitreousOs,
+
+            // Refraction
+            sphereOd, sphereOs,
+            cylOd, cylOs,
+            axisOd, axisOs,
+            addOd, addOs,
+            hPrismOd, hPrismOs,
+            hBaseOd, hBaseOs,
+            vPrismOd, vPrismOs,
+            vBaseOd, vBaseOs,
+            vcOd, vcOs,
+            bcvaOd, bcvaOs,
+
+            // Phorias
+            distAtUnnamed, distAtHorizontal, distAtVertical, distAtBase, distAtRefEye,
+            nearAtUnnamed, nearAtHorizontal, nearAtVertical, nearAtBase, nearAtRefEye,
+            phoriaMethodInput1, phoriaMethodInput2,
+
+            // Dates
+            nextAppointmentDate
+        } = req.body;
+        const { _id: userId } = (req.user).user;
+
+        if (!mongoose.Types.ObjectId.isValid(eyeModuleId)) {
+            return next(new ApiError(400, "Invalid EyeModule ID"));
+        }
+
+        const updateData = {
+            examination: {
+                slitLamp: {
+                    adnexa: { OD: adnexaOd, OS: adnexaOs },
+                    lids: { OD: lidsOd, OS: lidsOs },
+                    tearBreak: { OD: tearBreakOd, OS: tearBreakOs },
+                    conjunctiva: { OD: conjunctivaOd, OS: conjunctivaOs },
+                    cornea: { OD: corneaOd, OS: corneaOs },
+                    antChamber: { OD: antChamberOd, OS: antChamberOs },
+                    depth: { OD: depthOd, OS: depthOs },
+                    cells: { OD: cellsOd, OS: cellsOs },
+                    flare: { OD: flareOd, OS: flareOs },
+                    iris: { OD: irisOd, OS: irisOs },
+                    colour: { OD: colourOd, OS: colourOs },
+                    angles: { OD: anglesOd, OS: anglesOs },
+                    pupil: { OD: pupilOd, OS: pupilOs },
+                    lens: { OD: lensOd, OS: lensOs },
+                    clarity: { OD: clarityOd, OS: clarityOs },
+                    antCaps: { OD: antCapsOd, OS: antCapsOs },
+                    postCaps: { OD: postCapsOd, OS: postCapsOs },
+                    cortex: { OD: cortexOd, OS: cortexOs },
+                    nucleus: { OD: nucleusOd, OS: nucleusOs }
+                },
+                ophthalmoscopy: {
+                    opticDisc: { OD: opticDiscOd, OS: opticDiscOs },
+                    size: { OD: sizeOd, OS: sizeOs },
+                    ratio: { OD: ratioOd, OS: ratioOs },
+                    appearance: { OD: appearanceOd, OS: appearanceOs },
+                    nerveFiber: { OD: nerveFiberOd, OS: nerveFiberOs },
+                    retina: { OD: retinaOd, OS: retinaOs },
+                    macula: { OD: maculaOd, OS: maculaOs },
+                    postRetina: { OD: postRetinaOd, OS: postRetinaOs },
+                    vessels: { OD: vesselsOd, OS: vesselsOs },
+                    periphery: { OD: peripheryOd, OS: peripheryOs },
+                    vitreous: { OD: vitreousOd, OS: vitreousOs }
+                },
+                refraction: {
+                    sphere: { OD: sphereOd, OS: sphereOs },
+                    cyl: { OD: cylOd, OS: cylOs },
+                    axis: { OD: axisOd, OS: axisOs },
+                    add: { OD: addOd, OS: addOs },
+                    hPrism: { OD: hPrismOd, OS: hPrismOs },
+                    hBase: { OD: hBaseOd, OS: hBaseOs },
+                    vPrism: { OD: vPrismOd, OS: vPrismOs },
+                    vBase: { OD: vBaseOd, OS: vBaseOs },
+                    vc: { OD: vcOd, OS: vcOs },
+                    bcva: { OD: bcvaOd, OS: bcvaOs }
+                },
+                phorias: {
+                    distAt: {
+                        unnamed: distAtUnnamed,
+                        horizontal: distAtHorizontal,
+                        vertical: distAtVertical,
+                        base: distAtBase,
+                        refEye: distAtRefEye
+                    },
+                    nearAt: {
+                        unnamed: nearAtUnnamed,
+                        horizontal: nearAtHorizontal,
+                        vertical: nearAtVertical,
+                        base: nearAtBase,
+                        refEye: nearAtRefEye
+                    },
+                    method: {
+                        input1: phoriaMethodInput1,
+                        input2: phoriaMethodInput2
+                    }
+                },
+                nextAppointmentDate: nextAppointmentDate ? parseDate(nextAppointmentDate) : null
+            },
+            updatedBy: userId
+        };
+
+        const updatedDoc = await updateEyeModule(
+            eyeModuleId,
+            updateData,
+            next
+        );
+
+        if (!updatedDoc) {
+            return next(new ApiError(404, "EyeModule not found"));
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Examination updated successfully",
+            data: updatedDoc
+        });
+    }
+);
+
+export const updateOperationalTest = catchAsync(
+    async (req: Request | any, res: Response, next: NextFunction) => {
+        const { eyeModuleId } = req.params;
+        const files = req.files as any;
+        const { _id: userId } = (req.user).user;
+
+        if (!mongoose.Types.ObjectId.isValid(eyeModuleId)) {
+            return next(new ApiError(400, "Invalid EyeModule ID"));
+        }
+
+        const allowedTypes = OperationalNotesFileName.map(el => el.name);
+        const uploadedTests = [];
+
+        const protocol = req.get('X-Forwarded-Proto') || req.protocol;
+        const baseUrl = `${protocol}://${req.get('Host')}`;
+        const uploadPath = path.join(process.cwd(), configuration.useruploaddirectory);
+
+        await fs.mkdir(uploadPath, { recursive: true });
+
+        for (const [resultType, fileEntry] of Object.entries(files)) {
+            if (!allowedTypes.includes(resultType)) continue;
+
+            const fileList = Array.isArray(fileEntry) ? fileEntry : [fileEntry];
+
+            for (const file of fileList) {
+                const { name: originalName } = file;
+                const newFileName = !originalName ? `anon_${resultType}` : originalName.replace(/\s+/g, '');
+
+                // Generate unique filename
+                const filename = `${newFileName}_${uuidv4()}`;
+                const extension = path.extname(file.name).toLowerCase();
+
+                try {
+                    await uploaddocument(file, filename, ['.jpg', '.jpeg', '.png', '.pdf'], uploadPath);
+
+                    uploadedTests.push({
+                        resultType,
+                        fileUrl: `${baseUrl}/${configuration.useruploaddirectory}/${filename}${extension}`,
+                        uploadedBy: userId
+                    });
+                } catch (err: any) {
+                    return next(new ApiError(500, `Upload failed: ${err.message}`));
+                }
+            }
+        }
+
+        const updatedDoc = await updateEyeModule(
+            eyeModuleId,
+            { operationalTest: uploadedTests, updatedBy: userId },
+            next
+        );
+
+        if (!updatedDoc) {
+            return next(new ApiError(404, "EyeModule not found"));
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Operational tests updated successfully",
+            data: updatedDoc
+        });
+    }
+);
