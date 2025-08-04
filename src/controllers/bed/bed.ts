@@ -20,11 +20,13 @@ export const createbeds = async (req: any, res: Response) => {
     const actor = `${firstName} ${lastName}`;
     const id = new ObjectId(wardid);
     validateinputfaulsyvalue({ wardid });
+    
     const foundWard =  await readonewardmanagement({_id:id},'');
-    if(foundWard){
-      throw new Error(`Ward ${configuration.error.erroralreadyexit}`);
+    if(!foundWard){
+      throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
     
     }
+      
 
     // Check for existing bed with same number in the same ward
     const existing = await readonebed({ bednumber, ward:id }, '');
@@ -62,7 +64,7 @@ export const getAvailableBedsByWard = async (req: Request, res: Response) => {
       isDeleted:false
     };
 
-    const queryresult = await readallbeds(query, "");
+    const queryresult = await readallbeds(query, "","ward");
 
     res.status(200).json({ queryresult, status: true });
   } catch (error: any) {
@@ -93,7 +95,7 @@ export const softDeleteBed = async (req: Request, res: Response) => {
 
     // Adjust vacantbed count based on deletion or restoration
     const adjustment = isDeleted ? -1 : 1;
-    await updatewardmanagement(bed.ward, { $inc: { vacantbed: adjustment } });
+    if(isDeleted !== bed.isDeleted) await updatewardmanagement(bed.ward, { $inc: { vacantbed: adjustment,totalbed: adjustment } });
 
     // Apply soft delete / restore
     const queryresult = await updatebed(id, { isDeleted });
@@ -109,7 +111,7 @@ export const softDeleteBed = async (req: Request, res: Response) => {
 // Read all beds
 export const getallbeds = async (req: Request, res: Response) => {
   try {
-    const queryresult = await readallbeds({}, '');
+    const queryresult = await readallbeds({}, '','ward');
     res.status(200).json({ queryresult, status: true });
   } catch (e: any) {
     console.log(e);
@@ -121,20 +123,16 @@ export const getallbeds = async (req: Request, res: Response) => {
 export const updatebeds = async (req: any, res: Response) => {
   try {
     const { id } = req.params;
-    const { bednumber, wardid,  assignedPatient } = req.body;
+    const { bednumber} = req.body;
     const { firstName, lastName } = req.user.user;
     const actor = `${firstName} ${lastName}`;
-    validateinputfaulsyvalue({ bednumber, wardid });
-    const ward = new ObjectId(wardid);
-    const existing = await readonebed({ bednumber, ward }, '');
+    validateinputfaulsyvalue({ bednumber});
+    const existing = await readonebed({ bednumber}, '');
     if (existing) {
       throw new Error(`Bed ${configuration.error.erroralreadyexit}`);
     }
     const queryresult = await updatebed(id, {
-      bednumber,
-      ward,
-      assignedPatient,
-      assignedDate: assignedPatient ? new Date() : null
+      bednumber
     });
 
     await createaudit({ action: "Updated Bed", actor, affectedentity: bednumber });

@@ -13,9 +13,9 @@ export async function createbed(input: any) {
 }
 
 // Read all beds
-export async function readallbeds(query: any, selectquery: any) {
+export async function readallbeds(query: any, selectquery: any, populate:any) {
   try {
-    const bedDetails = await Bed.find(query).select(selectquery).sort({ createdAt: -1 });
+    const bedDetails = await Bed.find(query).select(selectquery).populate(populate).sort({ createdAt: -1 });
     const totalBeds = await Bed.countDocuments(query);
     return { bedDetails, totalBeds };
   } catch (err) {

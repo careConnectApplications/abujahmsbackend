@@ -98,7 +98,7 @@ export async function getallreferedforadmission(req:any, res:any){
     try{
        const {ward} = req.params;
        const referedward = new ObjectId(ward);
-        const queryresult = await readalladmission({referedward},{},'referedward','patient');
+        const queryresult = await readalladmission({referedward},{},'referedward','patient','bed');
         res.status(200).json({
             queryresult,
             status:true
@@ -119,7 +119,7 @@ export async function getalladmissionbypatient(req:any, res:any){
      const {patient} = req.params;
      console.log(patient);
      const referedward = new ObjectId(patient);
-      const queryresult = await readalladmission({patient},{},'referedward','patient');
+      const queryresult = await readalladmission({patient},{},'referedward','patient','bed');
       res.status(200).json({
           queryresult,
           status:true
