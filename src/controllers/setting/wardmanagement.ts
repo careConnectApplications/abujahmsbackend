@@ -8,7 +8,7 @@ import {createbed} from "../../dao/bed";
 export var createward = async (req:any,res:any) =>{
    
     try{
-     
+       req.body.occupiedbed=0;
        const {bedspecialization,wardname,totalbed,occupiedbed} = req.body;
        validateinputfaulsyvalue({bedspecialization,wardname});
        validateinputfornumber({totalbed,occupiedbed});
@@ -45,7 +45,7 @@ export var createward = async (req:any,res:any) =>{
         createbed({
           bednumber: `B${i.toString().padStart(3, '0')}`,  // e.g. B001
           ward: queryresult._id,
-          status: i <= occupiedbed ? 'occupied' : 'vacant',
+          status: 'vacant',
           assignedPatient: null,
           assignedDate: null
         })

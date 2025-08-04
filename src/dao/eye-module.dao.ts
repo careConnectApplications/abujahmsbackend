@@ -83,6 +83,7 @@ export const queryEyeRecordsPaginated = async (
     return docs;
 };
 
+
 export async function findEyeModule(query: any, selectquery: any) {
     return await EyeModule.find(query).select(selectquery);
 }
