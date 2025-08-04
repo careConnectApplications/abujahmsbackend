@@ -7,8 +7,8 @@ import configuration from "../../config";
 import { readonepatient } from "../../dao/patientmanagement";
 import { readoneappointment } from "../../dao/appointment";
 import { parseDate, uploaddocument } from "../../utils/otherservices";
-import { createEyeService, findOneEyeModule, updateEyeModule, getAllEyeRecordpaginated, queryEyeRecordsPaginated } from "../../dao/eye-module.dao";
-import { OperationalNotesFileName, LensTint, lensType } from "../../config/eye-modules";
+import { createEyeService, findOneEyeModule, updateEyeModule, getAllEyeRecordpaginated, queryEyeRecordsPaginated, findEyeModule } from "../../dao/eye-module.dao";
+import { OperationalNotesFileName, LensTint, lensType, slitLamp, opthalmoscopy, refraction } from "../../config/eye-modules";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { IOptions } from '../../paginate/paginate';
@@ -742,7 +742,7 @@ export const getAllEyeUtilData = catchAsync(async (req: Request | any, res: Resp
         status: "success",
         message: "eye module config",
         data: {
-            OperationalNotesFileName, LensTint, lensType
+            OperationalNotesFileName, LensTint, lensType, slitLamp, opthalmoscopy, refraction
         }
     });
 });
@@ -1181,3 +1181,33 @@ export const updateOperationalTest = catchAsync(
         });
     }
 );
+
+export const getEyeRecordByPatientId = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { patientId } = req.params;
+
+    // Validate required IDs
+    if (!patientId) return next(new ApiError(400, configuration.error.errorPatientIdIsRequired));
+
+    let _patientId;
+    try {
+        _patientId = new mongoose.Types.ObjectId(patientId);
+    } catch (err) {
+        return next(new ApiError(400, "Invalid ID format"));
+    }
+
+    // Check if patient and appointment exist
+    const foundPatient = await readonepatient({ _id: _patientId }, {}, '', '');
+    if (!foundPatient) {
+        return next(new ApiError(404, "Patient does not exist."));
+    }
+
+    const doc = await findEyeModule({ patient: _patientId }, {});
+
+    if (!doc) return next(new ApiError(404, `no record was found with patient id ${patientId} and appointmentId`));
+
+    res.status(200).json({
+        status: "success",
+        message: "Eye record fetched successfully",
+        data: doc
+    });
+});
