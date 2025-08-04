@@ -6,6 +6,7 @@ import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
+import {readonebed} from "../../dao/bed";
 import configuration from "../../config";
 const { ObjectId } = mongoose.Types;
 
@@ -17,17 +18,24 @@ export var referadmission= async (req:any, res:any) =>{
       var admissionid:any=String(Date.now());
       //accept _id from request
       const {id} = req.params;
-      console.log('id', id);
       //doctorname,patient,appointment
-      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid} = req.body;
-      validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate});
+      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid,bed_id} = req.body;
+      validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate,bed_id});
       //confirm ward
       const referedwardid = new ObjectId(referedward);
+      const bed = new ObjectId(bed_id);
       const foundWard =  await readonewardmanagement({_id:referedwardid},'');
+      const foundBed = await readonebed({_id:bed},'');
       if(!foundWard){
           throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
 
       }
+       if(!foundBed){
+          throw new Error(`Bed doesnt ${configuration.error.erroralreadyexit}`);
+
+      }
+      //valid that bed exist
+
          var appointment:any;
                 if(appointmentid){
                   appointmentid = new ObjectId(appointmentid);
@@ -66,13 +74,16 @@ export var referadmission= async (req:any, res:any) =>{
 
 }
 //create admission
-var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid});
+var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed});
+ await updatewardmanagement(referedwardid,{$inc:{occupiedbed:1,vacantbed:-1}});
 //update patient 
 var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
 if(appointmentid){
               await updateappointment(appointment._id,{admission:admissionrecord._id});
       
 }
+//create bed fee
+
 res.status(200).json({queryresult:admissionrecord, status: true});
     }
     
@@ -87,7 +98,7 @@ export async function getallreferedforadmission(req:any, res:any){
     try{
        const {ward} = req.params;
        const referedward = new ObjectId(ward);
-        const queryresult = await readalladmission({referedward},{},'referedward','patient');
+        const queryresult = await readalladmission({referedward},{},'referedward','patient','bed');
         res.status(200).json({
             queryresult,
             status:true
@@ -108,7 +119,7 @@ export async function getalladmissionbypatient(req:any, res:any){
      const {patient} = req.params;
      console.log(patient);
      const referedward = new ObjectId(patient);
-      const queryresult = await readalladmission({patient},{},'referedward','patient');
+      const queryresult = await readalladmission({patient},{},'referedward','patient','bed');
       res.status(200).json({
           queryresult,
           status:true

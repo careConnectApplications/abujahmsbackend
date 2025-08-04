@@ -8,6 +8,7 @@ import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestco
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
 import {createpricingmodel, updatepricingmodel, getpricingmodel} from "../controllers/setting/pricemodel";
 import {createoutreachmedications, getalloutreachmedications, updateoutreachmedications} from "../controllers/setting/outreachmedication";
+import {createbeds,getAvailableBedsByWard,softDeleteBed,getallbeds,updatebeds} from "../controllers/bed/bed";
 import {readAllaudit} from "../controllers/audit/audit";
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
@@ -65,7 +66,12 @@ router.get('/readallaudit',readAllaudit);
 router.post('/createoutreachmedication',createoutreachmedications);
 router.get('/getalloutreachmedication',getalloutreachmedications);
 router.put('/updateoutreachmedication/:id',updateoutreachmedications);
-
+//bed management
+router.post('/createbed',createbeds);
+router.get('/getavailablebedsbyward/:wardid',getAvailableBedsByWard);
+router.get('/getallbeds',getallbeds);
+router.put('/softdeleterestorebed/:id',softDeleteBed);
+router.put('/updatebednumber/:id',updatebeds);
     
 
 
