@@ -7,9 +7,12 @@ const psychiatricEvaluationSchema = new mongoose.Schema({
   },
   appointmentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Appointment',
-    required: true
+    ref: 'Appointment'
   },
+  admissionId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Admission'
+    },
   presentingcomplaints: [String],
   historyofpresentingcomplaints: [String],
   pastpsychiatrichistory: [String],

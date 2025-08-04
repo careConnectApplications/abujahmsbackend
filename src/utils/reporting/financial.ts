@@ -4,7 +4,7 @@ export const financialreports=(startdate:any,enddate:any)=>{
 const financialaggregatepaid = [
       {   
       
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+        $match:{$and:[{status:configuration.status[3]} , {updatedAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
       {
@@ -28,7 +28,7 @@ const financialaggregatepaid = [
     const financialaggregategrandtotalpaid = [
       {   
       
-        $match:{$and:[{status:configuration.status[3]} , {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+        $match:{$and:[{status:configuration.status[3]} , {updatedAt:{ $gt: startdate, $lt: enddate }}]}   
 
 },
       {

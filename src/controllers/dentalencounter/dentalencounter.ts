@@ -9,6 +9,7 @@ import {
 } from "../../dao/dentalencounter";
 import { readonepatient } from "../../dao/patientmanagement";
 import { readoneappointment } from "../../dao/appointment";
+import {readoneadmission} from  "../../dao/admissions";
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";const { ObjectId } = mongoose.Types;
 
@@ -88,25 +89,33 @@ export const createDentalEncounterController = catchAsync(async (req: Request | 
     materialsUsed,
     procedureNotes,
     postProcedureCareInstructions,
-    appointmentunderscoreid
+    appointmentoradmissionunderscoreid
   } = req.body;
 
-  validateinputfaulsyvalue({ id, appointmentunderscoreid });
+  validateinputfaulsyvalue({ id, appointmentoradmissionunderscoreid });
 
   const patient: any = await readonepatient({ _id: id }, {}, '', '');
   if (!patient) {
     return next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
   }
 
-  const appointmentId = new ObjectId(appointmentunderscoreid);
-  const appointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
-  if (!appointment) {
-    return next(new Error(`Appointment does not exist ${configuration.error.erroralreadyexit}`));
+  const checkappointmentId = new ObjectId(appointmentoradmissionunderscoreid);
+  const appointment: any = await readoneappointment({ _id: checkappointmentId }, {}, '');
+  var appointmentId;
+  var admissionId;
+   var checkadimmison = await readoneadmission({ _id: checkappointmentId }, {}, '');
+      if (checkadimmison) {
+        admissionId =checkappointmentId;
+  
+      }
+  if (appointment) {
+    admissionId=checkappointmentId;
   }
 
   const input = {
     patientId: patient._id,
     appointmentId,
+    admissionId,
     chiefComplaint,
   dentalHistoryNotes,
   previousDentalProcedure,
