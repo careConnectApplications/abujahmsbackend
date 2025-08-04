@@ -7,7 +7,11 @@ import {
     getAllEyeRecordsPaginatedHandler,
     getAllEyeUtilData,
     getEyeRecordByAppointmentIdAndPatientId,
-    getEyeRecordById
+    getEyeRecordById,
+    updateExamination,
+    updateLensPrescription,
+    updateOperationalTest,
+    updatePreliminaryTest
 } from "../controllers/eye-module/eye-module.controller";
 
 const router = express.Router();
@@ -19,6 +23,10 @@ router.post("/operational-notes/appointment/:appointmentId/patient/:patientId", 
 router.get("/appointment/:appointmentId/patient/:patientId", getEyeRecordByAppointmentIdAndPatientId)
 router.get("/:Id", getEyeRecordById);
 router.get("", getAllEyeRecordsPaginatedHandler);
-router.get("/data/config", getAllEyeUtilData)
+router.get("/data/config", getAllEyeUtilData);
+router.patch("/lens-prescription/:eyeModuleId", updateLensPrescription);
+router.patch("/preliminary-test/:eyeModuleId", updatePreliminaryTest);
+router.patch("/examination/:eyeModuleId", updateExamination);
+router.patch("/operational-notes", updateOperationalTest);
 
 export default router;
