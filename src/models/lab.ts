@@ -14,7 +14,8 @@ const testresultSchema = new Schema({
 });
 const chemicalpathologyreportSchema=new Schema({
   comment: String,
-  reportedby: { type: String }
+  reportedby: { type: String },
+  status: String
 });
 const peripheralbloodfilmreportSchema = new Schema({
   summary: [{ type: String }],
@@ -23,7 +24,8 @@ const peripheralbloodfilmreportSchema = new Schema({
   platelet: [{ type: String }],
   impression: [{ type: String }],
   suggestion: [{ type: String }],
-  reportedby: { type: String }
+  reportedby: { type: String },
+  status: String
 });
 const ADHbonemarrowaspirationreportSchema = new Schema({
   clinicalnotes: [{ type: String }],
@@ -37,7 +39,8 @@ const ADHbonemarrowaspirationreportSchema = new Schema({
   abnomalcells: { type: String },
   ironstore: { type: String },
   conclusion: [{ type: String }], // assuming this was a typo for "conclusion"
-  reportedby: { type: String }
+  reportedby: { type: String },
+  status: String
 });
 
 
