@@ -1129,7 +1129,8 @@ const configuration: any = {
     errorInvalidObjectId: "Invalid Object Id",
     errorMustBeAnArray: "Exam types are required and must be an array!",
     errorIdIsRequired: "Id not found in params!",
-    errorPatientIdIsRequired: "Patient Id is required!"
+    errorPatientIdIsRequired: "Patient Id is required!",
+    errorNotValidPhoneNumber: "not a valid phone number!"
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   environment: "test",

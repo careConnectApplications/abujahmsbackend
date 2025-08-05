@@ -5,13 +5,13 @@ export interface usersinterface {
   title: String;
   firstName: String;
   middleName: String;
-  lastName:String;
+  lastName: String;
 }
 //create schema
 const userSchema = new Schema(
   {
     title: {
-      
+
       type: String
     },
     staffId: {
@@ -22,7 +22,7 @@ const userSchema = new Schema(
       required: true,
       type: String,
     },
-    
+
     firstName: {
       required: true,
       type: String,
@@ -36,27 +36,26 @@ const userSchema = new Schema(
     },
 
     country: {
-     
+
       type: String
     },
     state: {
-      
+
       type: String
     },
     city: {
-     
+
       type: String
     },
     address: {
-    
+
       type: String
     },
     age: {
-    
+
       type: String
     },
     dateOfBirth: {
-     
       type: String
     },
     gender: {
@@ -64,43 +63,46 @@ const userSchema = new Schema(
       type: String,
     },
     licence: {
-   
+
       type: String
     },
     phoneNumber: {
-    
-      type: String
+      type: String,
+      trim: true,
+      required: [true, "phone number is required"],
+      unique: true
     },
     email: {
       required: true,
       type: String,
+      unique: true
     },
     role: {
       required: true,
       type: String,
     },
     degree: {
-     
+
       type: String
     },
     profession: {
-    
+
       type: String
     },
     employmentStatus: {
-   
+
       type: String
     },
     nativeSpokenLanguage: {
-      
+
       type: String
     },
     otherLanguage: {
-     
+
       type: String
     },
     readWriteLanguage: {
-      
+
       type: String
     },
     clinic: {
@@ -108,11 +110,11 @@ const userSchema = new Schema(
       type: String,
     },
     zip: {
-    
+
       type: String
     },
     specializationDetails: {
-    
+
       type: String
     },
     password: {
@@ -123,7 +125,7 @@ const userSchema = new Schema(
       type: [Number],
       default: []
     },
-    status:{
+    status: {
       required: true,
       type: String,
       default: configuration.status[1],
@@ -133,19 +135,19 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function(next){
-  try{
-      //GENERATE A SALT
-      const salt = await bcrypt.genSalt(10);
-      //generate password hash
-      const passwordHash = await bcrypt.hash(this.password, salt);
-      //re-assign hashed version of original
-      this.password = passwordHash;
-      next();
+userSchema.pre("save", async function (next) {
+  try {
+    //GENERATE A SALT
+    const salt = await bcrypt.genSalt(10);
+    //generate password hash
+    const passwordHash = await bcrypt.hash(this.password, salt);
+    //re-assign hashed version of original
+    this.password = passwordHash;
+    next();
 
   }
-  catch(error:any){
-      next(error)
+  catch (error: any) {
+    next(error)
   }
 });
 
