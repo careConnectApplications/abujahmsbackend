@@ -652,7 +652,7 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
   try {
     //for doctors show only patient assigned to them
     const { _id } = (req.user).user;
-    console.log('_id', _id);
+   
     //doctor
     //for nursings 
     // Get today's date

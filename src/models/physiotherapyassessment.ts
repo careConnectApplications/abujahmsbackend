@@ -76,7 +76,7 @@ const physiotherapyAssessmentSchema = new Schema({
   ROMDeficit: { type: String },
 
   painLevelDuringMovement: {
-    type: Number,
+    type: String,
     enum: ["1", "2", "3", "4", "5", "6"]
   },
 
@@ -95,9 +95,12 @@ const physiotherapyAssessmentSchema = new Schema({
       },
       appointmentId:{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Appointment',
-      required: true
-    }
+      ref: 'Appointment'
+    },
+     admissionId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Admission'
+      },
 },{
   timestamps: true
 });
