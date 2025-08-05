@@ -3,6 +3,7 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardname
+  bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
   tmjAssessment:['Normal', 'Clicking', 'Painful', 'Limited Movement', 'Other'],
