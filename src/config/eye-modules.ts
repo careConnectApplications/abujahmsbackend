@@ -4,7 +4,7 @@ export const OperationalNotesFileName = [
         label: "Central Visual Field  (CVF)"
     },
     { name: "OCT", label: "OCT" },
-    { name: "FundusPhotographs", label: "Fundus Photograph" },
+    { name: "FundusPhotograph", label: "Fundus Photograph" },
     { name: "FFA", label: "FFA" }
 ];
 
