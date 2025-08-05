@@ -217,9 +217,19 @@ export const isObjectAvailable = (objectName: any) => {
 }
 
 export function parseDate(input: string): Date | null {
-    if (!input || typeof input !== "string") return null;
+  if (!input || typeof input !== "string") return null;
 
-    const m = moment(input, "DD/MM/YYYY", true); // strict parsing
+  const m = moment(input, "DD/MM/YYYY", true); // strict parsing
 
-    return m.isValid() ? m.toDate() : null;
+  return m.isValid() ? m.toDate() : null;
+}
+
+export function isValidPhoneNumber(phoneNumber: string): boolean {
+  if (!phoneNumber || typeof phoneNumber === 'string') {
+    return false;
+  }
+
+  const phoneNumberRegex = /^(\+?234|0)(70|80|81|90|91)\d{8}$/;
+
+  return phoneNumberRegex.test(phoneNumber);
 }

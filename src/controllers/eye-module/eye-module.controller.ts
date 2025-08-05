@@ -127,7 +127,7 @@ export const createLensPrescription = catchAsync(async (req: Request | any, res:
 
     if (existingEyeModule) {
         if (existingEyeModule.optometryLensPrescription) {
-            return next(new ApiError(400, "Lens prescription already exists. Please use the update function instead."));
+            return next(new ApiError(400, "Lens prescription already exists. Please use schedule another one."));
         }
 
         eyeDoc = await updateEyeModule(
@@ -320,7 +320,7 @@ export const createExamination = catchAsync(async (req: Request | any, res: Resp
     if (existingEyeModule) {
         // If examination already exists, prevent overwrite unless you want update logic
         if (existingEyeModule.examination) {
-            return next(new ApiError(400, "Examination already exists. Use update instead."));
+            return next(new ApiError(400, "Examination already exists. schedule another."));
         }
 
         // Update existing module
@@ -503,7 +503,7 @@ export const createPreliminaryTest = catchAsync(async (req: Request | any, res: 
     if (existingEyeModule) {
         // Prevent overwrite if test already exists (optional — you may allow update)
         if (existingEyeModule.preliminaryTest) {
-            return next(new ApiError(400, "Preliminary test already exists. Use update instead."));
+            return next(new ApiError(400, "Preliminary test already exists. schedule another one."));
         }
 
         // Update existing module
@@ -1179,8 +1179,7 @@ export const updateOperationalTest = catchAsync(
             message: "Operational tests updated successfully",
             data: updatedDoc
         });
-    }
-);
+    });
 
 export const getEyeRecordByPatientId = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { patientId } = req.params;
