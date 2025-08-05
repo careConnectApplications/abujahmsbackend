@@ -6,7 +6,7 @@ import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
-import {readonebed} from "../../dao/bed";
+import {readonebed,updatebed} from "../../dao/bed";
 import configuration from "../../config";
 const { ObjectId } = mongoose.Types;
 
@@ -24,8 +24,8 @@ export var referadmission= async (req:any, res:any) =>{
       //confirm ward
       const referedwardid = new ObjectId(referedward);
       const bed = new ObjectId(bed_id);
-      const foundWard =  await readonewardmanagement({_id:referedwardid},'');
-      const foundBed = await readonebed({_id:bed},'');
+      const foundWard:any =  await readonewardmanagement({_id:referedwardid},'');
+      const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
       if(!foundWard){
           throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
 
@@ -76,6 +76,10 @@ export var referadmission= async (req:any, res:any) =>{
 //create admission
 var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed});
  await updatewardmanagement(referedwardid,{$inc:{occupiedbed:1,vacantbed:-1}});
+//change status of bed
+await updatebed(bed,{status:configuration.bedstatus[1]});
+
+ 
 //update patient 
 var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
 if(appointmentid){

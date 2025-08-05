@@ -64,7 +64,7 @@ export const createPsychiatricEvaluationController = catchAsync(async (req: Requ
     }
     var checkappointmentId=new ObjectId(appointmentoradmissionunderscoreid);
     //validate appointment id
-    var appointment:any = await readoneappointment({ _id:appointmentId }, {}, '');
+    var appointment:any = await readoneappointment({ _id:checkappointmentId }, {}, '');
      var checkadimmison = await readoneadmission({ _id: checkappointmentId }, {}, '');
     var appointmentId;
    var admissionId;
@@ -73,7 +73,7 @@ export const createPsychiatricEvaluationController = catchAsync(async (req: Requ
   
       }
        if (appointment) {
-    admissionId=checkappointmentId;
+    appointmentId=checkappointmentId;
   }
    
 
