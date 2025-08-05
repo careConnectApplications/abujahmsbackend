@@ -576,8 +576,6 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
     const allowedTypes = OperationalNotesFileName.map(el => el.name);
     const uploadedTests = [];
 
-    const protocol = req.get('X-Forwarded-Proto') || req.protocol;
-    const baseUrl = `${protocol}://${req.get('Host')}`;
     const uploadPath = path.join(process.cwd(), configuration.useruploaddirectory);
     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx'];
 
@@ -606,7 +604,7 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
                 await uploaddocument(file, filename, allowedExtensions, uploadPath);
 
                 // Build public URL
-                const fileUrl = `${baseUrl}/api/v1/${configuration.useruploaddirectory}/${filename}${extension}`;
+                const fileUrl = `/${configuration.useruploaddirectory}/${filename}${extension}`;
 
                 // Add to operational test list
                 uploadedTests.push({
@@ -1131,8 +1129,6 @@ export const updateOperationalTest = catchAsync(
         const allowedTypes = OperationalNotesFileName.map(el => el.name);
         const uploadedTests = [];
 
-        const protocol = req.get('X-Forwarded-Proto') || req.protocol;
-        const baseUrl = `${protocol}://${req.get('Host')}`;
         const uploadPath = path.join(process.cwd(), configuration.useruploaddirectory);
 
         await fs.mkdir(uploadPath, { recursive: true });
@@ -1155,7 +1151,7 @@ export const updateOperationalTest = catchAsync(
 
                     uploadedTests.push({
                         resultType,
-                        fileUrl: `${baseUrl}/${configuration.useruploaddirectory}/${filename}${extension}`,
+                        fileUrl: `/${configuration.useruploaddirectory}/${filename}${extension}`,
                         uploadedBy: userId
                     });
                 } catch (err: any) {
