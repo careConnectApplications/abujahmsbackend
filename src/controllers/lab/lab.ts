@@ -504,6 +504,9 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
             updatedAt:1,
             testid:1,
             department:1,
+            chemicalpathologyreport:1,
+            peripheralbloodfilmreport:1,
+            ADHbonemarrowaspirationreport:1,
             firstName:"$patient.firstName",
             lastName:"$patient.lastName",
             phoneNumber:"$patient.phoneNumber",
@@ -549,9 +552,9 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
     throw new Error(configuration.error.errorservicetray);
 
   }
-  const peripheralbloodfilmreport={reportedby,summary,redbloodcell,whitebloodcell,platelet,impression,suggestion};
-  const ADHbonemarrowaspirationreport={reportedby,clinicalnotes,boneconsistency,aspiration,erythroidratio,erythropoiesis,leucopoesis,megakaryopoiesis,plasmacells,abnomalcells,ironstore,conclusion};
-  const chemicalpathologyreport ={reportedby,comment};
+  const peripheralbloodfilmreport={status:configuration.hematologyandchemicalpathologystatus[2],reportedby,summary,redbloodcell,whitebloodcell,platelet,impression,suggestion};
+  const ADHbonemarrowaspirationreport={status:configuration.hematologyandchemicalpathologystatus[2],reportedby,clinicalnotes,boneconsistency,aspiration,erythroidratio,erythropoiesis,leucopoesis,megakaryopoiesis,plasmacells,abnomalcells,ironstore,conclusion};
+  const chemicalpathologyreport ={status:configuration.hematologyandchemicalpathologystatus[3],reportedby,comment};
   var processeddate:any=new Date();
   var queryresult;
   validateinputfaulsyvalue({lab});

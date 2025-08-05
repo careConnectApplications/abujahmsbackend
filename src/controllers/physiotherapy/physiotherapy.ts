@@ -11,6 +11,7 @@ import {
   readOnePhysiotherapyAssessment,
   updatePhysiotherapyAssessmentById
 } from "../../dao/physiotherapyassessment";
+import {readoneadmission} from  "../../dao/admissions";
 
 const { ObjectId } = mongoose.Types;
 
@@ -19,7 +20,7 @@ export const createPhysiotherapyAssessments = catchAsync(async (req: Request | a
   const { firstName, lastName } = req.user.user;
   const staffname = `${firstName} ${lastName}`;
   const { 
-    appointmentunderscoreid,
+  appointmentoradmissionunderscoreid,
   chiefComplaint,
   historyOfPresentCondition,
   medicalHistory,
@@ -65,19 +66,30 @@ export const createPhysiotherapyAssessments = catchAsync(async (req: Request | a
   
    } = req.body;
 
-  validateinputfaulsyvalue({ id, appointmentunderscoreid });
-const appointmentId = new ObjectId(appointmentunderscoreid);
+  validateinputfaulsyvalue({ id, appointmentoradmissionunderscoreid });
+//const appointmentId = new ObjectId(appointmentunderscoreid);
   const patient = await readonepatient({ _id: id }, {}, '', '');
   if (!patient) return next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
-
-  const appointment = await readoneappointment({ _id: new ObjectId(appointmentId) }, {}, '');
-  if (!appointment) return next(new Error(`Appointment does not exist ${configuration.error.erroralreadyexit}`));
+  var checkappointmentId=new ObjectId(appointmentoradmissionunderscoreid);
+  const appointment = await readoneappointment({ _id: checkappointmentId }, {}, '');
+  var checkadimmison = await readoneadmission({ _id: checkappointmentId }, {}, '');
+  var appointmentId;
+  var admissionId;
+  if (checkadimmison) {
+          admissionId =checkappointmentId;
+    
+        }
+          if (appointment) {
+    appointmentId=checkappointmentId;
+  }
+  //if (!appointment) return next(new Error(`Appointment does not exist ${configuration.error.erroralreadyexit}`));
   
 
    
   const input = {
   patientId: patient._id,
   appointmentId,
+  admissionId,
   createdBy: staffname,
 
 rangeofmotion:{

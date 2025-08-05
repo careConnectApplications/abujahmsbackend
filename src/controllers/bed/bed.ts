@@ -37,7 +37,7 @@ export const createbeds = async (req: any, res: Response) => {
     const queryresult = await createbed({
       bednumber,
       ward:id,
-      status: "vacant",
+      status: configuration.bedstatus[0],
       assignedPatient: null,
       assignedDate: null
     });
@@ -60,7 +60,7 @@ export const getAvailableBedsByWard = async (req: Request, res: Response) => {
 
     const query = {
       ward: wardid,
-      status: "vacant",
+      status: configuration.bedstatus[0],
       isDeleted:false
     };
 
@@ -89,7 +89,7 @@ export const softDeleteBed = async (req: Request, res: Response) => {
     }
 
     // Block operation if bed is occupied
-    if (bed.status === "occupied") {
+    if (bed.status === configuration.bedstatus[1]) {
       throw new Error("Cannot delete or restore an occupied bed.");
     }
 

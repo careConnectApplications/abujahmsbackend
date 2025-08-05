@@ -109,7 +109,7 @@ export const createDentalEncounterController = catchAsync(async (req: Request | 
   
       }
   if (appointment) {
-    admissionId=checkappointmentId;
+    appointmentId=checkappointmentId;
   }
 
   const input = {
