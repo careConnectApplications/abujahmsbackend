@@ -195,7 +195,7 @@ const configuration: any = {
         insulinroute: ["SC", "IV", "IM"],
         insulinsymptoms: ["Sweating", "Dizziness", "Confusion"],
         insulininterventionprovided: ["Oral", "Glucose", "IV"],
-        admissionstatus: ["admited", "totransfer", "transfered", "todischarge", "discharged"],
+        admissionstatus: configuration.admissionstatus,
         medicationchartfrequency: ["Start", "Daily", "BD", "TDS", "QDS", "PRM", "NOCTE", "4 Hours", "8 Hours", "12 Hours"],
         medicationchartroute: ["oral", "caudal block", "continuous epidural", "continuous intra-arterial infusion", "continuous IV infusion", "continuous nebulization", "continuous subcutaneous infusion", "continuous intrathecal infusion", "cervical", "dental", "epidural", "otic (ear)", "endotracheal", "feeding tube", "G-tube",
           "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
