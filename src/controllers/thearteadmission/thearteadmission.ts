@@ -99,7 +99,10 @@ res.status(200).json({queryresult:theatreadmissionrecord, status: true});
 export async function getallreferedfortheatreadmission(req:any, res:any){
     try{
        const {theatre} = req.params;
-       const referedtheatre = new ObjectId(theatre);
+       let referedtheatre;
+       if(theatre){
+       referedtheatre= new ObjectId(theatre);
+       }
         const queryresult = await readallthearteadmission({referedtheatre},{},'referedtheatre','patient','conscent');
         res.status(200).json({
             queryresult,

@@ -25,15 +25,19 @@ export var referadmission= async (req:any, res:any) =>{
       const referedwardid = new ObjectId(referedward);
       const bed = new ObjectId(bed_id);
       const foundWard:any =  await readonewardmanagement({_id:referedwardid},'');
-      const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
       if(!foundWard){
           throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
 
       }
+      const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
        if(!foundBed){
           throw new Error(`Bed doesnt ${configuration.error.erroralreadyexit}`);
 
       }
+      //validate bed status
+    if (foundBed.status == configuration.bedstatus[1]) {
+      throw new Error(`${foundBed.bednumber} Bed is already occupied`);
+    }
       //valid that bed exist
 
          var appointment:any;
@@ -73,15 +77,17 @@ export var referadmission= async (req:any, res:any) =>{
     throw new Error(`Patient Admission ${configuration.error.erroralreadyexit}`);
 
 }
+
+
 //create admission
 var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed});
- await updatewardmanagement(referedwardid,{$inc:{occupiedbed:1,vacantbed:-1}});
-//change status of bed
-await updatebed(bed,{status:configuration.bedstatus[1]});
+// Update ward and bed status simultaneously using Promise.all
+await Promise.all([
+  updatewardmanagement(referedwardid, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
+  updatebed(bed, { status: configuration.bedstatus[1] }),
+  updatepatient(patient._id,{$push: {admission:admissionrecord._id}})
+]);
 
- 
-//update patient 
-var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
 if(appointmentid){
               await updateappointment(appointment._id,{admission:admissionrecord._id});
       
@@ -139,11 +145,17 @@ export async function getalladmissionbypatient(req:any, res:any){
 //admited,to transfer,transfer,to discharge, discharge
 export async function updateadmissionstatus(req:any, res:any){
   const {id} = req.params;
-  var {status, transfterto} = req.body;
-   transfterto = new ObjectId(transfterto);
+  var {status, transfterto,bed_id} = req.body;
+  if (transfterto) {
+  transfterto = new ObjectId(transfterto);
+}
+
+if (bed_id) {
+  bed_id = new ObjectId(bed_id);
+}
   try{
     //validate that status is included in te status choice
-    if(!(configuration.admissionstatus).includes(status))
+    if(![ "transfered",  "discharged"].includes(status))
       throw new Error(`${status} status doesnt ${configuration.error.erroralreadyexit}`);
 
     //if status = discharge
@@ -153,56 +165,52 @@ export async function updateadmissionstatus(req:any, res:any){
       if(!response){
           throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
       }
-      var ward:any = await readonewardmanagement({_id:response?.referedward},{});
-      if(!ward){
-        // return error
-        throw new Error(`Ward donot ${configuration.error.erroralreadyexit}`);
-      }
+      
      
-      var transftertoward:any= await readonewardmanagement({_id:transfterto},{});
-      if(transfterto && status == configuration.admissionstatus[2] &&  !transftertoward){
-          // return error
-          throw new Error(`Ward to be transfered donot  ${configuration.error.erroralreadyexit}`);
-      }
-      if(transfterto && status == configuration.admissionstatus[2] && transftertoward.vacantbed < 1){
-        throw new Error(`${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
-        
+      var transftertoward:any;
+      var foundBed;
+      console.log("transftertoward",transfterto);
+     
+    if(transfterto){
+       console.log("insidetransftertoward",transfterto);
+            transftertoward= await readonewardmanagement({_id:transfterto},{});
+            foundBed=await readonebed({_id:bed_id, ward:transftertoward._id, status:configuration.bedstatus[0], isDeleted:false},'');
 
-      }
-      if((status == configuration.admissionstatus[1] || status == configuration.admissionstatus[3]) && ward.vacantbed < 1){
-        throw new Error(`${ward.wardname}  ${configuration.error.errorvacantspace}`);
-
-      }
+    }
+    if(transfterto && (status != configuration.admissionstatus[3] ||  !transftertoward || !foundBed)) throw new Error(`Ward or Bed to be transfered donot  ${configuration.error.erroralreadyexit} or ${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
       
       //validate if permitted base on status
      //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-      const queryresult:any =await updateadmission(id,{status});
-     
-      //if status is equal to admit reduce  ward count
-      if(status == configuration.admissionstatus[1] || status == configuration.admissionstatus[3]){        
-        await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:1,vacantbed:-1}});
-      }
-      // status is equal to  totransfer reduce target ward and increase source ward
-      else if(status == configuration.admissionstatus[2]){
-        await updateadmission(id,{status,referedward:transfterto,previousward:queryresult.referedward});
-      }
-      else if(status == configuration.admissionstatus[5]){
+   
+      if(status == configuration.admissionstatus[5]){
         //check that the patient is not owing
         var paymentrecord:any = await readallpayment({paymentreference:response.admissionid,status:{$ne: configuration.status[3]}},'');
         if((paymentrecord.paymentdetails).length > 0){
           throw new Error(configuration.error.errorpayment);
     
         }
+        //increase vancant and reduce occupied for current ward update appointment
+        await Promise.all([
+          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
+          updatebed(response.bed,{status:configuration.bedstatus[0]}),
+          updateadmission(id,{status})
 
-        await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:-1,vacantbed:1}});
-
+        ]);
+        //update bed
       }
       // status is equal to  transfer reduce target ward and increase 
       if(status == configuration.admissionstatus[3] ){
-        await updatewardmanagement(queryresult.previousward,{$inc:{occupiedbed:-1,vacantbed:1}});
-
+        ////increase vancant and reduce occupied for current ward use parallelism
+         await Promise.all([
+         
+          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
+          updatewardmanagement(transfterto,{$inc:{occupiedbed:1,vacantbed:-1}}),
+          updatebed(response.bed,{status:configuration.bedstatus[0]}),
+          updatebed(bed_id,{status:configuration.bedstatus[1]}),
+          updateadmission(id,{bed:bed_id,previousward:response.referedward,referedward:transfterto}),
+         ]);
       }
-
+    const queryresult="Succefully updated the admission status"; 
       res.status(200).json({
           queryresult,
           status:true
