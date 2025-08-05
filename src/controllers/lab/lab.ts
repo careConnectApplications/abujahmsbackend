@@ -567,7 +567,7 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   }
     
   else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathology[2]){
-    queryresult=await updatelab({_id:id},{chemicalpathologyreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
+    queryresult=await updatelab({_id:id},{chemicalpathologyreport, status:configuration.hematologyandchemicalpathologystatus[3],processeddate});
 
   }
 
