@@ -196,6 +196,7 @@ export const readAllRadiologyoptimized = async (req: any, res: any) => {
             testid: 1,
             testresult: 1,
             department: 1,
+            typetestresult:1,
             raiseby: 1,
             firstName: "$patient.firstName",
             lastName: "$patient.lastName",
