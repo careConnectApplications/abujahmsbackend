@@ -32,9 +32,11 @@ export const createreferrers = async (req:any, res:any) => {
       const {id} = req.params;
       const { firstName,lastName} = (req.user).user;
       req.body.referredby = `${firstName} ${lastName}`;
-      var {  diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby} = req.body;
-      validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
-       //frequency must inlcude
+      var {  diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention} = req.body;
+     // validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention});
+     validateinputfaulsyvalue({referredclinic,referraldate,receivingclinic,preferredconsultant});
+
+      //frequency must inlcude
        //route must contain allowed options
       
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
@@ -44,7 +46,7 @@ export const createreferrers = async (req:any, res:any) => {
   
        }
        preferredconsultant = new ObjectId(preferredconsultant);
-    const queryresult=await createreferrer({patient:patientrecord._id,diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
+    const queryresult=await createreferrer({patient:patientrecord._id,diagnosis,referredclinic,referraldate,receivingclinic,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention});
     res.status(200).json({queryresult, status: true});
     }
     catch(e:any){
@@ -62,10 +64,11 @@ export async function updatereferrers(req:any, res:any){
     const {id} = req.params;
     const { firstName,lastName} = (req.user).user;
     req.body.referredby = `${firstName} ${lastName}`;
-    var { diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby} = req.body;
-    validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
+    var { diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention} = req.body;
+    //validateinputfaulsyvalue({diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention});
+    validateinputfaulsyvalue({referredclinic,referraldate,preferredconsultant});
     preferredconsultant = new ObjectId(preferredconsultant);
-    var queryresult = await updatereferrer(id, {diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention,referredby});
+    var queryresult = await updatereferrer(id, {diagnosis,referredclinic,referraldate,preferredconsultant,priority,reasonforreferral,presentingcomplaints,presentingcomplaintsnotes,additionalnotes,salienthistory,findingsonexamination,investigationdoneifany,laboratoryfindings,requiredinputintervention});
     res.status(200).json({
         queryresult,
         status:true
