@@ -6,25 +6,34 @@ export interface patientinterface {
   title: String;
   firstName: String;
   middleName: String;
-  lastName:String;
+  lastName: String;
 }
+
+const clinicalInformationSchema = new Schema({
+  bloodGroup: { type: String, trim: true },
+  genotype: { type: String, trim: true },
+  bp: { type: String, trim: true },
+  heartRate: { type: String, trim: true },
+  temperature: { type: String, trim: true },
+}, { timestamps: true });
+
 //create schema
 const patientSchema = new Schema(
   {
     title: {
-     
+
       type: String
     },
     firstName: {
       required: true,
       type: String,
     },
-    patienttype:{
-      type:String,
-      default:configuration.patienttype[0]
+    patienttype: {
+      type: String,
+      default: configuration.patienttype[0]
     },
-    authorizationcode:String,
-    facilitypateintreferedfrom:String,
+    authorizationcode: String,
+    facilitypateintreferedfrom: String,
     middleName: {
       type: String,
     },
@@ -77,11 +86,11 @@ const patientSchema = new Schema(
       type: String,
     },
     nextOfKinPhoneNumber: {
-        type: String,
-      },
-      nextOfKinAddress: {
-        type: String,
-      },
+      type: String,
+    },
+    nextOfKinAddress: {
+      type: String,
+    },
     maritalStatus: {
       type: String,
     },
@@ -89,11 +98,11 @@ const patientSchema = new Schema(
       type: String,
     },
     occupation: {
-    
+
       type: String,
     },
     isHMOCover: {
-  
+
       type: String,
       default: configuration.ishmo[0],
     },
@@ -101,7 +110,7 @@ const patientSchema = new Schema(
       type: String,
     },
     HMOId: {
-      
+
       type: String,
     },
     HMOPlan: {
@@ -111,88 +120,93 @@ const patientSchema = new Schema(
       type: String,
     },
     MRN: {
-        required: true,
-        type: String,
+      required: true,
+      type: String,
+    },
+    password: {
+      required: true,
+      type: String,
+    },
+    appointment: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Appointment",
+        default: [],
       },
-      password: {
-        required: true,
-        type: String,
+    ],
+    admission: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Admission",
+        default: [],
       },
-      appointment: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Appointment",
-          default: [],
-        },
-      ],
-      admission:[
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Admission",
-          default: [],
-        },
 
-      ],
-      prescription: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Prescription",
-          default: [],
-        },
-      ],
-    
-      lab: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Lab",
-          default: [],
-        },
-      ],
-      radiology: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Radiology",
-          default: [],
-        },
-      ],
-      prcedure:[
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Procedure",
-          default: [],
-        },
-      ],
-      status:{
-        required: true,
-        type: String,
-        default: configuration.status[2],
-  
+    ],
+    prescription: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Prescription",
+        default: [],
       },
-      payment: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Payment",
-          default: [],
-        },
-      ]
-    
+    ],
+
+    lab: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Lab",
+        default: [],
+      },
+    ],
+    radiology: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Radiology",
+        default: [],
+      },
+    ],
+    prcedure: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Procedure",
+        default: [],
+      },
+    ],
+    status: {
+      required: true,
+      type: String,
+      default: configuration.status[2],
+
+    },
+    payment: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Payment",
+        default: [],
+      },
+    ],
+    clinicalInformation: {
+      type: clinicalInformationSchema,
+      default: null
+    },
+    specialNeeds: { type: String, trim: true }
+
   },
   { timestamps: true }
 );
 
-patientSchema.pre("save", async function(next){
-  try{
-      //GENERATE A SALT
-      const salt = await bcrypt.genSalt(10);
-      //generate password hash
-      const passwordHash = await bcrypt.hash(this.password, salt);
-      //re-assign hashed version of original
-      this.password = passwordHash;
-      next();
+patientSchema.pre("save", async function (next) {
+  try {
+    //GENERATE A SALT
+    const salt = await bcrypt.genSalt(10);
+    //generate password hash
+    const passwordHash = await bcrypt.hash(this.password, salt);
+    //re-assign hashed version of original
+    this.password = passwordHash;
+    next();
 
   }
-  catch(error:any){
-      next(error)
+  catch (error: any) {
+    next(error)
   }
 });
 
