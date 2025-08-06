@@ -27,7 +27,31 @@ export async function searchpartient(req: any, res: any) {
     };
     const { searchparams } = req.params;
 
-    const queryresult = await readallpatient({ $or: [{ lastName: { $regex: searchparams, $options: 'i' } }, { firstName: { $regex: searchparams, $options: 'i' } }, { HMOId: { $regex: searchparams, $options: 'i' } }, { MRN: { $regex: searchparams, $options: 'i' } }, { phoneNumber: { $regex: searchparams, $options: 'i' } }] }, selectquery, '', '');
+    const queryresult = await readallpatient({
+      $or:
+        [
+          // { lastName: { $regex: searchparams, $options: 'i' } },
+          // { firstName: { $regex: searchparams, $options: 'i' } },
+          {
+            "$expr": {
+              "$regexMatch": {
+                "input": {
+                  "$concat": [
+                    { "$ifNull": ["$firstName", ""] },
+                    " ",
+                    { "$ifNull": ["$lastName", ""] }
+                  ]
+                },
+                "regex": searchparams,
+                "options": "i"
+              }
+            }
+          },
+          { HMOId: { $regex: searchparams, $options: 'i' } },
+          { MRN: { $regex: searchparams, $options: 'i' } },
+          { phoneNumber: { $regex: searchparams, $options: 'i' } }]
+    }, selectquery, '', '');
+
     res.status(200).json({
       queryresult,
       status: true
