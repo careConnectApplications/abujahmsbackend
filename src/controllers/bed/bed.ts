@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import configuration from "../../config";
 import { createaudit } from "../../dao/audit";
 import { generateRandomNumber, validateinputfaulsyvalue } from "../../utils/otherservices";
@@ -10,11 +10,11 @@ import {
 } from "../../dao/bed";
 import  {readonewardmanagement,updatewardmanagement}  from "../../dao/wardmanagement";
 import mongoose from 'mongoose';
+import catchAsync from "../../utils/catchAsync";
 const { ObjectId } = mongoose.Types;
 
 // Create a new bed
-export const createbeds = async (req: any, res: Response) => {
-  try {
+export const createbeds = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { wardid,bednumber} = req.body;
     const { firstName, lastName } = req.user.user;
     const actor = `${firstName} ${lastName}`;
@@ -44,15 +44,11 @@ export const createbeds = async (req: any, res: Response) => {
      await updatewardmanagement(id,{$inc:{vacantbed:1}});
     await createaudit({ action: "Created Bed", actor, affectedentity: bednumber });
     res.status(200).json({ queryresult, status: true });
-  } catch (error: any) {
-    console.log(error);
-    res.status(403).json({ status: false, msg: error.message });
-  }
-};
+
+});
 //get all not deleted and vacant be by ward
 // Get all vacant and not-deleted beds in a specific ward
-export const getAvailableBedsByWard = async (req: Request, res: Response) => {
-  try {
+export const getAvailableBedsByWard = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { wardid } = req.params;
     if (!wardid) {
       throw new Error("Ward ID is required");
@@ -67,14 +63,12 @@ export const getAvailableBedsByWard = async (req: Request, res: Response) => {
     const queryresult = await readallbeds(query, "","ward");
 
     res.status(200).json({ queryresult, status: true });
-  } catch (error: any) {
-    console.log(error);
-    res.status(403).json({ status: false, msg: error.message });
-  }
-};
+ 
+});
 //delete a bed
-export const softDeleteBed = async (req: Request, res: Response) => {
-  try {const { id } = req.params;
+export const softDeleteBed = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+
+    const { id } = req.params;
     const { isDeleted } = req.body; // true or false
 
     if (!id || typeof isDeleted !== "boolean") {
@@ -102,26 +96,19 @@ export const softDeleteBed = async (req: Request, res: Response) => {
 
     res.status(200).json({ queryresult, status: true });
    
-  } catch (error: any) {
-    console.log(error);
-    res.status(403).json({ status: false, msg: error.message });
-  }
-};
+ 
+});
 
 // Read all beds
-export const getallbeds = async (req: Request, res: Response) => {
-  try {
+export const getallbeds = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+
     const queryresult = await readallbeds({}, '','ward');
     res.status(200).json({ queryresult, status: true });
-  } catch (e: any) {
-    console.log(e);
-    res.status(403).json({ status: false, msg: e.message });
-  }
-};
+  
+});
 
 // Update a bed
-export const updatebeds = async (req: any, res: Response) => {
-  try {
+export const updatebeds = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { bednumber} = req.body;
     const { firstName, lastName } = req.user.user;
@@ -138,8 +125,5 @@ export const updatebeds = async (req: any, res: Response) => {
     await createaudit({ action: "Updated Bed", actor, affectedentity: bednumber });
 
     res.status(200).json({ queryresult, status: true });
-  } catch (e: any) {
-    console.log(e);
-    res.status(403).json({ status: false, msg: e.message });
-  }
-};
+  
+});
