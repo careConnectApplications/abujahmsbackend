@@ -182,13 +182,8 @@ const patientSchema = new Schema(
   
 
       },
-    ],
-    status: {
-      required: true,
-      type: String,
-      default: configuration.status[2],
-
-    },
+    
+    
     payment: [
       {
         type: Schema.Types.ObjectId,
