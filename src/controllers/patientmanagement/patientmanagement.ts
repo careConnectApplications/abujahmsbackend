@@ -1,19 +1,19 @@
-import configuration from "../../config";
-import { v4 as uuidv4 } from 'uuid';
-import moment from "moment";
-import * as path from 'path';
-import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated, updatepatientbyanyquery } from "../../dao/patientmanagement";
-import { readoneprice } from "../../dao/price";
-import { createpayment } from "../../dao/payment";
-import { createvitalcharts } from "../../dao/vitalcharts";
-import { mail, generateRandomNumber, validateinputfaulsyvalue, uploaddocument, convertexceltojson, storeUniqueNumber } from "../../utils/otherservices";
-import { createappointment } from "../../dao/appointment";
-import { readonepricemodel } from "../../dao/pricingmodel";
-import mongoose, { AnyObject } from "mongoose";
-import { createaudit } from "../../dao/audit";
-import catchAsync from "../../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
+import moment from "moment";
+import mongoose from "mongoose";
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import configuration from "../../config";
+import { createappointment } from "../../dao/appointment";
+import { createaudit } from "../../dao/audit";
+import { createpatient, createpatientifnotexit, readallpatient, readallpatientpaginated, readonepatient, updatepatient, updatepatientbyanyquery, updatepatientmanybyquery } from "../../dao/patientmanagement";
+import { createpayment } from "../../dao/payment";
+import { readoneprice } from "../../dao/price";
+import { readonepricemodel } from "../../dao/pricingmodel";
+import { createvitalcharts } from "../../dao/vitalcharts";
 import { ApiError } from "../../errors";
+import catchAsync from "../../utils/catchAsync";
+import { convertexceltojson, storeUniqueNumber, uploaddocument, validateinputfaulsyvalue } from "../../utils/otherservices";
 //Insurance upload
 //get hmo patient 
 //read all patients
@@ -602,4 +602,41 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
     status: true,
     data: updatedPatient
   })
-})
+});
+
+export const updatePatientFluidBalancing = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { totalInput, totalOutput } = req.body;
+  const { patientId } = req.params;
+  const { _id: userId } = (req.user).user;
+
+  if (!patientId) {
+    return next(new ApiError(400, configuration.error.errorPatientIdIsRequired));
+  }
+
+  const _patientId = new mongoose.Types.ObjectId(patientId);
+
+  const patient: any = await readonepatient({ _id: _patientId }, {}, '', '');
+  if (!patient) {
+    return next(new ApiError(404, "Patient not found."));
+  }
+
+  const balance = (totalInput || 0) - (totalOutput || 0);
+
+  const newFluidRecord = {
+    totalInput,
+    totalOutput,
+    balance,
+    createdBy: userId,
+  };
+
+  const updatedPatient = await updatepatientbyanyquery(_patientId, {
+    $push: {
+      fluidBalance: newFluidRecord
+    }
+  });
+
+  res.status(200).json({
+    status: true,
+    data: updatedPatient
+  })
+});

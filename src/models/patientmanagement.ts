@@ -17,6 +17,18 @@ const clinicalInformationSchema = new Schema({
   temperature: { type: String, trim: true },
 }, { timestamps: true });
 
+////// this is for abuja clinic
+const fluidBalanceSchema = new Schema({
+  totalInput: { type: Number, default: 0 },
+  totalOutput: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "Users",
+    default: null,
+  },
+}, { timestamps: true });
+
 //create schema
 const patientSchema = new Schema(
   {
@@ -188,8 +200,8 @@ const patientSchema = new Schema(
       type: clinicalInformationSchema,
       default: null
     },
-    specialNeeds: { type: String, trim: true }
-
+    specialNeeds: { type: String, trim: true },
+   /// fluidBalance: { type: [fluidBalanceSchema], default: [] }
   },
   { timestamps: true }
 );
