@@ -11,7 +11,7 @@ export var createhmo = async (req:any,res:any) =>{
        const {hmoname,hmopercentagecover,id} = req.body;
        const { firstName, lastName } = (req.user).user;
       var actor = `${firstName} ${lastName}`;
-       validateinputfaulsyvalue({hmoname,hmopercentagecover});
+       validateinputfaulsyvalue({hmoname,hmopercentagecover,id});
        //var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length -1]}`;  
         const foundHmo =  await readonehmomanagement({$or:[{hmoname},{id}]},'');
         //update servicetype for New Patient Registration

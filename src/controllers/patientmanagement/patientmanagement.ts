@@ -234,9 +234,9 @@ export var createpatients = async (req: any, res: any) => {
     }
     req.body.appointmentcategory = configuration.category[3];
     req.body.appointmenttype = configuration.category[3];
-    var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
+    var { facilitypateintreferedfrom,HMOName,HMOId,HMOPlan, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
     //validation
-    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, isHMOCover });
+    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender,  isHMOCover });
     //define the service type
     /*
     if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
@@ -255,7 +255,13 @@ export var createpatients = async (req: any, res: any) => {
     }
     //define the service type
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
+       validateinputfaulsyvalue({ HMOName,HMOId,HMOPlan });
       req.body.status = configuration.status[1];
+       const gethmo:any = await readonehmomanagement({hmoname:req.body.HMOName},{_id:1});
+    if(!gethmo){
+      throw new Error("HMONAME does not exist");
+    }
+    req.body.insurance=gethmo._id;
     }
 
 
@@ -363,9 +369,10 @@ export var createpatients = async (req: any, res: any) => {
     //create payment for only none hmo patient
     let queryappointmentresult;
     let queryresult;
-    let vitals = await createvitalcharts({ status: configuration.status[8] });
+    let vitals:any; 
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
       if (appointmentdate) {
+        vitals = await createvitalcharts({ status: configuration.status[8] });
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
         queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
       }
@@ -378,6 +385,7 @@ export var createpatients = async (req: any, res: any) => {
       //payment.push(createappointmentpaymentqueryresult._id);
       //update createpatientquery
       if (appointmentdate) {
+         vitals = await createvitalcharts({ status: configuration.status[8] });
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: configuration.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
         queryresult = await updatepatient(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
       }
