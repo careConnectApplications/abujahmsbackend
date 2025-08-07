@@ -161,6 +161,11 @@ const patientSchema = new Schema(
           default: [],
         },
       ],
+      insurance:
+      {
+          type: Schema.Types.ObjectId,
+          ref: "Hmomanagement"
+        },
       status:{
         required: true,
         type: String,

@@ -2,6 +2,7 @@ import configuration from "../../config";
 import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import * as path from 'path';
+import {readonehmomanagement} from "../../dao/hmomanagement";
 import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated } from "../../dao/patientmanagement";
 import { readoneprice } from "../../dao/price";
 import { createpayment } from "../../dao/payment";
@@ -96,11 +97,18 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     const filename = configuration.hmouploadfilename;
     let allowedextension = ['.csv', '.xlsx'];
     let uploadpath = `${process.cwd()}/${configuration.useruploaddirectory}`;
+      //search for HMO to get the _id
+    const gethmo:any = await readonehmomanagement({hmoname:HMOName},{_id:1});
+    if(!gethmo){
+      throw new Error("HMONAME does not exist");
+    }
     //acieve document
     await updatepatientmanybyquery({ HMOName }, { status: configuration.status[15] });
     //await createpatientachieve(patientdetails);
     //delete patient management
     //await deletePatietsByCondition({HMOName});
+
+  
     var columnmapping = {
       A: "title",
       B: "firstName",
@@ -140,6 +148,7 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     if (hmo.length > 0) {
       for (var i = 0; i < hmo.length; i++) {
         hmo[i].isHMOCover = configuration.ishmo[1];
+        hmo[i].insurance=gethmo._id;
         hmo[i].HMOName = HMOName;
         const { phoneNumber, firstName, lastName, gender, HMOId } = hmo[i];
         validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, HMOId });

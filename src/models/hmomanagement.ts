@@ -14,6 +14,12 @@ const hmomanagementSchema = new Schema({
      type: String,
      required: true,
  },
+  hmopercentagecover: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0 // Optional: default coverage percentage
+  }
 },
 { timestamps: true }
 );
