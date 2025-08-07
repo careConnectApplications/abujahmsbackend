@@ -7,7 +7,7 @@ import {createaudit} from "../../dao/audit";
 export var createhmo = async (req:any,res:any) =>{
    
     try{
-     console.log(req.body);
+    
        const {hmoname,hmopercentagecover,id} = req.body;
        const { firstName, lastName } = (req.user).user;
       var actor = `${firstName} ${lastName}`;
@@ -19,7 +19,7 @@ export var createhmo = async (req:any,res:any) =>{
             throw new Error(`HMO name or id ${configuration.error.erroralreadyexit}`);
 
         }
-         const queryresult=await createhmomanagement({hmoname,id});
+         const queryresult=await createhmomanagement({hmoname,id,hmopercentagecover});
         await createaudit({action:"Create HMO",actor,affectedentity:hmoname});
          res.status(200).json({queryresult, status: true});
         
