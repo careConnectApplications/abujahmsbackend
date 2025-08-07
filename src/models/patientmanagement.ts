@@ -140,34 +140,47 @@ const patientSchema = new Schema(
         default: [],
       },
 
-    ],
-    prescription: [
+      ],
+      prescription: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Prescription",
+          default: [],
+        },
+      ],
+    
+      lab: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Lab",
+          default: [],
+        },
+      ],
+      radiology: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Radiology",
+          default: [],
+        },
+      ],
+      prcedure:[
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Procedure",
+          default: [],
+        },
+      ],
+      insurance:
       {
-        type: Schema.Types.ObjectId,
-        ref: "Prescription",
-        default: [],
-      },
-    ],
+          type: Schema.Types.ObjectId,
+          ref: "Hmomanagement"
+        },
+      status:{
+        required: true,
+        type: String,
+        default: configuration.status[2],
+  
 
-    lab: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Lab",
-        default: [],
-      },
-    ],
-    radiology: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Radiology",
-        default: [],
-      },
-    ],
-    prcedure: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Procedure",
-        default: [],
       },
     ],
     status: {

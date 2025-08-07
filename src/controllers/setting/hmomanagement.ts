@@ -8,15 +8,15 @@ export var createhmo = async (req:any,res:any) =>{
    
     try{
      console.log(req.body);
-       const {hmoname} = req.body;
+       const {hmoname,hmopercentagecover,id} = req.body;
        const { firstName, lastName } = (req.user).user;
       var actor = `${firstName} ${lastName}`;
-       validateinputfaulsyvalue({hmoname});
-       var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length -1]}`;  
-        const foundHmo =  await readonehmomanagement({hmoname},'');
+       validateinputfaulsyvalue({hmoname,hmopercentagecover});
+       //var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length -1]}`;  
+        const foundHmo =  await readonehmomanagement({$or:[{hmoname},{id}]},'');
         //update servicetype for New Patient Registration
         if(foundHmo){
-            throw new Error(`HMO ${configuration.error.erroralreadyexit}`);
+            throw new Error(`HMO name or id ${configuration.error.erroralreadyexit}`);
 
         }
          const queryresult=await createhmomanagement({hmoname,id});
@@ -54,13 +54,13 @@ export async function getallhmo(req:Request, res:any){
 export async function updatehmo(req:any, res:any){
     try{
     //get id
-    const {id} = req.params;
-    const {hmoname} = req.body;
+    const {_id} = req.params;
+    const {hmoname, id,hmopercentagecover} = req.body;
     const { firstName, lastName } = (req.user).user;
     var actor = `${firstName} ${lastName}`;
-    validateinputfaulsyvalue({hmoname,id});
+    validateinputfaulsyvalue({hmoname,id, _id,hmopercentagecover});
     await createaudit({action:"Update HMO",actor,affectedentity:hmoname});
-    var queryresult = await updatehmomanagement(id, {hmoname});
+    var queryresult = await updatehmomanagement(_id, {hmoname,id,hmopercentagecover});
     res.status(200).json({
         queryresult,
         status:true
