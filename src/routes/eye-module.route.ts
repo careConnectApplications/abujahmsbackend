@@ -29,6 +29,6 @@ router.get("/data/config", getAllEyeUtilData);
 router.patch("/lens-prescription/:eyeModuleId", updateLensPrescription);
 router.patch("/preliminary-test/:eyeModuleId", updatePreliminaryTest);
 router.patch("/examination/:eyeModuleId", updateExamination);
-router.patch("/operational-notes", updateOperationalTest);
+router.patch("/operational-notes/:eyeModuleId", updateOperationalTest);
 
 export default router;

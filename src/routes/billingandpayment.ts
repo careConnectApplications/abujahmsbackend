@@ -1,5 +1,5 @@
 import express from 'express';
-import {readbillinghistoryforapatient,readbillinghistoryforallapatient,confirmpayment,printreceipt,groupreadallpayment,readpaymentbyreferencenumber,confirmgrouppayment,groupreadallpaymentoptimized,getCashierTotal} from '../controllers/paymentandbilling/paymentandbilling';
+import {readbillinghistoryforapatient,readbillinghistoryforallapatient,confirmpayment,printreceipt,groupreadallpayment,readpaymentbyreferencenumber,confirmgrouppayment,groupreadallpaymentoptimized,getCashierTotal, CreateBilingRecord} from '../controllers/paymentandbilling/paymentandbilling';
 const router = express.Router();
 
 
@@ -15,6 +15,7 @@ router.get('/readpaymentbyreferencenumber/:paymentreference',readpaymentbyrefere
 router.put('/confirmgrouppayment/:paymentreferenceid',confirmgrouppayment);
 //getCashierTotal
 router.get('/getcashiertotal',getCashierTotal);
+router.post("/:patientId", CreateBilingRecord);
 
 
 

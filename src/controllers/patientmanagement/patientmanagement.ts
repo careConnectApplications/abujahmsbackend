@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from "moment";
 import * as path from 'path';
 import {readonehmomanagement} from "../../dao/hmomanagement";
-import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated } from "../../dao/patientmanagement";
+import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated, updatepatientbyanyquery } from "../../dao/patientmanagement";
+
 import { readoneprice } from "../../dao/price";
 import { createpayment } from "../../dao/payment";
 import { createvitalcharts } from "../../dao/vitalcharts";
@@ -214,7 +215,11 @@ export async function updateauthorizationcode(req: any, res: any) {
 export var createpatients = async (req: any, res: any) => {
 
   try {
-    const { alternatePhoneNumber } = req.body
+    const {
+      alternatePhoneNumber,
+      bloodGroup, genotype, bp, heartRate, temperature
+    } = req.body;
+
     var appointmentid: any = String(Date.now());
     if (!(req.body.isHMOCover)) {
       req.body.isHMOCover = configuration.ishmo[0]
@@ -231,7 +236,7 @@ export var createpatients = async (req: any, res: any) => {
     req.body.appointmenttype = configuration.category[3];
     var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
     //validation
-    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype, isHMOCover });
+    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, isHMOCover });
     //define the service type
     /*
     if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
@@ -341,6 +346,12 @@ export var createpatients = async (req: any, res: any) => {
       throw new Error(configuration.error.errornopriceset);
 
     }
+    const clinicalInformation = {
+      bloodGroup, genotype, bp, heartRate, temperature
+    }
+
+    req.body.clinicalInformation = clinicalInformation;
+
     var uniqunumber = await storeUniqueNumber(4);
     // chaorten the MRN to alphanumeric 
     req.body.MRN = uniqunumber;
@@ -354,9 +365,10 @@ export var createpatients = async (req: any, res: any) => {
     let queryresult;
     let vitals = await createvitalcharts({ status: configuration.status[8] });
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
-      queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
-      queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
-
+      if (appointmentdate) {
+        queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
+        queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
+      }
 
     }
     else {
@@ -365,13 +377,16 @@ export var createpatients = async (req: any, res: any) => {
       payment.push(createpaymentqueryresult._id);
       //payment.push(createappointmentpaymentqueryresult._id);
       //update createpatientquery
-      queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: configuration.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
-      queryresult = await updatepatient(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
-
-
+      if (appointmentdate) {
+        queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: configuration.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
+        queryresult = await updatepatient(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
+      }
     }
 
-    res.status(200).json({ queryresult, status: true });
+    res.status(200).json({
+      queryresult: appointmentdate ? queryresult : createpatientqueryresult,
+      status: true
+    });
   } catch (error: any) {
     console.log(error);
     res.status(403).json({ status: false, msg: error.message });
@@ -465,26 +480,40 @@ export async function getonepatients(req: any, res: any) {
 
 
 //update a patient
-export async function updatepatients(req: any, res: any) {
-  try {
-    //get id
-    const { id, status } = req.params;
-    //reject if status update
-    if (status) {
+export const updatepatients = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
 
-    }
-    var queryresult = await updatepatient(id, req.body);
-    res.status(200).json({
-      queryresult,
-      status: true
-    });
-  } catch (e: any) {
-    console.log(e);
-    res.status(403).json({ status: false, msg: e.message });
+  //get id
+  const { id, status } = req.params;
+  const { bloodGroup, genotype, bp, heartRate, temperature, specialNeeds } = req.body
+  //reject if status update
+  if (status) {
 
   }
+  if (!id) return next(new ApiError(400, "Patient Id is not provided!"));
 
-}
+  const _Id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+
+  const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
+
+  if (!foundPatient) {
+    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+  }
+  const clinicalInformation = {
+    bloodGroup, genotype, bp, heartRate, temperature
+  }
+
+  req.body.clinicalInformation = clinicalInformation;
+
+  var queryresult = await updatepatient(id, req.body);
+
+  if (!queryresult) return next(new ApiError(401, "update failed"));
+
+  res.status(200).json({
+    queryresult,
+    status: true
+  });
+})
+
 //upload patients photo
 export var uploadpix = async (req: any, res: any) => {
   try {
@@ -551,3 +580,36 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
     data: updatedPatient
   })
 });
+
+export const updatePatientClinicalInformation = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  const { bloodGroup, genotype, bp, heartRate, temperature, specialNeeds } = req.body
+
+  if (!id) return next(new ApiError(400, "Patient Id is not provided!"));
+
+  const _Id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
+
+  const { _id: userId } = (req.user).user;
+
+  const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
+
+  if (!foundPatient) {
+    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+  }
+
+  const clinicalInformation = {
+    bloodGroup, genotype, bp, heartRate, temperature
+  }
+
+  const updatedPatient = await updatepatientbyanyquery(_Id, {
+    clinicalInformation: clinicalInformation,
+    specialNeeds,
+    updatedBy: userId
+  });
+
+  res.status(200).json({
+    status: true,
+    data: updatedPatient
+  })
+})
