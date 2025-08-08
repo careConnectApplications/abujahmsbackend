@@ -233,3 +233,8 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
 
   return phoneNumberRegex.test(phoneNumber);
 }
+
+export function calculateAmountPaidByHMO(hmoCoveragePercentage: number, totalAmount: number): number {
+  const patientResponsibility = (100 - hmoCoveragePercentage) / 100;
+  return patientResponsibility * totalAmount;
+}
