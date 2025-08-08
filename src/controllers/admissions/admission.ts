@@ -1,13 +1,15 @@
+import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
 import {readoneappointment,updateappointment} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
-import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
+import  {updatepatient,readonepatient,readallpatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
 import {readonebed,updatebed} from "../../dao/bed";
 import configuration from "../../config";
+import catchAsync from "../../utils/catchAsync";
 const { ObjectId } = mongoose.Types;
 
 //refer for admission
@@ -225,4 +227,50 @@ if (bed_id) {
 
 }
 
+
+export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+
+    const { firstName, lastName, MRN, HMOId } = req.query;
+
+    // Build patient search conditions
+    const patientSearchConditions: any = {};
+    if (firstName) {
+      patientSearchConditions.firstName = { $regex: new RegExp(firstName as string, "i") };
+    }
+    if (lastName) {
+      patientSearchConditions.lastName = { $regex: new RegExp(lastName as string, "i") };
+    }
+    if (MRN) {
+      patientSearchConditions.MRN = { $regex: new RegExp(MRN as string, "i") };
+    }
+    if (HMOId) {
+      patientSearchConditions.HMOId = { $regex: new RegExp(HMOId as string, "i") };
+    }
+
+
+    var selectquery = {
+          "_id": 1, 
+        };
+      
+    
+
+    // First find matching patient IDs
+    const {patientdetails} = await readallpatient(patientSearchConditions,selectquery,'','');
+
+    if (patientdetails.length === 0) {
+      throw new Error("No patients found matching criteria.");
+    }
+
+    const patientIds = patientdetails.map((p) => p._id);
+
+    // Now find admissions that match those patient IDs
+    
+    const queryresult = await readalladmission({patient: { $in: patientIds }},{},'referedward','patient','bed');
+
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+});
 

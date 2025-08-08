@@ -49,7 +49,7 @@ router.put('/updatetheatre/:id',updatetheatre);
 //hmo
 router.post('/createinsurance',createhmo);
 router.get('/getallinsurance',getallhmo);
-router.put('/updateinsurance/:id',updatehmo);
+router.put('/updateinsurance/:_id',updatehmo);
 
 // test name
 router.post('/createtestcomponents',createtestcomponents);
