@@ -830,7 +830,7 @@ export var laborder = async (req: any, res: any) => {
     console.log("foundPatient", foundPatient);
     //insurance
     if (foundPatient) {
-      hmopercentagecover=foundPatient.insurance.hmopercentagecover;
+      hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
         patient: id,
@@ -858,7 +858,6 @@ export var laborder = async (req: any, res: any) => {
 
       //  isHMOCover = appointment.patient.isHMOCover;
     }
-console.log("hmopercentagecover",hmopercentagecover);
 
 
 
@@ -872,7 +871,7 @@ console.log("hmopercentagecover",hmopercentagecover);
       //console.log(isHMOCover);
       var testPrice: any = await readoneprice({ servicetype: testname[i]});
      
-      if (!testPrice) {
+      if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
       //var setting  = await configuration.settings();
@@ -1190,7 +1189,7 @@ export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) =>
     if (!appointment) {
       throw new Error("Appointment not found.");
     }
-
+console.log("appointment",appointment);
     // Find doctor
      const doctor = await readone({ _id:_doctorId });
     if (!doctor) {
@@ -1201,7 +1200,7 @@ export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) =>
     appointment.doctor = doctor._id;
     appointment.doctorsfirstName = doctor.firstName;
     appointment.doctorslastName = doctor.lastName;
-    appointment.doctorassigment =configuration.doctorassigmentstatus[1],
+    appointment.doctorassigment =configuration.doctorassigment[1],
 
     await appointment.save();
      res.status(200).json({

@@ -1,6 +1,6 @@
 import configuration from "../../config";
 import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
-import { validateinputfaulsyvalue} from "../../utils/otherservices";
+import { validateinputfaulsyvalue,calculateAmountPaidByHMO} from "../../utils/otherservices";
 import {createaudit} from "../../dao/audit";
 import {readonepricemodel} from "../../dao/pricingmodel";
 //add patiient
@@ -163,3 +163,28 @@ catch(e:any){
 }
   
 }
+//get price of services /////////////
+export const getpriceofservice = async (req:any, res:any) =>{
+    try{
+      
+      const {id} = req.params;
+     // const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
+     // hmopercentagecover=foundPatient.insurance.hmopercentagecover;
+     //calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount))
+    //search for the lab request
+    //var prescriptionresponse:any = await readoneprescription({_id:id},{},'patient','','');
+   
+    //const {prescription,patient,pharmacy} = prescriptionresponse;
+    //get amount 
+    //var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});  
+    //var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
+    //res.status(200).json({price:amount, status: true});
+    }
+    catch(e:any){
+      console.log("error", e);
+      res.status(403).json({ status: false, msg: e.message });
+  
+    }
+      
+  }
+  
