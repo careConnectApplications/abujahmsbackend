@@ -53,6 +53,7 @@ const admissionSchema = new Schema({
        required: true
 
   },
+  bedfee:Number,
   doctorname:
   {
     type: String, 

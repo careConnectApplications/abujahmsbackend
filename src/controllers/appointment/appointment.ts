@@ -827,7 +827,7 @@ export var laborder = async (req: any, res: any) => {
     var appointment: any;
     let patientappointment: any;
     var hmopercentagecover;
-    console.log("foundPatient", foundPatient);
+    
     //insurance
     if (foundPatient) {
       hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
@@ -852,7 +852,7 @@ export var laborder = async (req: any, res: any) => {
       //read insurance
       let insurance:any = await readonehmomanagement({_id:appointment.patient.insurance},{hmopercentagecover:1});
     
-      hmopercentagecover=insurance.hmopercentagecover;
+      hmopercentagecover=insurance?.hmopercentagecover ?? 0;
 
       //update appoint with lab order
 
