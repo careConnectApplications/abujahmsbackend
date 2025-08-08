@@ -5,7 +5,8 @@ import {
     getonepatients, bulkuploadhmopatients,
     getallhmopatients, searchpartient,
     updateauthorizationcode, updatePatientToHmo,
-    updatePatientClinicalInformation
+    updatePatientClinicalInformation,
+    updatePatientFluidBalancing
 } from '../controllers/patientmanagement/patientmanagement';
 const router = express.Router();
 
@@ -21,7 +22,6 @@ router.get('/getallhmopatients', getallhmopatients);
 router.get('/searchpartient/:searchparams', searchpartient);
 router.put("/update-to-hmo/:id", updatePatientToHmo);
 router.put("/update-clinical-information/:id", updatePatientClinicalInformation);
-
-
+router.put("/update-fluid-balancing/:patientId", updatePatientFluidBalancing);
 
 export default router;

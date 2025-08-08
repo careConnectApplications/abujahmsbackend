@@ -1,21 +1,19 @@
-import configuration from "../../config";
-import { v4 as uuidv4 } from 'uuid';
-import moment from "moment";
-import * as path from 'path';
-import {readonehmomanagement} from "../../dao/hmomanagement";
-import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated, updatepatientbyanyquery } from "../../dao/patientmanagement";
-
-import { readoneprice } from "../../dao/price";
-import { createpayment } from "../../dao/payment";
-import { createvitalcharts } from "../../dao/vitalcharts";
-import { mail, generateRandomNumber, validateinputfaulsyvalue, uploaddocument, convertexceltojson, storeUniqueNumber } from "../../utils/otherservices";
-import { createappointment } from "../../dao/appointment";
-import { readonepricemodel } from "../../dao/pricingmodel";
-import mongoose, { AnyObject } from "mongoose";
-import { createaudit } from "../../dao/audit";
-import catchAsync from "../../utils/catchAsync";
 import { NextFunction, Request, Response } from "express";
+import moment from "moment";
+import mongoose from "mongoose";
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import configuration from "../../config";
+import { createappointment } from "../../dao/appointment";
+import { createaudit } from "../../dao/audit";
+import { createpatient, createpatientifnotexit, readallpatient, readallpatientpaginated, readonepatient, updatepatient, updatepatientbyanyquery, updatepatientmanybyquery } from "../../dao/patientmanagement";
+import { createpayment } from "../../dao/payment";
+import { readoneprice } from "../../dao/price";
+import { readonepricemodel } from "../../dao/pricingmodel";
+import { createvitalcharts } from "../../dao/vitalcharts";
 import { ApiError } from "../../errors";
+import catchAsync from "../../utils/catchAsync";
+import { convertexceltojson, storeUniqueNumber, uploaddocument, validateinputfaulsyvalue } from "../../utils/otherservices";
 //Insurance upload
 //get hmo patient 
 //read all patients
@@ -98,18 +96,11 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     const filename = configuration.hmouploadfilename;
     let allowedextension = ['.csv', '.xlsx'];
     let uploadpath = `${process.cwd()}/${configuration.useruploaddirectory}`;
-      //search for HMO to get the _id
-    const gethmo:any = await readonehmomanagement({hmoname:HMOName},{_id:1});
-    if(!gethmo){
-      throw new Error("HMONAME does not exist");
-    }
     //acieve document
     await updatepatientmanybyquery({ HMOName }, { status: configuration.status[15] });
     //await createpatientachieve(patientdetails);
     //delete patient management
     //await deletePatietsByCondition({HMOName});
-
-  
     var columnmapping = {
       A: "title",
       B: "firstName",
@@ -149,7 +140,6 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     if (hmo.length > 0) {
       for (var i = 0; i < hmo.length; i++) {
         hmo[i].isHMOCover = configuration.ishmo[1];
-        hmo[i].insurance=gethmo._id;
         hmo[i].HMOName = HMOName;
         const { phoneNumber, firstName, lastName, gender, HMOId } = hmo[i];
         validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, HMOId });
@@ -234,9 +224,9 @@ export var createpatients = async (req: any, res: any) => {
     }
     req.body.appointmentcategory = configuration.category[3];
     req.body.appointmenttype = configuration.category[3];
-    var { facilitypateintreferedfrom,HMOName,HMOId,HMOPlan, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
+    var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
     //validation
-    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender,  isHMOCover });
+    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, isHMOCover });
     //define the service type
     /*
     if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
@@ -255,13 +245,7 @@ export var createpatients = async (req: any, res: any) => {
     }
     //define the service type
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
-       validateinputfaulsyvalue({ HMOName,HMOId,HMOPlan });
       req.body.status = configuration.status[1];
-       const gethmo:any = await readonehmomanagement({hmoname:req.body.HMOName},{_id:1});
-    if(!gethmo){
-      throw new Error("HMONAME does not exist");
-    }
-    req.body.insurance=gethmo._id;
     }
 
 
@@ -369,10 +353,9 @@ export var createpatients = async (req: any, res: any) => {
     //create payment for only none hmo patient
     let queryappointmentresult;
     let queryresult;
-    let vitals:any; 
+    let vitals = await createvitalcharts({ status: configuration.status[8] });
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
       if (appointmentdate) {
-        vitals = await createvitalcharts({ status: configuration.status[8] });
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
         queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
       }
@@ -385,7 +368,6 @@ export var createpatients = async (req: any, res: any) => {
       //payment.push(createappointmentpaymentqueryresult._id);
       //update createpatientquery
       if (appointmentdate) {
-         vitals = await createvitalcharts({ status: configuration.status[8] });
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: configuration.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
         queryresult = await updatepatient(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
       }
@@ -579,7 +561,7 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
 
   /// if hmo is true return an error
   /// then convert to true
-  const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1] });
+  const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1], previouslyNotHmo: true });
   /// save db
 
   res.status(200).json({
@@ -620,4 +602,41 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
     status: true,
     data: updatedPatient
   })
-})
+});
+
+export const updatePatientFluidBalancing = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { totalInput, totalOutput } = req.body;
+  const { patientId } = req.params;
+  const { _id: userId } = (req.user).user;
+
+  if (!patientId) {
+    return next(new ApiError(400, configuration.error.errorPatientIdIsRequired));
+  }
+
+  const _patientId = new mongoose.Types.ObjectId(patientId);
+
+  const patient: any = await readonepatient({ _id: _patientId }, {}, '', '');
+  if (!patient) {
+    return next(new ApiError(404, "Patient not found."));
+  }
+
+  const balance = (totalInput || 0) - (totalOutput || 0);
+
+  const newFluidRecord = {
+    totalInput,
+    totalOutput,
+    balance,
+    createdBy: userId,
+  };
+
+  const updatedPatient = await updatepatientbyanyquery(_patientId, {
+    $push: {
+      fluidBalance: newFluidRecord
+    }
+  });
+
+  res.status(200).json({
+    status: true,
+    data: updatedPatient
+  })
+});

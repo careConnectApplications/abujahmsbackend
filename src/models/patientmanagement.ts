@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import configuration from "../config";
 import bcrypt from "bcryptjs";
+import { required } from "joi";
 export interface patientinterface {
   title: String;
   firstName: String;
@@ -14,6 +15,18 @@ const clinicalInformationSchema = new Schema({
   bp: { type: String, trim: true },
   heartRate: { type: String, trim: true },
   temperature: { type: String, trim: true },
+}, { timestamps: true });
+
+////// this is for abuja clinic
+const fluidBalanceSchema = new Schema({
+  totalInput: { type: Number, default: 0 },
+  totalOutput: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "Users",
+    default: null,
+  },
 }, { timestamps: true });
 
 //create schema
@@ -140,50 +153,42 @@ const patientSchema = new Schema(
         default: [],
       },
 
-      ],
-      prescription: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Prescription",
-          default: [],
-        },
-      ],
-    
-      lab: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Lab",
-          default: [],
-        },
-      ],
-      radiology: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Radiology",
-          default: [],
-        },
-      ],
-      prcedure:[
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Procedure",
-          default: [],
-        },
-      ],
-      insurance:
+    ],
+    prescription: [
       {
-          type: Schema.Types.ObjectId,
-          ref: "Hmomanagement"
-        },
-      status:{
-        required: true,
-        type: String,
-        default: configuration.status[2],
-  
-
+        type: Schema.Types.ObjectId,
+        ref: "Prescription",
+        default: [],
       },
-    
-    
+    ],
+
+    lab: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Lab",
+        default: [],
+      },
+    ],
+    radiology: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Radiology",
+        default: [],
+      },
+    ],
+    prcedure: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Procedure",
+        default: [],
+      },
+    ],
+    status: {
+      required: true,
+      type: String,
+      default: configuration.status[2],
+
+    },
     payment: [
       {
         type: Schema.Types.ObjectId,
@@ -195,8 +200,12 @@ const patientSchema = new Schema(
       type: clinicalInformationSchema,
       default: null
     },
-    specialNeeds: { type: String, trim: true }
-
+    previouslyNotHmo: {
+      type: Boolean,
+      default: null
+    },
+    specialNeeds: { type: String, trim: true },
+    /// fluidBalance: { type: [fluidBalanceSchema], default: [] }
   },
   { timestamps: true }
 );
