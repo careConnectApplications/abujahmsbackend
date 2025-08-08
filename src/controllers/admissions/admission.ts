@@ -256,12 +256,14 @@ export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: 
 
     // First find matching patient IDs
     const {patientdetails} = await readallpatient(patientSearchConditions,selectquery,'','');
+  
 
     if (patientdetails.length === 0) {
       throw new Error("No patients found matching criteria.");
     }
 
     const patientIds = patientdetails.map((p) => p._id);
+    
 
     // Now find admissions that match those patient IDs
     
