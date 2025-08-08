@@ -200,8 +200,12 @@ const patientSchema = new Schema(
       type: clinicalInformationSchema,
       default: null
     },
+    previouslyNotHmo: {
+      type: Boolean,
+      default: null
+    },
     specialNeeds: { type: String, trim: true },
-   /// fluidBalance: { type: [fluidBalanceSchema], default: [] }
+    /// fluidBalance: { type: [fluidBalanceSchema], default: [] }
   },
   { timestamps: true }
 );

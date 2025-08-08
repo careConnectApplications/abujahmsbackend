@@ -561,7 +561,7 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
 
   /// if hmo is true return an error
   /// then convert to true
-  const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1] });
+  const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1], previouslyNotHmo: true });
   /// save db
 
   res.status(200).json({
