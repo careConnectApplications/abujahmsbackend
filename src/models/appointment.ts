@@ -550,6 +550,7 @@ const appointmentSchema = new Schema({
   },
   firstName: String,
   lastName: String,
+  amount: Number,
   MRN: String,
   HMOId: String,
   HMOName: String,
