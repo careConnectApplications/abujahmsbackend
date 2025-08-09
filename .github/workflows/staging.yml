@@ -56,11 +56,11 @@ jobs:
           # Optionally restart your app after copying the build
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME"@"$SERVER_IP" << 'EOF'
             # Stop any existing server (optional)
-            pm2 stop 7
+            pm2 stop 8
             # server commands (or your app, depending on your setup)
             cd /home/hms/hmsbackendabuja
             npm install
             npm run build
-            pm2 --name "hmsabuja" start /home/hms/hmsbackendabuja/build/index.js
+            pm2 --name "abuja" start /home/hms/hmsbackendabuja/build/index.js
 
           EOF
