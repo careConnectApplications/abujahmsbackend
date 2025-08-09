@@ -448,26 +448,16 @@ export async function printreceipt(req: any, res: any) {
 export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { patientId } = req.params;
   const {
-    serviceCategory,
+    serviceCategory, amount,
     serviceType, phoneNumber } = req.body;
 
-    const { _id: userId } = (req.user).user;
-
-  const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
+  const { _id: userId } = (req.user).user;
 
   const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
 
   if (!foundPatient) {
     return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
   }
-
-  const priceDetails = await readoneprice({ servicecategory: serviceCategory, isHMOCover: foundPatient.isHMOCover, servicetype: { $regex: serviceType, $options: 'i' } });
-
-  if (!priceDetails) {
-    return next(new ApiError(404, `Pricing model do not ${configuration.error.erroralreadyexit} for patient details`));
-  }
-
-  console.log(priceDetails);
 
   const { firstName, lastName, } = foundPatient;
 
@@ -479,10 +469,10 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
     MRN: req.body.MRN,
     phoneNumber,
     paymentreference: refNumber,
-    paymentype: priceDetails.servicetype,
-    paymentcategory: priceDetails.servicecategory,
+    paymentype: serviceType,
+    paymentcategory: serviceCategory,
     patient: foundPatient._id,
-    amount: Number(priceDetails.amount),
+    amount: Number(amount),
     createdById: userId,
   });
 
