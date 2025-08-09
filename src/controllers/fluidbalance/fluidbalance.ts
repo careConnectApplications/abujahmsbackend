@@ -12,7 +12,7 @@ const { ObjectId } = mongoose.Types;
 export const readallfluidbalanceByAdmission = async (req: any, res: any) => {
   try {
     const { admission } = req.params;
-    const queryresult = await readallfluidbalances({ admission }, { intaketype: 1, intakeroute: 1, intakeamount: 1, outputtype: 1, outputroute: 1, outputamount: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
+    const queryresult = await readallfluidbalances({ admission }, { inputamount: 1, balance: 1, outputamount: 1, patient: 1, createdBy: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, 'patient createdBy', '');
     res.status(200).json({
       queryresult,
       status: true
@@ -27,7 +27,7 @@ export const readAllfluidbalanceByPatient = async (req: any, res: any) => {
     //const {clinic} = (req.user).user;
     const { patient } = req.params;
     //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readallfluidbalances({ patient }, { intaketype: 1, intakeroute: 1, intakeamount: 1, outputtype: 1, outputroute: 1, outputamount: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, '', '');
+    const queryresult = await readallfluidbalances({ patient }, { patient: 1, inputamount: 1, staffname: 1, outputamount: 1, balance: 1, createdBy: 1, createdAt: 1, updatedAt: 1 }, 'patient createdBy', '');
     res.status(200).json({
       queryresult,
       status: true
