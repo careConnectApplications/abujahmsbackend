@@ -231,7 +231,7 @@ export var createpatients = async (req: any, res: any) => {
     req.body.appointmenttype = configuration.category[3];
     var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover,HMOName,HMOId,HMOPlan } = req.body;
     //validation
-    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, isHMOCover });
+    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender,  isHMOCover });
     //define the service type
    
 

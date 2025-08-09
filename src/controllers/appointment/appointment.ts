@@ -386,6 +386,15 @@ export const getAllPaidSchedules = async (req: any, res: any) => {
 };
 export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
   try {
+       const { _id } = (req.user).user;
+    //doctor
+    //for nursings 
+    // Get today's date
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
+    // Get the start of tomorrow to set the range for "today"
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(23, 59, 59, 999); 
 
     //const {clinic} = (req.user).user;
     const { clinic } = req.params;
@@ -394,7 +403,108 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
     var size = parseInt(req.query.size) || 150;
     // var statusfilter:any =status?{status,clinic}:{clinic};
    // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
-    let aggregatequery =
+    
+   let aggregatequery =(req.query.status == "today_queue")?[
+         {
+        $match: {doctor:new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+        
+      },
+        {
+        $lookup: {
+          from: 'payments',
+          localField: 'payment',
+          foreignField: '_id',
+          as: 'payment'
+        }
+      },
+      {
+        $lookup: {
+          from: 'patientsmanagements',
+          localField: 'patient',
+          foreignField: '_id',
+          as: 'patient'
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'doctor',
+          foreignField: '_id',
+          as: 'doctor'
+        }
+      },
+      {
+        $lookup: {
+          from: 'vitalcharts',
+          localField: 'vitals',
+          foreignField: '_id',
+          as: 'vitals'
+        }
+      },
+      {
+        $unwind: {
+          path: '$payment',
+          preserveNullAndEmptyArrays: true
+        }  // Deconstruct the payment array (from the lookup)
+      },
+      {
+        $unwind: {
+          path: '$vitals',
+          preserveNullAndEmptyArrays: true
+        }  // Deconstruct the payment array (from the lookup)
+      },
+      {
+        $unwind: {
+          path: '$patient',
+          preserveNullAndEmptyArrays: true
+
+        }  // Deconstruct the patient array (from the lookup)
+      }
+        ,
+
+      {
+        $match: { $or: [{ 'payment.status': configuration.status[3] }, { amount: 0 }]}  // Filter payment
+        
+      }
+        , {
+        $project: {
+          _id: 1,
+          doctorassigment:1,
+          createdAt: 1,
+          appointmentid: 1,
+          admission: 1,
+          doctor: 1,
+          reason: 1,
+          updatedAt: 1,
+          appointmenttype: 1,
+          appointmentdate: 1,
+          clinic: 1,
+          patient: 1,
+          firstName: "$patient.firstName",
+          lastName: "$patient.lastName",
+          MRN: "$patient.MRN",
+          HMOId: "$patient.HMOId",
+          HMOName: "$patient.HMOName",
+
+          appointmentcategory: 1,
+          vitalstatus: "$vitals.status",
+          vitals: 1,
+          clinicalencounter: 1,
+          status: 1,
+          payment: "$payment",
+          policecase: 1,
+          physicalassault: 1,
+          sexualassault: 1,
+          policaename: 1,
+          servicenumber: 1,
+          policephonenumber: 1,
+
+
+
+        }
+      },
+      { $sort: { createdAt: 1 } },
+      ]:
       [
         { $match: { clinic, ...(status && { status }) } },
 
