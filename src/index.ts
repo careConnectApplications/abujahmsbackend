@@ -10,8 +10,8 @@ import moment from "moment";
 
 dotenv.config();
 databaseconnection();
-const app=createServer();
-const port = configuration.environment === "test"?process.env.TESTPORT:process.env.PORT ;
-app.listen(port,()=>{
+const app = createServer();
+const port = configuration.environment === "test" ? process.env.TESTPORT : process.env.PORT;
+app.listen(port, () => {
     console.log(`Server is listening on Port ${port}`)
 })

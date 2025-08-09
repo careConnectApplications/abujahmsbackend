@@ -5,9 +5,9 @@ import {createconscentooperation,readoneconscentooperation,updateconscentooperat
 
 export const fillconscentform = async (req:any, res:any) => {
 try{
-const { imageBase64,nameofexplainer,nameofrepresentive,conscentdate} = req.body;
+const { imageBase64,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness} = req.body; 
 const {theatreadmission} = req.params;
-validateinputfaulsyvalue({theatreadmission,imageBase64,nameofexplainer,nameofrepresentive,conscentdate});
+validateinputfaulsyvalue({theatreadmission,imageBase64,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness});
       
 //theatre
 const filename = await uploadbase64image(imageBase64);
@@ -20,7 +20,7 @@ const filename = await uploadbase64image(imageBase64);
 }
 //const queryresult:any =await updatethearteadmission(id,{status});
 //create conscent
-const conscentresult = await createconscentooperation({theatreadmission,nameofexplainer,nameofrepresentive,conscentdate,filename})
+const conscentresult = await createconscentooperation({theatreadmission,nameofexplainer,nameofrepresentive,conscentdate,filename,addressofrepresentaive,fullnameofwitness})
 //update theatre admission
 const queryresult:any =await updatethearteadmission(theatreadmission,{conscent:conscentresult._id});
 res.status(200).json({
@@ -43,7 +43,7 @@ catch(e:any){
       //const {clinic} = (req.user).user;
       const {theatreadmission} = req.params;
       //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-      const queryresult = await readoneconscentooperation({theatreadmission},{},'');
+      const queryresult = await readoneconscentooperation({theatreadmission},{},'theatreadmission');
       res.status(200).json({
         queryresult,
         status:true
@@ -56,10 +56,14 @@ catch(e:any){
 
   export const updatefillconscentform = async (req:any, res:any) => {
     try{
-    const { nameofexplainer,nameofrepresentive,conscentdate} = req.body;
+    const {imageBase64, nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness} = req.body;
     const {id} = req.params;
-    validateinputfaulsyvalue({id,nameofexplainer,nameofrepresentive,conscentdate});
-          
+    validateinputfaulsyvalue({id,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness});
+      //theatre
+     let filename;
+     if(imageBase64){
+     filename=await uploadbase64image(imageBase64); 
+     }
     //theatre
     //const filename = await uploadbase64image(imageBase64);
     //validate theatre admission
@@ -68,9 +72,9 @@ catch(e:any){
         throw new Error(`Conscent Form ${configuration.error.erroralreadyexit}`);
     
     }
-    //const queryresult:any =await updatethearteadmission(id,{status});
+    //const queryresult:any =await updatethearteaadmission(id,{status});
     //create conscent
-    const queryresult = await updateconscentooperation(id,{nameofexplainer,nameofrepresentive,conscentdate})
+    const queryresult = await updateconscentooperation(id,{filename,nameofexplainer,nameofrepresentive,conscentdate,addressofrepresentaive,fullnameofwitness})
    
     res.status(200).json({
         queryresult,

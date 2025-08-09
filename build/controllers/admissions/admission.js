@@ -46,7 +46,9 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         var appointment;
         if (appointmentid) {
             appointmentid = new ObjectId(appointmentid);
+            console.log("appoitmentid", appointmentid);
             appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
+            console.log("appointment", appointment);
             if (!appointment) {
                 //create an appointment
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);

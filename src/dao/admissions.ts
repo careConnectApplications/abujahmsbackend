@@ -15,9 +15,9 @@ export async function countadmission(query:any) {
   }
 };
   //read all patient history
-  export async function readalladmission(query:any,selectquery:any,populatequery:any,populatesecondquery:any) {
+  export async function readalladmission(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      const admissiondetails = await Admission.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery);
+      const admissiondetails = await Admission.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
       const totaladmissiondetails = await Admission.find(query).countDocuments();
       return { admissiondetails, totaladmissiondetails };
     } catch (err) {

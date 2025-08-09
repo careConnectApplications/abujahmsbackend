@@ -13,6 +13,11 @@ export interface paymentinterface {
 //create schema
 const paymentSchema = new Schema(
   {
+    firstName:String,
+    lastName:String,
+    MRN:String,
+    HMOId:String,
+    phoneNumber:String,
     paymentype: {
       required: true,
       type: String,
@@ -68,6 +73,10 @@ const paymentSchema = new Schema(
   },
   { timestamps: true }
 );
+paymentSchema.index({ status: 1, paymentreference: 1, createdAt: -1 })
+paymentSchema.index({ paymentreference: 1 })
+paymentSchema.index({ status: 1 });
+paymentSchema.index({ patient: 1 });
 
 
 //create a model

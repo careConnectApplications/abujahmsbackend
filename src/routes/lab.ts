@@ -1,13 +1,14 @@
 //scheduleappointment
 import express from 'express';
 import {protect} from "../utils/middleware";
-import {readalllabb,readAllLabByPatient,labresultprocessing,readallscheduledlab,listlabreport,printlabreport,listlabreportbypatient,confirmlaborder} from '../controllers/lab/lab';
+import {readalllabb,readAllLabByPatient,labresultprocessing,readallscheduledlab,listlabreport,printlabreport,listlabreportbypatient,confirmlaborder,readallscheduledlaboptimized,sorthemathologyandchemicalpathology,readallscheduledlaboptimizedhemathologyandchemicalpathology,labresultprocessinghemathologychemicalpathology} from '../controllers/lab/lab';
 const router = express.Router();
 
 
 
 router.get('/readalllabb', readalllabb);
 router.get('/readallscheduledlab', readallscheduledlab);
+router.get('/readallscheduledlaboptimized', readallscheduledlaboptimized);
 router.get('/readlabbypatientid/:id', readAllLabByPatient);
 router.put('/labresultprocessing/:id', labresultprocessing);
 router.put('/confirmlaborder/:id', confirmlaborder);
@@ -16,7 +17,10 @@ router.put('/confirmlaborder/:id', confirmlaborder);
 router.get('/listlabreport', listlabreport);
 router.get('/printlabreport/:id', printlabreport);
 router.get('/listlabreportbypatient/:id', listlabreportbypatient);
-
+router.put('/sortbyhemathologyandchemicalpathology/:id', sorthemathologyandchemicalpathology);
+//readallscheduledlaboptimizedhemathologyandchemicalpathology
+router.get('/readallscheduledlaboptimizedhemathologyandchemicalpathology', readallscheduledlaboptimizedhemathologyandchemicalpathology);
+router.put('/labresultprocessinghemathologychemicalpathology/:id', labresultprocessinghemathologychemicalpathology);
 
 
 

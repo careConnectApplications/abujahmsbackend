@@ -9,7 +9,10 @@ import Lab from "../models/lab";
 import Radiology from "../models/radiology";
 import Prescription from "../models/prescription";
 import Patientsmanagement from "../models/patientmanagement";
+import Nutrition from "../models/nutrition";
 import configuration from "../config";
+import Immunization from "../models/immunization";
+import Familyplanning from "../models/familyplanning";
 export async function readpatientsmanagementaggregate(input:any) {
   try{
   return await Patientsmanagement.aggregate(input);
@@ -123,3 +126,36 @@ export async function readpaymentaggregate(input:any) {
                       throw new Error(configuration.error.erroruserupdate);
                     }
                     }
+
+                    //nutrition
+                      export async function readnutritionaggregate(input:any) {
+                    try{
+                    return await Nutrition.aggregate(input);
+                    }
+                    catch(e:any){
+                      console.log(e);
+                      throw new Error(configuration.error.erroruserupdate);
+                    }
+                    }
+                    //immunization
+              export async function readimmunizationaggregate(input:any) 
+              {
+                  try{
+                      return await Immunization.aggregate(input)
+                  }
+                  catch(e:any){
+                      console.log(e);
+                      throw new Error(configuration.error.erroruserupdate);
+                  }
+              }
+              //family planning
+               export async function readfamilyaggregate(input:any) 
+              {
+                  try{
+                      return await Familyplanning.aggregate(input)
+                  }
+                  catch(e:any){
+                      console.log(e);
+                      throw new Error(configuration.error.erroruserupdate);
+                  }
+              }

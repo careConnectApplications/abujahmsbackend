@@ -74,7 +74,7 @@ for(var i =0; i < procedures.length; i++){
       throw new Error(`${procedures[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
   }
        //create payment
-    var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:procedures[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:id,paymentype:procedures[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
    
     //create testrecordn 
     var procedurerecord = await createprocedure({procedure:procedures[i],patient:id,payment:createpaymentqueryresult._id,procedureid,clinic,indicationdiagnosisprocedure,appointmentdate,cptcodes,dxcodes,raiseby});
@@ -99,7 +99,10 @@ res.status(200).json({queryresult:theatreadmissionrecord, status: true});
 export async function getallreferedfortheatreadmission(req:any, res:any){
     try{
        const {theatre} = req.params;
-       const referedtheatre = new ObjectId(theatre);
+       let referedtheatre;
+       if(theatre){
+       referedtheatre= new ObjectId(theatre);
+       }
         const queryresult = await readallthearteadmission({referedtheatre},{},'referedtheatre','patient','conscent');
         res.status(200).json({
             queryresult,

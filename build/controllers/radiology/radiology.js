@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmradiologyorder = exports.uploadradiologyresult = exports.enterradiologyresult = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
+exports.confirmradiologyorder = exports.uploadradiologyresult = exports.enterradiologyresult = exports.readAllRadiologyoptimized = exports.readAllRadiology = exports.readAllRadiologyByPatient = exports.radiologyorder = void 0;
 exports.updateradiologys = updateradiologys;
 const mongoose_1 = __importDefault(require("mongoose"));
 const otherservices_1 = require("../../utils/otherservices");
@@ -161,6 +161,98 @@ const readAllRadiology = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.readAllRadiology = readAllRadiology;
+//get lab order 
+const readAllRadiologyoptimized = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        var { status, firstName, MRN, HMOId, lastName, phoneNumber, testname, testid } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 150;
+        const filter = {};
+        var statusfilter = status ? { status } : testname ? { testname } : testid ? { testid } : {};
+        // Add filters based on query parameters
+        if (firstName) {
+            filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+        }
+        if (MRN) {
+            filter.MRN = new RegExp(MRN, 'i');
+        }
+        if (HMOId) {
+            filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+        }
+        if (lastName) {
+            filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+        }
+        if (phoneNumber) {
+            filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+        }
+        let aggregatequery = [
+            {
+                $match: statusfilter
+            },
+            {
+                $lookup: {
+                    from: 'payments',
+                    localField: 'payment',
+                    foreignField: '_id',
+                    as: 'payment'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'patientsmanagements',
+                    localField: 'patient',
+                    foreignField: '_id',
+                    as: 'patient'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$payment', // Deconstruct the payment array (from the lookup)
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $unwind: {
+                    path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
+            },
+            {
+                $project: {
+                    _id: 1,
+                    createdAt: 1,
+                    testname: 1,
+                    updatedAt: 1,
+                    testid: 1,
+                    testresult: 1,
+                    department: 1,
+                    raiseby: 1,
+                    firstName: "$patient.firstName",
+                    lastName: "$patient.lastName",
+                    phoneNumber: "$patient.phoneNumber",
+                    MRN: "$patient.MRN",
+                    patient: "$patient",
+                    HMOId: "$patient.HMOId",
+                    HMOName: "$patient.HMOName",
+                    payment: "$payment",
+                    status: 1,
+                }
+            },
+            {
+                $match: filter
+            },
+        ];
+        const queryresult = yield (0, radiology_1.optimizedreadallradiology)(aggregatequery, page, size);
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.readAllRadiologyoptimized = readAllRadiologyoptimized;
 //update radiology
 function updateradiologys(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -296,7 +388,7 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
             paymentreference = testid;
         }
         if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], payment: createpaymentqueryresult._id, remark });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
         }

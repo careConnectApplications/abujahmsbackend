@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 // Define the Clinic Schema
 const histologyrequestSchema = new mongoose_1.Schema({
-    africannonafrican: [],
+    africannonafrican: String,
     historyofpresentillness: [],
     presentingcomplaint: [],
     findingonphysicalexamination: [],
