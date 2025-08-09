@@ -174,7 +174,11 @@ const patientSchema = new Schema(
       {
           type: Schema.Types.ObjectId,
           ref: "Hmomanagement"
-        },
+      },
+      subscriptionPaidUntil: {
+      type: Date,
+      default: null
+    },
       status:{
         required: true,
         type: String,
