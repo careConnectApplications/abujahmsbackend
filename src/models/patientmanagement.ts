@@ -183,6 +183,10 @@ const patientSchema = new Schema(
         default: [],
       },
     ],
+    subscriptionPaidUntil: {
+      type: Date,
+      default: null
+    },
     status: {
       required: true,
       type: String,

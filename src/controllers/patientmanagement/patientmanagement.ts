@@ -3,7 +3,6 @@ import moment from "moment";
 import mongoose from "mongoose";
 import * as path from 'path';
 import {readonehmomanagement} from "../../dao/hmomanagement";
-//import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated, updatepatientbyanyquery } from "../../dao/patientmanagement";
 import { v4 as uuidv4 } from 'uuid';
 import configuration from "../../config";
 import { readoneprice } from "../../dao/price";
@@ -14,13 +13,12 @@ import { mail, generateRandomNumber, validateinputfaulsyvalue, uploaddocument, c
 import { createappointment } from "../../dao/appointment";
 import { createaudit } from "../../dao/audit";
 import { createpatient, createpatientifnotexit, readallpatient, readallpatientpaginated, readonepatient, updatepatient, updatepatientbyanyquery, updatepatientmanybyquery } from "../../dao/patientmanagement";
-//import { createpayment } from "../../dao/payment";
-//import { readoneprice } from "../../dao/price";
+
 import { readonepricemodel } from "../../dao/pricingmodel";
-//import { createvitalcharts } from "../../dao/vitalcharts";
+
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
-//import { convertexceltojson, storeUniqueNumber, uploaddocument, validateinputfaulsyvalue } from "../../utils/otherservices";
+
 //Insurance upload
 //get hmo patient 
 //read all patients
