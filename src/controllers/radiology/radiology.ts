@@ -30,7 +30,6 @@ export var radiologyorder = async (req: any, res: any) => {
     validateinputfaulsyvalue({ id, testname, note });
     //find the record in appointment and validate
     const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
-    const { isHMOCover } = foundPatient;
     //category
     if (!foundPatient) {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
@@ -50,7 +49,7 @@ export var radiologyorder = async (req: any, res: any) => {
 
     }
 
-    const { servicetypedetails } = await readallservicetype({ category: configuration.category[4] }, { type: 1, category: 1, department: 1, _id: 0 });
+    
     //loop through all test and create record in lab order
     for (var i = 0; i < testname.length; i++) {
 
@@ -59,18 +58,10 @@ export var radiologyorder = async (req: any, res: any) => {
       if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
-      var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
-
-  
-  //    var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-      /* 
-       if(!testsetting || testsetting.length < 1){
-         throw new Error(`${testname[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
-     }
-         */
+      let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-      let testrecord: any=await createradiology({ note, testname: testname[i], patient: id, testid, raiseby, amount: Number(testPrice.amount) });
+      let testrecord: any=await createradiology({ note, testname: testname[i], patient: id, testid, raiseby, amount });
       //create testrecordn 
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -382,13 +373,13 @@ export const confirmradiologyorder = async (req: any, res: any) => {
     else {
       paymentreference = testid;
     }
-    if (option == true && patient.isHMOCover == configuration.ishmo[0]) {
+    if (option == true && amount > 0) {
       var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
       queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id, remark });
       await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id } });
 
     }
-    else if (option == true && patient.isHMOCover == configuration.ishmo[1]) {
+    else if (option == true && amount == 0) {
       queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
 
     }

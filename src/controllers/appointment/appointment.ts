@@ -46,9 +46,10 @@ export const scheduleappointment = async (req: any, res: any) => {
     }
     
     var { firstName, lastName, MRN, HMOId, HMOName } = patientrecord;
+   
     //search for price if available
     var appointmentPrice: any = await readoneprice({ servicecategory: appointmentcategory, servicetype: appointmenttype });
-    if (patientrecord.isHMOCover == configuration.ishmo[0] && !appointmentPrice) {
+    if (!appointmentPrice) {
       throw new Error(configuration.error.errornopriceset);
 
     }
@@ -72,6 +73,7 @@ export const scheduleappointment = async (req: any, res: any) => {
       //create vitals
       await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
     }
+   
     //create vitals
 
     //update patient
@@ -107,16 +109,7 @@ export const getAllSchedulesoptimized = async (req: any, res: any) => {
     if (appointmenttype) {
       filter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
     }
-    /*
-      if(status == "paid"){
-        otherfilter.status=configuration.status[3]
-     
-         }
-         else{
-          otherfilter.status=configuration.status[5];
-     
-         }
-          */
+ 
     const referencegroup = [
       //look up patient
       //add query
@@ -523,7 +516,6 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
   try {
     //for doctors show only patient assigned to them
     const { _id } = (req.user).user;
-   
     //doctor
     //for nursings 
     // Get today's date
@@ -734,19 +726,9 @@ export var laborder = async (req: any, res: any) => {
       if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
-     
+      let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any;
-      //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
-      if (foundPatient?.isHMOCover == configuration.ishmo[0] || (appointment.patient).isHMOCover == configuration.ishmo[0]) {
-
-        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
-      }
-      else {
-        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount:calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount)) });
-
-      }
-
+      let testrecord: any = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount });
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
     }
