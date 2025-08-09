@@ -51,11 +51,7 @@ export async function confirmgrouppayment(req: any, res: any) {
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
     const { paymentdetails } = response;
-    console.log('before', paymentdetails);
-    console.log('length', paymentdetails.length);
-
     for (var i = 0; i < paymentdetails.length; i++) {
-      console.log('paymentdetails', paymentdetails[i])
       let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
 
       //const {patient} = paymentdetails[i];

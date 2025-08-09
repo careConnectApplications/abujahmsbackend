@@ -2,8 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import moment from "moment";
 import mongoose from "mongoose";
 import * as path from 'path';
+import {readonehmomanagement} from "../../dao/hmomanagement";
+import { readallpatient, createpatient, updatepatient, readonepatient, updatepatientmanybyquery, createpatientifnotexit, readallpatientpaginated, updatepatientbyanyquery } from "../../dao/patientmanagement";
 import { v4 as uuidv4 } from 'uuid';
 import configuration from "../../config";
+import { readoneprice } from "../../dao/price";
+import { createpayment } from "../../dao/payment";
+import { createvitalcharts } from "../../dao/vitalcharts";
+import { mail, generateRandomNumber, validateinputfaulsyvalue, uploaddocument, convertexceltojson, storeUniqueNumber,calculateAmountPaidByHMO } from "../../utils/otherservices";
+
 import { createappointment } from "../../dao/appointment";
 import { createaudit } from "../../dao/audit";
 import { createpatient, createpatientifnotexit, readallpatient, readallpatientpaginated, readonepatient, updatepatient, updatepatientbyanyquery, updatepatientmanybyquery } from "../../dao/patientmanagement";
@@ -228,24 +235,22 @@ export var createpatients = async (req: any, res: any) => {
     //validation
     validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, clinic, isHMOCover });
     //define the service type
-    /*
-    if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
-      console.log("here");
-      //throw new Error(configuration.error.errorauthorizehmo);
-      req.body.patienttype = configuration.patienttype[1];
-      req.body.status = configuration.status[1];
-      validateinputfaulsyvalue({authorizationcode});
-
-    }
-      */
+   
 
     if (authorizationcode) {
       req.body.patienttype = configuration.patienttype[1];
 
     }
+    let gethmo:any;
     //define the service type
     if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
-      req.body.status = configuration.status[1];
+       validateinputfaulsyvalue({ HMOName,HMOId,HMOPlan });
+      gethmo = await readonehmomanagement({hmoname:req.body.HMOName},{_id:1,hmopercentagecover:1});
+    if(!gethmo){
+      throw new Error("HMONAME does not exist");
+    }
+    req.body.insurance=gethmo._id;
+
     }
 
 
@@ -293,27 +298,23 @@ export var createpatients = async (req: any, res: any) => {
       const isAdult = age >= 18;
       const isChild = age < 18;
       //check for error
-      console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
-      console.log("Clinic from request:", clinic);
-      console.log("Is adult:", isAdult);
-      console.log("Age:", age);
+     
 
       //confirm the type of pricing model
       if (foundPricingmodel.exactnameofancclinic == clinic) {
-        console.log("clinic");
         newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: clinic });
       }
       else if (isAdult) {
-        console.log("greater than 18")
+       
         newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforadult, $options: 'i' } });
       }
       else if (isChild) {
-        console.log("less than 18");
+       
         newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforchild, $options: 'i' } });
 
       }
       else {
-        console.log("errror /////");
+       
         //return error
         throw new Error(`${configuration.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}`);
 
@@ -323,15 +324,15 @@ export var createpatients = async (req: any, res: any) => {
 
     }
     else {
-      newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: configuration.category[3] });
+      newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], servicetype: configuration.category[3] });
 
     }
 
     //use age to calculate price
 
-    console.log("newRegistrationPrice", newRegistrationPrice);
+   
 
-    if (!(isHMOCover == configuration.ishmo[1] || isHMOCover == true) && !newRegistrationPrice) {
+    if ( !newRegistrationPrice) {
       console.log("second errror /////");
       throw new Error(configuration.error.errornopriceset);
 
@@ -348,13 +349,20 @@ export var createpatients = async (req: any, res: any) => {
     req.body.password = configuration.defaultPassword;
     //other validations
     var payment = [];
-    const createpatientqueryresult = await createpatient(req.body);
     //create payment
     //create payment for only none hmo patient
     let queryappointmentresult;
     let queryresult;
-    let vitals = await createvitalcharts({ status: configuration.status[8] });
-    if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
+
+    let vitals:any; 
+    var hmopercentagecover=gethmo?.hmopercentagecover ?? 0;
+    var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
+     if (amount == 0) {
+      req.body.status = configuration.status[1];
+     }
+    const createpatientqueryresult = await createpatient(req.body);
+    if (amount == 0) {
+
       if (appointmentdate) {
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
         queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
@@ -362,7 +370,7 @@ export var createpatients = async (req: any, res: any) => {
 
     }
     else {
-      const createpaymentqueryresult = await createpayment({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) })
+      const createpaymentqueryresult = await createpayment({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount })
       // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
       payment.push(createpaymentqueryresult._id);
       //payment.push(createappointmentpaymentqueryresult._id);
