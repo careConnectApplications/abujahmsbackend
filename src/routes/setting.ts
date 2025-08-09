@@ -1,5 +1,5 @@
 import express from 'express';
-import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology} from '../controllers/setting/pricesetting';
+import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice} from '../controllers/setting/pricesetting';
 import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
@@ -72,6 +72,9 @@ router.get('/getavailablebedsbyward/:wardid',getAvailableBedsByWard);
 router.get('/getallbeds',getallbeds);
 router.put('/softdeleterestorebed/:id',softDeleteBed);
 router.put('/updatebednumber/:id',updatebeds);
+//getpriceofservice
+router.post('/getpriceofservice/:id',getpriceofservice);
+
     
 
 

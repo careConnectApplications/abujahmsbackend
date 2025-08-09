@@ -1,8 +1,11 @@
+import { NextFunction, Request, Response } from "express";
 import configuration from "../../config";
 import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/price";
-import { validateinputfaulsyvalue} from "../../utils/otherservices";
+import { validateinputfaulsyvalue,calculateAmountPaidByHMO} from "../../utils/otherservices";
 import {createaudit} from "../../dao/audit";
 import {readonepricemodel} from "../../dao/pricingmodel";
+import {readonepatient} from "../../dao/patientmanagement";
+import catchAsync from "../../utils/catchAsync";
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    
@@ -163,3 +166,49 @@ catch(e:any){
 }
   
 }
+//get price of services /////////////
+export const getpriceofservice = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const { servicetype } = req.body;
+
+  // Validate inputs early
+  if (!id || !servicetype) {
+    throw new Error("Patient ID and service type are required.");
+  }
+
+  // Fetch patient with insurance populated
+  const foundPatient: any = await readonepatient(
+    { _id: id },
+    {},
+    "insurance",
+    ""
+  );
+
+  if (!foundPatient) {
+    throw new Error(`Patient does not ${configuration.error.erroralreadyexit}`);
+  }
+
+  // Fetch price for the service type
+  const price: any = await readoneprice({ servicetype });
+
+  if (price?.amount == null) {
+    throw new Error(`${configuration.error.errornopriceset} ${servicetype}`);
+  }
+
+  // Get HMO coverage percentage or default to 0
+  const hmoPercentageCover = foundPatient?.insurance?.hmopercentagecover ?? 0;
+
+  // Calculate patient amount
+  const amount = calculateAmountPaidByHMO(
+    Number(hmoPercentageCover),
+    Number(price.amount)
+  );
+
+  // Respond with calculated amount
+  res.status(200).json({ price: amount, status: true });
+
+
+
+      
+  })
+  

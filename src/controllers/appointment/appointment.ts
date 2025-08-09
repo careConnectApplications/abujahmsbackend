@@ -4,6 +4,7 @@ import { readoneadmission } from "../../dao/admissions";
 import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
+import {readonehmomanagement} from "../../dao/hmomanagement";
 import { readallservicetype } from "../../dao/servicetype";
 import { readone,readall } from "../../dao/users";
 import { readoneprice } from "../../dao/price";
@@ -12,7 +13,7 @@ import { createpayment } from "../../dao/payment";
 import mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
 import { createlab } from "../../dao/lab";
-import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable,calculateAmountPaidByHMO } from "../../utils/otherservices";
 import configuration from "../../config";
 const { ObjectId } = mongoose.Types;
 
@@ -122,7 +123,8 @@ export const getAllSchedulesoptimized = async (req: any, res: any) => {
 
       {
         $project: {
-          _id: 0,
+          _id: 1,
+          doctorassigment:1,
           createdAt: 1,
           updatedAt: 1,
           appointmenttype: 1,
@@ -593,6 +595,7 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
         {
           $project: {
             _id: 1,
+            doctorassigment:1,
             createdAt: 1,
             reason: 1,
             updatedAt: 1,
@@ -730,6 +733,7 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
         , {
         $project: {
           _id: 1,
+          doctorassigment:1,
           createdAt: 1,
           appointmentid: 1,
           admission: 1,
@@ -815,14 +819,18 @@ export var laborder = async (req: any, res: any) => {
     //find the record in appointment and validate
 
     //find patient
-    const foundPatient: any = await readonepatient({ _id: id }, {}, '', '');
+    const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
     // check is patient is under inssurance
     //var isHMOCover;
 
     // Create a new ObjectId
     var appointment: any;
     let patientappointment: any;
+    var hmopercentagecover;
+    
+    //insurance
     if (foundPatient) {
+      hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
         patient: id,
@@ -841,6 +849,11 @@ export var laborder = async (req: any, res: any) => {
         throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
 
       }
+      //read insurance
+      let insurance:any = await readonehmomanagement({_id:appointment.patient.insurance},{hmopercentagecover:1});
+    
+      hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+
       //update appoint with lab order
 
       //  isHMOCover = appointment.patient.isHMOCover;
@@ -849,16 +862,16 @@ export var laborder = async (req: any, res: any) => {
 
 
 
-
     //console.log(testname);
 
-    const { servicetypedetails } = await readallservicetype({ category: configuration.category[2] }, { type: 1, category: 1, department: 1, _id: 0 });
+    //const { servicetypedetails } = await readallservicetype({ category: configuration.category[2] }, { type: 1, category: 1, department: 1, _id: 0 });
     //loop through all test and create record in lab order
     for (var i = 0; i < testname.length; i++) {
       //    console.log(testname[i]);
       //console.log(isHMOCover);
-      var testPrice: any = await readoneprice({ servicetype: testname[i], isHMOCover: configuration.ishmo[0] });
-      if ((foundPatient?.isHMOCover == configuration.ishmo[0] || (appointment.patient).isHMOCover == configuration.ishmo[0]) && !testPrice) {
+      var testPrice: any = await readoneprice({ servicetype: testname[i]});
+     
+      if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
       //var setting  = await configuration.settings();
@@ -876,7 +889,7 @@ export var laborder = async (req: any, res: any) => {
         testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
       }
       else {
-        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department });
+        testrecord = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount:calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount)) });
 
       }
 
@@ -1172,11 +1185,11 @@ export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) =>
   var _appointmentId=new ObjectId(appointmentId);
    var _doctorId=new ObjectId(doctorId);
     // Find appointment
-    const appointment= await readoneappointment({ _id: _appointmentId }, {}, 'patient');
+    const appointment:any= await readoneappointment({ _id: _appointmentId }, {}, 'patient');
     if (!appointment) {
       throw new Error("Appointment not found.");
     }
-
+console.log("appointment",appointment);
     // Find doctor
      const doctor = await readone({ _id:_doctorId });
     if (!doctor) {
@@ -1187,6 +1200,7 @@ export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) =>
     appointment.doctor = doctor._id;
     appointment.doctorsfirstName = doctor.firstName;
     appointment.doctorslastName = doctor.lastName;
+    appointment.doctorassigment =configuration.doctorassigment[1],
 
     await appointment.save();
      res.status(200).json({

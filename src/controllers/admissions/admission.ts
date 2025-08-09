@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
-import { validateinputfaulsyvalue } from "../../utils/otherservices";
+import { validateinputfaulsyvalue,calculateAmountPaidByHMO } from "../../utils/otherservices";
 import {readoneappointment,updateappointment} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
 import  {updatepatient,readonepatient,readallpatient}  from "../../dao/patientmanagement";
@@ -8,6 +8,8 @@ import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanageme
 import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
 import {readonebed,updatebed} from "../../dao/bed";
+import {createpayment} from "../../dao/payment";
+import {readonehmomanagement} from "../../dao/hmomanagement";
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
 const { ObjectId } = mongoose.Types;
@@ -94,7 +96,6 @@ if(appointmentid){
               await updateappointment(appointment._id,{admission:admissionrecord._id});
       
 }
-//create bed fee
 
 res.status(200).json({queryresult:admissionrecord, status: true});
     }
@@ -256,12 +257,14 @@ export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: 
 
     // First find matching patient IDs
     const {patientdetails} = await readallpatient(patientSearchConditions,selectquery,'','');
+  
 
     if (patientdetails.length === 0) {
       throw new Error("No patients found matching criteria.");
     }
 
     const patientIds = patientdetails.map((p) => p._id);
+    
 
     // Now find admissions that match those patient IDs
     
@@ -273,4 +276,59 @@ export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: 
         }); 
 
 });
+export const addBedFee = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { id } = req.params; // Admission ID
+    const { bedfee }: any = req.body;
 
+    // Validate inputs
+    if (!id) {
+      throw new Error("Admission ID is required.");
+    }
+    if (bedfee == null || isNaN(Number(bedfee))) {
+      throw new Error("Valid bed fee is required.");
+    }
+
+    // Read admission (excluding discharged/completed status)
+    const findAdmission: any = await readoneadmission(
+      { _id: id, status: { $ne: configuration.admissionstatus[5] } },
+      {},
+      "patient"
+    );
+
+    if (!findAdmission) {
+      throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
+    }
+
+    const { patient } = findAdmission;
+    const paymentreference = findAdmission.admissionid;
+
+    // Update admission record with bed fee
+    const updatedAdmission = await updateadmission(id, { bedfee: Number(bedfee) });
+    if (!updatedAdmission) {
+      throw new Error("Failed to update admission bed fee.");
+    }
+// get insurance
+let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
+let hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(bedfee));
+console.log("amount", amount);
+if(amount > 0)
+    
+    await createpayment({
+      firstName: patient?.firstName,
+      lastName: patient?.lastName,
+      MRN: patient?.MRN,
+      phoneNumber: patient?.phoneNumber,
+      paymentreference,
+      paymentype: "bedfee",
+      paymentcategory: configuration.category[2],
+      patient: patient._id,
+      amount
+    });
+
+    res.status(200).json({
+      queryresult: "Bed fee added successfully.",
+      status: true
+    });
+
+});

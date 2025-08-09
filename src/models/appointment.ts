@@ -501,6 +501,10 @@ const vitalsSchema = new Schema({
   },
   */
   staffname: String,
+doctorassigment: {
+type: String,
+default: configuration.doctorassigment[0]
+  },
   status: {
 
     type: String,
