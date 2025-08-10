@@ -17,7 +17,11 @@ const fluidbalanceSchema = new Schema({
     ref: "Patientsmanagement",
     default: null,
   },
+  intaketype: { type: String, trim: true },
+  intakeroute: { type: String, trim: true },
   inputamount: { type: Number, default: 0 },
+  outputtype: { type: String, trim: true },
+  outputroute: { type: String, trim: true },
   netfliudbalancefor24hours: String,
   staffname: String,
   outputamount: { type: Number, default: 0 },
@@ -38,8 +42,6 @@ const fluidbalanceSchema = new Schema({
 
 const fluidbalance = model('Fluidbalance', fluidbalanceSchema);
 export default fluidbalance;
-
-
 
 
 

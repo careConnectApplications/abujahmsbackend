@@ -12,7 +12,17 @@ const { ObjectId } = mongoose.Types;
 export const readallfluidbalanceByAdmission = async (req: any, res: any) => {
   try {
     const { admission } = req.params;
-    const queryresult = await readallfluidbalances({ admission }, { inputamount: 1, balance: 1, outputamount: 1, patient: 1, createdBy: 1, staffname: 1, createdAt: 1, updatedAt: 1 }, 'patient createdBy', '');
+    const queryresult = await readallfluidbalances({ admission }, {
+      inputamount: 1, balance: 1, outputamount: 1, patient: 1,
+      createdBy: 1,
+      staffname: 1,
+      createdAt: 1,
+      updatedAt: 1,
+      intaketype: 1,
+      intakeroute: 1,
+      outputtype: 1,
+      outputroute: 1
+    }, 'patient createdBy', '');
     res.status(200).json({
       queryresult,
       status: true
@@ -27,7 +37,20 @@ export const readAllfluidbalanceByPatient = async (req: any, res: any) => {
     //const {clinic} = (req.user).user;
     const { patient } = req.params;
     //const queryresult = await readalllab({patient:id,department:clinic},{},'patient','appointment','payment');
-    const queryresult = await readallfluidbalances({ patient }, { patient: 1, inputamount: 1, staffname: 1, outputamount: 1, balance: 1, createdBy: 1, createdAt: 1, updatedAt: 1 }, 'patient createdBy', '');
+    const queryresult = await readallfluidbalances({ patient }, {
+      patient: 1,
+      inputamount: 1,
+      staffname: 1,
+      outputamount: 1,
+      balance: 1,
+      createdBy: 1,
+      createdAt: 1,
+      intaketype: 1,
+      intakeroute: 1,
+      outputtype: 1,
+      outputroute: 1,
+      updatedAt: 1
+    }, 'patient createdBy', '');
     res.status(200).json({
       queryresult,
       status: true
@@ -45,7 +68,7 @@ export const createfluidbalance = catchAsync(async (req: Request | any, res: Res
   const { firstName, lastName, _id: userId } = (req.user).user;
 
   req.body.staffname = `${firstName} ${lastName}`;
-  var { outputamount, inputamount, patientId, referedward } = req.body;
+  var { outputamount, inputamount, patientId, referedward, intakeroute, intaketype, outputtype, outputroute } = req.body;
   // var { oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname} = req.body;
   validateinputfaulsyvalue({ inputamount, outputamount });
   //frequency must inlcude
@@ -66,6 +89,10 @@ export const createfluidbalance = catchAsync(async (req: Request | any, res: Res
     inputamount,
     outputamount,
     balance,
+    intaketype,
+    intakeroute,
+    outputtype,
+    outputroute,
     createdBy: userId,
   };
 
@@ -84,7 +111,7 @@ export async function updatefluidbalance(req: any, res: any) {
     const { id } = req.params;
     const { firstName, lastName, _id: userId } = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
-    var { outputamount, inputamount } = req.body;
+    var { outputamount, inputamount, intakeroute, intaketype, outputtype, outputroute } = req.body;
 
     const fluidRecord: any = await readonefluidbalances({ _id: id }, {});
     //console.log(admissionrecord);   
@@ -98,6 +125,10 @@ export async function updatefluidbalance(req: any, res: any) {
       inputamount,
       outputamount,
       balance,
+      intaketype,
+      intakeroute,
+      outputtype,
+      outputroute,
       updatedBy: userId,
     };
 
