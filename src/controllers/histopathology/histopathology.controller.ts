@@ -74,7 +74,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     const raiseby = `${firstName} ${lastName}`;
 
     ///Step 2: Read the Appointment and populate the patient field.
-    const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+    const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
