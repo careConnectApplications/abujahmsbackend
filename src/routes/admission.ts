@@ -1,10 +1,10 @@
 import express from 'express';
-import {protect} from "../utils/middleware";
+import {protect, checkSubscription} from "../utils/middleware";
 import {referadmission,getallreferedforadmission,updateadmissionstatus,getalladmissionbypatient,searchAdmissionRecords,addBedFee} from '../controllers/admissions/admission';
 const router = express.Router();
 
 
-router.post('/referadmission/:id', referadmission);
+router.post('/referadmission/:id', checkSubscription,referadmission);
 router.get('/getallreferedforadmission/:ward', getallreferedforadmission);
 router.put('/updateadmissionstatus/:id', updateadmissionstatus);
 // admission from doctor
