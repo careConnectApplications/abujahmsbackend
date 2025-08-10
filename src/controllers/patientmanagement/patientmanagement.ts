@@ -19,9 +19,9 @@ import { readonepricemodel } from "../../dao/pricingmodel";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 
-//Insurance upload
-//get hmo patient 
-//read all patients
+
+
+
 //search patients 
 export async function searchpartient(req: any, res: any) {
   try {
@@ -73,7 +73,7 @@ export async function getallhmopatients(req: Request, res: any) {
     //var settings = await configuration.settings();
     var selectquery = {
       "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-      "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+      "maritalStatus": 1, "subscriptionPaidUntil":1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
     };
     //var populatequery="payment";
     const queryresult = await readallpatient({ isHMOCover: configuration.ishmo[1] }, selectquery, '', '');
@@ -103,6 +103,11 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     let uploadpath = `${process.cwd()}/${configuration.useruploaddirectory}`;
     //acieve document
     await updatepatientmanybyquery({ HMOName }, { status: configuration.status[15] });
+     const gethmo = await readonehmomanagement({hmoname:HMOName},{_id:1,hmopercentagecover:1});
+    if(!gethmo){
+      throw new Error("HMONAME does not exist");
+    }
+   
     //await createpatientachieve(patientdetails);
     //delete patient management
     //await deletePatietsByCondition({HMOName});
@@ -146,6 +151,7 @@ export async function bulkuploadhmopatients(req: any, res: any) {
       for (var i = 0; i < hmo.length; i++) {
         hmo[i].isHMOCover = configuration.ishmo[1];
         hmo[i].HMOName = HMOName;
+        hmo[i].insurance=gethmo._id;
         const { phoneNumber, firstName, lastName, gender, HMOId } = hmo[i];
         validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender, HMOId });
         console.log((phoneNumber.toString()).length);
@@ -423,7 +429,7 @@ export async function getallpatients(req: any, res: any) {
     //var settings = await configuration.settings();
     var selectquery = {
       "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-      "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
+      "maritalStatus": 1, "disability": 1,"subscriptionPaidUntil":1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
     };
     //var populatequery="payment";
 
