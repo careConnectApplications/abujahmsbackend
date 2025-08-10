@@ -1,6 +1,27 @@
 import  {Request, Response, NextFunction} from 'express';
 import configuration from '../config';
 import * as jwt from 'jsonwebtoken';
+/*
+// Middleware to block unpaid patients
+export const checkSubscriptionStatus = async (req: Request, res: Response, next: Function) => {
+  try {
+    const { patientId } = req.params;
+    const patient = await patientsmanagement.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    const now = new Date();
+    if (!patient.subscriptionPaidUntil || patient.subscriptionPaidUntil < now) {
+      return res.status(403).json({ message: "Subscription expired. Please renew." });
+    }
+
+    next();
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+*/
 //Protect routes
 export const protect = async(req:any,res:Response,next:NextFunction)=>{
     try{

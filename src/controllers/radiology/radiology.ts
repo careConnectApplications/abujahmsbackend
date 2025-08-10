@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { validateinputfaulsyvalue, uploaddocument } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, uploaddocument,calculateAmountPaidByHMO } from "../../utils/otherservices";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import { readoneappointment, updateappointment } from "../../dao/appointment";
 import { readallservicetype } from "../../dao/servicetype";
@@ -29,13 +29,13 @@ export var radiologyorder = async (req: any, res: any) => {
     //var paymentids =[];
     validateinputfaulsyvalue({ id, testname, note });
     //find the record in appointment and validate
-    const foundPatient: any = await readonepatient({ _id: id }, {}, '', '');
-    const { isHMOCover } = foundPatient;
+    const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
     //category
     if (!foundPatient) {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
     }
+    var hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
       appointmentid = new ObjectId(appointmentid);
@@ -49,36 +49,20 @@ export var radiologyorder = async (req: any, res: any) => {
 
     }
 
-    const { servicetypedetails } = await readallservicetype({ category: configuration.category[4] }, { type: 1, category: 1, department: 1, _id: 0 });
-    console.log(isHMOCover);
+    
     //loop through all test and create record in lab order
     for (var i = 0; i < testname.length; i++) {
 
       //search for price of test name
-      var testPrice: any = await readoneprice({ servicetype: testname[i], isHMOCover: configuration.ishmo[0] });
-      if (foundPatient?.isHMOCover == configuration.ishmo[0] && !testPrice) {
+      var testPrice: any = await readoneprice({ servicetype: testname[i]});
+      if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
-
-      //search testname in setting
-      console.log(servicetypedetails);
-      var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-      /* 
-       if(!testsetting || testsetting.length < 1){
-         throw new Error(`${testname[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
-     }
-         */
+      let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-      let testrecord: any;
+      let testrecord: any=await createradiology({ note, testname: testname[i], patient: id, testid, raiseby, amount });
       //create testrecordn 
-      if (foundPatient?.isHMOCover == configuration.ishmo[0]) {
-        testrecord = await createradiology({ note, testname: testname[i], patient: id, testid, raiseby, amount: Number(testPrice.amount) });
-      }
-      else {
-        testrecord = await createradiology({ note, testname: testname[i], patient: id, testid, raiseby });
-
-      }
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
     }
@@ -389,13 +373,13 @@ export const confirmradiologyorder = async (req: any, res: any) => {
     else {
       paymentreference = testid;
     }
-    if (option == true && patient.isHMOCover == configuration.ishmo[0]) {
+    if (option == true && amount > 0) {
       var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
       queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id, remark });
       await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id } });
 
     }
-    else if (option == true && patient.isHMOCover == configuration.ishmo[1]) {
+    else if (option == true && amount == 0) {
       queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
 
     }
