@@ -19,6 +19,7 @@ import catchAsync from "../../utils/catchAsync";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 import Histopathology from "../../models/histopathology";
+import {calculateAmountPaidByHMO} from  "../../utils/otherservices";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -73,12 +74,13 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     const raiseby = `${firstName} ${lastName}`;
 
     ///Step 2: Read the Appointment and populate the patient field.
-    const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+    const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
-
+    var hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
+    
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
 
     let totalAmount = 0;
@@ -93,8 +95,8 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         if (!testPrice) {
             return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
-
-        const serviceAmount = testPrice.amount;
+        const serviceAmount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+        //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
 
         //const refNumber = generateRefNumber();
