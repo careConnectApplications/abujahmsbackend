@@ -96,13 +96,11 @@ export const settings = async function () {
             {querytype:"hmoreportforpharmacy",querygroup:hmoNames},
             {querytype:"hmoappointmentreport",querygroup:hmoNames},
             {querytype:"hmoradiologyreport",querygroup:hmoNames},
-
             {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Radiology","Procedure","All",...pharmacyNames]},
+            
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
-
-
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning"];
           return {reports,summary};
     }
     catch (error: any) {

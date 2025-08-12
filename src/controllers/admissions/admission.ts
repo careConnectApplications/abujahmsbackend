@@ -1,12 +1,17 @@
+import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
-import { validateinputfaulsyvalue } from "../../utils/otherservices";
+import { validateinputfaulsyvalue,calculateAmountPaidByHMO } from "../../utils/otherservices";
 import {readoneappointment,updateappointment} from "../../dao/appointment";
 import {createadmission,readalladmission,updateadmission,readoneadmission} from  "../../dao/admissions";
-import  {updatepatient,readonepatient}  from "../../dao/patientmanagement";
+import  {updatepatient,readonepatient,readallpatient}  from "../../dao/patientmanagement";
 import {readonewardmanagement,updatewardmanagement} from "../../dao/wardmanagement";
 import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
+import {readonebed,updatebed} from "../../dao/bed";
+import {createpayment} from "../../dao/payment";
+import {readonehmomanagement} from "../../dao/hmomanagement";
 import configuration from "../../config";
+import catchAsync from "../../utils/catchAsync";
 const { ObjectId } = mongoose.Types;
 
 //refer for admission
@@ -17,17 +22,28 @@ export var referadmission= async (req:any, res:any) =>{
       var admissionid:any=String(Date.now());
       //accept _id from request
       const {id} = req.params;
-      console.log('id', id);
       //doctorname,patient,appointment
-      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid} = req.body;
-      validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate});
+      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid,bed_id} = req.body;
+      validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate,bed_id});
       //confirm ward
       const referedwardid = new ObjectId(referedward);
-      const foundWard =  await readonewardmanagement({_id:referedwardid},'');
+      const bed = new ObjectId(bed_id);
+      const foundWard:any =  await readonewardmanagement({_id:referedwardid},'');
       if(!foundWard){
           throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
 
       }
+      const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
+       if(!foundBed){
+          throw new Error(`Bed doesnt ${configuration.error.erroralreadyexit}`);
+
+      }
+      //validate bed status
+    if (foundBed.status == configuration.bedstatus[1]) {
+      throw new Error(`${foundBed.bednumber} Bed is already occupied`);
+    }
+      //valid that bed exist
+
          var appointment:any;
                 if(appointmentid){
                   appointmentid = new ObjectId(appointmentid);
@@ -65,14 +81,22 @@ export var referadmission= async (req:any, res:any) =>{
     throw new Error(`Patient Admission ${configuration.error.erroralreadyexit}`);
 
 }
+
+
 //create admission
-var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid});
-//update patient 
-var queryresult=await updatepatient(patient._id,{$push: {admission:admissionrecord._id}});
+var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed});
+// Update ward and bed status simultaneously using Promise.all
+await Promise.all([
+  updatewardmanagement(referedwardid, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
+  updatebed(bed, { status: configuration.bedstatus[1] }),
+  updatepatient(patient._id,{$push: {admission:admissionrecord._id}})
+]);
+
 if(appointmentid){
               await updateappointment(appointment._id,{admission:admissionrecord._id});
       
 }
+
 res.status(200).json({queryresult:admissionrecord, status: true});
     }
     
@@ -87,7 +111,7 @@ export async function getallreferedforadmission(req:any, res:any){
     try{
        const {ward} = req.params;
        const referedward = new ObjectId(ward);
-        const queryresult = await readalladmission({referedward},{},'referedward','patient');
+        const queryresult = await readalladmission({referedward},{},'referedward','patient','bed');
         res.status(200).json({
             queryresult,
             status:true
@@ -108,7 +132,7 @@ export async function getalladmissionbypatient(req:any, res:any){
      const {patient} = req.params;
      console.log(patient);
      const referedward = new ObjectId(patient);
-      const queryresult = await readalladmission({patient},{},'referedward','patient');
+      const queryresult = await readalladmission({patient},{},'referedward','patient','bed');
       res.status(200).json({
           queryresult,
           status:true
@@ -124,11 +148,17 @@ export async function getalladmissionbypatient(req:any, res:any){
 //admited,to transfer,transfer,to discharge, discharge
 export async function updateadmissionstatus(req:any, res:any){
   const {id} = req.params;
-  var {status, transfterto} = req.body;
-   transfterto = new ObjectId(transfterto);
+  var {status, transfterto,bed_id} = req.body;
+  if (transfterto) {
+  transfterto = new ObjectId(transfterto);
+}
+
+if (bed_id) {
+  bed_id = new ObjectId(bed_id);
+}
   try{
     //validate that status is included in te status choice
-    if(!(configuration.admissionstatus).includes(status))
+    if(![ "transfered",  "discharged"].includes(status))
       throw new Error(`${status} status doesnt ${configuration.error.erroralreadyexit}`);
 
     //if status = discharge
@@ -138,56 +168,52 @@ export async function updateadmissionstatus(req:any, res:any){
       if(!response){
           throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
       }
-      var ward:any = await readonewardmanagement({_id:response?.referedward},{});
-      if(!ward){
-        // return error
-        throw new Error(`Ward donot ${configuration.error.erroralreadyexit}`);
-      }
+      
      
-      var transftertoward:any= await readonewardmanagement({_id:transfterto},{});
-      if(transfterto && status == configuration.admissionstatus[2] &&  !transftertoward){
-          // return error
-          throw new Error(`Ward to be transfered donot  ${configuration.error.erroralreadyexit}`);
-      }
-      if(transfterto && status == configuration.admissionstatus[2] && transftertoward.vacantbed < 1){
-        throw new Error(`${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
-        
+      var transftertoward:any;
+      var foundBed;
+      console.log("transftertoward",transfterto);
+     
+    if(transfterto){
+       console.log("insidetransftertoward",transfterto);
+            transftertoward= await readonewardmanagement({_id:transfterto},{});
+            foundBed=await readonebed({_id:bed_id, ward:transftertoward._id, status:configuration.bedstatus[0], isDeleted:false},'');
 
-      }
-      if((status == configuration.admissionstatus[1] || status == configuration.admissionstatus[3]) && ward.vacantbed < 1){
-        throw new Error(`${ward.wardname}  ${configuration.error.errorvacantspace}`);
-
-      }
+    }
+    if(transfterto && (status != configuration.admissionstatus[3] ||  !transftertoward || !foundBed)) throw new Error(`Ward or Bed to be transfered donot  ${configuration.error.erroralreadyexit} or ${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
       
       //validate if permitted base on status
      //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-      const queryresult:any =await updateadmission(id,{status});
-     
-      //if status is equal to admit reduce  ward count
-      if(status == configuration.admissionstatus[1] || status == configuration.admissionstatus[3]){        
-        await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:1,vacantbed:-1}});
-      }
-      // status is equal to  totransfer reduce target ward and increase source ward
-      else if(status == configuration.admissionstatus[2]){
-        await updateadmission(id,{status,referedward:transfterto,previousward:queryresult.referedward});
-      }
-      else if(status == configuration.admissionstatus[5]){
+   
+      if(status == configuration.admissionstatus[5]){
         //check that the patient is not owing
         var paymentrecord:any = await readallpayment({paymentreference:response.admissionid,status:{$ne: configuration.status[3]}},'');
         if((paymentrecord.paymentdetails).length > 0){
           throw new Error(configuration.error.errorpayment);
     
         }
+        //increase vancant and reduce occupied for current ward update appointment
+        await Promise.all([
+          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
+          updatebed(response.bed,{status:configuration.bedstatus[0]}),
+          updateadmission(id,{status})
 
-        await updatewardmanagement(queryresult.referedward,{$inc:{occupiedbed:-1,vacantbed:1}});
-
+        ]);
+        //update bed
       }
       // status is equal to  transfer reduce target ward and increase 
       if(status == configuration.admissionstatus[3] ){
-        await updatewardmanagement(queryresult.previousward,{$inc:{occupiedbed:-1,vacantbed:1}});
-
+        ////increase vancant and reduce occupied for current ward use parallelism
+         await Promise.all([
+         
+          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
+          updatewardmanagement(transfterto,{$inc:{occupiedbed:1,vacantbed:-1}}),
+          updatebed(response.bed,{status:configuration.bedstatus[0]}),
+          updatebed(bed_id,{status:configuration.bedstatus[1]}),
+          updateadmission(id,{bed:bed_id,previousward:response.referedward,referedward:transfterto}),
+         ]);
       }
-
+    const queryresult="Succefully updated the admission status"; 
       res.status(200).json({
           queryresult,
           status:true
@@ -203,3 +229,106 @@ export async function updateadmissionstatus(req:any, res:any){
 }
 
 
+export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+
+    const { firstName, lastName, MRN, HMOId } = req.query;
+
+    // Build patient search conditions
+    const patientSearchConditions: any = {};
+    if (firstName) {
+      patientSearchConditions.firstName = { $regex: new RegExp(firstName as string, "i") };
+    }
+    if (lastName) {
+      patientSearchConditions.lastName = { $regex: new RegExp(lastName as string, "i") };
+    }
+    if (MRN) {
+      patientSearchConditions.MRN = { $regex: new RegExp(MRN as string, "i") };
+    }
+    if (HMOId) {
+      patientSearchConditions.HMOId = { $regex: new RegExp(HMOId as string, "i") };
+    }
+
+
+    var selectquery = {
+          "_id": 1, 
+        };
+      
+    
+
+    // First find matching patient IDs
+    const {patientdetails} = await readallpatient(patientSearchConditions,selectquery,'','');
+  
+
+    if (patientdetails.length === 0) {
+      throw new Error("No patients found matching criteria.");
+    }
+
+    const patientIds = patientdetails.map((p) => p._id);
+    
+
+    // Now find admissions that match those patient IDs
+    
+    const queryresult = await readalladmission({patient: { $in: patientIds }},{},'referedward','patient','bed');
+
+      res.status(200).json({
+          queryresult,
+          status:true
+        }); 
+
+});
+export const addBedFee = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { id } = req.params; // Admission ID
+    const { bedfee }: any = req.body;
+
+    // Validate inputs
+    if (!id) {
+      throw new Error("Admission ID is required.");
+    }
+    if (bedfee == null || isNaN(Number(bedfee))) {
+      throw new Error("Valid bed fee is required.");
+    }
+
+    // Read admission (excluding discharged/completed status)
+    const findAdmission: any = await readoneadmission(
+      { _id: id, status: { $ne: configuration.admissionstatus[5] } },
+      {},
+      "patient"
+    );
+
+    if (!findAdmission) {
+      throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
+    }
+
+    const { patient } = findAdmission;
+    const paymentreference = findAdmission.admissionid;
+
+    // Update admission record with bed fee
+    const updatedAdmission = await updateadmission(id, { bedfee: Number(bedfee) });
+    if (!updatedAdmission) {
+      throw new Error("Failed to update admission bed fee.");
+    }
+// get insurance
+let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
+let hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(bedfee));
+console.log("amount", amount);
+if(amount > 0)
+    
+    await createpayment({
+      firstName: patient?.firstName,
+      lastName: patient?.lastName,
+      MRN: patient?.MRN,
+      phoneNumber: patient?.phoneNumber,
+      paymentreference,
+      paymentype: "bedfee",
+      paymentcategory: configuration.category[2],
+      patient: patient._id,
+      amount
+    });
+
+    res.status(200).json({
+      queryresult: "Bed fee added successfully.",
+      status: true
+    });
+
+});

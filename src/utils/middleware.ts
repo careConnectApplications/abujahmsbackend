@@ -1,6 +1,35 @@
 import  {Request, Response, NextFunction} from 'express';
 import configuration from '../config';
+import {readonepatient} from "../dao/patientmanagement";
 import * as jwt from 'jsonwebtoken';
+import catchAsync from "../utils/catchAsync";
+
+
+// Middleware to block unpaid patients
+export const checkSubscription = catchAsync(async (req:any, res:Response, next:NextFunction) => {
+
+  
+    var {patient,id} = req.body;
+  const _id = patient || id;
+    if (!_id) {
+      throw new Error("Unauthorized");
+    }
+    const patientinfo: any = await readonepatient({ _id }, {}, '', '');
+   
+    if (!patientinfo) {
+       throw new Error("Patient not found");
+    }
+
+    const now = new Date();
+    if (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now) {
+       throw new Error("Subscription expired. Please renew to continue.");
+    }
+
+    next();
+  
+});
+
+
 //Protect routes
 export const protect = async(req:any,res:Response,next:NextFunction)=>{
     try{
@@ -28,3 +57,23 @@ export const protect = async(req:any,res:Response,next:NextFunction)=>{
   
     }
   }
+
+  
+
+export const globalErrorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const statusCode = err.statusCode || 500;
+  const status = false;
+
+  res.status(statusCode).json({
+    status,
+    msg: err.message || "Internal Server Error",
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+  });
+};
+
+export default globalErrorHandler;

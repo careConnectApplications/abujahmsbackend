@@ -1,5 +1,5 @@
 import express from 'express';
-import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology} from '../controllers/setting/pricesetting';
+import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice} from '../controllers/setting/pricesetting';
 import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
@@ -8,6 +8,7 @@ import {createtestcomponents, getalltestcomponent,updatetestcomponents,gettestco
 import {createhmo,getallhmo,updatehmo} from "../controllers/setting/hmomanagement";
 import {createpricingmodel, updatepricingmodel, getpricingmodel} from "../controllers/setting/pricemodel";
 import {createoutreachmedications, getalloutreachmedications, updateoutreachmedications} from "../controllers/setting/outreachmedication";
+import {createbeds,getAvailableBedsByWard,softDeleteBed,getallbeds,updatebeds} from "../controllers/bed/bed";
 import {readAllaudit} from "../controllers/audit/audit";
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
@@ -48,7 +49,7 @@ router.put('/updatetheatre/:id',updatetheatre);
 //hmo
 router.post('/createinsurance',createhmo);
 router.get('/getallinsurance',getallhmo);
-router.put('/updateinsurance/:id',updatehmo);
+router.put('/updateinsurance/:_id',updatehmo);
 
 // test name
 router.post('/createtestcomponents',createtestcomponents);
@@ -65,6 +66,14 @@ router.get('/readallaudit',readAllaudit);
 router.post('/createoutreachmedication',createoutreachmedications);
 router.get('/getalloutreachmedication',getalloutreachmedications);
 router.put('/updateoutreachmedication/:id',updateoutreachmedications);
+//bed management
+router.post('/createbed',createbeds);
+router.get('/getavailablebedsbyward/:wardid',getAvailableBedsByWard);
+router.get('/getallbeds',getallbeds);
+router.put('/softdeleterestorebed/:id',softDeleteBed);
+router.put('/updatebednumber/:id',updatebeds);
+//getpriceofservice
+router.post('/getpriceofservice/:id',getpriceofservice);
 
     
 

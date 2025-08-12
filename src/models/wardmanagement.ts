@@ -35,6 +35,7 @@ const wardmanagementSchema = new Schema({
     type: Number,
     required: true
   }, 
+
   status:{
     type: String,
     default: configuration.status[1],

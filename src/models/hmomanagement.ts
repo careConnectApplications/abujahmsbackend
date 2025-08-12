@@ -9,16 +9,25 @@ const hmomanagementSchema = new Schema({
   {
     type: String
   },
-  id: 
+  hmopercentagecover:Number,
+  isprimaryhmo:{
+    type: Boolean,
+    default: false
+  },
+
+  id:
   {
-     type: String,
-     required: true,
- },
+    type: String,
+    required: true,
+  },
+  insuranceId: {
+    type: String, trim: true
+  }
 },
-{ timestamps: true }
+  { timestamps: true }
 );
 
-const hmomanagement= model('Hmomanagement', hmomanagementSchema);
+const hmomanagement = model('Hmomanagement', hmomanagementSchema);
 export default hmomanagement;
 
 

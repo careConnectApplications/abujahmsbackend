@@ -3,11 +3,12 @@ import  {createwardmanagement,readonewardmanagement,readallwardmanagement,update
 import {readoneclinic} from "../../dao/clinics";
 import { validateinputfaulsyvalue,generateRandomNumber,validateinputfornumber} from "../../utils/otherservices";
 import {createaudit} from "../../dao/audit";
+import {createbed} from "../../dao/bed";
 //add patiient
 export var createward = async (req:any,res:any) =>{
    
     try{
-     
+       req.body.occupiedbed=0;
        const {bedspecialization,wardname,totalbed,occupiedbed} = req.body;
        validateinputfaulsyvalue({bedspecialization,wardname});
        validateinputfornumber({totalbed,occupiedbed});
@@ -35,8 +36,23 @@ export var createward = async (req:any,res:any) =>{
             throw new Error(`Ward ${configuration.error.erroralreadyexit}`);
 
         }
+       
          const queryresult=await createwardmanagement({bedspecialization,vacantbed,wardname,totalbed,occupiedbed,wardid});
-        const { firstName, lastName } = (req.user).user;
+        // Step 2: Create beds as separate documents
+    const bedCreationPromises = [];
+    for (let i = 1; i <= totalbed; i++) {
+      bedCreationPromises.push(
+        createbed({
+          bednumber: `B${i.toString().padStart(3, '0')}`,  // e.g. B001
+          ward: queryresult._id,
+          status: 'vacant',
+          assignedPatient: null,
+          assignedDate: null
+        })
+      );
+    }
+    await Promise.all(bedCreationPromises);
+         const { firstName, lastName } = (req.user).user;
             var actor = `${firstName} ${lastName}`;    
             await createaudit({action:"Created Ward",actor,affectedentity:wardname}); 
          res.status(200).json({queryresult, status: true});
