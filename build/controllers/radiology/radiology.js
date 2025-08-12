@@ -62,6 +62,7 @@ const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         //accept _id from request
         const { id } = req.params;
@@ -73,12 +74,12 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //var paymentids =[];
         (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, note });
         //find the record in appointment and validate
-        const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
-        const { isHMOCover } = foundPatient;
+        const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, 'insurance', '');
         //category
         if (!foundPatient) {
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
         }
+        var hmopercentagecover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
         var appointment;
         if (appointmentid) {
             appointmentid = new ObjectId(appointmentid);
@@ -88,33 +89,18 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
         }
-        const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[4] }, { type: 1, category: 1, department: 1, _id: 0 });
-        console.log(isHMOCover);
         //loop through all test and create record in lab order
         for (var i = 0; i < testname.length; i++) {
             //search for price of test name
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover: config_1.default.ishmo[0] });
-            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] && !testPrice) {
+            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i] });
+            if (!testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
-            //search testname in setting
-            console.log(servicetypedetails);
-            var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-            /*
-             if(!testsetting || testsetting.length < 1){
-               throw new Error(`${testname[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
-           }
-               */
+            let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create payment
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-            let testrecord;
+            let testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby, amount });
             //create testrecordn 
-            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby, amount: Number(testPrice.amount) });
-            }
-            else {
-                testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby });
-            }
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -226,6 +212,7 @@ const readAllRadiologyoptimized = (req, res) => __awaiter(void 0, void 0, void 0
                     testid: 1,
                     testresult: 1,
                     department: 1,
+                    typetestresult: 1,
                     raiseby: 1,
                     firstName: "$patient.firstName",
                     lastName: "$patient.lastName",
@@ -387,12 +374,12 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
         else {
             paymentreference = testid;
         }
-        if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
+        if (option == true && amount > 0) {
             var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], payment: createpaymentqueryresult._id, remark });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
         }
-        else if (option == true && patient.isHMOCover == config_1.default.ishmo[1]) {
+        else if (option == true && amount == 0) {
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], remark });
         }
         else {

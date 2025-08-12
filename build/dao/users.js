@@ -12,15 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getUserById = exports.updateUserSpecialPermissionService = void 0;
 exports.countuser = countuser;
 exports.readall = readall;
 exports.createuser = createuser;
 exports.readone = readone;
 exports.updateuser = updateuser;
 exports.createmanyuser = createmanyuser;
+const config_1 = __importDefault(require("../config"));
+const errors_1 = require("../errors");
 const users_1 = __importDefault(require("../models/users"));
 const otherservices_1 = require("../utils/otherservices");
-const config_1 = __importDefault(require("../config"));
 function countuser(query) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -116,3 +118,13 @@ function createmanyuser(input) {
         }
     });
 }
+const updateUserSpecialPermissionService = (id, body) => __awaiter(void 0, void 0, void 0, function* () {
+    const updatedUser = yield users_1.default.findByIdAndUpdate(id, { specialPermissions: body }, { new: true });
+    if (!updatedUser) {
+        throw new errors_1.ApiError(400, config_1.default.error.errorinvalidcredentials);
+    }
+    return updatedUser;
+});
+exports.updateUserSpecialPermissionService = updateUserSpecialPermissionService;
+const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () { return users_1.default.findById(id); });
+exports.getUserById = getUserById;

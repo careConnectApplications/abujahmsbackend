@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const eye_module_controller_1 = require("../controllers/eye-module/eye-module.controller");
+const router = express_1.default.Router();
+router.post("/lens-prescription", eye_module_controller_1.createLensPrescription);
+router.post("/preliminary-test", eye_module_controller_1.createPreliminaryTest);
+router.post("/create-examination", eye_module_controller_1.createExamination);
+router.post("/operational-notes/appointment/:appointmentId/patient/:patientId", eye_module_controller_1.createOperationalNotes);
+router.get("/appointment/:appointmentId/patient/:patientId", eye_module_controller_1.getEyeRecordByAppointmentIdAndPatientId);
+router.get("/patient/:patientId", eye_module_controller_1.getEyeRecordByPatientId);
+router.get("/:Id", eye_module_controller_1.getEyeRecordById);
+router.get("", eye_module_controller_1.getAllEyeRecordsPaginatedHandler);
+router.get("/data/config", eye_module_controller_1.getAllEyeUtilData);
+router.patch("/lens-prescription/:eyeModuleId", eye_module_controller_1.updateLensPrescription);
+router.patch("/preliminary-test/:eyeModuleId", eye_module_controller_1.updatePreliminaryTest);
+router.patch("/examination/:eyeModuleId", eye_module_controller_1.updateExamination);
+router.patch("/operational-notes/:eyeModuleId", eye_module_controller_1.updateOperationalTest);
+exports.default = router;

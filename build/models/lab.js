@@ -11,6 +11,36 @@ const testresultSchema = new mongoose_1.Schema({
     nranges: String,
     unit: String
 });
+const chemicalpathologyreportSchema = new mongoose_1.Schema({
+    comment: String,
+    reportedby: { type: String },
+    status: String
+});
+const peripheralbloodfilmreportSchema = new mongoose_1.Schema({
+    summary: [{ type: String }],
+    redbloodcell: [{ type: String }],
+    whitebloodcell: [{ type: String }],
+    platelet: [{ type: String }],
+    impression: [{ type: String }],
+    suggestion: [{ type: String }],
+    reportedby: { type: String },
+    status: String
+});
+const ADHbonemarrowaspirationreportSchema = new mongoose_1.Schema({
+    clinicalnotes: [{ type: String }],
+    boneconsistency: { type: String },
+    aspiration: { type: String },
+    erythroidratio: { type: String },
+    erythropoiesis: [{ type: String }],
+    leucopoesis: [{ type: String }],
+    megakaryopoiesis: [{ type: String }],
+    plasmacells: [{ type: String }],
+    abnomalcells: { type: String },
+    ironstore: { type: String },
+    conclusion: [{ type: String }], // assuming this was a typo for "conclusion"
+    reportedby: { type: String },
+    status: String
+});
 const labSchema = new mongoose_1.Schema({
     processeddate: {
         type: Date
@@ -28,6 +58,9 @@ const labSchema = new mongoose_1.Schema({
         required: true
     },
     testresult: [testresultSchema],
+    chemicalpathologyreport: chemicalpathologyreportSchema,
+    peripheralbloodfilmreport: peripheralbloodfilmreportSchema,
+    ADHbonemarrowaspirationreport: ADHbonemarrowaspirationreportSchema,
     patient: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Patientsmanagement",
@@ -55,6 +88,15 @@ const labSchema = new mongoose_1.Schema({
         ref: "Payment",
         default: null,
     },
+    labcategory: {
+        required: true,
+        type: String,
+        default: "lab",
+    },
+    sortby: String,
+    note: String,
+    priority: { type: String, enum: ["urgent", "routine"] },
+    sortbydate: Date,
     amount: Number,
     status: {
         required: true,
