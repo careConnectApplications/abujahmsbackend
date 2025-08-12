@@ -17,6 +17,9 @@ exports.settings = settings;
 const config_1 = __importDefault(require("../../config"));
 const users_1 = require("../../dao/users");
 const otherservices_1 = require("../../utils/otherservices");
+const roles_1 = require("../../dao/roles");
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const errors_1 = require("../../errors");
 //sign in
 var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -58,30 +61,34 @@ var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.signin = signin;
 //signup users 
-var signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        //get token from header
-        const { email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails } = req.body;
-        //get role id
-        var roleId = (config_1.default.roles).filter((e) => e.role == role)[0].roleId;
-        req.body.roleId = roleId;
-        (0, otherservices_1.validateinputfaulsyvalue)({ email, firstName, staffId, lastName, gender, role, clinic });
-        const foundUser = yield (0, users_1.readone)({ $or: [{ email }, { phoneNumber }] });
-        if (foundUser) {
-            throw new Error(`User with this email or phonenumber  ${config_1.default.error.erroralreadyexit}`);
-        }
-        req.body.password = config_1.default.defaultPassword;
-        //other validations
-        const queryresult = yield (0, users_1.createuser)(req.body);
-        //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
-        //await mail(email, "Account Registration Confrimation", message);
-        res.status(200).json({ queryresult, status: true });
+exports.signup = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    //get token from header
+    const { email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails } = req.body;
+    //get role id
+    var roleId = (config_1.default.roles).filter((e) => e.role == role)[0].roleId;
+    req.body.roleId = roleId;
+    (0, otherservices_1.validateinputfaulsyvalue)({ email, firstName, phoneNumber, lastName, gender, role, clinic });
+    const foundUser = yield (0, users_1.readone)({ $or: [{ email }, { phoneNumber }] });
+    if (foundUser) {
+        return next(new errors_1.ApiError(401, `User with this email or phonenumber  ${config_1.default.error.erroralreadyexit}`));
     }
-    catch (error) {
-        res.status(403).json({ status: false, msg: error.message });
+    if (!(0, otherservices_1.isValidPhoneNumber)(phoneNumber)) {
+        return next(new errors_1.ApiError(409, config_1.default.error.errorNotValidPhoneNumber));
     }
-});
-exports.signup = signup;
+    req.body.password = config_1.default.defaultPassword;
+    //get user permissions
+    const permissions = ((_a = (0, roles_1.getRolesById)(+roleId)) === null || _a === void 0 ? void 0 : _a.defaultPermissions) || [];
+    req.body.specialPermissions = permissions;
+    //other validations
+    const queryresult = yield (0, users_1.createuser)(req.body);
+    if (!queryresult) {
+        return next(new errors_1.ApiError(403, 'operation failed!'));
+    }
+    //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
+    //await mail(email, "Account Registration Confrimation", message);
+    res.status(200).json({ queryresult, status: true });
+}));
 //settings
 function settings(req, res) {
     return __awaiter(this, void 0, void 0, function* () {

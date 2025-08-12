@@ -45,38 +45,62 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadpix = exports.createpatients = void 0;
+exports.updatePatientFluidBalancing = exports.updatePatientClinicalInformation = exports.updatePatientToHmo = exports.uploadpix = exports.updatepatients = exports.createpatients = void 0;
 exports.searchpartient = searchpartient;
 exports.getallhmopatients = getallhmopatients;
 exports.bulkuploadhmopatients = bulkuploadhmopatients;
 exports.updateauthorizationcode = updateauthorizationcode;
 exports.getallpatients = getallpatients;
 exports.getonepatients = getonepatients;
-exports.updatepatients = updatepatients;
-const config_1 = __importDefault(require("../../config"));
-const uuid_1 = require("uuid");
 const moment_1 = __importDefault(require("moment"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const path = __importStar(require("path"));
-const patientmanagement_1 = require("../../dao/patientmanagement");
+const hmomanagement_1 = require("../../dao/hmomanagement");
+const uuid_1 = require("uuid");
+const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
-const vitalcharts_1 = require("../../dao/vitalcharts");
 const otherservices_1 = require("../../utils/otherservices");
 const appointment_1 = require("../../dao/appointment");
-const pricingmodel_1 = require("../../dao/pricingmodel");
 const audit_1 = require("../../dao/audit");
-//Insurance upload
-//get hmo patient 
-//read all patients
+const patientmanagement_1 = require("../../dao/patientmanagement");
+const pricingmodel_1 = require("../../dao/pricingmodel");
+const errors_1 = require("../../errors");
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 //search patients 
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //var settings = await configuration.settings();
-            var selectquery = { "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+            var selectquery = {
+                "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+            };
             const { searchparams } = req.params;
-            const queryresult = yield (0, patientmanagement_1.readallpatient)({ $or: [{ lastName: { $regex: searchparams, $options: 'i' } }, { firstName: { $regex: searchparams, $options: 'i' } }, { HMOId: { $regex: searchparams, $options: 'i' } }, { MRN: { $regex: searchparams, $options: 'i' } }, { phoneNumber: { $regex: searchparams, $options: 'i' } }] }, selectquery, '', '');
+            const queryresult = yield (0, patientmanagement_1.readallpatient)({
+                $or: [
+                    // { lastName: { $regex: searchparams, $options: 'i' } },
+                    // { firstName: { $regex: searchparams, $options: 'i' } },
+                    {
+                        "$expr": {
+                            "$regexMatch": {
+                                "input": {
+                                    "$concat": [
+                                        { "$ifNull": ["$firstName", ""] },
+                                        " ",
+                                        { "$ifNull": ["$lastName", ""] }
+                                    ]
+                                },
+                                "regex": searchparams,
+                                "options": "i"
+                            }
+                        }
+                    },
+                    { HMOId: { $regex: searchparams, $options: 'i' } },
+                    { MRN: { $regex: searchparams, $options: 'i' } },
+                    { phoneNumber: { $regex: searchparams, $options: 'i' } }
+                ]
+            }, selectquery, '', '');
             res.status(200).json({
                 queryresult,
                 status: true
@@ -90,8 +114,10 @@ function getallhmopatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //var settings = await configuration.settings();
-            var selectquery = { "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+            var selectquery = {
+                "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "subscriptionPaidUntil": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+            };
             //var populatequery="payment";
             const queryresult = yield (0, patientmanagement_1.readallpatient)({ isHMOCover: config_1.default.ishmo[1] }, selectquery, '', '');
             res.status(200).json({
@@ -117,6 +143,10 @@ function bulkuploadhmopatients(req, res) {
             let uploadpath = `${process.cwd()}/${config_1.default.useruploaddirectory}`;
             //acieve document
             yield (0, patientmanagement_1.updatepatientmanybyquery)({ HMOName }, { status: config_1.default.status[15] });
+            const gethmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname: HMOName }, { _id: 1, hmopercentagecover: 1 });
+            if (!gethmo) {
+                throw new Error("HMONAME does not exist");
+            }
             //await createpatientachieve(patientdetails);
             //delete patient management
             //await deletePatietsByCondition({HMOName});
@@ -155,6 +185,7 @@ function bulkuploadhmopatients(req, res) {
                 for (var i = 0; i < hmo.length; i++) {
                     hmo[i].isHMOCover = config_1.default.ishmo[1];
                     hmo[i].HMOName = HMOName;
+                    hmo[i].insurance = gethmo._id;
                     const { phoneNumber, firstName, lastName, gender, HMOId } = hmo[i];
                     (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, HMOId });
                     console.log((phoneNumber.toString()).length);
@@ -171,7 +202,7 @@ function bulkuploadhmopatients(req, res) {
                     //category
                     if(foundUser && phoneNumber !== configuration.defaultphonenumber){
                         throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
-            
+             
                     }
                         */
                     var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
@@ -212,7 +243,9 @@ function updateauthorizationcode(req, res) {
 }
 //add patiient
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
+        const { alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature } = req.body;
         var appointmentid = String(Date.now());
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
@@ -223,30 +256,29 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         req.body.appointmentcategory = config_1.default.category[3];
         req.body.appointmenttype = config_1.default.category[3];
-        var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
+        var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover, HMOName, HMOId, HMOPlan } = req.body;
         //validation
-        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype, isHMOCover });
+        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, isHMOCover });
         //define the service type
-        /*
-        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
-          console.log("here");
-          //throw new Error(configuration.error.errorauthorizehmo);
-          req.body.patienttype = configuration.patienttype[1];
-          req.body.status = configuration.status[1];
-          validateinputfaulsyvalue({authorizationcode});
-
-        }
-          */
         if (authorizationcode) {
             req.body.patienttype = config_1.default.patienttype[1];
         }
+        let gethmo;
         //define the service type
         if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            req.body.status = config_1.default.status[1];
+            (0, otherservices_1.validateinputfaulsyvalue)({ HMOName, HMOId, HMOPlan });
+            gethmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname: req.body.HMOName }, { _id: 1, hmopercentagecover: 1 });
+            if (!gethmo) {
+                throw new Error("HMONAME does not exist");
+            }
+            req.body.insurance = gethmo._id;
         }
         //get token from header and extract clinic
         //check for 11 digit
         if (phoneNumber.length !== 11) {
+            throw new Error(config_1.default.error.errorelevendigit);
+        }
+        if (alternatePhoneNumber && alternatePhoneNumber.length !== 11) {
             throw new Error(config_1.default.error.errorelevendigit);
         }
         if (dateOfBirth)
@@ -255,8 +287,10 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!dateOfBirth && req.body.age)
             req.body.dateOfBirth = (0, moment_1.default)().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
         console.log(req.body);
-        var selectquery = { "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-            "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+        var selectquery = {
+            "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+            "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+        };
         const foundUser = yield (0, patientmanagement_1.readonepatient)({ phoneNumber }, selectquery, '', '');
         //category
         if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
@@ -275,65 +309,72 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             const isAdult = age >= 18;
             const isChild = age < 18;
             //check for error
-            console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
-            console.log("Clinic from request:", clinic);
-            console.log("Is adult:", isAdult);
-            console.log("Age:", age);
             //confirm the type of pricing model
             if (foundPricingmodel.exactnameofancclinic == clinic) {
-                console.log("clinic");
                 newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: clinic });
             }
             else if (isAdult) {
-                console.log("greater than 18");
                 newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforadult, $options: 'i' } });
             }
             else if (isChild) {
-                console.log("less than 18");
                 newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforchild, $options: 'i' } });
             }
             else {
-                console.log("errror /////");
                 //return error
                 throw new Error(`${config_1.default.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}`);
             }
             //find pricing model
         }
         else {
-            newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: config_1.default.category[3] });
+            newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], servicetype: config_1.default.category[3] });
         }
         //use age to calculate price
-        console.log("newRegistrationPrice", newRegistrationPrice);
-        if (!(isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) && !newRegistrationPrice) {
+        if (!newRegistrationPrice) {
             console.log("second errror /////");
             throw new Error(config_1.default.error.errornopriceset);
         }
+        const clinicalInformation = {
+            bloodGroup, genotype, bp, heartRate, temperature
+        };
+        req.body.clinicalInformation = clinicalInformation;
         var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
         // chaorten the MRN to alphanumeric 
         req.body.MRN = uniqunumber;
         req.body.password = config_1.default.defaultPassword;
         //other validations
         var payment = [];
-        const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(req.body);
         //create payment
         //create payment for only none hmo patient
         let queryappointmentresult;
         let queryresult;
-        let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
-        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
+        let vitals;
+        var hmopercentagecover = (_a = gethmo === null || gethmo === void 0 ? void 0 : gethmo.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+        var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
+        if (amount == 0) {
+            req.body.status = config_1.default.status[1];
+        }
+        const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(req.body);
+        if (amount == 0) {
+            if (appointmentdate) {
+                queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
+            }
         }
         else {
-            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
+            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount });
             // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
             payment.push(createpaymentqueryresult._id);
             //payment.push(createappointmentpaymentqueryresult._id);
             //update createpatientquery
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
+            if (appointmentdate) {
+                queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
+            }
         }
-        res.status(200).json({ queryresult, status: true });
+        res.status(200).json({
+            queryresult: appointmentdate ? queryresult : createpatientqueryresult,
+            status: true
+        });
     }
     catch (error) {
         console.log(error);
@@ -370,8 +411,10 @@ function getallpatients(req, res) {
                 filter.email = new RegExp(req.query.email, 'i'); // Case-insensitive search for email
             }
             //var settings = await configuration.settings();
-            var selectquery = { "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1 };
+            var selectquery = {
+                "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "disability": 1, "subscriptionPaidUntil": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
+            };
             //var populatequery="payment";
             var populatequery = {
                 path: "payment",
@@ -399,8 +442,10 @@ function getonepatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = req.params;
         try {
-            var selectquery = { "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+            var selectquery = {
+                "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+                "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+            };
             var populatequery = 'payment';
             const queryresult = yield (0, patientmanagement_1.readonepatient)({ _id: id }, selectquery, populatequery, 'appointment');
             res.status(200).json({
@@ -415,26 +460,32 @@ function getonepatients(req, res) {
     });
 }
 //update a patient
-function updatepatients(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            //get id
-            const { id, status } = req.params;
-            //reject if status update
-            if (status) {
-            }
-            var queryresult = yield (0, patientmanagement_1.updatepatient)(id, req.body);
-            res.status(200).json({
-                queryresult,
-                status: true
-            });
-        }
-        catch (e) {
-            console.log(e);
-            res.status(403).json({ status: false, msg: e.message });
-        }
+exports.updatepatients = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    //get id
+    const { id, status } = req.params;
+    const { bloodGroup, genotype, bp, heartRate, temperature, specialNeeds } = req.body;
+    //reject if status update
+    if (status) {
+    }
+    if (!id)
+        return next(new errors_1.ApiError(400, "Patient Id is not provided!"));
+    const _Id = new mongoose_1.default.Types.ObjectId(id);
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
+    if (!foundPatient) {
+        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    const clinicalInformation = {
+        bloodGroup, genotype, bp, heartRate, temperature
+    };
+    req.body.clinicalInformation = clinicalInformation;
+    var queryresult = yield (0, patientmanagement_1.updatepatient)(id, req.body);
+    if (!queryresult)
+        return next(new errors_1.ApiError(401, "update failed"));
+    res.status(200).json({
+        queryresult,
+        status: true
     });
-}
+}));
 //upload patients photo
 var uploadpix = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -462,3 +513,82 @@ var uploadpix = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.uploadpix = uploadpix;
+exports.updatePatientToHmo = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id)
+        return next(new errors_1.ApiError(400, "Patient Id is not provided!"));
+    //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
+    const _Id = new mongoose_1.default.Types.ObjectId(id);
+    ///Step 2: Read the Appointment and populate the patient field.
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
+    /// fetch patient info
+    if (!foundPatient) {
+        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    /// check if patient hmo is false
+    if (foundPatient.isHMOCover === config_1.default.ishmo[1]) {
+        return next(new errors_1.ApiError(401, `patient already has an HMO`));
+    }
+    /// if hmo is true return an error
+    /// then convert to true
+    const updatedPatient = yield (0, patientmanagement_1.updatepatient)(id, { isHMOCover: config_1.default.ishmo[1], previouslyNotHmo: true });
+    /// save db
+    res.status(200).json({
+        status: true,
+        message: "patient hmo info updated successfully",
+        data: updatedPatient
+    });
+}));
+exports.updatePatientClinicalInformation = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { bloodGroup, genotype, bp, heartRate, temperature, specialNeeds } = req.body;
+    if (!id)
+        return next(new errors_1.ApiError(400, "Patient Id is not provided!"));
+    const _Id = new mongoose_1.default.Types.ObjectId(id);
+    const { _id: userId } = (req.user).user;
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
+    if (!foundPatient) {
+        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    const clinicalInformation = {
+        bloodGroup, genotype, bp, heartRate, temperature
+    };
+    const updatedPatient = yield (0, patientmanagement_1.updatepatientbyanyquery)(_Id, {
+        clinicalInformation: clinicalInformation,
+        specialNeeds,
+        updatedBy: userId
+    });
+    res.status(200).json({
+        status: true,
+        data: updatedPatient
+    });
+}));
+exports.updatePatientFluidBalancing = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { totalInput, totalOutput } = req.body;
+    const { patientId } = req.params;
+    const { _id: userId } = (req.user).user;
+    if (!patientId) {
+        return next(new errors_1.ApiError(400, config_1.default.error.errorPatientIdIsRequired));
+    }
+    const _patientId = new mongoose_1.default.Types.ObjectId(patientId);
+    const patient = yield (0, patientmanagement_1.readonepatient)({ _id: _patientId }, {}, '', '');
+    if (!patient) {
+        return next(new errors_1.ApiError(404, "Patient not found."));
+    }
+    const balance = (totalInput || 0) - (totalOutput || 0);
+    const newFluidRecord = {
+        totalInput,
+        totalOutput,
+        balance,
+        createdBy: userId,
+    };
+    const updatedPatient = yield (0, patientmanagement_1.updatepatientbyanyquery)(_patientId, {
+        $push: {
+            fluidBalance: newFluidRecord
+        }
+    });
+    res.status(200).json({
+        status: true,
+        data: updatedPatient
+    });
+}));

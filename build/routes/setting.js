@@ -13,6 +13,7 @@ const testscomponent_1 = require("../controllers/setting/testscomponent");
 const hmomanagement_1 = require("../controllers/setting/hmomanagement");
 const pricemodel_1 = require("../controllers/setting/pricemodel");
 const outreachmedication_1 = require("../controllers/setting/outreachmedication");
+const bed_1 = require("../controllers/bed/bed");
 const audit_1 = require("../controllers/audit/audit");
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express_1.default.Router();
@@ -44,7 +45,7 @@ router.put('/updatetheatre/:id', theatremanagement_1.updatetheatre);
 //hmo
 router.post('/createinsurance', hmomanagement_1.createhmo);
 router.get('/getallinsurance', hmomanagement_1.getallhmo);
-router.put('/updateinsurance/:id', hmomanagement_1.updatehmo);
+router.put('/updateinsurance/:_id', hmomanagement_1.updatehmo);
 // test name
 router.post('/createtestcomponents', testscomponent_1.createtestcomponents);
 router.get('/getalltestcomponent', testscomponent_1.getalltestcomponent);
@@ -60,4 +61,12 @@ router.get('/readallaudit', audit_1.readAllaudit);
 router.post('/createoutreachmedication', outreachmedication_1.createoutreachmedications);
 router.get('/getalloutreachmedication', outreachmedication_1.getalloutreachmedications);
 router.put('/updateoutreachmedication/:id', outreachmedication_1.updateoutreachmedications);
+//bed management
+router.post('/createbed', bed_1.createbeds);
+router.get('/getavailablebedsbyward/:wardid', bed_1.getAvailableBedsByWard);
+router.get('/getallbeds', bed_1.getallbeds);
+router.put('/softdeleterestorebed/:id', bed_1.softDeleteBed);
+router.put('/updatebednumber/:id', bed_1.updatebeds);
+//getpriceofservice
+router.post('/getpriceofservice/:id', pricesetting_1.getpriceofservice);
 exports.default = router;

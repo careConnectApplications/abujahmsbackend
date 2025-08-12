@@ -470,6 +470,10 @@ const vitalsSchema = new mongoose_1.Schema({
     },
     */
     staffname: String,
+    doctorassigment: {
+        type: String,
+        default: config_1.default.doctorassigment[0]
+    },
     status: {
         type: String,
         default: config_1.default.status[9]
@@ -507,6 +511,7 @@ const appointmentSchema = new mongoose_1.Schema({
     },
     firstName: String,
     lastName: String,
+    amount: Number,
     MRN: String,
     HMOId: String,
     HMOName: String,
