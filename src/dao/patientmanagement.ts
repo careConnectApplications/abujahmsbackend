@@ -105,9 +105,10 @@ export async function deletePatietsByCondition(query:any) {
     export async function updatepatientbyanyquery(query:any, reqbody:any){
       try{
         
-      const patient = await Patient.findOneAndUpdate(query, reqbody,{
-        new: true
-      });
+      const patient = await Patient.findOneAndUpdate(query, reqbody,
+        //{new: true}
+        { returnDocument: 'after' }
+      );
         if (!patient) {
           //return json  false response
           throw new Error(configuration.error.errorinvalidcredentials);
