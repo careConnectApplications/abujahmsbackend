@@ -84,9 +84,12 @@ export async function deletePatietsByCondition(query:any) {
         //re-assign hasshed version of original
         reqbody.password = passwordHash;
       }
-    const user = await Patient.findOneAndUpdate({ _id: id }, reqbody,{
-      new: true
-    });
+    const user = await Patient.findOneAndUpdate({ _id: id }, reqbody,
+    //  {new: true}
+    {
+      returnDocument: 'after'  // correct option here
+    }
+    );
       if (!user) {
         //return json  false response
         throw new Error(configuration.error.errorinvalidcredentials);
@@ -106,7 +109,7 @@ export async function deletePatietsByCondition(query:any) {
       try{
         
       const patient = await Patient.findOneAndUpdate(query, reqbody,
-        //{new: true}
+       
         { returnDocument: 'after' }
       );
         if (!patient) {
@@ -124,9 +127,12 @@ export async function deletePatietsByCondition(query:any) {
     }
     export async function updatepatientmanybyquery(query:any, reqbody:any){
       try{
-      const payment = await Patient.updateMany(query, reqbody,{
-        new: true
-      });
+      const payment = await Patient.updateMany(query, reqbody,
+        //{new: true}
+        {
+      returnDocument: 'after'  // correct option here
+    }
+      );
         if (!payment) {
           //return json  false response
           throw new Error(configuration.error.errorinvalidcredentials);
