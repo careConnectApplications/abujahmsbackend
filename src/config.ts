@@ -1134,9 +1134,9 @@ const configuration: any = {
     errorNotValidPhoneNumber: "not a valid phone number!"
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
-  //environment: "test",
+  environment: "test",
 
-  environment: "prod",
+  //environment: "prod",
 
 }
 export default configuration;
