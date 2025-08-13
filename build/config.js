@@ -13,7 +13,20 @@ const clinics_1 = require("./dao/clinics");
 const servicetype_1 = require("./dao/servicetype");
 const configuration = {
     //clinic name
-    //wardname  
+    //wardname
+    bedstatus: ['vacant', 'occupied'],
+    treatmentPlan: ['Urgent', 'Routine', 'Elective'],
+    intraOral: ['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
+    tmjAssessment: ['Normal', 'Clicking', 'Painful', 'Limited Movement', 'Other'],
+    oralCancerScreening: ['Normal', 'Abnormal', 'Biopsy Recommended'],
+    examinations: ['Healthy', 'Inflamed', 'Receding', 'Bleeding', 'Periodontal Pockets'],
+    labpriority: ["urgent", "routine"],
+    typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
+    typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
+    familyplanningyesnooption: ["Yes", "No"],
+    labcategory: ["hematology", "chemicalpathology"],
+    labreporttypehematologychemicalpathology: ["peripheralbloodfilmreport", "ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
+    gender: ["Male", "Female"],
     pricingtype: ["Standard", "Age and Clinic Aware"],
     anynotedadverseeffect: ["Yes", "No"],
     patienttype: ["primary", "secondary"],
@@ -64,11 +77,13 @@ const configuration = {
         "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
     defaultphonenumber: "11111111111",
     status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+    doctorassigment: ["unassigned", "assigned"],
+    hematologyandchemicalpathologystatus: ["hemathologyscheduled", "chemicalpathologyscheduled", "hemathologyprocessed", "chemicalpathologyprocessed"],
     admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
     servedstatus: ["served", "unserved"],
     clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
     defaultPassword: "HMSB",
-    category: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure"],
+    category: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure", "Histopathology", "Eye Appointment", "Annual-Subscription"],
     ishmo: ["No", "Yes"],
     settings: function () {
         return __awaiter(this, void 0, void 0, function* () {
@@ -84,6 +99,14 @@ const configuration = {
             }
             ;
             return ({
+                treatmentPlan: configuration.treatmentPlan,
+                intraOral: configuration.intraOral,
+                tmjAssessment: configuration.tmjAssessment,
+                oralCancerScreening: configuration.oralCancerScreening,
+                examinations: configuration.examinations,
+                labpriority: configuration.labpriority,
+                labcategory: configuration.labcategory,
+                labreporttypehematologychemicalpathology: configuration.labreporttypehematologychemicalpathology,
                 vaccinationlocation: ['fixed', 'outreach'],
                 pricingtype: ["Standard", "Age and Clinic Aware"],
                 tetanustoxoid: ["TT 1", "TT 2", "TT 3", "TT 4", "TT 5"],
@@ -148,12 +171,12 @@ const configuration = {
                 diagnosis: ["A04.9 Bacterial intestinal infection, unspecified", "A05 Other bacterial foodborne intoxications, not elsewhere classified", "A05.1 Botulism food poisoning"],
                 voluntorysterilization: ["Male", "Female"],
                 typeofiud: ["Hormonal", "Copper"],
-                typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
+                typeofimplants: configuration.typeofimplants,
                 nursingdiagnosis: ["Acute Confusion", "Acute Substance Withdrawal", "Adult Pressure Injury", "Anxiety", "Autonomic Dysreflexia", ""],
-                familyplanningyesnooption: ["Yes", "No"],
+                familyplanningyesnooption: configuration.familyplanningyesnooption,
                 typeoffamilyplanningclient: ["Post Abortion Care (PAC)", "Post-Partum Family Planning(PPFP)", "Routine"],
                 nameofinjectable: ["Depo medroxyprogrsterone ", "Noristerat(NOR)", "Others"],
-                typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
+                typeofbarriermethods: configuration.typeofbarriermethods,
                 liquor: ["0", "+1", "+2", "+3"],
                 moulding: ["0", "+1", "+2", "+3"],
                 cervicaldilationb: ["3.0", "4.0", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0"],
@@ -174,7 +197,7 @@ const configuration = {
                 insulinroute: ["SC", "IV", "IM"],
                 insulinsymptoms: ["Sweating", "Dizziness", "Confusion"],
                 insulininterventionprovided: ["Oral", "Glucose", "IV"],
-                admissionstatus: ["admited", "totransfer", "transfered", "todischarge", "discharged"],
+                admissionstatus: configuration.admissionstatus,
                 medicationchartfrequency: ["Start", "Daily", "BD", "TDS", "QDS", "PRM", "NOCTE", "4 Hours", "8 Hours", "12 Hours"],
                 medicationchartroute: ["oral", "caudal block", "continuous epidural", "continuous intra-arterial infusion", "continuous IV infusion", "continuous nebulization", "continuous subcutaneous infusion", "continuous intrathecal infusion", "cervical", "dental", "epidural", "otic (ear)", "endotracheal", "feeding tube", "G-tube",
                     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
@@ -956,14 +979,14 @@ const configuration = {
                 {clinic: "Pediatric Outpatient", id:2},
                  {clinic: "Medical Outpatient", id:3},
                  {clinic:"Surgical Outpatient", id:4},
-                  {clinic: "ANC", id: 5},
+                {clinic: "ANC", id: 5},
                  {clinic: "Labour room", id:6},
                  {clinic: "Gynae Emergency room", id:7},
                  {clinic: "Emergency Pediatric Unit", id:8},
                  {clinic: "Accident and Emergency", id:9},
                  {clinic: "Orthopedic Clinic", id:10},
                   {clinic: "Eye Care", id:11},
-                  {clinic: "Dialysis Unit", id:12},
+                {clinic: "Dialysis Unit", id:12},
                 {clinic: "Dental Unit", id:13},
                 {clinic: "Scanning", id:14},
                 {clinic: "X-ray", id:15},
@@ -974,7 +997,7 @@ const configuration = {
               
                 ],
                 */
-                gender: ["Male", "Female"],
+                gender: configuration.gender,
             });
         });
     },
@@ -1033,8 +1056,14 @@ const configuration = {
         errorreferrer: "You are not the preferred consultant for this referrer",
         errorgreaterthan: "Cannot be greater",
         errorbase64: "Missing imageBase64",
-        errorservicetray: "This service donot exist in your service tray"
+        errorservicetray: "This service donot exist in your service tray",
+        errorInvalidObjectId: "Invalid Object Id",
+        errorMustBeAnArray: "Exam types are required and must be an array!",
+        errorIdIsRequired: "Id not found in params!",
+        errorPatientIdIsRequired: "Patient Id is required!",
+        errorNotValidPhoneNumber: "not a valid phone number!"
     },
+    validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
     //environment: "test",
     environment: "prod",
 };

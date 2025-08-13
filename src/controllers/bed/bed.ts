@@ -20,7 +20,6 @@ export const createbeds = catchAsync(async (req: Request | any, res: Response, n
     const actor = `${firstName} ${lastName}`;
     const id = new ObjectId(wardid);
     validateinputfaulsyvalue({ wardid });
-    
     const foundWard =  await readonewardmanagement({_id:id},'');
     if(!foundWard){
       throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);

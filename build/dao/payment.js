@@ -17,6 +17,7 @@ exports.readpaymentaggregateoptimized = readpaymentaggregateoptimized;
 exports.readallpayment = readallpayment;
 exports.readallpaymentaggregate = readallpaymentaggregate;
 exports.createpayment = createpayment;
+exports.createpaymentSession = createpaymentSession;
 exports.readonepayment = readonepayment;
 exports.updatepayment = updatepayment;
 exports.updatepaymentbyquery = updatepaymentbyquery;
@@ -86,6 +87,18 @@ function createpayment(input) {
         }
     });
 }
+function createpaymentSession(input, session) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const payment = new payment_1.default(input);
+            return yield payment.save({ session });
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.errorusercreate);
+        }
+    });
+}
 //find one
 function readonepayment(query) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -102,9 +115,9 @@ function readonepayment(query) {
 function updatepayment(id, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const transaction = yield payment_1.default.findOneAndUpdate({ _id: id }, reqbody, {
-                new: true
-            });
+            const transaction = yield payment_1.default.findOneAndUpdate({ _id: id }, reqbody, 
+            //  { new: true}
+            { returnDocument: 'after' });
             if (!transaction) {
                 //return json  false response
                 throw new Error(config_1.default.error.errorinvalidcredentials);
@@ -121,8 +134,10 @@ function updatepayment(id, reqbody) {
 function updatepaymentbyquery(query, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const payment = yield payment_1.default.updateMany(query, reqbody, {
-                new: true
+            const payment = yield payment_1.default.updateMany(query, reqbody, 
+            // {new: true}
+            {
+                returnDocument: 'after' // correct option here
             });
             if (!payment) {
                 //return json  false response

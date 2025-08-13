@@ -65,11 +65,15 @@ const userSchema = new mongoose_1.Schema({
         type: String
     },
     phoneNumber: {
-        type: String
+        type: String,
+        trim: true,
+        required: [true, "phone number is required"],
+        unique: true
     },
     email: {
         required: true,
         type: String,
+        unique: true
     },
     role: {
         required: true,
@@ -106,6 +110,10 @@ const userSchema = new mongoose_1.Schema({
     password: {
         required: [true, "Password is required"],
         type: String,
+    },
+    specialPermissions: {
+        type: [Number],
+        default: []
     },
     status: {
         required: true,

@@ -87,9 +87,10 @@ export async function readonepayment(query: any) {
 //update  users
 export async function updatepayment(id: any, reqbody: any) {
   try {
-    const transaction = await Payment.findOneAndUpdate({ _id: id }, reqbody, {
-      new: true
-    });
+    const transaction = await Payment.findOneAndUpdate({ _id: id }, reqbody, 
+    //  { new: true}
+    { returnDocument: 'after' }
+    );
     if (!transaction) {
       //return json  false response
       throw new Error(configuration.error.errorinvalidcredentials);
@@ -105,9 +106,12 @@ export async function updatepayment(id: any, reqbody: any) {
 //update  appointment by query
 export async function updatepaymentbyquery(query: any, reqbody: any) {
   try {
-    const payment = await Payment.updateMany(query, reqbody, {
-      new: true
-    });
+    const payment = await Payment.updateMany(query, reqbody, 
+     // {new: true}
+     {
+      returnDocument: 'after'  // correct option here
+    }
+    );
     if (!payment) {
       //return json  false response
       throw new Error(configuration.error.errorinvalidcredentials);

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createprices = void 0;
+exports.getpriceofservice = exports.createprices = void 0;
 exports.getallprices = getallprices;
 exports.updateprices = updateprices;
 exports.updatepricestatus = updatepricestatus;
@@ -24,6 +24,8 @@ const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
 const pricingmodel_1 = require("../../dao/pricingmodel");
+const patientmanagement_1 = require("../../dao/patientmanagement");
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 //add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -165,3 +167,29 @@ function searchradiology(req, res) {
         }
     });
 }
+//get price of services /////////////
+exports.getpriceofservice = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const { id } = req.params;
+    const { servicetype } = req.body;
+    // Validate inputs early
+    if (!id || !servicetype) {
+        throw new Error("Patient ID and service type are required.");
+    }
+    // Fetch patient with insurance populated
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, "insurance", "");
+    if (!foundPatient) {
+        throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit}`);
+    }
+    // Fetch price for the service type
+    const price = yield (0, price_1.readoneprice)({ servicetype });
+    if ((price === null || price === void 0 ? void 0 : price.amount) == null) {
+        throw new Error(`${config_1.default.error.errornopriceset} ${servicetype}`);
+    }
+    // Get HMO coverage percentage or default to 0
+    const hmoPercentageCover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+    // Calculate patient amount
+    const amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmoPercentageCover), Number(price.amount));
+    // Respond with calculated amount
+    res.status(200).json({ price: amount, status: true });
+}));

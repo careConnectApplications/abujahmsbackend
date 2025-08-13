@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateBilingRecord = exports.getCashierTotal = exports.payAnnualSubscription = void 0;
 exports.confirmgrouppayment = confirmgrouppayment;
 exports.readpaymentbyreferencenumber = readpaymentbyreferencenumber;
 exports.groupreadallpayment = groupreadallpayment;
@@ -25,28 +26,52 @@ const patientmanagement_1 = require("../../dao/patientmanagement");
 const lab_1 = require("../../dao/lab");
 const config_1 = __importDefault(require("../../config"));
 const otherservices_1 = require("../../utils/otherservices");
-//deactivate a user
-/*
-export async function confirmpayment(req:any, res:any){
-    const {id} = req.params;
-    try{
-        const response = await readone({_id:id});
-       const status= response?.status == configuration.userstatus[0]? configuration.userstatus[1]: configuration.userstatus[0];
-        const queryresult:any =await updateuser(id,{status});
-        res.status(200).json({
-            queryresult,
-            status:true
-          });
-
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const errors_1 = require("../../errors");
+const price_1 = require("../../dao/price");
+const uuid_1 = require("uuid");
+const generatePaymentNumber = () => {
+    const uniqueId = (0, uuid_1.v4)();
+    return `Billing-${new Date().getFullYear()}-${uniqueId}`;
+};
+exports.payAnnualSubscription = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { patientId } = req.body;
+    // Check patient exists
+    const patient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
+    if (!patient) {
+        throw new Error("Patient not found");
     }
-    catch(e:any){
-        console.log(e);
-      res.status(403).json({status: false, msg:e.message});
-
+    const subscriptionPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[8], servicetype: config_1.default.category[8] });
+    if (!subscriptionPrice) {
+        throw new Error(config_1.default.error.errornopriceset);
     }
-
-}
-    */
+    const { amount } = subscriptionPrice;
+    var payment = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference: patient._id, paymentype: config_1.default.category[8], paymentcategory: config_1.default.category[8], patient: patient._id, amount });
+    // Extend subscription by 1 year
+    res.status(201).json({ queryresult: "Subscription payment recorded", payment, status: true });
+}));
+///deactivate a user
+//show total for each login cashier
+exports.getCashierTotal = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { email } = (req.user).user;
+    // Get start and end of today (local time)
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    const total = yield (0, payment_1.readallpaymentaggregate)([
+        { $match: { status: config_1.default.status[3], cashieremail: email, updatedAt: { $gte: startOfDay, $lte: endOfDay } } }, // Filter only completed payments if needed
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: "$amount" }
+            }
+        }
+    ]);
+    res.json({ queryresult: ((_a = total[0]) === null || _a === void 0 ? void 0 : _a.totalAmount) || 0, status: true });
+}));
+//cashieremail:email,cashierid:staffId
 //confirm payment
 function confirmgrouppayment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -56,16 +81,11 @@ function confirmgrouppayment(req, res) {
             //check for null of id
             const response = yield (0, payment_1.readallpayment)({ paymentreference: paymentreferenceid, status: config_1.default.status[2] }, '');
             const { paymentdetails } = response;
-            console.log('before', paymentdetails);
-            console.log('length', paymentdetails.length);
             for (var i = 0; i < paymentdetails.length; i++) {
-                console.log('paymentdetails', paymentdetails[i]);
                 let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i];
                 //const {patient} = paymentdetails[i];
                 const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
-                console.log('patient', patientrecord);
                 if (!patientrecord && paymentcategory !== config_1.default.category[3]) {
-                    console.log('true');
                     throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
                 }
                 //var settings =await  configuration.settings();
@@ -79,19 +99,16 @@ function confirmgrouppayment(req, res) {
                     //update patient registration status
                     yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1], paymentstatus: status, paymentreference });
                 }
-                /*
-                
-                else if(paymentcategory == configuration.category[0]){
-                  //schedule the patient
-                  //payment
-                  await updateappointmentbyquery({payment:_id},{status:configuration.status[5]});
-          
-                }
-                  */
                 //for lab test
                 else if (paymentcategory == config_1.default.category[2]) {
                     //update lab test
                     yield (0, lab_1.updatelabbyquery)({ payment: _id }, { status: config_1.default.status[5] });
+                }
+                else if (paymentcategory == config_1.default.category[8]) {
+                    const nextYear = new Date();
+                    nextYear.setFullYear(nextYear.getFullYear() + 1);
+                    patientrecord.subscriptionPaidUntil = nextYear;
+                    yield patientrecord.save();
                 }
             }
             res.status(200).json({
@@ -265,104 +282,6 @@ function groupreadallpaymentoptimized(req, res) {
                     MRN: 1,
                 },
             });
-            // Lookup patient
-            /*
-             statusfilter.status==configuration.status[2] && pipeline.push({
-              $lookup: {
-                from: 'patientsmanagements',
-                localField: 'patient',
-                foreignField: '_id',
-                as: 'patient',
-              },
-            });
-            */
-            //statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
-            // Build patient match condition dynamically
-            /*
-            const patientMatch:any = {};
-            
-            if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
-            if (lastName && statusfilter.status==configuration.status[2]) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
-            if (MRN && statusfilter.status==configuration.status[2]) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
-            if (HMOId && statusfilter.status==configuration.status[2]) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
-            if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
-            
-            if (Object.keys(patientMatch).length > 0) {
-              pipeline.push({ $match: patientMatch });
-            }
-              */
-            // Grouping
-            /*
-            statusfilter.status==configuration.status[2]?pipeline.push({
-              $group: {
-                _id: "$paymentreference",
-                paymentreference: { $first: "$paymentreference" },
-                createdAt: { $first: "$createdAt" },
-                updatedAt: { $first: "$updatedAt" },
-                amount: { $sum: "$amount" },
-                firstName: { $first: "$patient.firstName" },
-                phoneNumber: { $first: "$patient.phoneNumber" },
-                lastName: { $first: "$patient.lastName" },
-                MRN: { $first: "$patient.MRN" },
-                isHMOCover: { $first: "$patient.isHMOCover" },
-                HMOName: { $first: "$patient.HMOName" },
-                HMOId: { $first: "$patient.HMOId" },
-                HMOPlan: { $first: "$patient.HMOPlan" },
-              },
-            }):pipeline.push({
-              $group: {
-                _id: "$paymentreference",
-                paymentreference: { $first: "$paymentreference" },
-                createdAt: { $first: "$createdAt" },
-                updatedAt: { $first: "$updatedAt" },
-                amount: { $sum: "$amount" },
-               // firstName: { $first: "$patient.firstName" },
-                //phoneNumber: { $first: "$patient.phoneNumber" },
-                //lastName: { $first: "$patient.lastName" },
-                //MRN: { $first: "$patient.MRN" },
-                //isHMOCover: { $first: "$patient.isHMOCover" },
-                //HMOName: { $first: "$patient.HMOName" },
-                //HMOId: { $first: "$patient.HMOId" },
-                //HMOPlan: { $first: "$patient.HMOPlan" },
-              },
-            });
-            
-            
-            // Projection
-            statusfilter.status==configuration.status[2]?pipeline.push({
-              $project: {
-                _id: 0,
-                paymentreference: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                amount: 1,
-                firstName: 1,
-                phoneNumber: 1,
-                lastName: 1,
-                MRN: 1,
-                isHMOCover: 1,
-                HMOName: 1,
-                HMOId: 1,
-                HMOPlan: 1,
-              },
-            }):pipeline.push({
-              $project: {
-                _id: 0,
-                paymentreference: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                amount: 1,
-              //  firstName: 1,
-               // phoneNumber: 1,
-               // lastName: 1,
-                //MRN: 1,
-                //isHMOCover: 1,
-                //HMOName: 1,
-                //HMOId: 1,
-                //HMOPlan: 1,
-              },
-            });
-            */
             // Sorting
             pipeline.push({ $sort: { createdAt: -1 } });
             const queryresult = yield (0, payment_1.readpaymentaggregateoptimized)(pipeline, page, size);
@@ -448,13 +367,19 @@ function confirmpayment(req, res) {
               //schedule the patient
               //payment
               await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
-      
+        
             }
               */
             //for lab test
             else if (paymentcategory == config_1.default.category[2]) {
                 //update lab test
                 yield (0, lab_1.updatelabbyquery)({ payment: id }, { status: config_1.default.status[5] });
+            }
+            else if (paymentcategory == config_1.default.category[8]) {
+                const nextYear = new Date();
+                nextYear.setFullYear(nextYear.getFullYear() + 1);
+                patientrecord.subscriptionPaidUntil = nextYear;
+                yield patientrecord.save();
             }
             //update for pharmacy
             res.status(200).json({
@@ -516,3 +441,31 @@ function printreceipt(req, res) {
         }
     });
 }
+exports.CreateBilingRecord = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { patientId } = req.params;
+    const { serviceCategory, amount, serviceType, phoneNumber } = req.body;
+    const { _id: userId } = (req.user).user;
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
+    if (!foundPatient) {
+        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    const { firstName, lastName, } = foundPatient;
+    const refNumber = generatePaymentNumber();
+    const paymentInfo = yield (0, payment_1.createpayment)({
+        firstName,
+        lastName,
+        MRN: req.body.MRN,
+        phoneNumber,
+        paymentreference: refNumber,
+        paymentype: serviceType,
+        paymentcategory: serviceCategory,
+        patient: foundPatient._id,
+        amount: Number(amount),
+        createdById: userId,
+    });
+    res.status(201).json({
+        status: true,
+        message: "custom billing info created for user!",
+        data: paymentInfo
+    });
+}));

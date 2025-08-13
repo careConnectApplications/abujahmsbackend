@@ -12,6 +12,8 @@ router.put('/updatepassword/:id', usermanagement_1.updatepassword);
 router.put('/updatestatus/:id', usermanagement_1.updatestatus);
 router.post('/bulkuploadusers', usermanagement_1.bulkuploadusers);
 router.post('/passwordreset/:id', usermanagement_1.passwordreset);
-//updatepassword
-//updateusers
+router.get("/roles", usermanagement_1.getAllRoles);
+router.put("/:id/permissions", usermanagement_1.updateUserPermissions);
+router.get("/:id/permissions", usermanagement_1.getUserPermissions);
+router.put("/:id/default-permissions", usermanagement_1.setUserDefaultPermission);
 exports.default = router;

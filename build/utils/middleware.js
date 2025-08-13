@@ -45,9 +45,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.protect = void 0;
+exports.globalErrorHandler = exports.protect = exports.checkSubscription = void 0;
 const config_1 = __importDefault(require("../config"));
+const patientmanagement_1 = require("../dao/patientmanagement");
 const jwt = __importStar(require("jsonwebtoken"));
+const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
+// Middleware to block unpaid patients
+exports.checkSubscription = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var { patient, id } = req.body;
+    const _id = patient || id;
+    if (!_id) {
+        throw new Error("Unauthorized");
+    }
+    const patientinfo = yield (0, patientmanagement_1.readonepatient)({ _id }, {}, '', '');
+    if (!patientinfo) {
+        throw new Error("Patient not found");
+    }
+    const now = new Date();
+    if (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now) {
+        throw new Error("Subscription expired. Please renew to continue.");
+    }
+    next();
+}));
 //Protect routes
 const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -70,3 +89,10 @@ const protect = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.protect = protect;
+const globalErrorHandler = (err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const status = false;
+    res.status(statusCode).json(Object.assign({ status, msg: err.message || "Internal Server Error" }, (process.env.NODE_ENV === "development" && { stack: err.stack })));
+};
+exports.globalErrorHandler = globalErrorHandler;
+exports.default = exports.globalErrorHandler;

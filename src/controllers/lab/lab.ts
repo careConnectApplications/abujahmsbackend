@@ -503,6 +503,7 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
             department:1,
             chemicalpathologyreport:1,
             peripheralbloodfilmreport:1,
+            testresult:1,
             ADHbonemarrowaspirationreport:1,
             firstName:"$patient.firstName",
             lastName:"$patient.lastName",
@@ -528,7 +529,6 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
 
 
 });
-
 //process hemathology and chemical pathology result
   //lab processing
  export const labresultprocessinghemathologychemicalpathology=catchAsync(async (req:any,res:Response,next: NextFunction)=>{
@@ -542,11 +542,12 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   const {clinicalnotes,boneconsistency,aspiration,erythroidratio,erythropoiesis,leucopoesis,megakaryopoiesis,plasmacells,abnomalcells,ironstore,conclusion} = req.body;
   const { firstName, lastName } = (req.user).user;
   const reportedby = `${firstName} ${lastName}`;  
+
   //find id and validate
   var lab =await readonelab({_id:id},{},'');
   //if not lab or status !== scheduled return error
-  if(!lab || !(lab.status == configuration.hematologyandchemicalpathologystatus[0] || lab.status == configuration.hematologyandchemicalpathologystatus[1])){
-    throw new Error(configuration.error.errorservicetray);
+  if(!lab || !(lab.status ==  configuration.status[7])){
+    throw new Error("Lab Techician is Yet to enter result for this test");
 
   }
   const peripheralbloodfilmreport={status:configuration.hematologyandchemicalpathologystatus[2],reportedby,summary,redbloodcell,whitebloodcell,platelet,impression,suggestion};
@@ -557,17 +558,17 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   validateinputfaulsyvalue({lab});
  
   if(labreporttypehematologychemicalpathology==configuration.labreporttypehematologychemicalpathology[0]){
-    queryresult=await updatelab({_id:id},{peripheralbloodfilmreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
+    queryresult=await updatelab({_id:id},{labcategory:configuration.labcategory[0],peripheralbloodfilmreport, chemicalpathologyhemathologyreviewtstatus:configuration.hematologyandchemicalpathologystatus[2],processeddate});
 
   }
   
   else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathology[1]){
-    queryresult=await updatelab({_id:id},{ADHbonemarrowaspirationreport, status:configuration.hematologyandchemicalpathologystatus[2],processeddate});
+    queryresult=await updatelab({_id:id},{labcategory:configuration.labcategory[0],ADHbonemarrowaspirationreport, chemicalpathologyhemathologyreviewtstatus:configuration.hematologyandchemicalpathologystatus[2],processeddate});
 
   }
     
   else if(labreporttypehematologychemicalpathology == configuration.labreporttypehematologychemicalpathology[2]){
-    queryresult=await updatelab({_id:id},{chemicalpathologyreport, status:configuration.hematologyandchemicalpathologystatus[3],processeddate});
+    queryresult=await updatelab({_id:id},{labcategory:configuration.labcategory[1],chemicalpathologyreport, chemicalpathologyhemathologyreviewtstatus:configuration.hematologyandchemicalpathologystatus[3],processeddate});
 
   }
 
