@@ -358,27 +358,32 @@ export const confirmlaborder = async (req:any, res:any) =>{
     const {id} = req.params;
   //search for the lab request
   var lab:any =await readonelab({_id:id},{},'patient');
-  const {testname, testid,patient,amount} = lab;
+  //const {testname, testid,patient,amount} = lab;
   //validate the status
   let queryresult;
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  /*
   let paymentreference; 
   //let status;
 //validate the status
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+
   var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
     paymentreference = findAdmission.admissionid;
-    //status=configuration.status[5];
+    
 
 }
 else{
   paymentreference = testid;
-  //status=configuration.status[2];
+  
 }
+
+
   if(option == true && amount > 0){
+    otherstatus
     var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
-    queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
+   queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     
   }
@@ -386,6 +391,11 @@ else{
     queryresult= await updatelab({_id:id},{status:configuration.status[5],remark});
 
   }
+    */
+   if(option == true){
+      queryresult= await updatelab({_id:id},{status:configuration.otherstatus[0],remark});
+
+   }
   else{
     queryresult= await updatelab({_id:id},{status:configuration.status[13],remark});
 

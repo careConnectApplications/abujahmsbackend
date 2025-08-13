@@ -9,12 +9,6 @@ const hmomanagementSchema = new Schema({
   {
     type: String
   },
-  hmopercentagecover:Number,
-  isprimaryhmo:{
-    type: Boolean,
-    default: false
-  },
-
   id:
   {
     type: String,
