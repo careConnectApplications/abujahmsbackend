@@ -5,13 +5,11 @@ import { validateinputfaulsyvalue, generateRandomNumber } from "../../utils/othe
 import { createaudit } from "../../dao/audit";
 //add patiient
 export var createhmo = async (req: any, res: any) => {
-
   try {
-    console.log(req.body);
-    const { hmoname,id,hmopercentagecover } = req.body;
+    const { hmoname,id} = req.body;
     const { firstName, lastName } = (req.user).user;
     var actor = `${firstName} ${lastName}`;
-    validateinputfaulsyvalue({ hmoname,hmopercentagecover,id });
+    validateinputfaulsyvalue({ hmoname,id });
     //var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length - 1]}`;
     const foundHmo = await readonehmomanagement({ hmoname }, '');
     //update servicetype for New Patient Registration
@@ -19,7 +17,7 @@ export var createhmo = async (req: any, res: any) => {
       throw new Error(`HMO ${configuration.error.erroralreadyexit}`);
 
     }
-    const queryresult = await createhmomanagement({ hmoname, id,hmopercentagecover });
+    const queryresult = await createhmomanagement({ hmoname, id});
     await createaudit({ action: "Create HMO", actor, affectedentity: hmoname });
     res.status(200).json({ queryresult, status: true });
 
@@ -55,13 +53,13 @@ export async function updatehmo(req: any, res: any) {
   try {
     //get id
     const { _id } = req.params;
-    const { hmoname,id,hmopercentagecover } = req.body;
+    const { hmoname,id} = req.body;
     const { firstName, lastName } = (req.user).user;
     var actor = `${firstName} ${lastName}`;
-    validateinputfaulsyvalue({ hmoname, _id,id,hmopercentagecover });
+    validateinputfaulsyvalue({ hmoname, _id,id});
     await createaudit({ action: "Update HMO", actor, affectedentity: hmoname });
         //const queryresult = await createhmomanagement({ hmoname, id, insuranceId });
-    var queryresult = await updatehmomanagement(_id, { hmoname,id,hmopercentagecover });
+    var queryresult = await updatehmomanagement(_id, { hmoname,id});
     res.status(200).json({
       queryresult,
       status: true

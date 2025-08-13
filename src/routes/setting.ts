@@ -10,6 +10,11 @@ import {createpricingmodel, updatepricingmodel, getpricingmodel} from "../contro
 import {createoutreachmedications, getalloutreachmedications, updateoutreachmedications} from "../controllers/setting/outreachmedication";
 import {createbeds,getAvailableBedsByWard,softDeleteBed,getallbeds,updatebeds} from "../controllers/bed/bed";
 import {readAllaudit} from "../controllers/audit/audit";
+import {
+  createhmocategorycovercontroller,
+  getallhmocategorycovercontroller,
+  updatehmocategorycovercontroller
+} from "../controllers/setting/hmscategorycover";
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express.Router();
 
@@ -74,6 +79,10 @@ router.put('/softdeleterestorebed/:id',softDeleteBed);
 router.put('/updatebednumber/:id',updatebeds);
 //getpriceofservice
 router.post('/getpriceofservice/:id',getpriceofservice);
+//hmo category route
+router.post("/createhmocategorycover", createhmocategorycovercontroller);
+router.get("/getallhmocategorycover", getallhmocategorycovercontroller);
+router.put("/updatehmocategorycover/:_id", updatehmocategorycovercontroller);
 
     
 
