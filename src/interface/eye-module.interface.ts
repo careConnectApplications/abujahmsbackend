@@ -140,42 +140,65 @@ export interface OphthalmologyExamination {
 }
 
 export enum OperationalTestType {
-  CVF = 'CVF',
-  OCT = 'OCT',
-  FundusPhotograph = 'FundusPhotograph',
-  FFA = 'FFA'
+    CVF = 'CVF',
+    OCT = 'OCT',
+    FundusPhotograph = 'FundusPhotograph',
+    FFA = 'FFA'
 }
 
 export interface OphthalmologyOperationalTest {
-  resultType: OperationalTestType;
-  fileUrl: string;
-  uploadedAt?: Date;
-  uploadedBy: string;
+    resultType: OperationalTestType;
+    fileUrl: string;
+    uploadedAt?: Date;
+    uploadedBy: string;
+}
+
+export interface EyeConsultation {
+    comps?: string;
+    historyOfPresentingComplaint?: string;
+    pastMedicalHistory?: string;
+    opticalHistory?: string;
+    familySocialHx?: string;
+    va?: string;
+    IOP?: string;
+    Refraction?: string;
+    externalExamination?: string;
+    opthalmoscopy?: string;
+    slitLamp?: string;
+    diagnosis?: string;
+    treatmentPlan?: string;
+    createdBy?: string | mongoose.Types.ObjectId | null;
+    updatedBy?: string | mongoose.Types.ObjectId | null;
+    nextAppointmentDate?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IEyeModule {
-  patient: string | mongoose.Types.ObjectId;
-  ref?: string;
-  appointment?: string | mongoose.Types.ObjectId | null;
-  appointmentid: string;
-  createdBy?: string | mongoose.Types.ObjectId | null;
-  updatedBy?: string | mongoose.Types.ObjectId | null;
-  status: string;
-  optometryLensPrescription?: OptometryLensPrescription | null;
-  preliminaryTest?: PreliminaryTest | null;
-  examination?: OphthalmologyExamination | null;
-  operationalTest?: OphthalmologyOperationalTest[];
-  createdAt?: Date;
-  updatedAt?: Date;
+    patient: string | mongoose.Types.ObjectId;
+    ref?: string;
+    appointment?: string | mongoose.Types.ObjectId | null;
+    appointmentid: string;
+    createdBy?: string | mongoose.Types.ObjectId | null;
+    updatedBy?: string | mongoose.Types.ObjectId | null;
+    status: string;
+    optometryLensPrescription?: OptometryLensPrescription | null;
+    preliminaryTest?: PreliminaryTest | null;
+    examination?: OphthalmologyExamination | null;
+    operationalTest?: OphthalmologyOperationalTest[];
+    observationalNotes?: string | null;
+    eyeConsultation?: EyeConsultation | null;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IEyeModuleDoc extends IEyeModule, Document {
-  _id: string;
+    _id: string;
 }
 
 export interface IEyeModel extends Model<IEyeModuleDoc> {
-  paginate(
-    filter: Record<string, any>,
-    options: Record<string, any>
-  ): Promise<QueryResult>;
+    paginate(
+        filter: Record<string, any>,
+        options: Record<string, any>
+    ): Promise<QueryResult>;
 }

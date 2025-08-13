@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import configuration from "../../config";
 import { readoneadmission } from "../../dao/admissions";
-import { createfluidbalances, readallfluidbalances, readonefluidbalances, updatefluidbalances } from "../../dao/fluidbalance";
+import { createfluidbalances, createMultifluidbalances, readallfluidbalances, readonefluidbalances, updatefluidbalances } from "../../dao/fluidbalance";
+import { ApiError } from '../../errors';
 import catchAsync from "../../utils/catchAsync";
-import { validateinputfaulsyvalue } from "../../utils/otherservices";
-import admission from '../../models/admission';
+import { parseDate, validateinputfaulsyvalue } from "../../utils/otherservices";
 const { ObjectId } = mongoose.Types;
 
 // Get all lab records
@@ -21,7 +21,8 @@ export const readallfluidbalanceByAdmission = async (req: any, res: any) => {
       intaketype: 1,
       intakeroute: 1,
       outputtype: 1,
-      outputroute: 1
+      outputroute: 1,
+      observationalNotes: 1, dateTo: 1, dateFrom: 1
     }, 'patient createdBy', '');
     res.status(200).json({
       queryresult,
@@ -49,6 +50,7 @@ export const readAllfluidbalanceByPatient = async (req: any, res: any) => {
       intakeroute: 1,
       outputtype: 1,
       outputroute: 1,
+      observationalNotes: 1, dateTo: 1, dateFrom: 1,
       updatedAt: 1
     }, 'patient createdBy', '');
     res.status(200).json({
@@ -62,7 +64,7 @@ export const readAllfluidbalanceByPatient = async (req: any, res: any) => {
 
 //create vital charts
 // Create a new schedule
-export const createfluidbalance = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+export const createfluidbalancev1 = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
 
   const { id } = req.params;
   const { firstName, lastName, _id: userId } = (req.user).user;
@@ -111,7 +113,15 @@ export async function updatefluidbalance(req: any, res: any) {
     const { id } = req.params;
     const { firstName, lastName, _id: userId } = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
-    var { outputamount, inputamount, intakeroute, intaketype, outputtype, outputroute } = req.body;
+    var {
+      outputamount,
+      inputamount,
+      intakeroute,
+      intaketype,
+      outputtype,
+      outputroute,
+      observationalNotes, dateTo, dateFrom
+    } = req.body;
 
     const fluidRecord: any = await readonefluidbalances({ _id: id }, {});
     //console.log(admissionrecord);   
@@ -129,6 +139,9 @@ export async function updatefluidbalance(req: any, res: any) {
       intakeroute,
       outputtype,
       outputroute,
+      observationalNotes,
+      dateTo: parseDate(dateTo) || null,
+      dateFrom: parseDate(dateFrom) || null,
       updatedBy: userId,
     };
 
@@ -146,5 +159,55 @@ export async function updatefluidbalance(req: any, res: any) {
 
 }
 
+export const createfluidbalance = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const { firstName, lastName, _id: userId } = (req.user).user;
+
+  req.body.staffname = `${firstName} ${lastName}`;
+  const { patientId, fluidRecords } = req.body;
+
+  if (!fluidRecords) {
+    return next(new ApiError(404, `fluidRecords do not ${configuration.error.erroralreadyexit}, pass it as *fluidRecords* in the json`));
+  }
+
+  // Validate fluidRecords
+  if (!fluidRecords || !Array.isArray(fluidRecords) || fluidRecords.length === 0) {
+    return next(new ApiError(400, "fluidRecords is required and must be an array"));
+  }
+
+  const admissionrecord: any = await readoneadmission({ _id: id }, {}, '');
+  if (!admissionrecord) {
+    return next(new ApiError(404, `Admission do not ${configuration.error.erroralreadyexit}`));
+  }
 
 
+  let newFluidRecord = [];
+
+  for (const record of fluidRecords) {
+    var { outputamount, inputamount, referedward, intakeroute, intaketype, outputtype, outputroute, observationalNotes, dateTo, dateFrom } = record;
+    // var { oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname} = req.body;
+    validateinputfaulsyvalue({ inputamount, outputamount });
+
+    const balance = (inputamount || 0) - (outputamount || 0);
+
+    newFluidRecord.push({
+      admission: id,
+      referedward,
+      patient: patientId,
+      inputamount,
+      outputamount,
+      balance,
+      intaketype,
+      intakeroute,
+      outputtype,
+      outputroute,
+      observationalNotes,
+      dateTo: parseDate(dateTo) || null,
+      dateFrom: parseDate(dateFrom) || null,
+      createdBy: userId,
+    })
+  }
+  // const queryresult=await createfluidbalances({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname});
+  const queryresult = await createMultifluidbalances(newFluidRecord);
+  res.status(200).json({ queryresult, status: true });
+})

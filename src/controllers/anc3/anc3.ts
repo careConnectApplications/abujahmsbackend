@@ -118,6 +118,99 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
   })
 });
 
+export const updateAbujaAnc = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params; // anc id
+
+  const {
+    lmp,
+    edd,
+    gravida,
+    cycle,
+    breasts,
+    height,
+    weight,
+    cvs,
+    rs,
+    pelvis,
+    abdomen,
+    retroviral,
+    bp,
+    urine,
+    hb,
+    bloodGroup,
+    groupRh,
+    genotype,
+    ega,
+    VDRL,
+    others,
+    comments,
+    bleeding,
+    discharge,
+    swellingAnkles,
+    urinarySymptoms,
+    bookingDate,
+    indication,
+    specialPoint,
+    consultant,
+    postmedicalorsurgicalhistory,
+    previouspregnancy,
+    historyofpresentpregnancy
+  } = req.body;
+
+  const { _id: userId } = (req.user).user;
+  const ancrecord: any = await readoneanc({ _id: id }, {}, '');
+
+  if (!ancrecord) return next(new ApiError(404, "anc record does not exist"))
+
+  const updatedBody = {
+    postmedicalorsurgicalhistory: postmedicalorsurgicalhistory || [],
+    bookingInformation: {
+      bookingDate: parseDate(bookingDate),
+      lmp: parseDate(lmp),
+      edd: parseDate(edd),
+      gravida,
+      indication,
+      specialPoint,
+      consultant,
+      ega
+    },
+    previouspregnancy: previouspregnancy || [],
+    presentPregnancy: {
+      bleeding,
+      discharge,
+      swellingAnkles,
+      urinarySymptoms,
+    },
+    generalexamination: {
+      cycle,
+      breasts,
+      height,
+      weight,
+      cvs,
+      rs,
+      pelvis,
+      abdomen,
+      retroviral,
+      bp,
+      urine,
+      hb,
+      bloodGroup,
+      groupRh,
+      genotype,
+      VDRL,
+      others,
+      comments,
+    },
+    updatedBy: userId,
+    historyofpresentpregnancy: historyofpresentpregnancy || []
+  };
+
+  var queryresult = await updateanc(id, updatedBody);
+  res.status(200).json({
+    queryresult,
+    status: true
+  });
+});
 //get lab order by patient
 ///////////////////////////anc followup/////////////////////////
 export const readAllancfollowupByAncv3 = async (req: any, res: any) => {

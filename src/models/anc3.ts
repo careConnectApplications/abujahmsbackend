@@ -67,6 +67,11 @@ const anc3Schema = new Schema({
     ref: "Users",
     default: null,
   },
+  updatedBy: {
+    type: Schema.Types.ObjectId,
+    ref: "Users",
+    default: null,
+  },
   ancfollowup: [
     {
       type: Schema.Types.ObjectId,

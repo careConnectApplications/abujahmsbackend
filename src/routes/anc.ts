@@ -2,14 +2,13 @@ import express from 'express';
 import {
     createAbujaAnc,
     createancfollowupsv3,
-    createancsv3, 
-    readAllancByPatientv3, readAllancfollowupByAncv3, updateancfollowupsv3, updateancsv3
+    readAllancByPatientv3, readAllancfollowupByAncv3, updateAbujaAnc, updateancfollowupsv3
 } from '../controllers/anc3/anc3';
 const router = express.Router();
 
 router.post('/createancv3/:id', createAbujaAnc);
 router.post("/:id", createAbujaAnc);
-router.put('/updateancsv3/:id', updateancsv3);
+router.put('/updateancsv3/:id', updateAbujaAnc);
 router.get('/readallancbypatientv3/:patient', readAllancByPatientv3);
 //////////////////////anc followup ////////////////////////////////
 router.post('/createancfollowupsv3/:anc', createancfollowupsv3);

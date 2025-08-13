@@ -36,6 +36,9 @@ const fluidbalanceSchema = new Schema({
     ref: "Users",
     default: null,
   },
+  observationalNotes: { type: String },
+  dateTo: { type: Date, },
+  dateFrom: { type: Date }
 },
   { timestamps: true }
 );
