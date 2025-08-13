@@ -36,6 +36,19 @@ export interface ILabUse {
   DateReported?: Date;
 }
 
+export interface IConsentForm {
+  nameofexplainer: string;
+  filename?: string;
+  nameofrepresentive: string;
+  addressofrepresentaive: string;
+  fullnameofwitness: string;
+  createdBy?: Types.ObjectId | string | null;
+  updatedBy?: Types.ObjectId | string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+
 export interface IHistopathology {
   patient: Types.ObjectId;
   appointment?: Types.ObjectId | null;
@@ -47,6 +60,7 @@ export interface IHistopathology {
   status: string;
   testRequired?: IHistopathologyTestRequired[];
   diagnosisForm: IDiagnosisForm;
+  consentForm?: IConsentForm | null;
   LabUse?: ILabUse;
   createdAt?: Date;
   updatedAt?: Date;
