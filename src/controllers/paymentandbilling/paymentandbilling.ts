@@ -15,7 +15,29 @@ const generatePaymentNumber = () => {
   const uniqueId = uuidv4();
   return `Billing-${new Date().getFullYear()}-${uniqueId}`;
 }
+export const paySubscription = async (req: Request, res: Response) => {
+  try {
+    const { patientId, amount, year, paymentMethod } = req.body;
+     const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
 
+    // Save payment record
+    var payment =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:patient._id,paymentype:configuration.category[8],paymentcategory:configuration.category[8],patient:patient._id,amount});
+    // Extend subscription by 1 year from January 1 of given year
+    const validUntil = new Date(year, 11, 31, 23, 59, 59);
+    patient.subscriptionPaidUntil = validUntil;
+    await patient.save();
+
+    return res.status(200).json({
+      message: "Subscription paid successfully",
+      payment
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
 ///deactivate a user
 //show total for each login cashier
 export const getCashierTotal = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
@@ -51,11 +73,7 @@ export async function confirmgrouppayment(req: any, res: any) {
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
     const { paymentdetails } = response;
-    console.log('before', paymentdetails);
-    console.log('length', paymentdetails.length);
-
     for (var i = 0; i < paymentdetails.length; i++) {
-      console.log('paymentdetails', paymentdetails[i])
       let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
 
       //const {patient} = paymentdetails[i];
