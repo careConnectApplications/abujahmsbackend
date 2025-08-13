@@ -40,6 +40,12 @@ const admissionSchema = new mongoose_1.Schema({
         ref: "Appointment",
         default: null,
     },
+    bed: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Bed",
+        required: true
+    },
+    bedfee: Number,
     doctorname: {
         type: String,
         required: true
@@ -49,7 +55,7 @@ const admissionSchema = new mongoose_1.Schema({
     },
     status: {
         type: String,
-        default: config_1.default.admissionstatus[0],
+        default: config_1.default.admissionstatus[1],
         required: true
     }
 }, { timestamps: true });

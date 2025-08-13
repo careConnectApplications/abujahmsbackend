@@ -33,10 +33,10 @@ function countadmission(query) {
 }
 ;
 //read all patient history
-function readalladmission(query, selectquery, populatequery, populatesecondquery) {
+function readalladmission(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const admissiondetails = yield admission_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery);
+            const admissiondetails = yield admission_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery);
             const totaladmissiondetails = yield admission_1.default.find(query).countDocuments();
             return { admissiondetails, totaladmissiondetails };
         }

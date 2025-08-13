@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 //scheduleappointment
 const express_1 = __importDefault(require("express"));
+const middleware_1 = require("../utils/middleware");
 //import {registration,login,updatestatus,getallusers,getusertypes} from '../controllers/user';
 const appointment_1 = require("../controllers/appointment/appointment");
 const router = express_1.default.Router();
 router.get('/getallmedicalhistoryoptimized/:clinic', appointment_1.getAllPaidSchedulesoptimized);
-router.post('/scheduleappointment', appointment_1.scheduleappointment);
+router.post('/scheduleappointment', middleware_1.checkSubscription, appointment_1.scheduleappointment);
 router.get('/getallschedules', appointment_1.getAllSchedules);
 router.get('/getallschedulesoptimized', appointment_1.getAllSchedulesoptimized);
 //getAllSchedulesoptimized
@@ -36,4 +37,8 @@ router.post('/addclinicalencounter/:id', appointment_1.addclinicalencounter);
 router.get('/getallcompletedclinicalencounter/:id', appointment_1.getAllCompletedClinicalEncounter);
 router.get('/getallinprogressclinicalencounter/:id', appointment_1.getAllInProgressClinicalEncounter);
 router.get('/getallpreviousclinicalencounter/:id', appointment_1.getAllPreviousClininicalEncounter);
+///////////////////////////
+router.get('/getdoctorsbyclinic/:clinic', appointment_1.getDoctorsByClinic);
+router.post('/assigndoctortoappointment', appointment_1.assignDoctorToAppointment);
+router.get('/countpatientsperdoctor/:clinic', appointment_1.countPatientsPerDoctor);
 exports.default = router;

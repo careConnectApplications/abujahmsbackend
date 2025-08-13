@@ -298,6 +298,9 @@ export const addBedFee = catchAsync(async (req: Request | any, res: Response, ne
     if (!findAdmission) {
       throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
     }
+    //validate bedfee
+    if(findAdmission.bedfee) throw new Error("Bed has been previous generated for this patient")
+
 
     const { patient } = findAdmission;
     const paymentreference = findAdmission.admissionid;

@@ -15,29 +15,24 @@ const generatePaymentNumber = () => {
   const uniqueId = uuidv4();
   return `Billing-${new Date().getFullYear()}-${uniqueId}`;
 }
-export const paySubscription = async (req: Request, res: Response) => {
-  try {
-    const { patientId, amount, year, paymentMethod } = req.body;
-     const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
+export const payAnnualSubscription = catchAsync(async (req: Request | any, res: Response) => {
+    const { patientId } = req.body;
+    // Check patient exists
+   const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
     if (!patient) {
-      return res.status(404).json({ message: "Patient not found" });
+      throw new Error("Patient not found" );
     }
-
-    // Save payment record
+    const subscriptionPrice: any = await readoneprice({ servicecategory:configuration.category[8], servicetype: configuration.category[8] });
+         if (!subscriptionPrice) {
+           throw new Error(configuration.error.errornopriceset);
+     
+         }
+    const {amount} = subscriptionPrice;
     var payment =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:patient._id,paymentype:configuration.category[8],paymentcategory:configuration.category[8],patient:patient._id,amount});
-    // Extend subscription by 1 year from January 1 of given year
-    const validUntil = new Date(year, 11, 31, 23, 59, 59);
-    patient.subscriptionPaidUntil = validUntil;
-    await patient.save();
-
-    return res.status(200).json({
-      message: "Subscription paid successfully",
-      payment
-    });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    // Extend subscription by 1 year
+    res.status(201).json({ queryresult: "Subscription payment recorded", payment,status: true });
+ 
+});
 ///deactivate a user
 //show total for each login cashier
 export const getCashierTotal = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
@@ -77,10 +72,9 @@ export async function confirmgrouppayment(req: any, res: any) {
       let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
 
       //const {patient} = paymentdetails[i];
-      const patientrecord = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
-      console.log('patient', patientrecord);
+      const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
       if (!patientrecord && paymentcategory !== configuration.category[3]) {
-        console.log('true');
+      
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
@@ -101,6 +95,12 @@ export async function confirmgrouppayment(req: any, res: any) {
       else if (paymentcategory == configuration.category[2]) {
         //update lab test
         await updatelabbyquery({ payment: _id }, { status: configuration.status[5] })
+      }
+      else if(paymentcategory ==configuration.category[8]){
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        patientrecord.subscriptionPaidUntil = nextYear;
+        await patientrecord.save();
       }
 
     }
@@ -361,7 +361,7 @@ export async function confirmpayment(req: any, res: any) {
     //check for null of id
     const response: any = await readonepayment({ _id: id });
     const { patient } = response;
-    const patientrecord = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
+    const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
     console.log('patient', patientrecord);
     if (!patientrecord && response.paymentcategory !== configuration.category[3]) {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
@@ -398,6 +398,12 @@ export async function confirmpayment(req: any, res: any) {
       //update lab test
       await updatelabbyquery({ payment: id }, { status: configuration.status[5] })
     }
+    else if(paymentcategory ==configuration.category[8]){
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        patientrecord.subscriptionPaidUntil = nextYear;
+        await patientrecord.save();
+      }
     //update for pharmacy
 
 

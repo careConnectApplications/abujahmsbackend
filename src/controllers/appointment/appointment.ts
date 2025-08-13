@@ -1163,7 +1163,7 @@ console.log("appointment",appointment);
 
 // Get all doctors in a specific clinic
 export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
-  const { clinic } = req.params;
+  /*const { clinic } = req.params;
    // Validate inputs
     if (!clinic) {
        throw new Error("Clinic is required.");
@@ -1176,6 +1176,79 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
       status: true,
       queryresult:doctors
     });
+    */
+      const { clinic } = req.params;
+
+  // Validate inputs
+  if (!clinic) {
+    throw new Error("Clinic is required.");
+  }
+
+  // Step 1: Get all doctors in the clinic
+  const {userdetails} = await readall({
+    clinic: clinic,
+    status: configuration.status[1],
+    roleId: configuration.roles[5].roleId
+  });
+  console.log("userdetails",userdetails);
+
+  // Step 2: Define start and end of today
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Step 3: Query to count patients per doctor for today
+  const appointmentQuery = {
+    doctor: { $ne: null },
+    patient: { $ne: null },
+    status: configuration.status[5],
+    clinic,
+    appointmentdate: { $gte: startOfDay, $lt: endOfDay }
+  };
+
+  const countPatientsDoctorAggregate = [
+    { $match: appointmentQuery },
+    {
+      $group: {
+        _id: "$doctor",
+        uniquePatients: { $addToSet: "$patient" }
+      }
+    },
+    {
+      $project: {
+        doctor: "$_id",
+        _id: 0,
+        patientCount: { $size: "$uniquePatients" }
+      }
+    }
+  ];
+
+  const {appointmentdetails} = await modifiedreadallappointment(
+    appointmentQuery,
+    countPatientsDoctorAggregate
+  );
+  console.log("appointmentdetails",appointmentdetails);
+
+  // Step 4: Merge counts with doctor list
+  const doctorListWithCounts = userdetails.map((doc: any) => {
+    const countObj = appointmentdetails.find(
+      (p: any) => String(p.doctor) === String(doc._id)
+    );
+    return {
+      ...doc.toObject?.() || doc,
+      patientCountToday: countObj ? countObj.patientCount : 0
+    };
+  });
+
+  // Step 5: Send response
+  res.status(200).json({
+    status: true,
+    queryresult: doctorListWithCounts
+  });
+
+
  
 });
 
@@ -1223,7 +1296,7 @@ export const countPatientsPerDoctor = catchAsync(async (req: Request, res: Respo
       status: true,
       queryresult
     });
-
+    
    
 
  

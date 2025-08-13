@@ -17,7 +17,7 @@ router.put('/confirmlaborder/:id', confirmlaborder);
 router.get('/listlabreport', listlabreport);
 router.get('/printlabreport/:id', printlabreport);
 router.get('/listlabreportbypatient/:id', listlabreportbypatient);
-router.put('/sortbyhemathologyandchemicalpathology/:id', sorthemathologyandchemicalpathology);
+//router.put('/sortbyhemathologyandchemicalpathology/:id', sorthemathologyandchemicalpathology);
 //readallscheduledlaboptimizedhemathologyandchemicalpathology
 router.get('/readallscheduledlaboptimizedhemathologyandchemicalpathology', readallscheduledlaboptimizedhemathologyandchemicalpathology);
 router.put('/labresultprocessinghemathologychemicalpathology/:id', labresultprocessinghemathologychemicalpathology);

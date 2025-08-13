@@ -15,5 +15,11 @@ router.get('/groupreadallpayment/:status?', paymentandbilling_1.groupreadallpaym
 router.get('/groupreadallpaymentoptimized', paymentandbilling_1.groupreadallpaymentoptimized);
 router.get('/readpaymentbyreferencenumber/:paymentreference', paymentandbilling_1.readpaymentbyreferencenumber);
 router.put('/confirmgrouppayment/:paymentreferenceid', paymentandbilling_1.confirmgrouppayment);
+//pay for subscription
+router.post("/payannualsubscription", paymentandbilling_1.payAnnualSubscription);
+//getCashierTotal
+router.get('/getcashiertotal', paymentandbilling_1.getCashierTotal);
+router.post("/:patientId", paymentandbilling_1.CreateBilingRecord);
+//payAnnualSubscription
 exports.default = router;
 //readbillinghistoryforapatient

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+exports.labresultprocessinghemathologychemicalpathology = exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = exports.sorthemathologyandchemicalpathology = exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -22,6 +22,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
 const users_1 = require("../../dao/users");
 const config_1 = __importDefault(require("../../config"));
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const admissions_1 = require("../../dao/admissions");
 //adjust lab to view from department
 // Get all lab records
@@ -330,11 +331,8 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
         //extract option
         const { option, remark } = req.body;
         const { id } = req.params;
-        console.log('////confirmbodyrequest body////', req.body);
-        console.log('////confirmbodyrequest params////', id);
         //search for the lab request
         var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, 'patient');
-        console.log('lab', lab);
         const { testname, testid, patient, amount } = lab;
         //validate the status
         let queryresult;
@@ -352,12 +350,12 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
             paymentreference = testid;
             //status=configuration.status[2];
         }
-        if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
+        if (option == true && amount > 0) {
             var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
             queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
             yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
         }
-        else if (option == true && patient.isHMOCover == config_1.default.ishmo[1]) {
+        else if (option == true && amount == 0) {
             queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[5], remark });
         }
         else {
@@ -378,3 +376,154 @@ const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.confirmlaborder = confirmlaborder;
+// differentiate hemathology and histopathology
+exports.sorthemathologyandchemicalpathology = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { labcategory } = req.body;
+    const { email } = (req.user).user;
+    var status;
+    if (labcategory == config_1.default.labcategory[0]) {
+        status = config_1.default.hematologyandchemicalpathologystatus[0];
+    }
+    else if (labcategory == config_1.default.labcategory[1]) {
+        status = config_1.default.hematologyandchemicalpathologystatus[1];
+    }
+    else {
+        throw new Error("Wrong Lab Category detected");
+    }
+    //find id and validate
+    var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
+    //if not lab or status !== scheduled return error
+    if (!lab || lab.status !== config_1.default.status[5]) {
+        throw new Error(config_1.default.error.errorservicetray);
+    }
+    (0, otherservices_1.validateinputfaulsyvalue)({ lab, labcategory });
+    var sortbydate = new Date();
+    var queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status, labcategory, sortbydate, sortby: email });
+    //update status of appointment
+    res.status(200).json({
+        queryresult,
+        status: true
+    });
+}));
+// get all scheduled hemathology and chemical pathology
+exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var { status, firstName, MRN, HMOId, lastName, phoneNumber, testname, labcategory } = req.query;
+    (0, otherservices_1.validateinputfaulsyvalue)({ labcategory });
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 150;
+    const filter = {};
+    var statusfilter = status ? { status } : testname ? { testname } : {};
+    statusfilter.labcategory = labcategory;
+    if (firstName) {
+        filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
+    }
+    if (MRN) {
+        filter.MRN = new RegExp(MRN, 'i');
+    }
+    if (HMOId) {
+        filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
+    }
+    if (lastName) {
+        filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
+    }
+    if (phoneNumber) {
+        filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
+    }
+    let aggregatequery = [
+        {
+            $match: statusfilter
+        },
+        {
+            $lookup: {
+                from: 'patientsmanagements',
+                localField: 'patient',
+                foreignField: '_id',
+                as: 'patient'
+            }
+        },
+        {
+            $unwind: {
+                path: '$patient',
+                preserveNullAndEmptyArrays: true
+            } // Deconstruct the patient array (from the lookup)
+        },
+        {
+            $project: {
+                _id: 1,
+                createdAt: 1,
+                testname: 1,
+                updatedAt: 1,
+                testid: 1,
+                department: 1,
+                chemicalpathologyreport: 1,
+                peripheralbloodfilmreport: 1,
+                ADHbonemarrowaspirationreport: 1,
+                firstName: "$patient.firstName",
+                lastName: "$patient.lastName",
+                phoneNumber: "$patient.phoneNumber",
+                MRN: "$patient.MRN",
+                patient: "$patient",
+                HMOId: "$patient.HMOId",
+                HMOName: "$patient.HMOName",
+                status: 1,
+            }
+        },
+        {
+            $match: filter
+        },
+    ];
+    const queryresult = yield (0, lab_1.optimizedreadalllab)(aggregatequery, page, size);
+    res.status(200).json({
+        queryresult,
+        status: true
+    });
+}));
+//process hemathology and chemical pathology result
+//lab processing
+exports.labresultprocessinghemathologychemicalpathology = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    //get id
+    const { id } = req.params;
+    var { labreporttypehematologychemicalpathology } = req.query;
+    (0, otherservices_1.validateinputfaulsyvalue)({ labreporttypehematologychemicalpathology });
+    const { comment, summary, redbloodcell, whitebloodcell, platelet, impression, suggestion } = req.body;
+    const { clinicalnotes, boneconsistency, aspiration, erythroidratio, erythropoiesis, leucopoesis, megakaryopoiesis, plasmacells, abnomalcells, ironstore, conclusion } = req.body;
+    const { firstName, lastName } = (req.user).user;
+    const reportedby = `${firstName} ${lastName}`;
+    //find id and validate
+    var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
+    //if not lab or status !== scheduled return error
+    if (!lab || !(lab.status == config_1.default.hematologyandchemicalpathologystatus[0] || lab.status == config_1.default.hematologyandchemicalpathologystatus[1])) {
+        throw new Error(config_1.default.error.errorservicetray);
+    }
+    const peripheralbloodfilmreport = { status: config_1.default.hematologyandchemicalpathologystatus[2], reportedby, summary, redbloodcell, whitebloodcell, platelet, impression, suggestion };
+    const ADHbonemarrowaspirationreport = { status: config_1.default.hematologyandchemicalpathologystatus[2], reportedby, clinicalnotes, boneconsistency, aspiration, erythroidratio, erythropoiesis, leucopoesis, megakaryopoiesis, plasmacells, abnomalcells, ironstore, conclusion };
+    const chemicalpathologyreport = { status: config_1.default.hematologyandchemicalpathologystatus[3], reportedby, comment };
+    var processeddate = new Date();
+    var queryresult;
+    (0, otherservices_1.validateinputfaulsyvalue)({ lab });
+    if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[0]) {
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { peripheralbloodfilmreport, status: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
+    }
+    else if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[1]) {
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { ADHbonemarrowaspirationreport, status: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
+    }
+    else if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[2]) {
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { chemicalpathologyreport, status: config_1.default.hematologyandchemicalpathologystatus[3], processeddate });
+    }
+    else {
+        throw new Error("Wrong Lab Category report detected");
+    }
+    //update status of appointment
+    res.status(200).json({
+        queryresult,
+        status: true
+    });
+}));
+// get all rejected orders
+//report for hemathology
+//report for histopathology
+//Add note field for lab
+//Add priority as a field under lab, priority should be either (urgent or routine)
+//Include the prices of radiology, lab, procedure in Dr create order
+//Rejected orders should be added in a seperate tab
