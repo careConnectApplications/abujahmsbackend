@@ -6,6 +6,7 @@ import { ophthalmologyExaminationSchema } from "./opthalamology-examination.mode
 import { ophthalmologyOperationalTestSchema } from "./opthalmology-operational-test.model";
 import { IEyeModel, IEyeModuleDoc } from "../../interface/eye-module.interface";
 import { paginate } from "../../paginate";
+import { eyeConsultationSchema } from "./eyeConsultation.model";
 
 const eyeModuleSchema = new Schema<IEyeModuleDoc, IEyeModel>({
     patient: {
@@ -60,10 +61,15 @@ const eyeModuleSchema = new Schema<IEyeModuleDoc, IEyeModel>({
         type: ophthalmologyExaminationSchema,
         default: null
     },
+    eyeConsultation: {
+        type: eyeConsultationSchema,
+        default: null
+    },
     operationalTest: {
         type: [ophthalmologyOperationalTestSchema],
         default: []
-    }
+    },
+    observationalNotes: { type: String }
 }, { timestamps: true });
 
 eyeModuleSchema.pre<IEyeModuleDoc>(/^find/, function (next) {
