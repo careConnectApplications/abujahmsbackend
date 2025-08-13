@@ -20,9 +20,11 @@ const wardmanagement_1 = require("../../dao/wardmanagement");
 const clinics_1 = require("../../dao/clinics");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
+const bed_1 = require("../../dao/bed");
 //add patiient
 var createward = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        req.body.occupiedbed = 0;
         const { bedspecialization, wardname, totalbed, occupiedbed } = req.body;
         (0, otherservices_1.validateinputfaulsyvalue)({ bedspecialization, wardname });
         (0, otherservices_1.validateinputfornumber)({ totalbed, occupiedbed });
@@ -43,6 +45,18 @@ var createward = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error(`Ward ${config_1.default.error.erroralreadyexit}`);
         }
         const queryresult = yield (0, wardmanagement_1.createwardmanagement)({ bedspecialization, vacantbed, wardname, totalbed, occupiedbed, wardid });
+        // Step 2: Create beds as separate documents
+        const bedCreationPromises = [];
+        for (let i = 1; i <= totalbed; i++) {
+            bedCreationPromises.push((0, bed_1.createbed)({
+                bednumber: `B${i.toString().padStart(3, '0')}`, // e.g. B001
+                ward: queryresult._id,
+                status: 'vacant',
+                assignedPatient: null,
+                assignedDate: null
+            }));
+        }
+        yield Promise.all(bedCreationPromises);
         const { firstName, lastName } = (req.user).user;
         var actor = `${firstName} ${lastName}`;
         yield (0, audit_1.createaudit)({ action: "Created Ward", actor, affectedentity: wardname });

@@ -1,27 +1,35 @@
 import  {Request, Response, NextFunction} from 'express';
 import configuration from '../config';
+import {readonepatient} from "../dao/patientmanagement";
 import * as jwt from 'jsonwebtoken';
-/*
+import catchAsync from "../utils/catchAsync";
+
+
 // Middleware to block unpaid patients
-export const checkSubscriptionStatus = async (req: Request, res: Response, next: Function) => {
-  try {
-    const { patientId } = req.params;
-    const patient = await patientsmanagement.findById(patientId);
-    if (!patient) {
-      return res.status(404).json({ message: "Patient not found" });
+export const checkSubscription = catchAsync(async (req:any, res:Response, next:NextFunction) => {
+
+  
+    var {patient,id} = req.body;
+  const _id = patient || id;
+    if (!_id) {
+      throw new Error("Unauthorized");
+    }
+    const patientinfo: any = await readonepatient({ _id }, {}, '', '');
+   
+    if (!patientinfo) {
+       throw new Error("Patient not found");
     }
 
     const now = new Date();
-    if (!patient.subscriptionPaidUntil || patient.subscriptionPaidUntil < now) {
-      return res.status(403).json({ message: "Subscription expired. Please renew." });
+    if (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now) {
+       throw new Error("Subscription expired. Please renew to continue.");
     }
 
     next();
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
-  }
-};
-*/
+  
+});
+
+
 //Protect routes
 export const protect = async(req:any,res:Response,next:NextFunction)=>{
     try{

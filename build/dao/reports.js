@@ -24,6 +24,8 @@ exports.readlabaggregate = readlabaggregate;
 exports.readradiologyaggregate = readradiologyaggregate;
 exports.readprescriptionaggregate = readprescriptionaggregate;
 exports.readnutritionaggregate = readnutritionaggregate;
+exports.readimmunizationaggregate = readimmunizationaggregate;
+exports.readfamilyaggregate = readfamilyaggregate;
 const payment_1 = __importDefault(require("../models/payment"));
 const admission_1 = __importDefault(require("../models/admission"));
 const appointment_1 = __importDefault(require("../models/appointment"));
@@ -37,6 +39,8 @@ const prescription_1 = __importDefault(require("../models/prescription"));
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const nutrition_1 = __importDefault(require("../models/nutrition"));
 const config_1 = __importDefault(require("../config"));
+const immunization_1 = __importDefault(require("../models/immunization"));
+const familyplanning_1 = __importDefault(require("../models/familyplanning"));
 function readpatientsmanagementaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -166,6 +170,30 @@ function readnutritionaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             return yield nutrition_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//immunization
+function readimmunizationaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield immunization_1.default.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+//family planning
+function readfamilyaggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield familyplanning_1.default.aggregate(input);
         }
         catch (e) {
             console.log(e);

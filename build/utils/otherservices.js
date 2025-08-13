@@ -53,15 +53,19 @@ exports.validateinputyesno = validateinputyesno;
 exports.validateinputfornumber = validateinputfornumber;
 exports.uploaddocument = uploaddocument;
 exports.convertexceltojson = convertexceltojson;
-const promises_1 = __importDefault(require("fs/promises"));
-const { v4: uuidv4 } = require('uuid');
+exports.parseDate = parseDate;
+exports.isValidPhoneNumber = isValidPhoneNumber;
+exports.calculateAmountPaidByHMO = calculateAmountPaidByHMO;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const moment_1 = __importDefault(require("moment"));
+const convert_excel_to_json_1 = __importDefault(require("convert-excel-to-json"));
+const promises_1 = __importDefault(require("fs/promises"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
-const config_1 = __importDefault(require("../config"));
 const path = __importStar(require("path"));
-const convert_excel_to_json_1 = __importDefault(require("convert-excel-to-json"));
+const config_1 = __importDefault(require("../config"));
 const patientmanagement_1 = require("../dao/patientmanagement");
+const { v4: uuidv4 } = require('uuid');
 var encrypt = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -88,8 +92,8 @@ var isValidPassword = function (newPassword, currentpassword) {
 };
 exports.isValidPassword = isValidPassword;
 var sendTokenResponse = (user) => {
-    const { firstName, lastName, role, staffId, email, clinic, _id, roleId } = user;
-    const token = jsonwebtoken_1.default.sign({ user: { firstName, lastName, role, staffId, email, clinic, _id, roleId } }, process.env.KEYGEN, { expiresIn: "1d" });
+    const { firstName, lastName, role, staffId, email, clinic, _id, roleId, specialPermissions } = user;
+    const token = jsonwebtoken_1.default.sign({ user: { firstName, lastName, role, staffId, email, clinic, _id, roleId, permissions: specialPermissions } }, process.env.KEYGEN, { expiresIn: "1d" });
     const options = {
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
@@ -246,3 +250,20 @@ const isObjectAvailable = (objectName) => {
     return Object.keys(objectName).length >= 0 && objectName.constructor === Object;
 };
 exports.isObjectAvailable = isObjectAvailable;
+function parseDate(input) {
+    if (!input || typeof input !== "string")
+        return null;
+    const m = (0, moment_1.default)(input, "DD/MM/YYYY", true); // strict parsing
+    return m.isValid() ? m.toDate() : null;
+}
+function isValidPhoneNumber(phoneNumber) {
+    if (!phoneNumber || typeof phoneNumber === 'string') {
+        return false;
+    }
+    const phoneNumberRegex = /^(\+?234|0)(70|80|81|90|91)\d{8}$/;
+    return phoneNumberRegex.test(phoneNumber);
+}
+function calculateAmountPaidByHMO(hmoCoveragePercentage, totalAmount) {
+    const patientResponsibility = (100 - hmoCoveragePercentage) / 100;
+    return patientResponsibility * totalAmount;
+}

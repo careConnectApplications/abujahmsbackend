@@ -103,7 +103,10 @@ function getallreferedfortheatreadmission(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { theatre } = req.params;
-            const referedtheatre = new ObjectId(theatre);
+            let referedtheatre;
+            if (theatre) {
+                referedtheatre = new ObjectId(theatre);
+            }
             const queryresult = yield (0, theatreadmission_1.readallthearteadmission)({ referedtheatre }, {}, 'referedtheatre', 'patient', 'conscent');
             res.status(200).json({
                 queryresult,

@@ -20,6 +20,7 @@ import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 import Histopathology from "../../models/histopathology";
 import { uploadbase64image } from "../../utils/otherservices";
+import { calculateAmountPaidByHMO } from "../../utils/otherservices";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -46,7 +47,6 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         imageBase64,
         nameofexplainer,
         nameofrepresentive,
-        conscentdate,
         addressofrepresentaive,
         fullnameofwitness
     } = req.body;
@@ -75,11 +75,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     const { firstName, lastName, _id: userId } = (req.user).user;
 
     ///Step 2: Read the Appointment and populate the patient field.
-    const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+    const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
+    var hmopercentagecover = foundPatient?.insurance?.hmopercentagecover ?? 0;
 
     let fileName;
     if (imageBase64) fileName = await uploadbase64image(imageBase64);
@@ -98,8 +99,8 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         if (!testPrice) {
             return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
-
-        const serviceAmount = testPrice.amount;
+        const serviceAmount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+        //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
 
         //const refNumber = generateRefNumber();

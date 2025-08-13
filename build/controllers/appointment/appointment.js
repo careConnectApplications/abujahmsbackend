@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readallvitalchartByAppointment = exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedulesoptimized = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.getAllSchedulesoptimized = exports.scheduleappointment = void 0;
+exports.countPatientsPerDoctor = exports.getDoctorsByClinic = exports.assignDoctorToAppointment = exports.readallvitalchartByAppointment = exports.getAllVtalsByPatient = exports.laborder = exports.examinepatient = exports.getAllPaidQueueSchedules = exports.getAllPaidSchedulesByPatient = exports.getAllPaidSchedulesoptimized = exports.getAllPaidSchedules = exports.getAllInProgressClinicalEncounter = exports.getAllInProgressEncounter = exports.getAllCompletedEncounter = exports.getAllCompletedClinicalEncounter = exports.getAllPreviousClininicalEncounter = exports.getAllPreviousEncounter = exports.getAllSchedulesByPatient = exports.getAllSchedules = exports.getAllSchedulesoptimized = exports.scheduleappointment = void 0;
 exports.updateappointments = updateappointments;
 exports.addclinicalencounter = addclinicalencounter;
 exports.addencounter = addencounter;
@@ -21,9 +21,10 @@ const admissions_1 = require("../../dao/admissions");
 const vitalcharts_1 = require("../../dao/vitalcharts");
 const vitalcharts_2 = require("../../dao/vitalcharts");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const servicetype_1 = require("../../dao/servicetype");
+const hmomanagement_1 = require("../../dao/hmomanagement");
 const users_1 = require("../../dao/users");
 const price_1 = require("../../dao/price");
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const payment_1 = require("../../dao/payment");
 const mongoose_1 = __importDefault(require("mongoose"));
 //import {createvital} from "../../dao/vitals";
@@ -34,6 +35,7 @@ const { ObjectId } = mongoose_1.default.Types;
 //add vitals for 
 // Create a new schedule
 const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         //req.body.appointmentdate=new Date(req.body.appointmentdate);
         var appointmentid = String(Date.now());
@@ -42,33 +44,37 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         (0, otherservices_1.validateinputfaulsyvalue)({ clinic, appointmentdate, appointmentcategory, appointmenttype, patient });
         //pending
         //validatioborder
-        var selectquery = { "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-            "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1 };
+        var selectquery = {
+            "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+            "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+        };
         //search patient if available and por
-        const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, selectquery, '', '');
+        const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, selectquery, 'insurance', '');
         // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
         if (!patientrecord) {
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
         }
         var { firstName, lastName, MRN, HMOId, HMOName } = patientrecord;
         //search for price if available
-        var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype, isHMOCover: config_1.default.ishmo[0] });
-        if (patientrecord.isHMOCover == config_1.default.ishmo[0] && !appointmentPrice) {
+        var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
+        if (!appointmentPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
+        var hmopercentagecover = (_b = (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+        var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(appointmentPrice.amount));
         //create appointment
         //create payment
         let createpaymentqueryresult;
         let queryresult;
-        if (patientrecord.isHMOCover == config_1.default.ishmo[1]) {
+        if (amount == 0) {
             let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
-            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
+            queryresult = yield (0, appointment_1.createappointment)({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { appointment: queryresult._id } });
         }
-        else {
-            createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.firstName, lastName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.lastName, MRN: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.MRN, phoneNumber: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount: Number(appointmentPrice.amount) });
+        else if (amount > 0) {
+            createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.firstName, lastName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.lastName, MRN: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.MRN, phoneNumber: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount });
             let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
-            queryresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
+            queryresult = yield (0, appointment_1.createappointment)({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
             //create vitals
             yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
         }
@@ -104,16 +110,6 @@ const getAllSchedulesoptimized = (req, res) => __awaiter(void 0, void 0, void 0,
         if (appointmenttype) {
             filter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
         }
-        /*
-          if(status == "paid"){
-            otherfilter.status=configuration.status[3]
-         
-             }
-             else{
-              otherfilter.status=configuration.status[5];
-         
-             }
-              */
         const referencegroup = [
             //look up patient
             //add query
@@ -122,7 +118,8 @@ const getAllSchedulesoptimized = (req, res) => __awaiter(void 0, void 0, void 0,
             },
             {
                 $project: {
-                    _id: 0,
+                    _id: 1,
+                    doctorassigment: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     appointmenttype: 1,
@@ -367,7 +364,7 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
                 } // Deconstruct the patient array (from the lookup)
             },
             {
-                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }] } // Filter payment
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { amount: 0 }] } // Filter payment
             }
         ];
         const queryresult = yield (0, appointment_1.modifiedreadallappointment)({ clinic }, aggregatequery);
@@ -386,256 +383,27 @@ const getAllPaidSchedules = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.getAllPaidSchedules = getAllPaidSchedules;
 const getAllPaidSchedulesoptimized = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { _id } = (req.user).user;
+        //doctor
+        //for nursings 
+        // Get today's date
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0); // Set the time to 00:00:00
+        // Get the start of tomorrow to set the range for "today"
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setHours(23, 59, 59, 999);
         //const {clinic} = (req.user).user;
         const { clinic } = req.params;
         var { status, firstName, MRN, HMOId, lastName, phoneNumber } = req.query;
         var page = parseInt(req.query.page) || 1;
         var size = parseInt(req.query.size) || 150;
         // var statusfilter:any =status?{status,clinic}:{clinic};
-        /*
-        var filter:any = {};
-            var statusfilter:any =status?{status,clinic}:{clinic};
-            // Add filters based on query parameters
-            if (firstName) {
-              filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
-            }
-            if(MRN) {
-              filter.MRN = new RegExp(MRN, 'i');
-            }
-            if (HMOId) {
-              filter.HMOId = new RegExp(HMOId, 'i'); // Case-insensitive search for email
-            }
-            if (lastName) {
-              filter.lastName = new RegExp(lastName, 'i'); // Case-insensitive search for email
-            }
-            if (phoneNumber) {
-              filter.phoneNumber = new RegExp(phoneNumber, 'i'); // Case-insensitive search for email
-            }
-          
-        */
         // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
-        let aggregatequery = [
-            /*
+        let aggregatequery = (req.query.status == "today_queue") ? [
             {
-              $match:statusfilter
-             },
-            {
-            $lookup: {
-              from: 'payments',
-              localField: 'payment',
-              foreignField: '_id',
-              as: 'payment'
-            }
-          },
-          {
-            $lookup: {
-              from: 'patientsmanagements',
-              localField: 'patient',
-              foreignField: '_id',
-              as: 'patient'
-            }
-          },
-          {
-            $lookup: {
-              from: 'users',
-              localField: 'doctor',
-              foreignField: '_id',
-              as: 'doctor'
-            }
-          },
-          {
-            $lookup: {
-              from: 'vitalcharts',
-              localField: 'vitals',
-              foreignField: '_id',
-              as: 'vitals'
-            }
-          },
-          //vitals
-          {
-            $unwind:{
-              path:'$payment' , // Deconstruct the payment array (from the lookup)
-            preserveNullAndEmptyArrays: true
-            }
-          },
-          {
-            $unwind: {
-              path: '$patient',
-              preserveNullAndEmptyArrays: true
-      
-            }  // Deconstruct the patient array (from the lookup)
-          },
-          {
-            $unwind: {
-              path: '$vitals',
-              preserveNullAndEmptyArrays: true
-      
-            }  // Deconstruct the patient array (from the lookup)
-          },
-         
-          {
-            $match: { $or:[{'payment.status': configuration.status[3]},{'patient.isHMOCover':configuration.ishmo[1]}] }  // Filter payment
-          },
-          {
-            $project:{
-              _id:1,
-              createdAt:1,
-              reason:1,
-              updatedAt:1,
-              appointmenttype:1,
-              appointmentdate:1,
-              clinic:1,
-              appointmentcategory:1,
-              firstName:"$patient.firstName",
-              lastName:"$patient.lastName",
-              phoneNumber:"$patient.phoneNumber",
-              MRN:"$patient.MRN",
-              patient:"$patient",
-              vitals:1,
-              HMOId:"$patient.HMOId",
-              HMOName:"$patient.HMOName",
-              vitalstatus:"$vitals.status",
-              status:1,
-              paymentstatus:"$payment.status",
-              paymentreference:"$payment.paymentreference",
-              doctorsfirstName:"$doctor.firstName",
-              doctorslastName:"$doctor.lastName"
-            }
-          },
-          {
-            $match:filter
-          },
-          */
-            { $match: Object.assign({ clinic }, (status && { status })) },
-            {
-                $lookup: {
-                    from: 'patientsmanagements',
-                    localField: 'patient',
-                    foreignField: '_id',
-                    as: 'patient'
-                }
-            },
-            { $unwind: '$patient' },
-            {
-                $match: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {})), (MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {})), (HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {})), (lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {})), (phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}))
-            },
-            /*
-              {
-                $lookup: {
-                  from: 'patientsmanagements',
-                  let: { patientId: '$patient' },
-                  pipeline: [
-                    {
-                      $match: {
-                        $expr: { $eq: ['$_id', '$$patientId'] },
-                        ...(firstName ? { firstName: new RegExp(firstName, 'i') } : {}),
-                        ...(MRN ? { MRN: new RegExp(MRN, 'i') } : {}),
-                        ...(HMOId ? { HMOId: new RegExp(HMOId, 'i') } : {}),
-                        ...(lastName ? { lastName: new RegExp(lastName, 'i') } : {}),
-                        ...(phoneNumber ? { phoneNumber: new RegExp(phoneNumber, 'i') } : {}),
-                      }
-                    }
-                  ],
-                  as: 'patient'
-                }
-              },
-              */
-            //{ $unwind: { path: '$patient', preserveNullAndEmptyArrays: false } },
-            // Repeat lookup structure for payments, doctor, vitals (but skip if not needed)
-            {
-                $lookup: {
-                    from: 'payments',
-                    localField: 'payment',
-                    foreignField: '_id',
-                    as: 'payment'
-                }
-            },
-            { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
-            {
-                $match: {
-                    $or: [
-                        { 'payment.status': config_1.default.status[3] },
-                        { 'patient.isHMOCover': config_1.default.ishmo[1] }
-                    ]
-                }
+                $match: { doctor: new ObjectId(_id), status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } } // Filter payment
             },
             {
-                $lookup: {
-                    from: 'vitalcharts',
-                    localField: 'vitals',
-                    foreignField: '_id',
-                    as: 'vitals'
-                }
-            },
-            {
-                $unwind: {
-                    path: '$vitals',
-                    preserveNullAndEmptyArrays: true
-                } // Deconstruct the patient array (from the lookup)
-            },
-            {
-                $project: {
-                    _id: 1,
-                    createdAt: 1,
-                    reason: 1,
-                    updatedAt: 1,
-                    appointmenttype: 1,
-                    appointmentdate: 1,
-                    clinic: 1,
-                    appointmentcategory: 1,
-                    //patient:{ $arrayElemAt: ["$patient", 0] },
-                    patient: 1,
-                    vitals: 1,
-                    vitalstatus: "$vitals.status",
-                    status: 1,
-                    //doctorsfirstName:"$doctor.firstName",
-                    //doctorslastName:"$doctor.lastName"
-                }
-            },
-            { $sort: { createdAt: -1 } },
-        ];
-        const queryresult = yield (0, appointment_1.optimizedreadallappointment)(aggregatequery, page, size);
-        //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
-        //'payment.status':configuration.status[3]
-        res.status(200).json({
-            queryresult,
-            status: true
-        });
-    }
-    catch (error) {
-        res.status(403).json({ status: false, msg: error.message });
-    }
-});
-exports.getAllPaidSchedulesoptimized = getAllPaidSchedulesoptimized;
-//get schedule by single patient
-const getAllPaidSchedulesByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // const {clinic} = (req.user).user;
-        const { id } = req.params;
-        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
-        res.status(200).json({
-            queryresult,
-            status: true
-        });
-    }
-    catch (error) {
-        res.status(403).json({ status: false, msg: error.message });
-    }
-});
-exports.getAllPaidSchedulesByPatient = getAllPaidSchedulesByPatient;
-//queue
-//get all patient with paid schduled
-const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // Get today's date
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0); // Set the time to 00:00:00
-        // Get the start of tomorrow to set the range for "today"
-        const endOfDay = new Date(startOfDay);
-        endOfDay.setHours(23, 59, 59, 999); // Set the time to 23:59:59  
-        //const {clinic} = (req.user).user;
-        const { clinic } = req.params;
-        let aggregatequery = [{
                 $lookup: {
                     from: 'payments',
                     localField: 'payment',
@@ -686,12 +454,217 @@ const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0,
                 } // Deconstruct the patient array (from the lookup)
             },
             {
-                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { 'patient.isHMOCover': config_1.default.ishmo[1] }], status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } } // Filter payment
-                //$match: { 'patient.isHMOCover':configuration.ishmo[1], status:configuration.status[5],clinic,appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { amount: 0 }] } // Filter payment
             },
             {
                 $project: {
                     _id: 1,
+                    doctorassigment: 1,
+                    createdAt: 1,
+                    appointmentid: 1,
+                    admission: 1,
+                    doctor: 1,
+                    reason: 1,
+                    updatedAt: 1,
+                    appointmenttype: 1,
+                    appointmentdate: 1,
+                    clinic: 1,
+                    patient: 1,
+                    firstName: "$patient.firstName",
+                    lastName: "$patient.lastName",
+                    MRN: "$patient.MRN",
+                    HMOId: "$patient.HMOId",
+                    HMOName: "$patient.HMOName",
+                    appointmentcategory: 1,
+                    vitalstatus: "$vitals.status",
+                    vitals: 1,
+                    clinicalencounter: 1,
+                    status: 1,
+                    payment: "$payment",
+                    policecase: 1,
+                    physicalassault: 1,
+                    sexualassault: 1,
+                    policaename: 1,
+                    servicenumber: 1,
+                    policephonenumber: 1,
+                }
+            },
+            { $sort: { createdAt: 1 } },
+        ] :
+            [
+                { $match: Object.assign({ clinic }, (status && { status })) },
+                {
+                    $lookup: {
+                        from: 'patientsmanagements',
+                        localField: 'patient',
+                        foreignField: '_id',
+                        as: 'patient'
+                    }
+                },
+                { $unwind: '$patient' },
+                {
+                    $match: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (firstName ? { 'patient.firstName': new RegExp(firstName, 'i') } : {})), (MRN ? { 'patient.MRN': new RegExp(MRN, 'i') } : {})), (HMOId ? { 'patient.HMOId': new RegExp(HMOId, 'i') } : {})), (lastName ? { 'patient.lastName': new RegExp(lastName, 'i') } : {})), (phoneNumber ? { 'patient.phoneNumber': new RegExp(phoneNumber, 'i') } : {}))
+                },
+                // Repeat lookup structure for payments, doctor, vitals (but skip if not needed)
+                {
+                    $lookup: {
+                        from: 'payments',
+                        localField: 'payment',
+                        foreignField: '_id',
+                        as: 'payment'
+                    }
+                },
+                { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
+                {
+                    $match: {
+                        $or: [
+                            { 'payment.status': config_1.default.status[3] },
+                            { amount: 0 }
+                        ]
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'vitalcharts',
+                        localField: 'vitals',
+                        foreignField: '_id',
+                        as: 'vitals'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$vitals',
+                        preserveNullAndEmptyArrays: true
+                    } // Deconstruct the patient array (from the lookup)
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        doctorassigment: 1,
+                        createdAt: 1,
+                        reason: 1,
+                        updatedAt: 1,
+                        appointmenttype: 1,
+                        appointmentdate: 1,
+                        clinic: 1,
+                        appointmentcategory: 1,
+                        //patient:{ $arrayElemAt: ["$patient", 0] },
+                        patient: 1,
+                        vitals: 1,
+                        vitalstatus: "$vitals.status",
+                        status: 1,
+                        //doctorsfirstName:"$doctor.firstName",
+                        //doctorslastName:"$doctor.lastName"
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+            ];
+        const queryresult = yield (0, appointment_1.optimizedreadallappointment)(aggregatequery, page, size);
+        //const queryresult = await readallappointment({clinic},{},'patient','doctor',{path:'payment', match: { status: { $eq: configuration.status[3] } },});
+        //'payment.status':configuration.status[3]
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllPaidSchedulesoptimized = getAllPaidSchedulesoptimized;
+//get schedule by single patient
+const getAllPaidSchedulesByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const {clinic} = (req.user).user;
+        const { id } = req.params;
+        const queryresult = yield (0, appointment_1.readallappointment)({ patient: id, $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }] }, {}, 'patient', 'doctor', 'payment', '', '', '', '', '', '');
+        res.status(200).json({
+            queryresult,
+            status: true
+        });
+    }
+    catch (error) {
+        res.status(403).json({ status: false, msg: error.message });
+    }
+});
+exports.getAllPaidSchedulesByPatient = getAllPaidSchedulesByPatient;
+//queue
+//get all patient with paid schduled
+const getAllPaidQueueSchedules = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //for doctors show only patient assigned to them
+        const { _id } = (req.user).user;
+        //doctor
+        //for nursings 
+        // Get today's date
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0); // Set the time to 00:00:00
+        // Get the start of tomorrow to set the range for "today"
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setHours(23, 59, 59, 999); // Set the time to 23:59:59  
+        //const {clinic} = (req.user).user;
+        const { clinic } = req.params;
+        let aggregatequery = [
+            {
+                $match: { doctor: new ObjectId(_id), status: config_1.default.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } } // Filter payment
+            },
+            {
+                $lookup: {
+                    from: 'payments',
+                    localField: 'payment',
+                    foreignField: '_id',
+                    as: 'payment'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'patientsmanagements',
+                    localField: 'patient',
+                    foreignField: '_id',
+                    as: 'patient'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'doctor',
+                    foreignField: '_id',
+                    as: 'doctor'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'vitalcharts',
+                    localField: 'vitals',
+                    foreignField: '_id',
+                    as: 'vitals'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$payment',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the payment array (from the lookup)
+            },
+            {
+                $unwind: {
+                    path: '$vitals',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the payment array (from the lookup)
+            },
+            {
+                $unwind: {
+                    path: '$patient',
+                    preserveNullAndEmptyArrays: true
+                } // Deconstruct the patient array (from the lookup)
+            },
+            {
+                $match: { $or: [{ 'payment.status': config_1.default.status[3] }, { amount: 0 }] } // Filter payment
+            },
+            {
+                $project: {
+                    _id: 1,
+                    doctorassigment: 1,
                     createdAt: 1,
                     appointmentid: 1,
                     admission: 1,
@@ -758,25 +731,27 @@ var examinepatient = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.examinepatient = examinepatient;
 //lab order
 var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
     try {
         //accept _id from request.
         const { id } = req.params;
-        console.log('////lab order request body////', req.body);
-        console.log('////lab order request params////', id);
-        const { testname, appointmentunderscoreid, department } = req.body;
+        const { testname, appointmentunderscoreid, department, note, priority } = req.body;
         var testid = String(Date.now());
         var testsid = [];
         //var paymentids =[];
         (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, department });
         //find the record in appointment and validate
         //find patient
-        const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
+        const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, 'insurance', '');
         // check is patient is under inssurance
         //var isHMOCover;
         // Create a new ObjectId
         var appointment;
         let patientappointment;
+        var hmopercentagecover;
+        //insurance
         if (foundPatient) {
+            hmopercentagecover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
             patientappointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentunderscoreid }, {}, 'patient');
             appointment = {
                 patient: id,
@@ -792,35 +767,20 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 //create an appointment
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
-            //update appoint with lab order
-            //  isHMOCover = appointment.patient.isHMOCover;
+            //read insurance
+            let insurance = yield (0, hmomanagement_1.readonehmomanagement)({ _id: appointment.patient.insurance }, { hmopercentagecover: 1 });
+            hmopercentagecover = (_c = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
         }
-        //console.log(testname);
-        const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[2] }, { type: 1, category: 1, department: 1, _id: 0 });
-        //loop through all test and create record in lab order
         for (var i = 0; i < testname.length; i++) {
             //    console.log(testname[i]);
             //console.log(isHMOCover);
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i], isHMOCover: config_1.default.ishmo[0] });
-            console.log("oks");
-            if (((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] || (appointment.patient).isHMOCover == config_1.default.ishmo[0]) && !testPrice) {
+            var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i] });
+            if ((testPrice === null || testPrice === void 0 ? void 0 : testPrice.amount) == null) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
-            //var setting  = await configuration.settings();
-            //search testname in setting
-            //var testsetting = servicetypedetails.filter(item => (item.type).includes(testname[i]));
-            //create payment
-            //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-            //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:configuration.category[2],patient:appointment.patient,amount:Number(testPrice.amount)})
+            let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create testrecord
-            let testrecord;
-            //var testrecord = await createlab({testname:testname[i],patient:appointment.patient,appointment:appointment._id,payment:createpaymentqueryresult._id,appointmentid:appointment.appointmentid,testid,department:testsetting[0].department});
-            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] || (appointment.patient).isHMOCover == config_1.default.ishmo[0]) {
-                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount: Number(testPrice.amount) });
-            }
-            else {
-                testrecord = yield (0, lab_1.createlab)({ testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department });
-            }
+            let testrecord = yield (0, lab_1.createlab)({ note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount });
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -869,7 +829,7 @@ function addclinicalencounter(req, res) {
                 queryresult = yield (0, appointment_1.updateappointment)(id, { clinicalencounter, status, doctor: user === null || user === void 0 ? void 0 : user._id, admission: checkadimmison._id, patient: checkadimmison.patient, fromclinicalencounter: true });
             }
             else {
-                queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, doctor: user === null || user === void 0 ? void 0 : user._id, doctorsfirstName: user === null || user === void 0 ? void 0 : user.firstName, doctorslastName: user === null || user === void 0 ? void 0 : user.lastName, fromclinicalencounter: true });
+                queryresult = yield (0, appointment_1.updateappointmentbyquery)({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, fromclinicalencounter: true });
                 const { firstName, lastName } = (req.user).user;
                 req.body.staffname = `${firstName} ${lastName}`;
                 const { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname } = req.body;
@@ -1085,3 +1045,146 @@ const readallvitalchartByAppointment = (req, res) => __awaiter(void 0, void 0, v
     }
 });
 exports.readallvitalchartByAppointment = readallvitalchartByAppointment;
+exports.assignDoctorToAppointment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { appointmentId, doctorId } = req.body;
+    //change both to objectid
+    // Validate inputs
+    if (!appointmentId || !doctorId) {
+        throw new Error("Appointment ID and Doctor ID are required.");
+    }
+    var _appointmentId = new ObjectId(appointmentId);
+    var _doctorId = new ObjectId(doctorId);
+    // Find appointment
+    const appointment = yield (0, appointment_1.readoneappointment)({ _id: _appointmentId }, {}, 'patient');
+    if (!appointment) {
+        throw new Error("Appointment not found.");
+    }
+    console.log("appointment", appointment);
+    // Find doctor
+    const doctor = yield (0, users_1.readone)({ _id: _doctorId });
+    if (!doctor) {
+        throw new Error("Doctor not found.");
+    }
+    // Assign doctor
+    appointment.doctor = doctor._id;
+    appointment.doctorsfirstName = doctor.firstName;
+    appointment.doctorslastName = doctor.lastName;
+    appointment.doctorassigment = config_1.default.doctorassigment[1],
+        yield appointment.save();
+    res.status(200).json({
+        queryresult: appointment,
+        status: true
+    });
+}));
+// Get all doctors in a specific clinic
+exports.getDoctorsByClinic = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    /*const { clinic } = req.params;
+     // Validate inputs
+      if (!clinic) {
+         throw new Error("Clinic is required.");
+      }
+      const doctors = await readall({clinic: clinic,status:configuration.status[1],
+        roleId: configuration.roles[5].roleId});
+      
+  
+      res.status(200).json({
+        status: true,
+        queryresult:doctors
+      });
+      */
+    const { clinic } = req.params;
+    // Validate inputs
+    if (!clinic) {
+        throw new Error("Clinic is required.");
+    }
+    // Step 1: Get all doctors in the clinic
+    const { userdetails } = yield (0, users_1.readall)({
+        clinic: clinic,
+        status: config_1.default.status[1],
+        roleId: config_1.default.roles[5].roleId
+    });
+    console.log("userdetails", userdetails);
+    // Step 2: Define start and end of today
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(23, 59, 59, 999);
+    // Step 3: Query to count patients per doctor for today
+    const appointmentQuery = {
+        doctor: { $ne: null },
+        patient: { $ne: null },
+        status: config_1.default.status[5],
+        clinic,
+        appointmentdate: { $gte: startOfDay, $lt: endOfDay }
+    };
+    const countPatientsDoctorAggregate = [
+        { $match: appointmentQuery },
+        {
+            $group: {
+                _id: "$doctor",
+                uniquePatients: { $addToSet: "$patient" }
+            }
+        },
+        {
+            $project: {
+                doctor: "$_id",
+                _id: 0,
+                patientCount: { $size: "$uniquePatients" }
+            }
+        }
+    ];
+    const { appointmentdetails } = yield (0, appointment_1.modifiedreadallappointment)(appointmentQuery, countPatientsDoctorAggregate);
+    console.log("appointmentdetails", appointmentdetails);
+    // Step 4: Merge counts with doctor list
+    const doctorListWithCounts = userdetails.map((doc) => {
+        var _a;
+        const countObj = appointmentdetails.find((p) => String(p.doctor) === String(doc._id));
+        return Object.assign(Object.assign({}, ((_a = doc.toObject) === null || _a === void 0 ? void 0 : _a.call(doc)) || doc), { patientCountToday: countObj ? countObj.patientCount : 0 });
+    });
+    // Step 5: Send response
+    res.status(200).json({
+        status: true,
+        queryresult: doctorListWithCounts
+    });
+}));
+//count number of patient assigment to each doctor
+// controllers/appointmentController.ts
+exports.countPatientsPerDoctor = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0); // Set the time to 00:00:00
+    // Get the start of tomorrow to set the range for "today"
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(23, 59, 59, 999); // Set the time to 23:59:59  
+    //const {clinic} = (req.user).user;
+    const { clinic } = req.params;
+    const query = {
+        doctor: { $ne: null }, // Only include appointments with assigned doctors
+        patient: { $ne: null }, // Only include appointments with assigned patients
+        status: config_1.default.status[5],
+        clinic,
+        appointmentdate: { $gte: startOfDay, $lt: endOfDay }
+    };
+    const countpatientsdoctoraggregate = [
+        {
+            $match: query
+        },
+        {
+            $group: {
+                _id: "$doctor",
+                uniquePatients: { $addToSet: "$patient" }
+            }
+        },
+        {
+            $project: {
+                doctor: "$_id",
+                _id: 0,
+                patientCount: { $size: "$uniquePatients" }
+            }
+        }
+    ];
+    const queryresult = yield (0, appointment_1.modifiedreadallappointment)(query, countpatientsdoctoraggregate);
+    res.status(200).json({
+        status: true,
+        queryresult
+    });
+}));

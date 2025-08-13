@@ -15,6 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../config"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const clinicalInformationSchema = new mongoose_1.Schema({
+    bloodGroup: { type: String, trim: true },
+    genotype: { type: String, trim: true },
+    bp: { type: String, trim: true },
+    heartRate: { type: String, trim: true },
+    temperature: { type: String, trim: true },
+}, { timestamps: true });
+////// this is for abuja clinic
+const fluidBalanceSchema = new mongoose_1.Schema({
+    totalInput: { type: Number, default: 0 },
+    totalOutput: { type: Number, default: 0 },
+    balance: { type: Number, default: 0 },
+    createdBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+}, { timestamps: true });
 //create schema
 const patientSchema = new mongoose_1.Schema({
     title: {
@@ -63,7 +81,15 @@ const patientSchema = new mongoose_1.Schema({
         type: String,
     },
     phoneNumber: {
+        type: String
+    },
+    alternatePhoneNumber: {
         type: String,
+    },
+    insurance: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Hmomanagement",
+        default: null,
     },
     email: {
         type: String,
@@ -158,6 +184,10 @@ const patientSchema = new mongoose_1.Schema({
             default: [],
         },
     ],
+    subscriptionPaidUntil: {
+        type: Date,
+        default: null
+    },
     status: {
         required: true,
         type: String,
@@ -169,7 +199,17 @@ const patientSchema = new mongoose_1.Schema({
             ref: "Payment",
             default: [],
         },
-    ]
+    ],
+    clinicalInformation: {
+        type: clinicalInformationSchema,
+        default: null
+    },
+    previouslyNotHmo: {
+        type: Boolean,
+        default: null
+    },
+    specialNeeds: { type: String, trim: true },
+    /// fluidBalance: { type: [fluidBalanceSchema], default: [] }
 }, { timestamps: true });
 patientSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -572,8 +572,9 @@ if(orderPrice.qty <=0){
 
 
 
-
-var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+  let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
+  var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+  var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
 let paymentreference; 
 //validate the status
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
