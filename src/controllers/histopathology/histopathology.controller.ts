@@ -19,7 +19,8 @@ import catchAsync from "../../utils/catchAsync";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 import Histopathology from "../../models/histopathology";
-import {calculateAmountPaidByHMO} from  "../../utils/otherservices";
+import { uploadbase64image } from "../../utils/otherservices";
+import { calculateAmountPaidByHMO } from "../../utils/otherservices";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -42,7 +43,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         biopsyType,
         wholeOrgan,
         previousBiopsy,
-        diagnosis
+        diagnosis,
+        imageBase64,
+        nameofexplainer,
+        nameofrepresentive,
+        addressofrepresentaive,
+        fullnameofwitness
     } = req.body;
 
     // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
@@ -61,17 +67,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
 
-    // let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
-    // if (!appointment) {
-    //     return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
-    // }
 
     // check if patient still has a pending record
     let pendingHistopathologyRecord = await queryHistopathologyRecord({ patient: _patientId, status: configuration.status[2] }, null, null);
     if (pendingHistopathologyRecord) return next(new ApiError(400, "this patient still has a pending histopathology record"))
 
     const { firstName, lastName, _id: userId } = (req.user).user;
-    const raiseby = `${firstName} ${lastName}`;
 
     ///Step 2: Read the Appointment and populate the patient field.
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
@@ -79,14 +80,17 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
-    var hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
-    
+    var hmopercentagecover = foundPatient?.insurance?.hmopercentagecover ?? 0;
+
+    let fileName;
+    if (imageBase64) fileName = await uploadbase64image(imageBase64);
+
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
 
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
     const createdPayments = [];
-     const refNumber = generateRefNumber();
+    const refNumber = generateRefNumber();
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
 
@@ -95,21 +99,21 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         if (!testPrice) {
             return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
-        const serviceAmount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+        const serviceAmount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
         //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
 
         //const refNumber = generateRefNumber();
-        
+
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
             paymentcategory: configuration.category[6], // Histopathology category
             patient: _patientId,
-            firstName:foundPatient?.firstName,
-            lastName:foundPatient?.lastName,
-            MRN:foundPatient?.MRN,
-            phoneNumber:foundPatient?.phoneNumber,
+            firstName: foundPatient?.firstName,
+            lastName: foundPatient?.lastName,
+            MRN: foundPatient?.MRN,
+            phoneNumber: foundPatient?.phoneNumber,
             amount: Number(serviceAmount)
         }
 
@@ -123,7 +127,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     }
 
     for (let i = 0; i < createdPayments.length; i++) {
-      
+
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
@@ -148,6 +152,14 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
             requestingDoctor: _doctorId,
             phoneNumber: foundPatient.phoneNumber || null
         },
+        consentForm: {
+            nameofexplainer,
+            nameofrepresentive,
+            filename: fileName,
+            addressofrepresentaive,
+            fullnameofwitness,
+            createdBy: userId
+        }
 
     };
 
@@ -353,7 +365,7 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
                     status: "$testPayment.status",
                     paymentCategory: "$testPayment.paymentcategory",
                     paymentType: "$testPayment.paymentype",
-                    cashierName:"$testPayment.cashiername",
+                    cashierName: "$testPayment.cashiername",
                     createdAt: "$testPayment.createdAt",
                 }
             }
