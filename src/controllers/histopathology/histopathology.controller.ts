@@ -388,3 +388,22 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
         },
     });
 });
+
+
+export const getHistopathologyRecordByPatientId = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+
+    const doc = await getAllHistopathologyRecords({ patient: id });
+
+    if (!doc) {
+        return next(new ApiError(404, `histopathology report ${configuration.error.errornotfound}`))
+    }
+
+    res.status(200).json({
+        status: true,
+        data: doc
+    })
+});

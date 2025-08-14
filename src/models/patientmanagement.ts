@@ -85,10 +85,10 @@ const patientSchema = new Schema(
     alternatePhoneNumber: {
       type: String,
     },
-    insurance:{
-       type: Schema.Types.ObjectId,
-    ref: "Hmomanagement",
-    default: null,
+    insurance: {
+      type: Schema.Types.ObjectId,
+      ref: "Hmomanagement",
+      default: null,
 
     },
     email: {
@@ -191,6 +191,10 @@ const patientSchema = new Schema(
     ],
     subscriptionPaidUntil: {
       type: Date,
+      default: null
+    },
+    subscriptionExpired: {
+      type: Boolean,
       default: null
     },
     status: {

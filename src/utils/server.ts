@@ -64,6 +64,12 @@ function createServer() {
       createParentPath: true,
   }));
   */
+
+  /****
+   * Cron Jobs
+   */
+  import("../jobs/checkExpiredSubscriptionDate.job");
+  
   app.use(fileUpload());
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
