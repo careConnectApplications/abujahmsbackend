@@ -5,6 +5,7 @@ import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import {readonehmomanagement} from "../../dao/hmomanagement";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { readallservicetype } from "../../dao/servicetype";
 import { readone,readall } from "../../dao/users";
 import { readoneprice } from "../../dao/price";
@@ -800,7 +801,8 @@ export var laborder = async (req: any, res: any) => {
     
     //insurance
     if (foundPatient) {
-      hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
+      let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance._id, category:configuration.category[2]},{hmopercentagecover:1});
+      hmopercentagecover=insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
         patient: id,
@@ -820,8 +822,7 @@ export var laborder = async (req: any, res: any) => {
 
       }
       //read insurance
-      let insurance:any = await readonehmomanagement({_id:appointment.patient.insurance},{hmopercentagecover:1});
-    
+      let insurance:any = await readonehmocategorycover({hmoId:appointment.patient.insurance, category:configuration.category[2]},{hmopercentagecover:1});
       hmopercentagecover=insurance?.hmopercentagecover ?? 0;
 
      

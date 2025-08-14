@@ -2,7 +2,7 @@ import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
-  //wardname
+  //wardnames
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
@@ -68,6 +68,7 @@ const configuration: any = {
     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
   defaultphonenumber: "11111111111",
   status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+  otherstatus:["awaiting authorization"],
   doctorassigment:["unassigned", "assigned"],
   hematologyandchemicalpathologystatus:["hemathologyscheduled","chemicalpathologyscheduled","hemathologyprocessed","chemicalpathologyprocessed"],
   admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],

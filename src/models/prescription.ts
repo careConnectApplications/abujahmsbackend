@@ -41,7 +41,7 @@ const prescriptionSchema = new Schema({
     type: String, 
     required: true
   },
-  
+  amount:Number,
   orderid:
   {
     type: String, 
