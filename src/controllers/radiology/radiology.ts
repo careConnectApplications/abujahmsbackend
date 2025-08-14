@@ -6,6 +6,7 @@ import { readallservicetype } from "../../dao/servicetype";
 import { createradiology, readallradiology, updateradiology, readoneradiology, optimizedreadallradiology } from "../../dao/radiology";
 import { readoneprice } from "../../dao/price";
 import { createpayment, updatepayment, readonepayment } from "../../dao/payment";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { readoneadmission } from "../../dao/admissions";
@@ -35,7 +36,8 @@ export var radiologyorder = async (req: any, res: any) => {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
     }
-    var hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
+    let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance._id, category:configuration.category[4]},{hmopercentagecover:1});
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
       appointmentid = new ObjectId(appointmentid);
@@ -357,12 +359,13 @@ export const confirmradiologyorder = async (req: any, res: any) => {
     const { option, remark } = req.body;
     const { id } = req.params;
     //search for the lab request
-    var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
+    //var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
     // if not radiology return error
 
-    const { testname, testid, patient, amount } = radiology;
+    //const { testname, testid, patient, amount } = radiology;
     //validate the status
     let queryresult;
+    /*
     let paymentreference;
     //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
     var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
@@ -383,10 +386,16 @@ export const confirmradiologyorder = async (req: any, res: any) => {
       queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
 
     }
-    else {
-      queryresult = await updateradiology({ _id: id }, { status: configuration.status[13], remark });
-
-    }
+    
+      */
+     if(option == true){
+          queryresult= await updateradiology({_id:id},{status:configuration.otherstatus[0],remark});
+    
+       }
+      else{
+        queryresult= await updateradiology({_id:id},{status:configuration.status[13],remark});
+    
+      }
     res.status(200).json({ queryresult, status: true });
     //if accept
     //accept or reject lab order

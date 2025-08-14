@@ -357,7 +357,7 @@ export const confirmlaborder = async (req:any, res:any) =>{
     const {option,remark} = req.body;
     const {id} = req.params;
   //search for the lab request
-  var lab:any =await readonelab({_id:id},{},'patient');
+  //var lab:any =await readonelab({_id:id},{},'patient');
   //const {testname, testid,patient,amount} = lab;
   //validate the status
   let queryresult;
@@ -391,6 +391,8 @@ else{
     queryresult= await updatelab({_id:id},{status:configuration.status[5],remark});
 
   }
+     
+
     */
    if(option == true){
       queryresult= await updatelab({_id:id},{status:configuration.otherstatus[0],remark});
