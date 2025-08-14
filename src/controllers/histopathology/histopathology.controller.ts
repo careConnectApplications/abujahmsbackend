@@ -396,7 +396,88 @@ export const getHistopathologyRecordByPatientId = catchAsync(async (req: Request
     if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
     if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
 
-    const doc = await getAllHistopathologyRecords({ patient: id });
+    //const doc = await getAllHistopathologyRecords({ patient: id });
+    const status = req.query.status;
+
+    const baseMatch: any = {};
+    if (status) {
+        baseMatch["testRequired.paymentStatus"] = status;
+    }
+
+    baseMatch["patientDetails._id"] = new mongoose.Types.ObjectId(id);
+
+    const doc = await Histopathology.aggregate([
+        { $unwind: "$testRequired" },
+        {
+            $lookup: {
+                from: "users",
+                localField: "staffInfo",
+                foreignField: "_id",
+                as: "staff"
+            }
+        },
+        { $unwind: { path: "$staff", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "patientsmanagements",
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientDetails"
+            }
+        },
+        { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $match: baseMatch
+        },
+        {
+            $lookup: {
+                from: "payments",
+                localField: "testRequired.PaymentRef",
+                foreignField: "_id",
+                as: "testPayment"
+            }
+        },
+        { $unwind: { path: "$testPayment", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 0,
+                histopathologyId: "$_id",
+                testName: "$testRequired.name",
+                testPaymentStatus: "$testRequired.paymentStatus",
+                testPaymentRef: "$testRequired.PaymentRef",
+                amount: "$amount",
+                status: "$status",
+                createdAt: "$createdAt",
+                diagnosisForm: "$diagnosisForm",
+                staff: {
+                    //name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    firstName: "$staff.firstName",
+                    lastName: "$staff.lastName",
+                    email: "$staff.email",
+                    staffId: "$staff.staffId",
+                    role: "$staff.role"
+                },
+                patient: {
+                    //name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    firstName: "$patientDetails.firstName",
+                    lastName: "$patientDetails.lastName",
+                    age: "$patientDetails.age",
+                    phone: "$patientDetails.phoneNumber",
+                    gender: "$patientDetails.gender",
+                    mrn: "$patientDetails.MRN"
+                },
+                paymentInfo: {
+                    amount: "$testPayment.amount",
+                    paymentReference: "$testPayment.paymentreference",
+                    status: "$testPayment.status",
+                    paymentCategory: "$testPayment.paymentcategory",
+                    paymentType: "$testPayment.paymentype",
+                    cashierName: "$testPayment.cashiername",
+                    createdAt: "$testPayment.createdAt",
+                }
+            }
+        }
+    ]);
 
     if (!doc) {
         return next(new ApiError(404, `histopathology report ${configuration.error.errornotfound}`))
