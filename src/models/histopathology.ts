@@ -6,21 +6,21 @@ import { paginate } from "../paginate";
 const consentFormSchema = new Schema({
     nameofexplainer: {
         type: String,
-        required: true,
+       // required: true,
     },
     filename: String,
     nameofrepresentive:
     {
         type: String,
-        required: true,
+       // required: true,
     },
     addressofrepresentaive: {
         type: String,
-        required: true,
+        //required: true,
     },
     fullnameofwitness: {
         type: String,
-        required: true,
+        //required: true,
     },
     createdBy: {
         type: Schema.Types.ObjectId,
