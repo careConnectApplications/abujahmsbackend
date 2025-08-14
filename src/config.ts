@@ -2,7 +2,7 @@ import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
-  //wardname
+  //wardnames
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],

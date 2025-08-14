@@ -8,6 +8,7 @@ import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate,optimizedreadprescriptionaggregate } from "../../dao/prescription";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
 import {readoneadmission} from  "../../dao/admissions";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
 
 const { ObjectId } = mongoose.Types;
 
@@ -125,7 +126,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
     var {products} = req.body;
     var orderid:any=String(Date.now());
     var pharcyorderid =[];
-    var paymentids =[];
+    //var paymentids =[];
       validateinputfaulsyvalue({id, products});
     //search patient
     var patient:any = await readonepatient({_id:id,status:configuration.status[1]},{},'insurance','');
@@ -152,10 +153,12 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
       if(!orderPrice){
         throw new Error(`${configuration.error.errornopriceset} ${drug}`);
     }
-    var hmopercentagecover=patient?.insurance?.hmopercentagecover ?? 0;
+    let insurance:any = await readonehmocategorycover({hmoId:patient?.insurance?._id, category:configuration.category[1]},{hmopercentagecover:1});
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
     var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
 
     //var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+    /*
     let paymentreference; 
     //validate the status
       //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
@@ -169,13 +172,16 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
     }
    
     var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+    */
+   
+      
     //create 
    // console.log("got here");
-    var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
+    var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.otherstatus[0],amount,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
     pharcyorderid.push(prescriptionrecord ._id);
-    paymentids.push(createpaymentqueryresult._id);
+    //paymentids.push(createpaymentqueryresult._id);
     }
-    var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
+    var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid}});
     res.status(200).json({queryresult, status: true});
   }
   
@@ -505,9 +511,10 @@ export const confirmpharmacygrouporder = async (req:any, res:any) =>{
         if(!orderPrice || orderPrice.amount == null){
           throw new Error(`${configuration.error.errornopriceset} ${prescription}`);
       }
-      let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
-       var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+      let insurance:any = await readonehmocategorycover({hmoId:patient.insurance, category:configuration.category[1]},{hmopercentagecover:1});
+      var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
       var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
+      /*
       let paymentreference; 
       //validate the status
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
@@ -525,9 +532,14 @@ export const confirmpharmacygrouporder = async (req:any, res:any) =>{
         await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
         
       }
+        */
+       if(option == true){
+          queryresult= await updateprescription(id,{dispensestatus:configuration.otherstatus[0],amount,remark});
+           
+      }
       else{
-        queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
-    
+          queryresult= await updateprescription(id,{dispensestatus:configuration.status[13],remark});
+           
       }
       
 
@@ -548,6 +560,7 @@ export const confirmpharmacyorder = async (req:any, res:any) =>{
   try{
     //extract option
     const {option,remark, qty} = req.body;
+     let queryresult;
     if(option == true){
     validateinputfaulsyvalue({qty});
     }
@@ -572,9 +585,11 @@ if(orderPrice.qty <=0){
 
 
 
-  let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
-  var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
-  var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
+ let insurance:any = await readonehmocategorycover({hmoId:patient?.insurance?._id, category:configuration.category[1]},{hmopercentagecover:1});
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+    var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
+
+  /*
 let paymentreference; 
 //validate the status
   //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
@@ -586,17 +601,24 @@ let paymentreference;
 else{
   paymentreference = orderid;
 }
-  let queryresult;
+  
+ 
   if(option == true){
     var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
   queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
     await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
     
   }
-  else{
-    queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
-
-  }
+  
+    */
+   if(option == true){
+          queryresult= await updateprescription(id,{dispensestatus:configuration.otherstatus[0],amount,remark});
+           
+      }
+      else{
+          queryresult= await updateprescription(id,{dispensestatus:configuration.status[13],remark});
+           
+      }
   res.status(200).json({queryresult, status: true});
     //if accept
 //accept or reject lab order
