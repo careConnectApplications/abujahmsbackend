@@ -146,6 +146,7 @@ export const readallscheduledlaboptimized = async (req:any, res:any) => {
           $project:{
             _id:1,
             createdAt:1,
+            testresult:1,
             testname:1,
             updatedAt:1,
             testid:1,

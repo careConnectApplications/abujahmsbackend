@@ -13,11 +13,11 @@ import { mail, generateRandomNumber, validateinputfaulsyvalue, uploaddocument, c
 import { createappointment } from "../../dao/appointment";
 import { createaudit } from "../../dao/audit";
 import { createpatient, createpatientifnotexit, readallpatient, readallpatientpaginated, readonepatient, updatepatient, updatepatientbyanyquery, updatepatientmanybyquery } from "../../dao/patientmanagement";
-
 import { readonepricemodel } from "../../dao/pricingmodel";
-
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
+import { createDeflateRaw } from "zlib";
 
 
 
@@ -274,8 +274,6 @@ export var createpatients = async (req: any, res: any) => {
     if (dateOfBirth) req.body.age = moment().diff(moment(dateOfBirth), 'years');
     //if not dateObirth but age calculate date of birth
     if (!dateOfBirth && req.body.age) req.body.dateOfBirth = moment().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
-    console.log(req.body);
-
     var selectquery = {
       "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
       "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
@@ -286,59 +284,33 @@ export var createpatients = async (req: any, res: any) => {
       throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
 
     }
-    //var settings =await configuration.settings();
-    //validate if price is set for patient registration
-    //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
-    // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
-    //console.log('appointmentprice', appointmentPrice);
-
+   
     var { isHMOCover } = req.body;
-    var newRegistrationPrice: any;
-
-    const foundPricingmodel: any = await readonepricemodel({ pricingtype: configuration.pricingtype[1] });
-
-    if (foundPricingmodel) {
-      const age = Number(req.body.age);
-      const isAdult = age >= 18;
-      const isChild = age < 18;
-      //check for error
-     
-
-      //confirm the type of pricing model
-      if (foundPricingmodel.exactnameofancclinic == clinic) {
-        newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: clinic });
-      }
-      else if (isAdult) {
-       
-        newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforadult, $options: 'i' } });
-      }
-      else if (isChild) {
-       
-        newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforchild, $options: 'i' } });
-
-      }
-      else {
-       
-        //return error
-        throw new Error(`${configuration.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}`);
-
-      }
-      //find pricing model
+      var [
+  newRegistrationPrice,
+  annualsubscriptionnewRegistrationPrice,
+  cardfeenewRegistrationPrice
+] = await Promise.all([
+  readoneprice({
+    servicecategory: configuration.category[3],
+    servicetype: configuration.category[3]
+  }),
+  readoneprice({
+    servicecategory: configuration.category[8],
+    servicetype: configuration.category[8]
+  }),
+  readoneprice({
+    servicecategory: configuration.category[9],
+    servicetype: configuration.category[9]
+  })
+]);
 
 
-    }
-    else {
-      newRegistrationPrice = await readoneprice({ servicecategory: configuration.category[3], servicetype: configuration.category[3] });
 
-    }
 
     //use age to calculate price
-
-   
-
-    if ( !newRegistrationPrice) {
-      console.log("second errror /////");
-      throw new Error(configuration.error.errornopriceset);
+    if ( !newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
+      throw new Error(`Price for ${configuration.category[3]}  or ${configuration.category[8]} or ${configuration.category[9]} is not set`);
 
     }
     const clinicalInformation = {
@@ -359,13 +331,34 @@ export var createpatients = async (req: any, res: any) => {
     let queryresult;
 
     let vitals:any; 
-    var hmopercentagecover=gethmo?.hmopercentagecover ?? 0;
+   const [insurance, annualsubscription, cardfee] = await Promise.all([
+  readonehmocategorycover(
+    { hmoId: gethmo?._id, category: configuration.category[3] },
+    { hmopercentagecover: 1 }
+  ),
+  readonehmocategorycover(
+    { hmoId: gethmo?._id, category: configuration.category[8] },
+    { hmopercentagecover: 1 }
+  ),
+  readonehmocategorycover(
+    { hmoId: gethmo?._id, category: configuration.category[9] },
+    { hmopercentagecover: 1 }
+  )
+]);
+
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+    var annualsubscriptionhmopercentagecover=annualsubscription?.hmopercentagecover ?? 0;
+    var cardfeehmopercentagecover=cardfee?.hmopercentagecover ?? 0;
     var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-     if (amount == 0) {
+     var annualsubscriptionamount =calculateAmountPaidByHMO(Number(annualsubscriptionhmopercentagecover), Number(annualsubscriptionnewRegistrationPrice.amount));
+      var cardfeeamountamount =calculateAmountPaidByHMO(Number(cardfeehmopercentagecover), Number(cardfeenewRegistrationPrice.amount));
+     //var annualsubscriptionamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
+      //var cardfeeamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
+     if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
       req.body.status = configuration.status[1];
      }
     const createpatientqueryresult = await createpatient(req.body);
-    if (amount == 0) {
+    if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
 
       if (appointmentdate) {
         queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
@@ -374,9 +367,52 @@ export var createpatients = async (req: any, res: any) => {
 
     }
     else {
-      const createpaymentqueryresult = await createpayment({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount })
+      //add year suscription fee
+      //add 
+      const [
+  createpaymentqueryresult,
+  annualsubscriptioncreatepaymentqueryresult,
+  cardfeecreatepaymentqueryresult
+] = await Promise.all([
+  createpayment({
+    firstName,
+    lastName,
+    MRN: req.body.MRN,
+    phoneNumber,
+    paymentreference: req.body.MRN,
+    paymentype: newRegistrationPrice.servicetype,
+    paymentcategory: newRegistrationPrice.servicecategory,
+    patient: createpatientqueryresult._id,
+    amount
+  }),
+  createpayment({
+    firstName,
+    lastName,
+    MRN: req.body.MRN,
+    phoneNumber,
+    paymentreference: req.body.MRN,
+    paymentype: annualsubscriptionnewRegistrationPrice.servicetype,
+    paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory,
+    patient: createpatientqueryresult._id,
+    amount:annualsubscriptionamount
+  }),
+  createpayment({
+    firstName,
+    lastName,
+    MRN: req.body.MRN,
+    phoneNumber,
+    paymentreference: req.body.MRN,
+    paymentype: cardfeenewRegistrationPrice.servicetype,
+    paymentcategory: cardfeenewRegistrationPrice.servicecategory,
+    patient: createpatientqueryresult._id,
+    amount:cardfeeamountamount
+  })
+]);
+
       // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
       payment.push(createpaymentqueryresult._id);
+      payment.push(annualsubscriptioncreatepaymentqueryresult._id);
+      payment.push(cardfeecreatepaymentqueryresult._id);
       //payment.push(createappointmentpaymentqueryresult._id);
       //update createpatientquery
       if (appointmentdate) {

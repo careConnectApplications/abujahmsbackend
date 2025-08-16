@@ -6,6 +6,8 @@ import {createaudit} from "../../dao/audit";
 import {readonepricemodel} from "../../dao/pricingmodel";
 import {readonepatient} from "../../dao/patientmanagement";
 import catchAsync from "../../utils/catchAsync";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
+
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    
@@ -196,7 +198,8 @@ export const getpriceofservice = catchAsync(async (req: Request | any, res: Resp
   }
 
   // Get HMO coverage percentage or default to 0
-  const hmoPercentageCover = foundPatient?.insurance?.hmopercentagecover ?? 0;
+  let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance?._id, category:price.servicecategory},{hmopercentagecover:1});
+  const hmoPercentageCover =insurance?.hmopercentagecover ?? 0;
 
   // Calculate patient amount
   const amount = calculateAmountPaidByHMO(

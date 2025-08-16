@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import configuration from "../../config";
-import { readoneappointment } from "../../dao/appointment";
+//import { readoneappointment } from "../../dao/appointment";
 import {
     CreateHistopatholgyDao,
     getHistopathologyById, getAllHistopathologyRecords,
@@ -21,6 +21,7 @@ import pick from "../../utils/pick";
 import Histopathology from "../../models/histopathology";
 import { uploadbase64image } from "../../utils/otherservices";
 import { calculateAmountPaidByHMO } from "../../utils/otherservices";
+import { readonehmocategorycover } from "../../dao/hmocategorycover";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -80,17 +81,23 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
-    var hmopercentagecover = foundPatient?.insurance?.hmopercentagecover ?? 0;
+let insurance: any = await readonehmocategorycover(
+  { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
+  { hmopercentagecover: 1 }
+);
+var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
 
-    let fileName;
-    if (imageBase64) fileName = await uploadbase64image(imageBase64);
+let fileName;
+if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
 
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
-    const createdPayments = [];
-    const refNumber = generateRefNumber();
+
+//    const createdPayments = [];
+  //   const refNumber = generateRefNumber();
+
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
 
@@ -105,6 +112,8 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
 
         //const refNumber = generateRefNumber();
 
+        /*
+
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
@@ -116,22 +125,25 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
             phoneNumber: foundPatient?.phoneNumber,
             amount: Number(serviceAmount)
         }
+            */
 
         testRequiredRecords.push({
+            amount: serviceAmount,
             name: service,
             PaymentRef: null,
             paymentStatus: configuration.status[5] // Scheduled
         });
 
-        createdPayments.push(paymentData);
+       // createdPayments.push(paymentData);
     }
-
+/*
     for (let i = 0; i < createdPayments.length; i++) {
 
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
     }
+        */
 
     const labNo = generateLabNumber();
 
@@ -139,7 +151,8 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         patient: _patientId,
         staffInfo: userId,
         amount: totalAmount,
-        status: configuration.status[5],
+        //status: configuration.status[5],
+        status: configuration.otherstatus[0],
         paymentStatus: configuration.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {

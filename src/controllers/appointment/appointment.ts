@@ -4,7 +4,6 @@ import { readoneadmission } from "../../dao/admissions";
 import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
-import {readonehmomanagement} from "../../dao/hmomanagement";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { readallservicetype } from "../../dao/servicetype";
 import { readone,readall } from "../../dao/users";
@@ -54,7 +53,8 @@ export const scheduleappointment = async (req: any, res: any) => {
       throw new Error(configuration.error.errornopriceset);
 
     }
-    var hmopercentagecover=patientrecord?.insurance?.hmopercentagecover ?? 0;
+    let insurance:any = await readonehmocategorycover({hmoId:patientrecord?.insurance?._id, category:configuration.category[0]},{hmopercentagecover:1});
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
      var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
 
     //create appointment

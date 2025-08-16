@@ -3,7 +3,6 @@ import {validateinputfaulsyvalue,calculateAmountPaidByHMO} from "../../utils/oth
 import configuration from "../../config";
 import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
-import {readonehmomanagement} from "../../dao/hmomanagement";
 import {createpayment,readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate,optimizedreadprescriptionaggregate } from "../../dao/prescription";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
@@ -147,8 +146,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
       validateinputfaulsyvalue({qty});
       //    console.log(testname[i]);
       //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
-    
-      var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
+          var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
      
       if(!orderPrice){
         throw new Error(`${configuration.error.errornopriceset} ${drug}`);

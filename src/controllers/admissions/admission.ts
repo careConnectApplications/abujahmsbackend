@@ -9,7 +9,8 @@ import {readoneclinic} from "../../dao/clinics";
 import {readallpayment} from "../../dao/payment";
 import {readonebed,updatebed} from "../../dao/bed";
 import {createpayment} from "../../dao/payment";
-import {readonehmomanagement} from "../../dao/hmomanagement";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
+
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
 const { ObjectId } = mongoose.Types;
@@ -279,7 +280,6 @@ export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: 
 export const addBedFee = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { id } = req.params; // Admission ID
     const { bedfee }: any = req.body;
-
     // Validate inputs
     if (!id) {
       throw new Error("Admission ID is required.");
@@ -287,34 +287,29 @@ export const addBedFee = catchAsync(async (req: Request | any, res: Response, ne
     if (bedfee == null || isNaN(Number(bedfee))) {
       throw new Error("Valid bed fee is required.");
     }
-
     // Read admission (excluding discharged/completed status)
     const findAdmission: any = await readoneadmission(
       { _id: id, status: { $ne: configuration.admissionstatus[5] } },
       {},
       "patient"
     );
-
     if (!findAdmission) {
       throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
     }
+    
     //validate bedfee
     if(findAdmission.bedfee) throw new Error("Bed has been previous generated for this patient")
-
-
     const { patient } = findAdmission;
     const paymentreference = findAdmission.admissionid;
-
     // Update admission record with bed fee
     const updatedAdmission = await updateadmission(id, { bedfee: Number(bedfee) });
     if (!updatedAdmission) {
       throw new Error("Failed to update admission bed fee.");
     }
 // get insurance
-let insurance:any = await readonehmomanagement({_id:patient.insurance},{hmopercentagecover:1});
+let insurance:any = await readonehmocategorycover({hmoId:patient.insurance, category:configuration.category[10]},{hmopercentagecover:1});
 let hmopercentagecover=insurance?.hmopercentagecover ?? 0;
 let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(bedfee));
-console.log("amount", amount);
 if(amount > 0)
     
     await createpayment({
