@@ -3,6 +3,37 @@ import configuration from "../config";
 import { IHistopathologyDoc, IHistopathologyModel } from "../interface/histopathology.interface";
 import { paginate } from "../paginate";
 
+const consentFormSchema = new Schema({
+    nameofexplainer: {
+        type: String,
+       // required: true,
+    },
+    filename: String,
+    nameofrepresentive:
+    {
+        type: String,
+       // required: true,
+    },
+    addressofrepresentaive: {
+        type: String,
+        //required: true,
+    },
+    fullnameofwitness: {
+        type: String,
+        //required: true,
+    },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+    updatedBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+}, { timestamps: true });
+
 const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel>(
     {
         patient: {
@@ -78,31 +109,10 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 default: null
             }
         },
-        // LabUse: {
-        //     DateReceived: {
-        //         type: Date,
-        //         default: Date.now
-        //     },
-        //     DateInspected: {
-        //         type: Date,
-        //     },
-        //     DateGrossed: {
-        //         type: Date,
-        //     },
-        //     DatePassed: {
-        //         type: Date,
-        //     },
-        //     NumberOfBlocks: {
-        //         type: Number
-        //     },
-        //     Action: { type: String, trim: true },
-        //     DateRequested: {
-        //         type: Date,
-        //     },
-        //     DateReported: {
-        //         type: Date,
-        //     },
-        // }
+        consentForm: {
+            type: consentFormSchema,
+            default: true,
+        },
     },
     {
         timestamps: true,

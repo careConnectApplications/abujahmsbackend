@@ -19,8 +19,9 @@ import catchAsync from "../../utils/catchAsync";
 import { IOptions } from "../../paginate/paginate";
 import pick from "../../utils/pick";
 import Histopathology from "../../models/histopathology";
-import {calculateAmountPaidByHMO} from  "../../utils/otherservices";
-import {readonehmocategorycover} from "../../dao/hmocategorycover";
+import { uploadbase64image } from "../../utils/otherservices";
+import { calculateAmountPaidByHMO } from "../../utils/otherservices";
+import { readonehmocategorycover } from "../../dao/hmocategorycover";
 
 const generateRefNumber = () => {
     const uniqueHistopathologyId = uuidv4();
@@ -43,7 +44,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         biopsyType,
         wholeOrgan,
         previousBiopsy,
-        diagnosis
+        diagnosis,
+        imageBase64,
+        nameofexplainer,
+        nameofrepresentive,
+        addressofrepresentaive,
+        fullnameofwitness
     } = req.body;
 
     // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
@@ -62,17 +68,12 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
 
-    // let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
-    // if (!appointment) {
-    //     return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
-    // }
 
     // check if patient still has a pending record
     let pendingHistopathologyRecord = await queryHistopathologyRecord({ patient: _patientId, status: configuration.status[2] }, null, null);
     if (pendingHistopathologyRecord) return next(new ApiError(400, "this patient still has a pending histopathology record"))
 
     const { firstName, lastName, _id: userId } = (req.user).user;
-    const raiseby = `${firstName} ${lastName}`;
 
     ///Step 2: Read the Appointment and populate the patient field.
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
@@ -80,15 +81,23 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     if (!foundPatient) {
         return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
     }
-    let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance?._id, category:configuration.category[6]},{hmopercentagecover:1});
-    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
-    
+let insurance: any = await readonehmocategorycover(
+  { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
+  { hmopercentagecover: 1 }
+);
+var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+
+let fileName;
+if (imageBase64) fileName = await uploadbase64image(imageBase64);
+
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
 
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
+
 //    const createdPayments = [];
   //   const refNumber = generateRefNumber();
+
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
 
@@ -97,21 +106,23 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         if (!testPrice) {
             return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
-        const serviceAmount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+        const serviceAmount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
         //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
 
         //const refNumber = generateRefNumber();
+
         /*
+
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
             paymentcategory: configuration.category[6], // Histopathology category
             patient: _patientId,
-            firstName:foundPatient?.firstName,
-            lastName:foundPatient?.lastName,
-            MRN:foundPatient?.MRN,
-            phoneNumber:foundPatient?.phoneNumber,
+            firstName: foundPatient?.firstName,
+            lastName: foundPatient?.lastName,
+            MRN: foundPatient?.MRN,
+            phoneNumber: foundPatient?.phoneNumber,
             amount: Number(serviceAmount)
         }
             */
@@ -127,7 +138,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     }
 /*
     for (let i = 0; i < createdPayments.length; i++) {
-      
+
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
@@ -154,6 +165,14 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
             requestingDoctor: _doctorId,
             phoneNumber: foundPatient.phoneNumber || null
         },
+        consentForm: {
+            nameofexplainer,
+            nameofrepresentive,
+            filename: fileName,
+            addressofrepresentaive,
+            fullnameofwitness,
+            createdBy: userId
+        }
 
     };
 
@@ -359,7 +378,7 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
                     status: "$testPayment.status",
                     paymentCategory: "$testPayment.paymentcategory",
                     paymentType: "$testPayment.paymentype",
-                    cashierName:"$testPayment.cashiername",
+                    cashierName: "$testPayment.cashiername",
                     createdAt: "$testPayment.createdAt",
                 }
             }
@@ -381,4 +400,104 @@ export const getAllHistopathologyDashboard = catchAsync(async (req: Request, res
             totalPages
         },
     });
+});
+
+
+export const getHistopathologyRecordByPatientId = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
+    if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+
+    //const doc = await getAllHistopathologyRecords({ patient: id });
+    const status = req.query.status;
+
+    const baseMatch: any = {};
+    if (status) {
+        baseMatch["testRequired.paymentStatus"] = status;
+    }
+
+    baseMatch["patientDetails._id"] = new mongoose.Types.ObjectId(id);
+
+    const doc = await Histopathology.aggregate([
+        { $unwind: "$testRequired" },
+        {
+            $lookup: {
+                from: "users",
+                localField: "staffInfo",
+                foreignField: "_id",
+                as: "staff"
+            }
+        },
+        { $unwind: { path: "$staff", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "patientsmanagements",
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientDetails"
+            }
+        },
+        { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $match: baseMatch
+        },
+        {
+            $lookup: {
+                from: "payments",
+                localField: "testRequired.PaymentRef",
+                foreignField: "_id",
+                as: "testPayment"
+            }
+        },
+        { $unwind: { path: "$testPayment", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 0,
+                histopathologyId: "$_id",
+                testName: "$testRequired.name",
+                testPaymentStatus: "$testRequired.paymentStatus",
+                testPaymentRef: "$testRequired.PaymentRef",
+                amount: "$amount",
+                status: "$status",
+                createdAt: "$createdAt",
+                diagnosisForm: "$diagnosisForm",
+                staff: {
+                    //name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    firstName: "$staff.firstName",
+                    lastName: "$staff.lastName",
+                    email: "$staff.email",
+                    staffId: "$staff.staffId",
+                    role: "$staff.role"
+                },
+                patient: {
+                    //name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    firstName: "$patientDetails.firstName",
+                    lastName: "$patientDetails.lastName",
+                    age: "$patientDetails.age",
+                    phone: "$patientDetails.phoneNumber",
+                    gender: "$patientDetails.gender",
+                    mrn: "$patientDetails.MRN"
+                },
+                paymentInfo: {
+                    amount: "$testPayment.amount",
+                    paymentReference: "$testPayment.paymentreference",
+                    status: "$testPayment.status",
+                    paymentCategory: "$testPayment.paymentcategory",
+                    paymentType: "$testPayment.paymentype",
+                    cashierName: "$testPayment.cashiername",
+                    createdAt: "$testPayment.createdAt",
+                }
+            }
+        }
+    ]);
+
+    if (!doc) {
+        return next(new ApiError(404, `histopathology report ${configuration.error.errornotfound}`))
+    }
+
+    res.status(200).json({
+        status: true,
+        data: doc
+    })
 });
