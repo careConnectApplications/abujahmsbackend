@@ -21,7 +21,7 @@ export const checkSubscription = catchAsync(async (req:any, res:Response, next:N
     }
 
     const now = new Date();
-    if (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now) {
+    if ((patientinfo.isHMOCover != configuration.ishmo[1]  || patientinfo.isHMOCover != true) && (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now)) {
        throw new Error("Subscription expired. Please renew to continue.");
     }
 

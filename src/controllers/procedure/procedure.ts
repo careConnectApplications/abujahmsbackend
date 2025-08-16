@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { validateinputfaulsyvalue, uploaddocument } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, uploaddocument,calculateAmountPaidByHMO } from "../../utils/otherservices";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import { readoneappointment, updateappointment } from "../../dao/appointment";
 import { readallservicetype } from "../../dao/servicetype";
@@ -9,6 +9,7 @@ import { createpayment, updatepayment, readonepayment } from "../../dao/payment"
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { readoneadmission } from "../../dao/admissions";
+import {readonehmocategorycover} from "../../dao/hmocategorycover";
 const { ObjectId } = mongoose.Types;
 
 
@@ -19,14 +20,13 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
   try {
     //accept _id from request
     const { id } = req.params;
-    console.log("///////id", id);
     var { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
 
     const { firstName, lastName } = (req.user).user;
     const raiseby = `${firstName} ${lastName}`;
     var procedureid: any = String(Date.now());
     var proceduresid = [];
-    var paymentids = [];
+    //var paymentids = [];
     validateinputfaulsyvalue({ id, procedure });
     //find the record in appointment and validate
     const foundPatient: any = await readonepatient({ _id: id }, {}, '', '');
@@ -35,6 +35,8 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
     }
+    let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance, category:configuration.category[5]},{hmopercentagecover:1});
+    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
       appointmentid = new ObjectId(appointmentid);
@@ -52,19 +54,14 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
     //loop through all test and create record in lab order
     for (var i = 0; i < procedure.length; i++) {
       //search for price of test name
-      var testPrice: any = await readoneprice({ servicetype: procedure[i], isHMOCover: configuration.ishmo[0] });
-      if (foundPatient?.isHMOCover == configuration.ishmo[0] && !testPrice) {
+      var testPrice: any = await readoneprice({ servicetype: procedure[i] });
+      //var testPrice: any = await readoneprice({ servicetype: procedure[i], isHMOCover: configuration.ishmo[0] });
+      if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${procedure[i]}`);
       }
+      const amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
 
-      //search testname in setting
-
-
-      //var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-      /*      f(!testsetting || testsetting.length < 1){
-        throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
-    }
-        */
+     /*
       let paymentreference;
 
       //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
@@ -76,7 +73,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
       else {
         paymentreference = procedureid;
       }
-      //create payment
+              //create payment
       if (foundPatient?.isHMOCover == configuration.ishmo[0]) {
 
         var createpaymentqueryresult = await createpayment({ firstName: foundPatient?.firstName, lastName: foundPatient?.lastName, MRN: foundPatient?.MRN, phoneNumber: foundPatient?.phoneNumber, paymentreference, paymentype: procedure[i], paymentcategory: configuration.category[5], patient: id, amount: Number(testPrice.amount) })
@@ -94,9 +91,15 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
         proceduresid.push(procedurerecord._id);
         //paymentids.push(createpaymentqueryresult._id);
       }
+        */
+
+       var procedurerecord = await createprocedure({ procedure: procedure[i], patient: id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby,status: configuration.otherstatus[0],amount });
+        proceduresid.push(procedurerecord._id);
+       
 
     }
-    let queryresult: any;
+    let queryresult=await updatepatient(id, { $push: { prcedure: proceduresid } });
+/*
     if (foundPatient?.isHMOCover == configuration.ishmo[0]) {
       queryresult = await updatepatient(id, { $push: { prcedure: proceduresid, payment: paymentids } });
     }
@@ -104,14 +107,13 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
       queryresult = await updatepatient(id, { $push: { prcedure: proceduresid } });
 
     }
+      */
     if (appointmentid) {
       await updateappointment(appointment._id, { $push: { procedure: proceduresid } });
       //procedure
 
     }
     res.status(200).json({ queryresult, status: true });
-
-
 
   }
   catch (error: any) {
