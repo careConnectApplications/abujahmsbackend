@@ -778,11 +778,11 @@ export var examinepatient = async (req: any, res: any) => {
 //lab order
 export var laborder = async (req: any, res: any) => {
   try {
-
+    const { firstName,lastName} = (req.user).user;
     //accept _id from request.
     const { id } = req.params;
     const { testname, appointmentunderscoreid, department,note,priority } = req.body;
-    
+    const raiseby = `${firstName} ${lastName}`;
     var testid: any = String(Date.now());
     var testsid = [];
     //var paymentids =[];
@@ -839,7 +839,7 @@ export var laborder = async (req: any, res: any) => {
       }
       let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount });
+      let testrecord: any = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby });
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
     }

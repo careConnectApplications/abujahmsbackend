@@ -37,6 +37,8 @@ import histopathologyText from "../routes/histopathology-tests.route";
 import physiotherapyRoute from "../routes/phisiotherapy";
 import EyeModuleRoute from "../routes/eye-module.route";
 import DoctorWardRoute from "../routes/doctor-ward-round.route";
+import Insuranceclaimsandauthorization from '../routes/insuranceauthorizationandclaims';
+
 
 
 function createServer() {
@@ -68,7 +70,7 @@ function createServer() {
   /****
    * Cron Jobs
    */
-  import("../jobs/checkExpiredSubscriptionDate.job");
+  //import("../jobs/checkExpiredSubscriptionDate.job");
   
   app.use(fileUpload());
   app.use('/api/v1/downloads', downloads);
@@ -104,6 +106,7 @@ function createServer() {
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
   app.use("/api/v1/eye-module", protect, EyeModuleRoute);
   app.use("/api/v1/doctor-ward-round", protect, DoctorWardRoute);
+  app.use("/api/v1/insuranceauthorizationandclaims", protect, Insuranceclaimsandauthorization);
 
   // Handle POST requests to /webhook
   /*

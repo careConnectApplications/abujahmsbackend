@@ -47,3 +47,25 @@ export const updateHistopathologyRecord = async (query: any, reqbody: any) => {
 
     return doc;
 }
+export const getAllPaginatedHistopathologyRecords = async (
+  query: any,
+  page: number = 1,
+  size: number = 150
+) => {
+  const skip = (page - 1) * size;
+
+  const [docs, total] = await Promise.all([
+    Histopathology.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(size),
+    Histopathology.countDocuments(query),
+  ]);
+
+  return {
+    docs,
+    total,
+    page,
+    totalPages: Math.ceil(total / size),
+  };
+};

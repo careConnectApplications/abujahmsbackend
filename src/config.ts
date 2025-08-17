@@ -3,6 +3,7 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardnames
+  referencecategory:['lab','radiology','procedure','pharmacy'],
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
@@ -94,6 +95,7 @@ const configuration: any = {
 
     return (
       {
+        referencecategory:configuration.referencecategory,
         treatmentPlan:configuration.treatmentPlan,
         intraOral:configuration.intraOral,
         tmjAssessment:configuration.tmjAssessment,
