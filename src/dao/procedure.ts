@@ -85,7 +85,19 @@ export async function countprocedure(query:any) {
 
   }
   
-
+    export async function readprocedureaggregateoptimized(input:any, page:any, size:any) {
+    try{
+      const skip = (page - 1) * size;
+    const prodecuredetails= await Procedure.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+     const totalproceduredetails = (await Procedure.aggregate(input)).length;
+      const totalPages = Math.ceil(totalproceduredetails / size);
+      return { prodecuredetails, totalPages,totalproceduredetails, size, page};
+    }
+    catch(e:any){
+      console.log(e);
+      throw new Error(configuration.error.erroruserupdate);
+    }
+    }
   export async function readprocedureaggregate(input:any) {
     try{
     return await Procedure.aggregate(input);

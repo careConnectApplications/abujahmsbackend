@@ -96,6 +96,7 @@ const labSchema = new Schema({
     ref: "Users",
     default: null,
   },
+  raiseby:String,
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
