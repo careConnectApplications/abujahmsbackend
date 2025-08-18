@@ -132,8 +132,7 @@ subscriptionfeePaid = await readonepayment({
       else if(paymentcategory ==configuration.category[8]){
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
-        patientrecord.subscriptionPaidUntil = nextYear;
-        await patientrecord.save();
+        await updatepayment(_id, { subscriptionPaidUntil: nextYear });
       }
 
     }
