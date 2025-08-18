@@ -75,6 +75,7 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             type: String,
             default: configuration.status[5],
         },
+        refNumber:String,
         testRequired: [{
             name: { type: String, required: true, trim: true },
             PaymentRef: {

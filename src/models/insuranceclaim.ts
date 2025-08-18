@@ -36,7 +36,7 @@ const InsuranceClaimSchema: Schema<IInsuranceClaim> = new Schema(
     amountClaimed: { type: Number, required: true },
     amountApproved: { type: Number },
     insurer: { type: String },
-    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    createdBy: { type: Schema.Types.ObjectId, ref: "Users" },
   },
   { timestamps: true }
 );

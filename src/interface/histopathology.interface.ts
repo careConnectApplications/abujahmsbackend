@@ -56,6 +56,7 @@ export interface IHistopathology {
   staffInfo?: Types.ObjectId | null;
   payment?: Types.ObjectId | null;
   amount?: number;
+  refNumber:string,
   paymentStatus?: string;
   status: string;
   testRequired?: IHistopathologyTestRequired[];
