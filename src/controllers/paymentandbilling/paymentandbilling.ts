@@ -77,7 +77,7 @@ export async function confirmgrouppayment(req: any, res: any) {
       const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
       let cardFeePaid;
       let subscriptionfeePaid;
-      if (!patientrecord && paymentcategory !== configuration.category[3]) {
+      if (!patientrecord && (paymentcategory !== configuration.category[3] || paymentcategory !== configuration.category[8] || paymentcategory !== configuration.category[9])) {
       
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 

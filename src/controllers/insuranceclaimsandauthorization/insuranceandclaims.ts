@@ -449,7 +449,7 @@ else{
     await updatelab({_id:id},{status:configuration.status[5]});
 
   }
-  //creale insurance claim
+  //create insurance claim
 
   
      
