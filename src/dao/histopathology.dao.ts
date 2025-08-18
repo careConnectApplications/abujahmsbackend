@@ -2,7 +2,14 @@ import { NextFunction } from "express";
 import mongoose from "mongoose";
 import Histopathology from "../models/histopathology";
 import { IOptions, QueryResult } from "../paginate/paginate";
+export const findTestRequiredById = async (subdocId: string) => {
+  const result = await Histopathology.findOne(
+    { "testRequired._id": new mongoose.Types.ObjectId(subdocId) },
+    { "testRequired.$": 1 } // project only the matching subdocument
+  );
 
+  return result;
+};
 export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
     try {
         const histopathology = new Histopathology(body);

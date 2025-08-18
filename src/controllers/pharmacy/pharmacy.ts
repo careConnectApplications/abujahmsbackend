@@ -532,7 +532,7 @@ export const confirmpharmacygrouporder = async (req:any, res:any) =>{
       }
         */
        if(option == true){
-          queryresult= await updateprescription(id,{dispensestatus:configuration.otherstatus[0],amount,remark});
+          queryresult= await updateprescription(id,{dispensestatus:configuration.otherstatus[0],amount,qty,remark});
            
       }
       else{

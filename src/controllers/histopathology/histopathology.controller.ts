@@ -96,7 +96,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
     const testRequiredRecords: any[] = [];
 
 //    const createdPayments = [];
-  //   const refNumber = generateRefNumber();
+     const refNumber = generateRefNumber();
 
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
@@ -151,6 +151,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
         patient: _patientId,
         staffInfo: userId,
         amount: totalAmount,
+        refNumber,
         //status: configuration.status[5],
         status: configuration.otherstatus[0],
         paymentStatus: configuration.status[2],

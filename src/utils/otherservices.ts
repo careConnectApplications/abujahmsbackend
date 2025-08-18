@@ -238,7 +238,3 @@ export function calculateAmountPaidByHMO(hmoCoveragePercentage: number, totalAmo
   const patientResponsibility = (100 - hmoCoveragePercentage) / 100;
   return patientResponsibility * totalAmount;
 }
-
-
-
-
