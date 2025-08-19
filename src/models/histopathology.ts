@@ -65,6 +65,7 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             type: Number,
             min: [0, "Amount cannot be negative"],
         },
+       
         paymentStatus: {
             type: String,
             default: configuration.status[2],
@@ -81,6 +82,7 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 ref: "Payment",
                 default: null
             },
+            amount: { type: Number, min: [0, "Amount cannot be negative"] },
             paymentStatus: { type: String, default: configuration.status[5] }
         }],
         diagnosisForm: {

@@ -3,11 +3,11 @@ import configuration from "../config";
 
 export interface labinterface {
   testname: String;
-  patient:any,
+  patient: any,
 
 }
 const radiologySchema = new Schema({
-  processeddate:{
+  processeddate: {
     type: Date
 
   },
@@ -21,12 +21,12 @@ const radiologySchema = new Schema({
   },
   testname:
   {
-    type: String, 
+    type: String,
     required: true
   },
   testid:
   {
-    type: String, 
+    type: String,
     required: true
   },
   department:
@@ -34,8 +34,8 @@ const radiologySchema = new Schema({
     type: String
     //required: true
   },
-  testresult:[],
-  typetestresult:[],
+  testresult: [],
+  typetestresult: [],
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
@@ -43,26 +43,28 @@ const radiologySchema = new Schema({
   },
   raiseby: {
     type: String,
-   
+
   },
   amount: Number,
   processby: {
     type: String
   },
   payment: {
-      type: Schema.Types.ObjectId,
-      ref: "Payment",
-      default: null,
-    },
-  
-  status:{
+    type: Schema.Types.ObjectId,
+    ref: "Payment",
+    default: null,
+  },
+  status: {
     required: true,
     type: String,
     default: configuration.status[14],
-
-  }
+  },
+  filename: {
+    type: String,
+    trim: true,
+  },
 },
-{ timestamps: true }
+  { timestamps: true }
 );
 
 const radiology = model('Radiology', radiologySchema);
