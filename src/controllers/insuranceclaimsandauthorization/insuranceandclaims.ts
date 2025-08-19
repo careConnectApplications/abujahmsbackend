@@ -1,15 +1,12 @@
 
 import { NextFunction, Request, Response } from "express";
-import {optimizedreadallradiology,readallradiology,readoneradiology,updateradiology } from "../../dao/radiology";
-import {readallprocedure,readprocedureaggregateoptimized,readoneprocedure,updateprocedure} from "../../dao/procedure";
-import {optimizedreadprescriptionaggregate,readallprescription,readoneprescription,updateprescription} from "../../dao/prescription";
-import {optimizedreadalllab,readalllab,readonelab,updatelab} from "../../dao/lab";
-import {getAllPaginatedHistopathologyRecords,getHistopathologyById} from "../../dao/histopathology.dao";
+import {optimizedreadallradiology,readallradiology } from "../../dao/radiology";
+import {readallprocedure,readprocedureaggregateoptimized} from "../../dao/procedure";
+import {optimizedreadprescriptionaggregate,readallprescription} from "../../dao/prescription";
+import {optimizedreadalllab,readalllab} from "../../dao/lab";
+import {getAllPaginatedHistopathologyRecords} from "../../dao/histopathology.dao";
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
-import {readoneadmission} from "../../dao/admissions";
-import {createpayment} from "../../dao/payment";
-import {updatepatient} from "../../dao/patientmanagement";
-import {createInsuranceClaim} from "../../dao/insuranceclaim";
+import {readAllInsuranceClaims,createInsuranceClaim,updateInsuranceClaimById} from "../../dao/insuranceclaim";
 import configuration from "../../config";
 import {processLab,processRadiology,processProcedure,processPharmacy} from "./insuranceclaimandauthorization.helper";
 import catchAsync from "../../utils/catchAsync";
@@ -416,172 +413,6 @@ queryresult=await readallradiology({testid:referencenumber, status:configuration
 })
 
 //////////////////////////authorize transaction individually   ///////////////////////
-/*
-export const authorizeTransaction = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
-    const { authorizationCode, approvalCode } = req.body;
-    const { id, referencecategory } = req.params;
-    const { firstName, lastName } = (req.user).user;
-    let createdBy = `${firstName} ${lastName}`;
-     validateinputfaulsyvalue({ authorizationCode, approvalCode,referencecategory,id });
-     let input:any={};
-    // Update the transaction status
-    if(referencecategory == configuration.referencecategory[0] ){
-     //lab
-     var lab:any =await readonelab({_id:id},{},'patient');
-     const {testname, testid,patient,amount} = lab;
-      let paymentreference; 
-  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
-  if(findAdmission){
-    paymentreference = findAdmission.admissionid;
-}
-else{
-  paymentreference = testid;
-  
-}
-  
-  if(amount > 0){
-    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
-    await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id});
-    await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}})
-    
-  }
-  else if(amount == 0){
-    await updatelab({_id:id},{status:configuration.status[5]});
-
-  }
-  //create insurance claim
-      input.patient=patient._id;
-      input.serviceCategory=configuration.category[2];
-      input.lab=lab._id;
-      input.authorizationCode=authorizationCode;
-      input.approvalCode=approvalCode;
-      input.amountClaimed= amount;
-      input.amountApproved= amount;
-      input.insurer= patient.HMOName;
-      input.createdBy=createdBy;   
-    }
-    
-    else if(referencecategory == configuration.referencecategory[1] ){
-      //radiology
-      var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
-      const { testname, testid, patient, amount } = radiology;
-      let paymentreference;
-      var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
-    if (findAdmission) {
-      paymentreference = findAdmission.admissionid;
-
-    }
-    else {
-      paymentreference = testid;
-    }
-    if (amount > 0) {
-          var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
-          await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id});
-          await updatepatient(patient._id, { $push: { payment: createpaymentqueryresult._id } });
-    
-        }
-        else if (amount == 0) {
-          await updateradiology({ _id: id }, { status: configuration.status[9]});
-    
-        }
-      input.patient=patient._id;
-      input.serviceCategory=configuration.category[4];
-      input.radiology=radiology._id;
-      input.authorizationCode=authorizationCode;
-      input.approvalCode=approvalCode;
-      input.amountClaimed= amount;
-      input.amountApproved= amount;
-      input.insurer= patient.HMOName;
-      input.createdBy=createdBy
-    }
-
-    else if(referencecategory == configuration.referencecategory[2] ){
-      //procedure
-      var findprocedure: any = await readoneprocedure({ _id: id }, {}, 'patient');
-       const { procedure, procedureid, patient, amount } = findprocedure;
-      let paymentreference;
-      //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-      var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
-      if (findAdmission) {
-        paymentreference = findAdmission.admissionid;
-
-      }
-      else {
-        paymentreference = procedureid;
-      }
-              //create payment
-      if (amount > 0) {
-
-        var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: procedure,paymentcategory: configuration.category[5], patient: id, amount: Number(amount) });
-        await updateprocedure({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id});
-        await updatepatient(patient._id, { $push: { payment: createpaymentqueryresult._id } });
-      }
-      else {
-        //create testrecordn 
-        var procedurerecord = await await updateprocedure({ _id: id }, { status: configuration.status[9], });
-         await updatepatient(patient._id, { $push: {proceduresid: procedurerecord._id } });
-      }
-
-      input.patient=patient._id;
-      input.serviceCategory=configuration.category[5];
-      input.procedure=findprocedure._id;
-      input.authorizationCode=authorizationCode;
-      input.approvalCode=approvalCode;
-      input.amountClaimed= amount;
-      input.amountApproved= amount;
-      input.insurer= patient.HMOName;
-      input.createdBy=createdBy;
-        
-    }
-    else if(referencecategory == configuration.referencecategory[3] ){
-      const findPharmacy:any =await readoneprescription({_id:id},{},'patient','','');
-      const { prescription, orderid, patient, amount,qty,pharmacy } = findPharmacy;
-            //pharmacy  
-            let paymentreference; 
-      //validate the status
-        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
-        if(findAdmission){
-          paymentreference = findAdmission.admissionid;
-      
-      }
-      else{
-        paymentreference = orderid;
-      }
-      if(amount > 0){
-        var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
-        await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id});
-        await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
-        
-      }
-      else if(amount == 0){
-        await updateprescription(id,{dispensestatus:configuration.status[10]});
-      }
-      input.patient=patient._id;
-      input.serviceCategory=configuration.category[1];
-      input.prescription=findPharmacy._id;
-      input.authorizationCode=authorizationCode;
-      input.approvalCode=approvalCode;
-      input.amountClaimed= amount;
-      input.amountApproved= amount;
-      input.insurer= patient.HMOName;
-      input.createdBy=createdBy;
-           
-    }
-    else{
-            throw new Error( "Invalid reference category");
-    }
-
-if (Object.keys(input).length !== 0)  await createInsuranceClaim(input);    
-
-    res.status(200).json({
-      queryresult: "Transaction authorized successfully.",
-    status: true
-    });
-});
-*/
-// 🔹 MAIN CONTROLLER
 export const authorizeTransaction = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { authorizationCode, approvalCode } = req.body;
   const { id, referencecategory } = req.params;
@@ -612,3 +443,41 @@ export const authorizeTransaction = catchAsync(async (req: Request | any, res: R
     status: true
   });
 });
+
+
+
+export const fetchInsuranceClaims = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const query: any = {};
+    if (req.query.status) query.status = req.query.status;
+    if (req.query.patient) query.patient = req.query.patient;
+
+    const queryresult = await readAllInsuranceClaims({
+      page,
+      limit,
+      query,
+    });
+
+    res.status(200).json({ queryresult,
+    status: true});
+  
+});
+/////////// update insurance claim status////////////////
+export const updateInsuranceClaimStatus = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    const { claimId } = req.params;
+    const { status } = req.body;
+
+    // Ensure status is valid
+    const validStatuses = ["Submitted", "Re-submitted", "Cancelled", "Rejected", "Paid"];
+    if (!validStatuses.includes(status))  throw new Error(`Invalid status. Allowed values are: ${validStatuses.join(", ")}`);
+    
+
+    const queryresult = await updateInsuranceClaimById(claimId, { status });
+    return res.status(200).json({
+      status: true,
+      queryresult
+    });
+
+  }) 
