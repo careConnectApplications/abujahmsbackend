@@ -76,3 +76,42 @@ export const getAllPaginatedHistopathologyRecords = async (
     totalPages: Math.ceil(total / size),
   };
 };
+
+export const getHistopatholofySubdocument = async (id: string) => {
+      const result = await Histopathology.aggregate([
+      { $match: { "testRequired._id": new mongoose.Types.ObjectId(id) } },
+      // lookup patient
+      {
+        $lookup: {
+          from: "patientsmanagements", // collection name (check exact name in MongoDB)
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient"
+        }
+      },
+      { $unwind: "$patient" },
+      {
+        $project: {
+          patient: 1,
+          staffInfo: 1,
+          amount: 1,
+          status: 1,
+          refNumber: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          testRequired: {
+            $filter: {
+              input: "$testRequired",
+              as: "tr",
+              cond: { $eq: ["$$tr._id", new mongoose.Types.ObjectId(id)] }
+            }
+          }
+        }
+      }
+    ]);
+
+    if (!result || result.length === 0)  throw new Error("TestRequired not found");
+    return result;
+     
+    
+  }

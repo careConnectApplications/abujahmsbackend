@@ -8,7 +8,7 @@ import {getAllPaginatedHistopathologyRecords} from "../../dao/histopathology.dao
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
 import {readAllInsuranceClaims,createInsuranceClaim,updateInsuranceClaimById} from "../../dao/insuranceclaim";
 import configuration from "../../config";
-import {processLab,processRadiology,processProcedure,processPharmacy} from "./insuranceclaimandauthorization.helper";
+import {processLab,processRadiology,processProcedure,processPharmacy,processHistopathology} from "./insuranceclaimandauthorization.helper";
 import catchAsync from "../../utils/catchAsync";
 //import status from "http-status";
 
@@ -430,8 +430,8 @@ export const authorizeTransaction = catchAsync(async (req: Request | any, res: R
     insuranceClaim = await processProcedure(id, { authorizationCode, approvalCode, createdBy });
   } else if (referencecategory === configuration.referencecategory[3]) {
     insuranceClaim = await processPharmacy(id, { authorizationCode, approvalCode, createdBy });
-  } else {
-    throw new Error("Invalid reference category");
+  } 
+  else {    throw new Error("Invalid reference category");
   }
 
   if (insuranceClaim) {
@@ -444,6 +444,90 @@ export const authorizeTransaction = catchAsync(async (req: Request | any, res: R
   });
 });
 
+export const authorizeTransactiongroup = catchAsync(
+  async (req: Request | any, res: Response, next: NextFunction) => {
+    const { authorizationCode, approvalCode } = req.body;
+    const { testid, referencecategory } = req.params; // 🔹 use testId instead of single id
+    const { _id } = (req.user).user;
+    const createdBy = `${_id}`;
+
+    validateinputfaulsyvalue({
+      authorizationCode,
+      approvalCode,
+      referencecategory,
+      testid,
+    });
+
+    let insuranceClaims: any[] = [];
+
+    // Fetch all records that match the group testId
+    let records: any[] = [];
+    if (referencecategory === configuration.referencecategory[0]) {
+      records = (await readalllab({testid},{},'','','')).labdetails; // custom service to fetch labs by testId
+    } else if (referencecategory === configuration.referencecategory[1]) {
+      //ragiology
+      records = (await readallradiology({testid},{},'','')).radiologydetails;
+    } else if (referencecategory === configuration.referencecategory[2]) {
+     //procedure
+      records = (await readallprocedure({procedureid:testid},{},'','')).proceduredetails;
+    } else if (referencecategory === configuration.referencecategory[3]) {
+      //pharmacy
+      records = (await readallprescription({orderid:testid},{},'','','')).prescriptiondetails;
+    } else {
+      throw new Error("Invalid reference category");
+    }
+
+    if (!records || records.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No records found for the given testId",
+      });
+    }
+
+    // Loop through group of records and process each one
+    for (const record of records) {
+      let insuranceClaim: any = null;
+      if (referencecategory === configuration.referencecategory[0]) {
+        insuranceClaim = await processLab(record._id, {
+          authorizationCode,
+          approvalCode,
+          createdBy,
+        });
+      } else if (referencecategory === configuration.referencecategory[1]) {
+        insuranceClaim = await processRadiology(record._id, {
+          authorizationCode,
+          approvalCode,
+          createdBy,
+        });
+      } else if (referencecategory === configuration.referencecategory[2]) {
+        insuranceClaim = await processProcedure(record._id, {
+          authorizationCode,
+          approvalCode,
+          createdBy,
+        });
+      } else if (referencecategory === configuration.referencecategory[3]) {
+        insuranceClaim = await processPharmacy(record._id, {
+          authorizationCode,
+          approvalCode,
+          createdBy,
+        });
+      }
+
+      if (insuranceClaim) {
+        insuranceClaims.push(insuranceClaim);
+      }
+    }
+    // Bulk insert claims if available
+    if (insuranceClaims.length > 0) {
+      await createInsuranceClaim(insuranceClaims); // should accept array for bulk
+    }
+
+    res.status(200).json({
+      queryresult: `${insuranceClaims.length} transactions authorized successfully`,
+      status: true,
+    });
+  }
+);
 
 
 export const fetchInsuranceClaims = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
