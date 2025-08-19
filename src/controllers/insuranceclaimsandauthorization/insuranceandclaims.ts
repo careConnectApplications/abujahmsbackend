@@ -431,6 +431,10 @@ export const authorizeTransaction = catchAsync(async (req: Request | any, res: R
   } else if (referencecategory === configuration.referencecategory[3]) {
     insuranceClaim = await processPharmacy(id, { authorizationCode, approvalCode, createdBy });
   } 
+  else if (referencecategory === configuration.referencecategory[4]) {
+    insuranceClaim = await processHistopathology(id, { authorizationCode, approvalCode, createdBy });
+  }
+  
   else {    throw new Error("Invalid reference category");
   }
 
