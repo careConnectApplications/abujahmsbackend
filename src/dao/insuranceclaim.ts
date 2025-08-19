@@ -1,27 +1,55 @@
 import InsuranceClaim from "../models/insuranceclaim";
 import configuration from "../config";
+interface PaginationOptions {
+  page?: number;
+  limit?: number;
+  query?: any;
+  select?: string;
+  populate?: {
+    path: string;
+    select?: string;
+  }[];
+}
 
 // 🔍 Read all insurance claims
 export async function readAllInsuranceClaims(
-  query = {},
-  selectquery = {},
-  populatequery = "",
-  populatesecondquery = "",
-  skip = 0,
-  limit = 150
+ options: PaginationOptions
 ) {
+    const {
+    page = 1,
+    limit = 150,
+    query = {},
+    select = "",
+    populate = [
+      { path: "patient", select: "firstName middleName lastName phoneNumber email isHMOCover HMOName HMOId MRN" },
+      { path: "lab", select: "testname testid raiseby createdAt" },
+      { path: "radiology", select: "testname testid raiseby createdAt" },
+      { path: "procedure", select: "procedure procedureid raiseby createdAt" },
+      { path: "pharmacy", select: "prescription pharmacy orderid qty" },
+      { path: "createdBy", select: "firstName lastName role" },
+    ],
+  } = options;
   try {
-    const claims = await InsuranceClaim.find(query)
-      .select(selectquery)
-      .populate(populatequery)
-      .populate(populatesecondquery)
-      .sort({ createdAt: -1 })
+    const skip = (page - 1) * limit;
+
+     const queryBuilder = InsuranceClaim.find(query)
+      .select(select)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
-    const total = await InsuranceClaim.countDocuments(query);
+    // apply populate with field selection
+    populate.forEach((p) => {
+      queryBuilder.populate(p);
+    });
 
-    return { claims, total };
+    const [claims, total] = await Promise.all([
+      queryBuilder.exec(), // latest first
+      InsuranceClaim.countDocuments(query),
+    ]);
+     return { claims, totalPages:Math.ceil(total / limit),total, limit, page};
+
+    
   } catch (err) {
     console.error(err);
     throw new Error(configuration.error.erroruserread);
