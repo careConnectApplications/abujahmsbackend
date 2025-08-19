@@ -7,7 +7,7 @@ import {readoneprescription,updateprescription} from "../../dao/prescription";
 import {readonelab,updatelab} from "../../dao/lab";
 import {readoneadmission} from "../../dao/admissions";
 import {createpayment} from "../../dao/payment";
-import {getHistopatholofySubdocument} from "../../dao/histopathology.dao";
+import {getHistopathologyByIdPopulate,updateHistopathologyRecord} from "../../dao/histopathology.dao";
 import {updatepatient} from "../../dao/patientmanagement";
 import configuration from "../../config";
 ////////////////////////   helper function for insurance claims
@@ -153,7 +153,7 @@ export async function processProcedure(id: string, ctx: any) {
   return buildInsuranceClaim({
     patient,
     serviceCategory: configuration.category[5],
-    entityId: procedure._id,
+    entityId: findprocedure._id,
     entityKey: "procedure",
     authorizationCode,
     approvalCode,
@@ -187,7 +187,7 @@ export async function processPharmacy(id: string, ctx: any) {
   return buildInsuranceClaim({
     patient,
     serviceCategory: configuration.category[1],
-    entityId: pharmacy._id,
+    entityId: findPharmacy._id,
     entityKey: "pharmacy",
     authorizationCode,
     approvalCode,
@@ -196,29 +196,32 @@ export async function processPharmacy(id: string, ctx: any) {
   });
 }
 
-export async function processHistopathology(id: string, ctx: any){
+export async function processHistopathology(id: any, ctx: any){
      const { authorizationCode, approvalCode, createdBy } = ctx;
-   const findHistopathology =await  getHistopatholofySubdocument(id);
-   console.log("findHistopathology",findHistopathology)
-    /*
+   const findHistopathology =await  getHistopathologyByIdPopulate(id);
+     const { patient, amount,refNumber } = findHistopathology;   
     const paymentData = {
             paymentreference: refNumber,
-            paymentype: service,
+            paymentype: configuration.category[6],
             paymentcategory: configuration.category[6], // Histopathology category
-            patient: _patientId,
-            firstName: foundPatient?.firstName,
-            lastName: foundPatient?.lastName,
-            MRN: foundPatient?.MRN,
-            phoneNumber: foundPatient?.phoneNumber,
-            amount: Number(serviceAmount)
+            patient: patient?._id,
+            firstName: patient?.firstName,
+            lastName: patient?.lastName,
+            MRN: patient?.MRN,
+            phoneNumber: patient?.phoneNumber,
+            amount
         }
-        
-    */
-   /*
-   for (let i = 0; i < createdPayments.length; i++) {
-
-        const paymentRecord = await createpayment(createdPayments[i]);
-
-        testRequiredRecords[i].PaymentRef = paymentRecord._id;
-    }*/ 
+      await handlePayment(patient, paymentData, updateHistopathologyRecord, { _id: id },configuration.status[5],configuration.status[5],"status");  
+      return buildInsuranceClaim({
+    patient,
+    serviceCategory: configuration.category[6],
+    entityId: findHistopathology._id,
+    entityKey: "histopathology",
+    authorizationCode,
+    approvalCode,
+    amount,
+    createdBy
+  });
+    
+    
 }

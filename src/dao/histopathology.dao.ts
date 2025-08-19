@@ -19,6 +19,9 @@ export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
         return next(err);
     }
 }
+export const getHistopathologyByIdPopulate = async (
+    id: mongoose.Types.ObjectId
+): Promise<any | null> => Histopathology.findById(id).populate('patient');
 
 export const getHistopathologyById = async (
     id: mongoose.Types.ObjectId

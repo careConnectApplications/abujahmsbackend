@@ -7,6 +7,7 @@ export interface IInsuranceClaim extends Document {
   radiology?: mongoose.Types.ObjectId;
   procedure?: mongoose.Types.ObjectId;
   pharmacy?: mongoose.Types.ObjectId;
+  histopathology?: mongoose.Types.ObjectId;
   authorizationCode?: string;
   approvalCode?: string;
   status: "Submitted" | "Re-submitted" | "Cancelled" | "Rejected" | "Paid";
@@ -26,6 +27,7 @@ const InsuranceClaimSchema: Schema<IInsuranceClaim> = new Schema(
     radiology: { type: Schema.Types.ObjectId, ref: "Radiology" },
     procedure: { type: Schema.Types.ObjectId, ref: "Procedure" },
     pharmacy: { type: Schema.Types.ObjectId, ref: "Prescription" },
+    histopathology: { type: Schema.Types.ObjectId, ref: "Histopathology" },
     authorizationCode: { type: String },
     approvalCode: { type: String },
     status: {
