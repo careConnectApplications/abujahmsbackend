@@ -7,6 +7,7 @@ import {readoneprescription,updateprescription} from "../../dao/prescription";
 import {readonelab,updatelab} from "../../dao/lab";
 import {readoneadmission} from "../../dao/admissions";
 import {createpayment} from "../../dao/payment";
+import {getHistopatholofySubdocument} from "../../dao/histopathology.dao";
 import {updatepatient} from "../../dao/patientmanagement";
 import configuration from "../../config";
 ////////////////////////   helper function for insurance claims
@@ -193,4 +194,31 @@ export async function processPharmacy(id: string, ctx: any) {
     amount,
     createdBy
   });
+}
+
+export async function processHistopathology(id: string, ctx: any){
+     const { authorizationCode, approvalCode, createdBy } = ctx;
+   const findHistopathology =await  getHistopatholofySubdocument(id);
+   console.log("findHistopathology",findHistopathology)
+    /*
+    const paymentData = {
+            paymentreference: refNumber,
+            paymentype: service,
+            paymentcategory: configuration.category[6], // Histopathology category
+            patient: _patientId,
+            firstName: foundPatient?.firstName,
+            lastName: foundPatient?.lastName,
+            MRN: foundPatient?.MRN,
+            phoneNumber: foundPatient?.phoneNumber,
+            amount: Number(serviceAmount)
+        }
+        
+    */
+   /*
+   for (let i = 0; i < createdPayments.length; i++) {
+
+        const paymentRecord = await createpayment(createdPayments[i]);
+
+        testRequiredRecords[i].PaymentRef = paymentRecord._id;
+    }*/ 
 }

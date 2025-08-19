@@ -57,6 +57,7 @@ export async function readAllInsuranceClaims(
 }
 
 // ➕ Create a new insurance claim
+/*
 export async function createInsuranceClaim(input: any) {
   try {
     const newClaim = new InsuranceClaim(input);
@@ -66,6 +67,23 @@ export async function createInsuranceClaim(input: any) {
     throw new Error(configuration.error.errorusercreate);
   }
 }
+  */
+export async function createInsuranceClaim(input: any) {
+  try {
+    if (Array.isArray(input)) {
+      // 🔹 Insert many claims at once
+      return await InsuranceClaim.insertMany(input);
+    } else {
+      // 🔹 Fallback for single claim
+      const newClaim = new InsuranceClaim(input);
+      return await newClaim.save();
+    }
+  } catch (err) {
+    console.error(err);
+    throw new Error(configuration.error.errorusercreate);
+  }
+}
+
 
 // 🔍 Read one insurance claim
 export async function readOneInsuranceClaim(query: any, selectquery = {}) {
