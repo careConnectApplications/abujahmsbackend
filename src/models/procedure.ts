@@ -33,6 +33,8 @@ const procedureSchema = new Schema({
     type: String
   },
   amount:Number,
+  hmopercentagecover:Number,
+  actualcost:Number,
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",

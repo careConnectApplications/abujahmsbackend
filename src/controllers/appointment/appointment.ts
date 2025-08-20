@@ -847,7 +847,8 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       }
       let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any = await createlab({ note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby, filename: fileName });
+      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName });
+
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
     }

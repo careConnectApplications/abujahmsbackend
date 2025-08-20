@@ -15,6 +15,7 @@ const pricemodel_1 = require("../controllers/setting/pricemodel");
 const outreachmedication_1 = require("../controllers/setting/outreachmedication");
 const bed_1 = require("../controllers/bed/bed");
 const audit_1 = require("../controllers/audit/audit");
+const hmscategorycover_1 = require("../controllers/setting/hmscategorycover");
 //import {readicdten} from "../controllers/icdten/icdten";
 const router = express_1.default.Router();
 router.post('/createprices', pricesetting_1.createprices);
@@ -69,4 +70,8 @@ router.put('/softdeleterestorebed/:id', bed_1.softDeleteBed);
 router.put('/updatebednumber/:id', bed_1.updatebeds);
 //getpriceofservice
 router.post('/getpriceofservice/:id', pricesetting_1.getpriceofservice);
+//hmo category route
+router.post("/createhmocategorycover", hmscategorycover_1.createhmocategorycovercontroller);
+router.get("/getallhmocategorycover", hmscategorycover_1.getallhmocategorycovercontroller);
+router.put("/updatehmocategorycover/:_id", hmscategorycover_1.updatehmocategorycovercontroller);
 exports.default = router;

@@ -22,11 +22,11 @@ const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const hmomanagement_1 = require("../../dao/hmomanagement");
 const payment_1 = require("../../dao/payment");
 const prescription_1 = require("../../dao/prescription");
 const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const { ObjectId } = mongoose_1.default.Types;
 //pharmacy order
 var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -120,7 +120,7 @@ var pharmacyorderwithoutconfirmation = (req, res) => __awaiter(void 0, void 0, v
         var { products } = req.body;
         var orderid = String(Date.now());
         var pharcyorderid = [];
-        var paymentids = [];
+        //var paymentids =[];
         (0, otherservices_1.validateinputfaulsyvalue)({ id, products });
         //search patient
         var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, 'insurance', '');
@@ -141,27 +141,32 @@ var pharmacyorderwithoutconfirmation = (req, res) => __awaiter(void 0, void 0, v
             if (!orderPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset} ${drug}`);
             }
-            var hmopercentagecover = (_b = (_a = patient === null || patient === void 0 ? void 0 : patient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patient === null || patient === void 0 ? void 0 : patient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[1] }, { hmopercentagecover: 1 });
+            var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
             var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
             //var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+            /*
             let paymentreference;
             //validate the status
-            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-            if (findAdmission) {
+              //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+              var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+              if(findAdmission){
                 paymentreference = findAdmission.admissionid;
+            
             }
-            else {
-                paymentreference = orderid;
+            else{
+              paymentreference = orderid;
             }
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: drug, paymentcategory: pharmacy, patient: patient._id, amount, qty });
+           
+            var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+            */
             //create 
             // console.log("got here");
-            var prescriptionrecord = yield (0, prescription_1.createprescription)({ isHMOCover: patient === null || patient === void 0 ? void 0 : patient.isHMOCover, HMOPlan: patient === null || patient === void 0 ? void 0 : patient.HMOPlan, HMOName: patient === null || patient === void 0 ? void 0 : patient.HMOName, HMOId: patient === null || patient === void 0 ? void 0 : patient.HMOId, firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, qty, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid, appointmentdate: appointment === null || appointment === void 0 ? void 0 : appointment.appointmentdate, clinic: appointment === null || appointment === void 0 ? void 0 : appointment.clinic });
+            var prescriptionrecord = yield (0, prescription_1.createprescription)({ isHMOCover: patient === null || patient === void 0 ? void 0 : patient.isHMOCover, HMOPlan: patient === null || patient === void 0 ? void 0 : patient.HMOPlan, HMOName: patient === null || patient === void 0 ? void 0 : patient.HMOName, HMOId: patient === null || patient === void 0 ? void 0 : patient.HMOId, firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, dispensestatus: config_1.default.otherstatus[0], amount, qty, pharmacy, duration, dosageform, strength, dosage, frequency, route, prescription: drug, patient: patient._id, orderid, prescribersname: firstName + " " + lastName, prescriptionnote, appointment: appointment._id, appointmentid: appointment.appointmentid, appointmentdate: appointment === null || appointment === void 0 ? void 0 : appointment.appointmentdate, clinic: appointment === null || appointment === void 0 ? void 0 : appointment.clinic });
             pharcyorderid.push(prescriptionrecord._id);
-            paymentids.push(createpaymentqueryresult._id);
+            //paymentids.push(createpaymentqueryresult._id);
         }
-        var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { prescription: pharcyorderid, payment: paymentids } });
+        var queryresult = yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { prescription: pharcyorderid } });
         res.status(200).json({ queryresult, status: true });
     }
     catch (error) {
@@ -461,23 +466,30 @@ const confirmpharmacygrouporder = (req, res) => __awaiter(void 0, void 0, void 0
             if (!orderPrice || orderPrice.amount == null) {
                 throw new Error(`${config_1.default.error.errornopriceset} ${prescription}`);
             }
-            let insurance = yield (0, hmomanagement_1.readonehmomanagement)({ _id: patient.insurance }, { hmopercentagecover: 1 });
+            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: patient.insurance, category: config_1.default.category[1] }, { hmopercentagecover: 1 });
             var hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
             var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
+            /*
             let paymentreference;
             //validate the status
-            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-            if (findAdmission) {
+              //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+              var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+              if(findAdmission){
                 paymentreference = findAdmission.admissionid;
+            
             }
-            else {
-                paymentreference = orderid;
+            else{
+              paymentreference = orderid;
             }
-            if (option == true && amount > 0) {
-                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
-                queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
-                yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
+            if(option == true && amount > 0){
+              var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+            queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+              await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+              
+            }
+              */
+            if (option == true) {
+                queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.otherstatus[0], amount, qty, remark });
             }
             else {
                 queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[13], remark });
@@ -492,10 +504,11 @@ const confirmpharmacygrouporder = (req, res) => __awaiter(void 0, void 0, void 0
 });
 exports.confirmpharmacygrouporder = confirmpharmacygrouporder;
 const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     try {
         //extract option
         const { option, remark, qty } = req.body;
+        let queryresult;
         if (option == true) {
             (0, otherservices_1.validateinputfaulsyvalue)({ qty });
         }
@@ -515,24 +528,33 @@ const confirmpharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
           */
         //validate quantity entered
-        let insurance = yield (0, hmomanagement_1.readonehmomanagement)({ _id: patient.insurance }, { hmopercentagecover: 1 });
-        var hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patient === null || patient === void 0 ? void 0 : patient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[1] }, { hmopercentagecover: 1 });
+        var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
         var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(orderPrice.amount)) * qty;
-        let paymentreference;
-        //validate the status
+        /*
+      let paymentreference;
+      //validate the status
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-        if (findAdmission) {
-            paymentreference = findAdmission.admissionid;
+        var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+        if(findAdmission){
+          paymentreference = findAdmission.admissionid;
+      
+      }
+      else{
+        paymentreference = orderid;
+      }
+        
+       
+        if(option == true){
+          var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+        queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+          await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+          
         }
-        else {
-            paymentreference = orderid;
-        }
-        let queryresult;
+        
+          */
         if (option == true) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: prescription, paymentcategory: pharmacy, patient: patient._id, amount, qty });
-            queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[10], payment: createpaymentqueryresult._id, remark, qty });
-            yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
+            queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.otherstatus[0], amount, remark });
         }
         else {
             queryresult = yield (0, prescription_1.updateprescription)(id, { dispensestatus: config_1.default.status[13], remark });

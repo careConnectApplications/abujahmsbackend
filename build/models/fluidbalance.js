@@ -36,6 +36,9 @@ const fluidbalanceSchema = new mongoose_1.Schema({
         ref: "Users",
         default: null,
     },
+    observationalNotes: { type: String },
+    dateTo: { type: Date, },
+    dateFrom: { type: Date }
 }, { timestamps: true });
 const fluidbalance = (0, mongoose_1.model)('Fluidbalance', fluidbalanceSchema);
 exports.default = fluidbalance;

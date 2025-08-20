@@ -1,110 +1,93 @@
-my-react-app/
-├── public/                  # Public files (index.html, favicon, etc.)
-├── src/                     # Source code files
-│   ├── assets/              # Images, fonts, and other static assets
-│   ├── components/          # Reusable UI components
-│   ├── pages/               # Page components (views, routes)
-│   ├── services/            # API calls, utilities, services
-│   ├── store/               # State management (Redux, Context API, etc.)
-│   ├── styles/              # Global styles (e.g., CSS, SCSS)
-│   ├── utils/               # Utility functions and helpers
-│   ├── App.js               # Main app component
-│   ├── index.js             # Entry point of the application
-│   ├── router.js            # App routing configuration
-│   └── theme.js             # Theme configuration (if applicable)
-├── .gitignore               # Specifies which files Git should ignore
-├── package.json             # Project dependencies, scripts, etc.
-├── README.md                # Project documentation
-└── webpack.config.js        # Webpack configuration (if using Webpack)
+# hmsbackend
 
+This project is a Hospital Management System backend built with Node.js, Express, and TypeScript. It uses MongoDB as the database.
 
+## Installation
 
-assets/:
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/careConnectApplications/abujahmsbackend.git
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd abujahmsbackend
+    ```
+3.  Install the dependencies:
+    ```bash
+    npm install
+    ```
 
-Store your images, fonts, or other static files (like icons) here.
-Example: logo.png, background.jpg, etc.
-components/:
+## Usage
 
-Reusable UI components that don’t belong to a specific page but are used in multiple parts of the application.
-These could be generic components like buttons, inputs, cards, modals, etc.
-Example:
-Button.js
-Header.js
-Footer.js
+### Development
 
+To run the application in a development environment with auto-reloading, use the following command:
 
-pages/:
+```bash
+npm run teststart
+```
 
-Components that represent entire views or pages in the application. These are typically connected to routes in React Router.
-Example:
-HomePage.js
-LoginPage.js
-DashboardPage.js
-services/:
+Alternatively, you can use:
 
-Contains logic for making API requests, interacting with third-party services, or managing local storage, etc.
-These files often abstract external dependencies so that your components remain clean and only focus on UI.
-Example:
-api.js (all API call logic)
-authService.js (authentication-related functions)
+```bash
+npm run testenv
+```
 
-styles/:
+### Production
 
-Global styles such as App.css or App.scss. This directory can also include CSS modules, styled-components, or a custom theme file if using a design system.
-Example:
-global.css
-theme.scss
-utils/:
+To build and run the application in a production environment, use the following commands:
 
-Store utility functions and helper functions that can be reused across your app.
-Example:
-formatDate.js (for date formatting)
-validateEmail.js (for email validation)
-router.js:
+```bash
+npm run build
+npm start
+```
 
-If you're using React Router or any other routing mechanism, you may want to separate the route configuration into its own file to keep App.js clean.
-theme.js:
-If you're using a custom design system or a UI framework like Material-UI or styled-components, this file could contain your theme configuration.
+## Scripts
 
+-   `teststart`: Starts the application in development mode using `ts-node-dev` with auto-reloading.
+-   `testenv`: Starts the application in development mode using `nodemon` and `ts-node`.
+-   `start`: Starts the application in production mode from the `build` directory.
+-   `build`: Compiles the TypeScript code to JavaScript and outputs it to the `build` directory.
 
-1. Naming Conventions:
+## Dependencies
 
-Use PascalCase for React components (MyComponent.js).
-Use camelCase for variable names, functions, and hooks (fetchData, handleClick).
-Use snake_case or kebab-case for filenames if needed, but keep it consistent.
+-   `axios`: Promise based HTTP client for the browser and node.js
+-   `bcryptjs`: Library to help you hash passwords
+-   `convert-excel-to-json`: A module to convert Excel files to JSON.
+-   `cors`: Node.js CORS middleware
+-   `date-fns`: Modern JavaScript date utility library
+-   `dotenv`: Loads environment variables from .env file
+-   `express`: Fast, unopinionated, minimalist web framework for node.
+-   `express-fileupload`: Simple express file upload middleware.
+-   `http-status`: Utility to interact with HTTP status codes
+-   `joi`: Object schema description language and validator for JavaScript objects.
+-   `jsonwebtoken`: JSON Web Token implementation for node.js
+-   `moment`: A lightweight JavaScript date library for parsing, validating, manipulating, and formatting dates.
+-   `mongoose`: MongoDB object modeling tool designed to work in an asynchronous environment.
+-   `morgan`: HTTP request logger middleware for node.js
+-   `node-cron`: A simple cron-like job scheduler for Node.js.
+-   `nodemailer`: Send e-mails with Node.JS – easy as cake!
+-   `uuid`: For the creation of RFC4122 UUIDs
+-   `winston`: A logger for just about everything.
 
-2. Indentation and formatting: Ensure consistent indentation (usually 2 or 4 spaces) and formatting across all files. Prefer Prettier or similar tools to enforce automatic code formatting.
+## Dev Dependencies
 
-3. Avoid magic numbers: Avoid hardcoding values directly in JSX/JS, and use variables or constants for better readability.
-
-4. Code Complexity
-Keep functions and components small: Functions and components should have one responsibility. If a function or component is too large, it should be split into smaller, reusable components or functions.
-Avoid large components: Components should generally be no larger than 300-400 lines. If they exceed this limit, consider refactoring into smaller components.
-
-5. Commenting and Documentation
-Clear and meaningful comments: Avoid over-commenting, but when necessary, explain why certain decisions are made, especially if the code is complex or non-obvious.
-
-6. Error Handling
-Handle errors gracefully: Ensure that all asynchronous operations (e.g., API calls) handle errors properly using try-catch blocks or .catch() chains.
-
-Show user-friendly error messages: If an error occurs in a component, provide an appropriate message to the user.
-
-7. Component reusability: Ensure components are generic and reusable. Avoid hardcoding specific values inside components and instead pass them as props.
-
-Props destructuring: Use destructuring to access props in function components
-
-Prop validation: Use PropTypes (or TypeScript for static type checking) to define and validate props for each component.
-
-8. Conditional Rendering
-Avoid unnecessary ternary operators: When multiple conditions are checked, avoid deeply nested ternary operators, as they can be confusing. Use if statements or switch-case for complex conditions.
-
-9. Optimization
-Avoid unnecessary re-renders: Make sure to use React.memo() for functional components that don’t depend on frequent prop changes, and use useMemo and useCallback to memoize expensive operations and functions respectively.
-
-10. API Calls and Asynchronous Logic
-Avoid making API calls directly in components: If an API call is required, extract it into a service to keep the component focused on UI logic.
-
-Use async/await: Prefer using async/await for asynchronous operations over .then(), as it leads to cleaner, more readable code.
-
-11.  Security and Accessibility Security:
-Ensure that user input is sanitized and validated to prevent vulnerabilities such as XSS (Cross-Site Scripting).
+-   `@types/axios`: TypeScript definitions for axios
+-   `@types/bcryptjs`: TypeScript definitions for bcryptjs
+-   `@types/convert-excel-to-json`: TypeScript definitions for convert-excel-to-json
+-   `@types/cors`: TypeScript definitions for cors
+-   `@types/dotenv`: TypeScript definitions for dotenv
+-   `@types/express`: TypeScript definitions for Express
+-   `@types/express-fileupload`: TypeScript definitions for express-fileupload
+-   `@types/joi`: TypeScript definitions for joi
+-   `@types/jsonwebtoken`: TypeScript definitions for jsonwebtoken
+-   `@types/mongoose`: TypeScript definitions for mongoose
+-   `@types/morgan`: TypeScript definitions for morgan
+-   `@types/node`: TypeScript definitions for Node.js
+-   `@types/node-cron`: TypeScript definitions for node-cron
+-   `@types/nodemailer`: TypeScript definitions for nodemailer
+-   `@types/uuid`: TypeScript definitions for uuid
+-   `nodemon`: Monitor for any changes in your node.js application and automatically restart the server - perfect for development
+-   `ts-node`: TypeScript execution and REPL for node.js, with source map support
+-   `ts-node-dev`: Compiles your TS app and restarts when files are modified.
+-   `typescript`: A typed superset of JavaScript that compiles to plain JavaScript.

@@ -46,6 +46,8 @@ const radiologySchema = new Schema({
 
   },
   amount: Number,
+  hmopercentagecover:Number,
+  actualcost:Number,
   processby: {
     type: String
   },

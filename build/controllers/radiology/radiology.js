@@ -55,6 +55,7 @@ const servicetype_1 = require("../../dao/servicetype");
 const radiology_1 = require("../../dao/radiology");
 const price_1 = require("../../dao/price");
 const payment_1 = require("../../dao/payment");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
 const admissions_1 = require("../../dao/admissions");
@@ -62,7 +63,7 @@ const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     try {
         //accept _id from request
         const { id } = req.params;
@@ -79,7 +80,8 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!foundPatient) {
             throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
         }
-        var hmopercentagecover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance._id, category: config_1.default.category[4] }, { hmopercentagecover: 1 });
+        var hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
         var appointment;
         if (appointmentid) {
             appointmentid = new ObjectId(appointmentid);
@@ -360,27 +362,36 @@ const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const { option, remark } = req.body;
         const { id } = req.params;
         //search for the lab request
-        var radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, 'patient');
+        //var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
         // if not radiology return error
-        const { testname, testid, patient, amount } = radiology;
+        //const { testname, testid, patient, amount } = radiology;
         //validate the status
         let queryresult;
+        /*
         let paymentreference;
         //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
         if (findAdmission) {
-            paymentreference = findAdmission.admissionid;
+          paymentreference = findAdmission.admissionid;
+    
         }
         else {
-            paymentreference = testid;
+          paymentreference = testid;
         }
         if (option == true && amount > 0) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[4], patient, amount });
-            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], payment: createpaymentqueryresult._id, remark });
-            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id } });
+          var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
+          queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id, remark });
+          await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id } });
+    
         }
         else if (option == true && amount == 0) {
-            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[9], remark });
+          queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
+    
+        }
+        
+          */
+        if (option == true) {
+            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.otherstatus[0], remark });
         }
         else {
             queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[13], remark });

@@ -8,7 +8,10 @@ const { ObjectId } = mongoose.Types;
 import { readone } from "../../dao/users";
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
-import { readoneadmission } from "../../dao/admissions";
+
+import { HmoLabConfirmationStrategy, SelfPayLabConfirmationStrategy,LabConfirmationContext } from "./lab.helper";
+
+
 
 //adjust lab to view from department
 
@@ -352,74 +355,35 @@ export const listlabreportbypatient = async (req: any, res: any) => {
   }
 };
 //this endpoint is use to accept or reject lab order
-export const confirmlaborder = async (req: any, res: any) => {
-  try {
-    //extract option
+
+//isHMOCover: { $eq: configuration.ishmo[0] }
+export const confirmlaborder = catchAsync(async (req:any,res:Response,next: NextFunction) =>{
     const { option, remark } = req.body;
     const { id } = req.params;
-    //search for the lab request
-    //var lab:any =await readonelab({_id:id},{},'patient');
-    //const {testname, testid,patient,amount} = lab;
-    //validate the status
-    let queryresult;
-    //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-    /*
-    let paymentreference; 
-    //let status;
-  //validate the status
-    //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-  
-    var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
-    if(findAdmission){
-      paymentreference = findAdmission.admissionid;
-      
-  
-  }
-  else{
-    paymentreference = testid;
-    
-  }
-  
-  
-    if(option == true && amount > 0){
-      otherstatus
-      var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:testname,paymentcategory:configuration.category[2],patient:patient._id,amount});
-     queryresult= await updatelab({_id:id},{status:configuration.status[2],payment:createpaymentqueryresult._id,remark});
-      await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
-      
+    validateinputfaulsyvalue({id});
+    const lab: any = await readonelab({ _id: id }, {}, "patient");
+    if (lab.status !== configuration.status[14]) {
+      throw new Error(configuration.error.errorLabStatus);
     }
-    else if(option == true && amount == 0){
-      queryresult= await updatelab({_id:id},{status:configuration.status[5],remark});
-  
-    }
-       
-  
-      */
-    if (option == true) {
-      queryresult = await updatelab({ _id: id }, { status: configuration.otherstatus[0], remark });
+    const { patient } = lab;
+    // choose strategy based on isHMOCover
+    const strategyFn =
+    !(patient.isHMOCover == configuration.ishmo[1]  || patient.isHMOCover == true)
+        ? SelfPayLabConfirmationStrategy
+        : HmoLabConfirmationStrategy;
+    const context = LabConfirmationContext(strategyFn);
+    const queryresult = await context.execute({
+      id,
+      option,
+      remark,
+      lab,
+      patient
+    });
 
-    }
-    else {
-      queryresult = await updatelab({ _id: id }, { status: configuration.status[13], remark });
 
-    }
     res.status(200).json({ queryresult, status: true });
-    //if accept
-    //accept or reject lab order
-    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-    //paymentids.push(createpaymentqueryresult._id);
-    //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
-    //var testrecord = await createlab({payment:createpaymentqueryresult._id});
-    //change status to 2 or  13 for reject
 
-  }
-  catch (e: any) {
-    console.log("error", e);
-    res.status(403).json({ status: false, msg: e.message });
-
-  }
-}
-
+});
 
 // differentiate hemathology and histopathology
 export const sorthemathologyandchemicalpathology: any = catchAsync(async (req: any, res: Response, next: NextFunction) => {
@@ -607,4 +571,3 @@ export const labresultprocessinghemathologychemicalpathology = catchAsync(async 
 //Add priority as a field under lab, priority should be either (urgent or routine)
 //Include the prices of radiology, lab, procedure in Dr create order
 //Rejected orders should be added in a seperate tab
-

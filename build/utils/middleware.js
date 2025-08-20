@@ -62,7 +62,7 @@ exports.checkSubscription = (0, catchAsync_1.default)((req, res, next) => __awai
         throw new Error("Patient not found");
     }
     const now = new Date();
-    if (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now) {
+    if (!(patientinfo.isHMOCover == config_1.default.ishmo[1] || patientinfo.isHMOCover == true) && (!patientinfo.subscriptionPaidUntil || patientinfo.subscriptionPaidUntil < now)) {
         throw new Error("Subscription expired. Please renew to continue.");
     }
     next();

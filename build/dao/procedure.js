@@ -18,6 +18,7 @@ exports.createprocedure = createprocedure;
 exports.readoneprocedure = readoneprocedure;
 exports.updateprocedure = updateprocedure;
 exports.updateprocedurebyquery = updateprocedurebyquery;
+exports.readprocedureaggregateoptimized = readprocedureaggregateoptimized;
 exports.readprocedureaggregate = readprocedureaggregate;
 const procedure_1 = __importDefault(require("../models/procedure"));
 const config_1 = __importDefault(require("../config"));
@@ -106,6 +107,21 @@ function updateprocedurebyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
+            throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function readprocedureaggregateoptimized(input, page, size) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * size;
+            const prodecuredetails = yield procedure_1.default.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+            const totalproceduredetails = (yield procedure_1.default.aggregate(input)).length;
+            const totalPages = Math.ceil(totalproceduredetails / size);
+            return { prodecuredetails, totalPages, totalproceduredetails, size, page };
+        }
+        catch (e) {
+            console.log(e);
             throw new Error(config_1.default.error.erroruserupdate);
         }
     });

@@ -4,8 +4,8 @@ import { NextFunction, Request, Response } from "express";
 import {readoneradiology,updateradiology } from "../../dao/radiology";
 import {readoneprocedure,updateprocedure} from "../../dao/procedure";
 import {readoneprescription,updateprescription} from "../../dao/prescription";
+import  {getPaymentReference} from "../../utils/otherservices";
 import {readonelab,updatelab} from "../../dao/lab";
-import {readoneadmission} from "../../dao/admissions";
 import {createpayment} from "../../dao/payment";
 import {getHistopathologyByIdPopulate,updateHistopathologyRecord} from "../../dao/histopathology.dao";
 import {updatepatient} from "../../dao/patientmanagement";
@@ -45,14 +45,7 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
 
 
 // 🔹 Common payment reference resolver
-async function getPaymentReference(patientId: string, fallbackId: string) {
-  const admission = await readoneadmission(
-    { patient: patientId, status: { $ne: configuration.admissionstatus[5] } },
-    {},
-    ""
-  );
-  return admission ? admission.admissionid : fallbackId;
-}
+
 
 // 🟢 LAB HANDLER
 export async function processLab(id: string, ctx: any) {  

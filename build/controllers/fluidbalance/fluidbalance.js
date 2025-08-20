@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createfluidbalance = exports.readAllfluidbalanceByPatient = exports.readallfluidbalanceByAdmission = void 0;
+exports.createfluidbalance = exports.createfluidbalancev1 = exports.readAllfluidbalanceByPatient = exports.readallfluidbalanceByAdmission = void 0;
 exports.updatefluidbalance = updatefluidbalance;
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
 const admissions_1 = require("../../dao/admissions");
 const fluidbalance_1 = require("../../dao/fluidbalance");
+const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const otherservices_1 = require("../../utils/otherservices");
 const { ObjectId } = mongoose_1.default.Types;
@@ -34,7 +35,8 @@ const readallfluidbalanceByAdmission = (req, res) => __awaiter(void 0, void 0, v
             intaketype: 1,
             intakeroute: 1,
             outputtype: 1,
-            outputroute: 1
+            outputroute: 1,
+            observationalNotes: 1, dateTo: 1, dateFrom: 1
         }, 'patient createdBy', '');
         res.status(200).json({
             queryresult,
@@ -64,6 +66,7 @@ const readAllfluidbalanceByPatient = (req, res) => __awaiter(void 0, void 0, voi
             intakeroute: 1,
             outputtype: 1,
             outputroute: 1,
+            observationalNotes: 1, dateTo: 1, dateFrom: 1,
             updatedAt: 1
         }, 'patient createdBy', '');
         res.status(200).json({
@@ -78,7 +81,7 @@ const readAllfluidbalanceByPatient = (req, res) => __awaiter(void 0, void 0, voi
 exports.readAllfluidbalanceByPatient = readAllfluidbalanceByPatient;
 //create vital charts
 // Create a new schedule
-exports.createfluidbalance = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createfluidbalancev1 = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { firstName, lastName, _id: userId } = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
@@ -118,7 +121,7 @@ function updatefluidbalance(req, res) {
             const { id } = req.params;
             const { firstName, lastName, _id: userId } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
-            var { outputamount, inputamount, intakeroute, intaketype, outputtype, outputroute } = req.body;
+            var { outputamount, inputamount, intakeroute, intaketype, outputtype, outputroute, observationalNotes, dateTo, dateFrom } = req.body;
             const fluidRecord = yield (0, fluidbalance_1.readonefluidbalances)({ _id: id }, {});
             //console.log(admissionrecord);   
             if (!fluidRecord) {
@@ -133,6 +136,9 @@ function updatefluidbalance(req, res) {
                 intakeroute,
                 outputtype,
                 outputroute,
+                observationalNotes,
+                dateTo: (0, otherservices_1.parseDate)(dateTo) || null,
+                dateFrom: (0, otherservices_1.parseDate)(dateFrom) || null,
                 updatedBy: userId,
             };
             (0, otherservices_1.validateinputfaulsyvalue)({ inputamount, outputamount });
@@ -148,3 +154,46 @@ function updatefluidbalance(req, res) {
         }
     });
 }
+exports.createfluidbalance = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { firstName, lastName, _id: userId } = (req.user).user;
+    req.body.staffname = `${firstName} ${lastName}`;
+    const { patientId, fluidRecords } = req.body;
+    if (!fluidRecords) {
+        return next(new errors_1.ApiError(404, `fluidRecords do not ${config_1.default.error.erroralreadyexit}, pass it as *fluidRecords* in the json`));
+    }
+    // Validate fluidRecords
+    if (!fluidRecords || !Array.isArray(fluidRecords) || fluidRecords.length === 0) {
+        return next(new errors_1.ApiError(400, "fluidRecords is required and must be an array"));
+    }
+    const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
+    if (!admissionrecord) {
+        return next(new errors_1.ApiError(404, `Admission do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    let newFluidRecord = [];
+    for (const record of fluidRecords) {
+        var { outputamount, inputamount, referedward, intakeroute, intaketype, outputtype, outputroute, observationalNotes, dateTo, dateFrom } = record;
+        // var { oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname} = req.body;
+        (0, otherservices_1.validateinputfaulsyvalue)({ inputamount, outputamount });
+        const balance = (inputamount || 0) - (outputamount || 0);
+        newFluidRecord.push({
+            admission: id,
+            referedward,
+            patient: patientId,
+            inputamount,
+            outputamount,
+            balance,
+            intaketype,
+            intakeroute,
+            outputtype,
+            outputroute,
+            observationalNotes,
+            dateTo: (0, otherservices_1.parseDate)(dateTo) || null,
+            dateFrom: (0, otherservices_1.parseDate)(dateFrom) || null,
+            createdBy: userId,
+        });
+    }
+    // const queryresult=await createfluidbalances({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname});
+    const queryresult = yield (0, fluidbalance_1.createMultifluidbalances)(newFluidRecord);
+    res.status(200).json({ queryresult, status: true });
+}));
