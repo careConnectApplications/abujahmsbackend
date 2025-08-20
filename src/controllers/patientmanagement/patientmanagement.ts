@@ -18,6 +18,7 @@ import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 import { createDeflateRaw } from "zlib";
+import {selectPatientStrategy,PatientRegistrationContext} from "./patientmanagement.helper"
 
 
 
@@ -211,8 +212,99 @@ export async function updateauthorizationcode(req: any, res: any) {
 
 }
 
+export var createpatients = async (req: any, res: any) => {
+  try {
+    const appointmentid: any = String(Date.now());
+    const { dateOfBirth,phoneNumber,isHMOCover,alternatePhoneNumber,bloodGroup, genotype, bp, heartRate, temperature } = req.body;
+    const clinicalInformation = {
+      bloodGroup, genotype, bp, heartRate, temperature
+    }
 
+    req.body.clinicalInformation = clinicalInformation;
+    var uniqunumber = await storeUniqueNumber(4);
+    // chaorten the MRN to alphanumeric 
+    req.body.MRN = uniqunumber;
+    req.body.password = configuration.defaultPassword;
+    req.body.appointmentcategory = configuration.category[3];
+    req.body.appointmenttype = configuration.category[3];
+
+
+    if (!(req.body.isHMOCover)) {
+      req.body.isHMOCover = configuration.ishmo[0];
+    }
+    if (phoneNumber.length !== 11) {
+      throw new Error(configuration.error.errorelevendigit);
+    }
+
+    if (alternatePhoneNumber && alternatePhoneNumber.length !== 11) {
+      throw new Error(configuration.error.errorelevendigit);
+    }
+
+
+    if (dateOfBirth) req.body.age = moment().diff(moment(dateOfBirth), 'years');
+    //if not dateObirth but age calculate date of birth
+    if (!dateOfBirth && req.body.age) req.body.dateOfBirth = moment().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
+
+
+    if (!(isHMOCover == configuration.ishmo[1] || isHMOCover == true)) {
+      delete req.body.authorizationcode;
+      delete req.body.facilitypateintreferedfrom;
+    }
+      var selectquery = {
+      "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
+      "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
+    };
+    const foundUser: any = await readonepatient({ phoneNumber }, selectquery, '', '');
+    //category
+    if (foundUser && phoneNumber !== configuration.defaultphonenumber) {
+      throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+
+    }
+    // fetch prices
+    const [
+      newRegistrationPrice,
+      annualsubscriptionnewRegistrationPrice,
+      cardfeenewRegistrationPrice,
+    ] = await Promise.all([
+      readoneprice({
+        servicecategory: configuration.category[3],
+        servicetype: configuration.category[3],
+      }),
+      readoneprice({
+        servicecategory: configuration.category[8],
+        servicetype: configuration.category[8],
+      }),
+      readoneprice({
+        servicecategory: configuration.category[9],
+        servicetype: configuration.category[9],
+      }),
+    ]);
+
+    if (!newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
+      throw new Error(
+        `Price for ${configuration.category[3]} or ${configuration.category[8]} or ${configuration.category[9]} is not set`
+      );
+    }
+
+    // pick strategy
+    const strategy = selectPatientStrategy(req.body.isHMOCover);
+    const context = PatientRegistrationContext(strategy);
+
+    const result = await context.execute({
+      reqBody: req.body,
+      appointmentid,
+      newRegistrationPrice,
+      annualsubscriptionnewRegistrationPrice,
+      cardfeenewRegistrationPrice,
+    });
+
+    res.status(200).json({ queryresult: result, status: true });
+  } catch (error: any) {
+    res.status(403).json({ status: false, msg: error.message });
+  }
+};
 //add patiient
+/*
 export var createpatients = async (req: any, res: any) => {
 
   try {
@@ -430,6 +522,7 @@ export var createpatients = async (req: any, res: any) => {
     res.status(403).json({ status: false, msg: error.message });
   }
 }
+  */
 //read all patients
 export async function getallpatients(req: any, res: any) {
   try {
