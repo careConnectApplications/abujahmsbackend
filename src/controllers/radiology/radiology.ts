@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
-import { validateinputfaulsyvalue, uploaddocument,calculateAmountPaidByHMO } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, uploaddocument, calculateAmountPaidByHMO, uploadbase64image } from "../../utils/otherservices";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import { readoneappointment, updateappointment } from "../../dao/appointment";
 import { readallservicetype } from "../../dao/servicetype";
 import { createradiology, readallradiology, updateradiology, readoneradiology, optimizedreadallradiology } from "../../dao/radiology";
 import { readoneprice } from "../../dao/price";
+
 import { readonepayment } from "../../dao/payment";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
+
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { readoneadmission } from "../../dao/admissions";
@@ -26,7 +28,7 @@ export var radiologyorder = async (req: any, res: any) => {
 
     //accept _id from request
     const { id } = req.params;
-    var { testname, note, appointmentid } = req.body;
+    var { testname, note, appointmentid, imageBase64 } = req.body;
     const { firstName, lastName } = (req.user).user;
     const raiseby = `${firstName} ${lastName}`;
     var testid: any = String(Date.now());
@@ -40,8 +42,8 @@ export var radiologyorder = async (req: any, res: any) => {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
 
     }
-    let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance._id, category:configuration.category[4]},{hmopercentagecover:1});
-    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+    let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[4] }, { hmopercentagecover: 1 });
+    var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
       appointmentid = new ObjectId(appointmentid);
@@ -55,20 +57,25 @@ export var radiologyorder = async (req: any, res: any) => {
 
     }
 
-    
+
+    let filename;
+    if (imageBase64) filename = await uploadbase64image(imageBase64);
+
     //loop through all test and create record in lab order
     for (var i = 0; i < testname.length; i++) {
 
       //search for price of test name
-      var testPrice: any = await readoneprice({ servicetype: testname[i]});
+      var testPrice: any = await readoneprice({ servicetype: testname[i] });
       if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
-      let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+      let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
+
       let testrecord: any=await createradiology({ hmopercentagecover,
-        actualcost:testPrice.amount, note, testname: testname[i], patient: id, testid, raiseby, amount });
+        actualcost:testPrice.amount, note, testname: testname[i], patient: id, testid, raiseby, amount,filename });
+
       //create testrecordn 
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -187,7 +194,7 @@ export const readAllRadiologyoptimized = async (req: any, res: any) => {
             testid: 1,
             testresult: 1,
             department: 1,
-            typetestresult:1,
+            typetestresult: 1,
             raiseby: 1,
             firstName: "$patient.firstName",
             lastName: "$patient.lastName",
@@ -375,6 +382,7 @@ export const confirmradiologyorder = catchAsync(async (req: any, res: Response, 
 
   const context = RadiologyConfirmationContext(strategyFn);
 
+
   const queryresult = await context.execute({
     id,
     option,
@@ -382,6 +390,7 @@ export const confirmradiologyorder = catchAsync(async (req: any, res: Response, 
     radiology,
     patient,
   });
+
 
   res.status(200).json({ queryresult, status: true });
 });
