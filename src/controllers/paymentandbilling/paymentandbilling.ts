@@ -77,10 +77,6 @@ export async function confirmgrouppayment(req: any, res: any) {
       const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
       let cardFeePaid;
       let subscriptionfeePaid;
-      console.log('*********', paymentcategory);
-      console.log('*********', configuration.category[3]);
-      console.log('*********', configuration.category[8]);
-      console.log('*********', configuration.category[9]);
       if (!patientrecord && !(paymentcategory == configuration.category[3] || paymentcategory == configuration.category[8] || paymentcategory == configuration.category[9])) {
       
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
@@ -107,7 +103,7 @@ subscriptionfeePaid = await readonepayment({
 
 
       }
-      //ensure card fee and annual fee is paid before confirming payment for patient registration
+      //ensure card fee and annual fee is paid before confirming payment for patient registration 
       if (paymentcategory == configuration.category[3] && (cardFeePaid || subscriptionfeePaid)) {
         throw new Error(`Patient has not paid for ${configuration.category[9]} or ${configuration.category[8]}`);
       }
@@ -119,6 +115,7 @@ subscriptionfeePaid = await readonepayment({
       //const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
       if (paymentcategory == configuration.category[3]) {
+        console.log('*********', patient);
         //update patient registration status
         await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1], paymentstatus: status, paymentreference });
       }
@@ -130,9 +127,10 @@ subscriptionfeePaid = await readonepayment({
         await updatelabbyquery({ payment: _id }, { status: configuration.status[5] })
       }
       else if(paymentcategory ==configuration.category[8]){
+        console.log('*********', configuration.category[8]);
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
-        await updatepayment(_id, { subscriptionPaidUntil: nextYear });
+        await updatepatientbyanyquery({_id:patient}, { subscriptionPaidUntil: nextYear, subscriptionExpired:false });
       }
 
     }
