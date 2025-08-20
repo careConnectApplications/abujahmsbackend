@@ -188,6 +188,10 @@ const patientSchema = new mongoose_1.Schema({
         type: Date,
         default: null
     },
+    subscriptionExpired: {
+        type: Boolean,
+        default: null
+    },
     status: {
         required: true,
         type: String,

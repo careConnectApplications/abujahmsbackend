@@ -113,6 +113,8 @@ const labSchema = new Schema({
   priority:{type:String, enum: ["urgent", "routine"]},
   sortbydate:Date,
   amount: Number,
+  hmopercentagecover:Number,
+  actualcost:Number,
   chemicalpathologyhemathologyreviewtstatus:{
     required: true,
     type: String,

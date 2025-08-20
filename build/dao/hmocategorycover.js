@@ -12,21 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readallfluidbalances = readallfluidbalances;
-exports.createfluidbalances = createfluidbalances;
-exports.readonefluidbalances = readonefluidbalances;
-exports.updatefluidbalances = updatefluidbalances;
-exports.updatefluidbalancequery = updatefluidbalancequery;
-exports.createMultifluidbalances = createMultifluidbalances;
-const fluidbalance_1 = __importDefault(require("../models/fluidbalance"));
+exports.readallhmocategorycover = readallhmocategorycover;
+exports.createhmocategorycover = createhmocategorycover;
+exports.readonehmocategorycover = readonehmocategorycover;
+exports.updatehmocategorycover = updatehmocategorycover;
+exports.updatehmocategorycoverbyquery = updatehmocategorycoverbyquery;
+const hmocategorycover_1 = __importDefault(require("../models/hmocategorycover"));
 const config_1 = __importDefault(require("../config"));
-//read all patient history
-function readallfluidbalances(query, selectquery, populatequery, populatesecondquery) {
+// Read all HMO Category Covers
+function readallhmocategorycover(query, selectquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const fluidbalancesdetails = yield fluidbalance_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).sort({ createdAt: -1 });
-            const totalfluidbalancesdetails = yield fluidbalance_1.default.find(query).countDocuments();
-            return { fluidbalancesdetails, totalfluidbalancesdetails };
+            const hmocategorycoverdetails = yield hmocategorycover_1.default.find(query)
+                .select(selectquery)
+                .populate("hmoId")
+                .sort({ createdAt: -1 });
+            const totalhmocategorycoverdetails = yield hmocategorycover_1.default.find(query).countDocuments();
+            return { hmocategorycoverdetails, totalhmocategorycoverdetails };
         }
         catch (err) {
             console.log(err);
@@ -34,13 +36,12 @@ function readallfluidbalances(query, selectquery, populatequery, populatesecondq
         }
     });
 }
-;
-function createfluidbalances(input) {
+// Create new HMO Category Cover
+function createhmocategorycover(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log('///////////', input);
-            const fluidbalances = new fluidbalance_1.default(input);
-            return yield fluidbalances.save();
+            const hmocategorycover = new hmocategorycover_1.default(input);
+            return yield hmocategorycover.save();
         }
         catch (err) {
             console.log(err);
@@ -48,11 +49,11 @@ function createfluidbalances(input) {
         }
     });
 }
-//find one
-function readonefluidbalances(query, selectquery) {
+// Find one HMO Category Cover
+function readonehmocategorycover(query, selectquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield fluidbalance_1.default.findOne(query).select(selectquery);
+            return yield hmocategorycover_1.default.findOne(query).select(selectquery).populate("hmoId");
         }
         catch (err) {
             console.log(err);
@@ -60,16 +61,15 @@ function readonefluidbalances(query, selectquery) {
         }
     });
 }
-function updatefluidbalances(id, reqbody) {
+// Update by ID
+function updatehmocategorycover(id, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const fluidbalance = yield fluidbalance_1.default.findOneAndUpdate({ _id: id }, reqbody, {
-                new: true
-            });
-            if (!fluidbalance) {
+            const hmocategorycover = yield hmocategorycover_1.default.findOneAndUpdate({ _id: id }, reqbody, { new: true });
+            if (!hmocategorycover) {
                 throw new Error(config_1.default.error.errorinvalidcredentials);
             }
-            return fluidbalance;
+            return hmocategorycover;
         }
         catch (err) {
             console.log(err);
@@ -77,33 +77,19 @@ function updatefluidbalances(id, reqbody) {
         }
     });
 }
-//update  appointment by query
-function updatefluidbalancequery(query, reqbody) {
+// Update by query
+function updatehmocategorycoverbyquery(query, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const fluidbalance = yield fluidbalance_1.default.findOneAndUpdate(query, reqbody, {
-                new: true
-            });
-            if (!fluidbalance) {
-                //return json  false response
+            const hmocategorycover = yield hmocategorycover_1.default.findOneAndUpdate(query, reqbody, { new: true });
+            if (!hmocategorycover) {
                 throw new Error(config_1.default.error.errorinvalidcredentials);
             }
-            return fluidbalance;
+            return hmocategorycover;
         }
         catch (err) {
             console.log(err);
             throw new Error(config_1.default.error.erroruserupdate);
-        }
-    });
-}
-function createMultifluidbalances(input) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return yield fluidbalance_1.default.create(input);
-        }
-        catch (err) {
-            console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
         }
     });
 }

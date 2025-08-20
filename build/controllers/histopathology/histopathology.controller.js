@@ -23,20 +23,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllHistopathologyDashboard = exports.CreateMultipleTestReport = exports.getAllHistopathologyPaginatedHandler = exports.getAllHistopathology = exports.getHistopathologyRecordById = exports.CreateHistopatholgyService = void 0;
+exports.getHistopathologyRecordByPatientId = exports.getAllHistopathologyDashboard = exports.CreateMultipleTestReport = exports.getAllHistopathologyPaginatedHandler = exports.getAllHistopathology = exports.getHistopathologyRecordById = exports.CreateHistopatholgyService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const uuid_1 = require("uuid");
 const config_1 = __importDefault(require("../../config"));
+//import { readoneappointment } from "../../dao/appointment";
 const histopathology_dao_1 = require("../../dao/histopathology.dao");
 const histopathology_tests_dao_1 = require("../../dao/histopathology-tests.dao");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const payment_1 = require("../../dao/payment");
 const price_1 = require("../../dao/price");
 const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const pick_1 = __importDefault(require("../../utils/pick"));
 const histopathology_1 = __importDefault(require("../../models/histopathology"));
 const otherservices_1 = require("../../utils/otherservices");
+const otherservices_2 = require("../../utils/otherservices");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const generateRefNumber = () => {
     const uniqueHistopathologyId = (0, uuid_1.v4)();
     return `histo-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
@@ -49,7 +51,7 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
     var _a, _b;
     const { patientId, examTypes, /// this is the service types
-    doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy, diagnosis } = req.body;
+    doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy, diagnosis, imageBase64, nameofexplainer, nameofrepresentive, addressofrepresentaive, fullnameofwitness } = req.body;
     // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
     //if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
     if (!patientId)
@@ -65,26 +67,25 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     }
     //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId = new mongoose_1.default.Types.ObjectId(patientId);
-    // let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
-    // if (!appointment) {
-    //     return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
-    // }
     // check if patient still has a pending record
     let pendingHistopathologyRecord = yield (0, histopathology_dao_1.queryHistopathologyRecord)({ patient: _patientId, status: config_1.default.status[2] }, null, null);
     if (pendingHistopathologyRecord)
         return next(new errors_1.ApiError(400, "this patient still has a pending histopathology record"));
     const { firstName, lastName, _id: userId } = (req.user).user;
-    const raiseby = `${firstName} ${lastName}`;
     ///Step 2: Read the Appointment and populate the patient field.
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, 'insurance', '');
     if (!foundPatient) {
         return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
     }
-    var hmopercentagecover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+    let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[6] }, { hmopercentagecover: 1 });
+    var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+    let fileName;
+    if (imageBase64)
+        fileName = yield (0, otherservices_1.uploadbase64image)(imageBase64);
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
     let totalAmount = 0;
     const testRequiredRecords = [];
-    const createdPayments = [];
+    //    const createdPayments = [];
     const refNumber = generateRefNumber();
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
@@ -92,38 +93,48 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
         if (!testPrice) {
             return next(new Error(`${config_1.default.error.errornopriceset}  ${service}`));
         }
-        const serviceAmount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
+        const serviceAmount = (0, otherservices_2.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
         //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
         //const refNumber = generateRefNumber();
+        /*
+
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
-            paymentcategory: config_1.default.category[6], // Histopathology category
+            paymentcategory: configuration.category[6], // Histopathology category
             patient: _patientId,
-            firstName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.firstName,
-            lastName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.lastName,
-            MRN: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.MRN,
-            phoneNumber: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.phoneNumber,
+            firstName: foundPatient?.firstName,
+            lastName: foundPatient?.lastName,
+            MRN: foundPatient?.MRN,
+            phoneNumber: foundPatient?.phoneNumber,
             amount: Number(serviceAmount)
-        };
+        }
+            */
         testRequiredRecords.push({
+            amount: serviceAmount,
             name: service,
             PaymentRef: null,
             paymentStatus: config_1.default.status[5] // Scheduled
         });
-        createdPayments.push(paymentData);
+        // createdPayments.push(paymentData);
     }
-    for (let i = 0; i < createdPayments.length; i++) {
-        const paymentRecord = yield (0, payment_1.createpayment)(createdPayments[i]);
-        testRequiredRecords[i].PaymentRef = paymentRecord._id;
-    }
+    /*
+        for (let i = 0; i < createdPayments.length; i++) {
+    
+            const paymentRecord = await createpayment(createdPayments[i]);
+    
+            testRequiredRecords[i].PaymentRef = paymentRecord._id;
+        }
+            */
     const labNo = generateLabNumber();
     const newHistopathology = {
         patient: _patientId,
         staffInfo: userId,
         amount: totalAmount,
-        status: config_1.default.status[5],
+        refNumber,
+        //status: configuration.status[5],
+        status: config_1.default.otherstatus[0],
         paymentStatus: config_1.default.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {
@@ -136,6 +147,14 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
             requestingDoctor: _doctorId,
             phoneNumber: foundPatient.phoneNumber || null
         },
+        consentForm: {
+            nameofexplainer,
+            nameofrepresentive,
+            filename: fileName,
+            addressofrepresentaive,
+            fullnameofwitness,
+            createdBy: userId
+        }
     };
     const savedHistopathology = yield (0, histopathology_dao_1.CreateHistopatholgyDao)(newHistopathology, next);
     res.status(201).json({
@@ -333,5 +352,98 @@ exports.getAllHistopathologyDashboard = (0, catchAsync_1.default)((req, res, nex
             totalCount,
             totalPages
         },
+    });
+}));
+exports.getHistopathologyRecordByPatientId = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id)
+        return next(new errors_1.ApiError(400, `id ${config_1.default.error.errornotfound}`));
+    if (!mongoose_1.default.Types.ObjectId.isValid(id))
+        return next(new errors_1.ApiError(404, config_1.default.error.errorInvalidObjectId));
+    //const doc = await getAllHistopathologyRecords({ patient: id });
+    const status = req.query.status;
+    const baseMatch = {};
+    if (status) {
+        baseMatch["testRequired.paymentStatus"] = status;
+    }
+    baseMatch["patientDetails._id"] = new mongoose_1.default.Types.ObjectId(id);
+    const doc = yield histopathology_1.default.aggregate([
+        { $unwind: "$testRequired" },
+        {
+            $lookup: {
+                from: "users",
+                localField: "staffInfo",
+                foreignField: "_id",
+                as: "staff"
+            }
+        },
+        { $unwind: { path: "$staff", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "patientsmanagements",
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientDetails"
+            }
+        },
+        { $unwind: { path: "$patientDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $match: baseMatch
+        },
+        {
+            $lookup: {
+                from: "payments",
+                localField: "testRequired.PaymentRef",
+                foreignField: "_id",
+                as: "testPayment"
+            }
+        },
+        { $unwind: { path: "$testPayment", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 0,
+                histopathologyId: "$_id",
+                testName: "$testRequired.name",
+                testPaymentStatus: "$testRequired.paymentStatus",
+                testPaymentRef: "$testRequired.PaymentRef",
+                amount: "$amount",
+                status: "$status",
+                createdAt: "$createdAt",
+                diagnosisForm: "$diagnosisForm",
+                staff: {
+                    //name: { $concat: ["$staff.firstName", " ", "$staff.lastName"] },
+                    firstName: "$staff.firstName",
+                    lastName: "$staff.lastName",
+                    email: "$staff.email",
+                    staffId: "$staff.staffId",
+                    role: "$staff.role"
+                },
+                patient: {
+                    //name: { $concat: ["$patientDetails.firstName", " ", "$patientDetails.lastName"] },
+                    firstName: "$patientDetails.firstName",
+                    lastName: "$patientDetails.lastName",
+                    age: "$patientDetails.age",
+                    phone: "$patientDetails.phoneNumber",
+                    gender: "$patientDetails.gender",
+                    mrn: "$patientDetails.MRN"
+                },
+                paymentInfo: {
+                    amount: "$testPayment.amount",
+                    paymentReference: "$testPayment.paymentreference",
+                    status: "$testPayment.status",
+                    paymentCategory: "$testPayment.paymentcategory",
+                    paymentType: "$testPayment.paymentype",
+                    cashierName: "$testPayment.cashiername",
+                    createdAt: "$testPayment.createdAt",
+                }
+            }
+        }
+    ]);
+    if (!doc) {
+        return next(new errors_1.ApiError(404, `histopathology report ${config_1.default.error.errornotfound}`));
+    }
+    res.status(200).json({
+        status: true,
+        data: doc
     });
 }));

@@ -19,4 +19,6 @@ router.patch("/lens-prescription/:eyeModuleId", eye_module_controller_1.updateLe
 router.patch("/preliminary-test/:eyeModuleId", eye_module_controller_1.updatePreliminaryTest);
 router.patch("/examination/:eyeModuleId", eye_module_controller_1.updateExamination);
 router.patch("/operational-notes/:eyeModuleId", eye_module_controller_1.updateOperationalTest);
+router.post("/eye-consultation", eye_module_controller_1.createEyeConsultation);
+router.put("/eye-consultation/:eyeModuleId", eye_module_controller_1.updateEyeConsultation);
 exports.default = router;

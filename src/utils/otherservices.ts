@@ -7,6 +7,7 @@ import nodemailer from "nodemailer";
 import * as path from 'path';
 import configuration from "../config";
 import { readonepatient } from '../dao/patientmanagement';
+import {readoneadmission} from "../dao/admissions";
 const { v4: uuidv4 } = require('uuid');
 
 export var encrypt = async function (password: any) {
@@ -237,4 +238,14 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
 export function calculateAmountPaidByHMO(hmoCoveragePercentage: number, totalAmount: number): number {
   const patientResponsibility = (100 - hmoCoveragePercentage) / 100;
   return patientResponsibility * totalAmount;
+}
+
+
+export async function getPaymentReference(patientId: string, fallbackId: string) {
+  const admission = await readoneadmission(
+    { patient: patientId, status: { $ne: configuration.admissionstatus[5] } },
+    {},
+    ""
+  );
+  return admission ? admission.admissionid : fallbackId;
 }

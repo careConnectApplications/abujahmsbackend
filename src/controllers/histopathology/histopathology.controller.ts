@@ -22,17 +22,72 @@ import Histopathology from "../../models/histopathology";
 import { uploadbase64image } from "../../utils/otherservices";
 import { calculateAmountPaidByHMO } from "../../utils/otherservices";
 import { readonehmocategorycover } from "../../dao/hmocategorycover";
+import {HistopathologyCreationContext, HMOHistopathologyCreationStrategy, SelfPayHistopathologyCreationStrategy} from "./histolopathology.helper";
 
-const generateRefNumber = () => {
-    const uniqueHistopathologyId = uuidv4();
-    return `histo-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
-}
+export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const {
+    patientId,
+    examTypes,
+    doctorId,
+    lmp,
+    biopsyType,
+    wholeOrgan,
+    previousBiopsy,
+    diagnosis,
+    imageBase64,
+    nameofexplainer,
+    nameofrepresentive,
+    addressofrepresentaive,
+    fullnameofwitness
+  } = req.body;
 
-const generateLabNumber = () => {
-    const uniqueHistopathologyId = uuidv4();
-    return `Lab-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
-}
+  if (!patientId) return next(new ApiError(400, "Patient Id is not provided!"));
+  if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0)
+    return next(new ApiError(400, configuration.error.errorMustBeAnArray));
+  if (doctorId && !mongoose.Types.ObjectId.isValid(doctorId))
+    return next(new ApiError(404, "Invalid doctor id"));
 
+  const _doctorId = doctorId ? new mongoose.Types.ObjectId(doctorId) : null;
+  const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
+
+  const pending = await queryHistopathologyRecord(
+    { patient: _patientId, status: configuration.status[2] }, null, null
+  );
+  if (pending) return next(new ApiError(400, "this patient still has a pending histopathology record"));
+
+  const { _id: userId } = (req.user).user;
+  const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
+  if (!foundPatient) return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+
+  let insurance: any = await readonehmocategorycover(
+    { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
+    { hmopercentagecover: 1 }
+  );
+  console.log("insurance", insurance?.hmopercentagecover);
+  var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+
+  // Strategy selection
+  const strategyFn =
+    (foundPatient.isHMOCover == configuration.ishmo[1] || foundPatient.isHMOCover == true)
+      ? HMOHistopathologyCreationStrategy
+      : SelfPayHistopathologyCreationStrategy;
+
+  const context = HistopathologyCreationContext(strategyFn);
+  const savedHistopathology = await context.execute({
+    req, next, _patientId, foundPatient, hmopercentagecover, examTypes,
+    userId, _doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy,
+    diagnosis, imageBase64, nameofexplainer, nameofrepresentive,
+    addressofrepresentaive, fullnameofwitness
+  });
+
+  res.status(201).json({
+    status: true,
+    message: "Histopathology created successfully",
+    data: savedHistopathology
+  });
+});
+
+/*
 export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
 
@@ -89,12 +144,9 @@ var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
 
 let fileName;
 if (imageBase64) fileName = await uploadbase64image(imageBase64);
-
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
-
     let totalAmount = 0;
     const testRequiredRecords: any[] = [];
-
 //    const createdPayments = [];
      const refNumber = generateRefNumber();
 
@@ -126,7 +178,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
             amount: Number(serviceAmount)
         }
             */
-
+/*
         testRequiredRecords.push({
             amount: serviceAmount,
             name: service,
@@ -144,7 +196,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
     }
         */
-
+/*
     const labNo = generateLabNumber();
 
     const newHistopathology = {
@@ -185,6 +237,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
         data: savedHistopathology
     });
 });
+*/
 
 export const getHistopathologyRecordById = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     const { id } = req.params;

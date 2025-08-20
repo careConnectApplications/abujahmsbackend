@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkAndUpdateExpiredSubscription = void 0;
 exports.countpatient = countpatient;
 exports.deletePatietsByCondition = deletePatietsByCondition;
 exports.readallpatient = readallpatient;
@@ -25,6 +26,7 @@ exports.createpatientifnotexit = createpatientifnotexit;
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const otherservices_1 = require("../utils/otherservices");
 const config_1 = __importDefault(require("../config"));
+const date_fns_1 = require("date-fns");
 function countpatient(query) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -180,3 +182,26 @@ function createpatientifnotexit(filterinput, input) {
         }
     });
 }
+const checkAndUpdateExpiredSubscription = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const today = (0, date_fns_1.startOfDay)(new Date());
+        const expiredSubscriptions = yield patientmanagement_1.default.find({
+            subscriptionPaidUntil: { $ne: null, $lt: today },
+            subscriptionExpired: { $ne: true },
+            isHMOCover: { $eq: config_1.default.ishmo[0] }
+        });
+        if (!expiredSubscriptions.length) {
+            console.log("No subscriptions to update.");
+            return;
+        }
+        const ids = expiredSubscriptions.map(sub => sub._id);
+        console.log(ids);
+        yield patientmanagement_1.default.updateMany({ _id: { $in: ids } }, { $set: { subscriptionExpired: true } });
+        console.log(`Updated ${ids.length} subscriptions to expired.`);
+    }
+    catch (err) {
+        console.error("Error updating expired subscriptions:", err);
+        throw err;
+    }
+});
+exports.checkAndUpdateExpiredSubscription = checkAndUpdateExpiredSubscription;

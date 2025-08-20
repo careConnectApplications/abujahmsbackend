@@ -83,6 +83,7 @@ const labSchema = new mongoose_1.Schema({
         ref: "Users",
         default: null,
     },
+    raiseby: String,
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",
@@ -98,6 +99,11 @@ const labSchema = new mongoose_1.Schema({
     priority: { type: String, enum: ["urgent", "routine"] },
     sortbydate: Date,
     amount: Number,
+    chemicalpathologyhemathologyreviewtstatus: {
+        required: true,
+        type: String,
+        default: config_1.default.status[14],
+    },
     status: {
         required: true,
         type: String,

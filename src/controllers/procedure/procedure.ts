@@ -1,21 +1,82 @@
 import mongoose from 'mongoose';
-import { validateinputfaulsyvalue, uploaddocument,calculateAmountPaidByHMO } from "../../utils/otherservices";
-import { readonepatient, updatepatient } from "../../dao/patientmanagement";
-import { readoneappointment, updateappointment } from "../../dao/appointment";
-import { readallservicetype } from "../../dao/servicetype";
-import { createprocedure, readallprocedure, updateprocedure, readoneprocedure } from "../../dao/procedure";
+import { validateinputfaulsyvalue, uploaddocument } from "../../utils/otherservices";
+import { readonepatient } from "../../dao/patientmanagement";
+import { readoneappointment } from "../../dao/appointment";
+import { readallprocedure, updateprocedure, readoneprocedure } from "../../dao/procedure";
 import { readoneprice } from "../../dao/price";
-import { createpayment, updatepayment, readonepayment } from "../../dao/payment";
+import { updatepayment, readonepayment } from "../../dao/payment";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
-import { readoneadmission } from "../../dao/admissions";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
 const { ObjectId } = mongoose.Types;
+import catchAsync from "../../utils/catchAsync";
+import { HmoProcedureStrategy, SelfPayProcedureStrategy, ProcedureScheduleContext } from "./procedure.helper";
+import { Response, NextFunction } from 'express'; 
 
 
 
 import configuration from "../../config";
-//lab order
+export const scheduleprocedureorder = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
+
+  const { firstName, lastName } = (req.user).user;
+  const raiseby = `${firstName} ${lastName}`;
+  const procedureid: string = String(Date.now());
+
+  validateinputfaulsyvalue({ id, procedure });
+
+  // find patient
+  const foundPatient: any = await readonepatient({ _id: id }, {}, "", "");
+  if (!foundPatient) {
+    throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+  }
+console.log("foundPatient", foundPatient?.insurance);
+  // HMO coverage %
+  const insurance: any = await readonehmocategorycover(
+    { hmoId: foundPatient?.insurance, category: configuration.category[5] },
+    { hmopercentagecover: 1 }
+  );
+  console.log("insurance",insurance);
+  const hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+
+  // validate appointment if provided
+  let appointment: any;
+  if (appointmentid) {
+    appointmentid = new ObjectId(appointmentid);
+    appointment = await readoneappointment({ _id: appointmentid }, {}, "");
+    if (!appointment) {
+      throw new Error(`Appointment ${configuration.error.erroralreadyexit}`);
+    }
+  }
+
+  // 🔑 Strategy: HMO vs Self-Pay
+  const strategyFn =
+    !(foundPatient.isHMOCover == configuration.ishmo[1] || foundPatient.isHMOCover == true)
+      ? SelfPayProcedureStrategy
+      : HmoProcedureStrategy;
+
+  const context = ProcedureScheduleContext(strategyFn);
+
+  const queryresult = await context.execute({
+    id,
+    procedure,
+    clinic,
+    indicationdiagnosisprocedure,
+    appointmentdate,
+    cptcodes,
+    dxcodes,
+    appointmentid,
+    raiseby,
+    procedureid,
+    foundPatient,
+    hmopercentagecover,
+  });
+
+  res.status(200).json({ queryresult, status: true });
+});
+
+/*
 export var scheduleprocedureorder = async (req: any, res: any) => {
   try {
     //accept _id from request
@@ -50,12 +111,11 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
 
     }
 
-    //const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
+   
     //loop through all test and create record in lab order
     for (var i = 0; i < procedure.length; i++) {
       //search for price of test name
       var testPrice: any = await readoneprice({ servicetype: procedure[i] });
-      //var testPrice: any = await readoneprice({ servicetype: procedure[i], isHMOCover: configuration.ishmo[0] });
       if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${procedure[i]}`);
       }
@@ -92,7 +152,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
         //paymentids.push(createpaymentqueryresult._id);
       }
         */
-
+/*
        var procedurerecord = await createprocedure({ procedure: procedure[i], patient: id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby,status: configuration.otherstatus[0],amount });
         proceduresid.push(procedurerecord._id);
        
@@ -108,6 +168,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
 
     }
       */
+     /*
     if (appointmentid) {
       await updateappointment(appointment._id, { $push: { procedure: proceduresid } });
       //procedure
@@ -123,7 +184,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
   }
 
 }
-
+*/
 
 //get lab order by patient
 export const readAllprocedureByPatient = async (req: any, res: any) => {

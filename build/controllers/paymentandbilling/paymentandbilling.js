@@ -81,12 +81,41 @@ function confirmgrouppayment(req, res) {
             //check for null of id
             const response = yield (0, payment_1.readallpayment)({ paymentreference: paymentreferenceid, status: config_1.default.status[2] }, '');
             const { paymentdetails } = response;
+            if (!paymentdetails || paymentdetails.length === 0)
+                throw new Error("no paymentfound for this service");
             for (var i = 0; i < paymentdetails.length; i++) {
                 let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i];
                 //const {patient} = paymentdetails[i];
                 const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
-                if (!patientrecord && paymentcategory !== config_1.default.category[3]) {
+                let cardFeePaid;
+                let subscriptionfeePaid;
+                console.log('*********', paymentcategory);
+                console.log('*********', config_1.default.category[3]);
+                console.log('*********', config_1.default.category[8]);
+                console.log('*********', config_1.default.category[9]);
+                if (!patientrecord && !(paymentcategory == config_1.default.category[3] || paymentcategory == config_1.default.category[8] || paymentcategory == config_1.default.category[9])) {
                     throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+                }
+                if (paymentcategory == config_1.default.category[3]) {
+                    cardFeePaid = yield (0, payment_1.readonepayment)({
+                        patient,
+                        paymentype: config_1.default.category[9],
+                        paymentreference,
+                        paymentcategory: config_1.default.category[9],
+                        status: config_1.default.status[2]
+                    });
+                    //read payment for subscription fee
+                    subscriptionfeePaid = yield (0, payment_1.readonepayment)({
+                        patient,
+                        paymentype: config_1.default.category[8],
+                        paymentreference,
+                        paymentcategory: config_1.default.category[8],
+                        status: config_1.default.status[2]
+                    });
+                }
+                //ensure card fee and annual fee is paid before confirming payment for patient registration
+                if (paymentcategory == config_1.default.category[3] && (cardFeePaid || subscriptionfeePaid)) {
+                    throw new Error(`Patient has not paid for ${config_1.default.category[9]} or ${config_1.default.category[8]}`);
                 }
                 //var settings =await  configuration.settings();
                 const status = config_1.default.status[3];
@@ -107,8 +136,7 @@ function confirmgrouppayment(req, res) {
                 else if (paymentcategory == config_1.default.category[8]) {
                     const nextYear = new Date();
                     nextYear.setFullYear(nextYear.getFullYear() + 1);
-                    patientrecord.subscriptionPaidUntil = nextYear;
-                    yield patientrecord.save();
+                    yield (0, payment_1.updatepayment)(_id, { subscriptionPaidUntil: nextYear });
                 }
             }
             res.status(200).json({
@@ -342,11 +370,34 @@ function confirmpayment(req, res) {
             const { id } = req.params;
             //check for null of id
             const response = yield (0, payment_1.readonepayment)({ _id: id });
-            const { patient } = response;
+            if (!response)
+                throw new Error("no payment found for this service");
+            const { patient, paymentcategory, paymentreference } = response;
             const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
-            console.log('patient', patientrecord);
-            if (!patientrecord && response.paymentcategory !== config_1.default.category[3]) {
+            let cardFeePaid;
+            let subscriptionfeePaid;
+            if (!patientrecord && paymentcategory !== config_1.default.category[3]) {
                 throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            }
+            if (paymentcategory == config_1.default.category[3]) {
+                cardFeePaid = yield (0, payment_1.readonepayment)({
+                    patient,
+                    paymentype: config_1.default.category[9],
+                    paymentreference,
+                    paymentcategory: config_1.default.category[9],
+                    status: config_1.default.status[2]
+                });
+                //read payment for subscription fee
+                subscriptionfeePaid = yield (0, payment_1.readonepayment)({
+                    patient,
+                    paymentype: config_1.default.category[8],
+                    paymentreference,
+                    paymentcategory: config_1.default.category[8],
+                    status: config_1.default.status[2]
+                });
+            }
+            if (paymentcategory == config_1.default.category[3] && (cardFeePaid || subscriptionfeePaid)) {
+                throw new Error(`Patient has not paid for ${config_1.default.category[9]} or ${config_1.default.category[8]}`);
             }
             //var settings =await  configuration.settings();
             const status = config_1.default.status[3];
@@ -354,7 +405,6 @@ function confirmpayment(req, res) {
             const queryresult = yield (0, payment_1.updatepayment)(id, { status, cashieremail: email, cashierid: staffId });
             //const queryresult:any =await updatepayment(id,{status});
             //confirm payment of the service paid for 
-            const { paymentype, paymentcategory, paymentreference } = queryresult;
             //for patient registration
             if (paymentcategory == config_1.default.category[3]) {
                 //update patient registration status

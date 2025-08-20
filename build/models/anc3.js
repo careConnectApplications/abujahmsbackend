@@ -67,6 +67,11 @@ const anc3Schema = new mongoose_1.Schema({
         ref: "Users",
         default: null,
     },
+    updatedBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
     ancfollowup: [
         {
             type: mongoose_1.Schema.Types.ObjectId,

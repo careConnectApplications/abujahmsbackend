@@ -29,6 +29,7 @@ const procedureSchema = new mongoose_1.Schema({
     processby: {
         type: String
     },
+    amount: Number,
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",
@@ -42,13 +43,3 @@ const procedureSchema = new mongoose_1.Schema({
 }, { timestamps: true });
 const procedure = (0, mongoose_1.model)('Procedure', procedureSchema);
 exports.default = procedure;
-/*
-
-clinic
-indicationdiagnosisprocedure
-procedure:[]
-appointmentdate
-cptcodes:[]
-dxcodes:[]
-
-*/ 

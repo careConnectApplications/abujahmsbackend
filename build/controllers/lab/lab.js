@@ -15,15 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.labresultprocessinghemathologychemicalpathology = exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = exports.sorthemathologyandchemicalpathology = exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
-const patientmanagement_1 = require("../../dao/patientmanagement");
 const otherservices_1 = require("../../utils/otherservices");
-const payment_1 = require("../../dao/payment");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
 const users_1 = require("../../dao/users");
 const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const admissions_1 = require("../../dao/admissions");
+const lab_helper_1 = require("./lab.helper");
+const lab_helper_2 = require("./lab.helper");
 //adjust lab to view from department
 // Get all lab records
 const readalllabb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -157,6 +156,7 @@ const readallscheduledlaboptimized = (req, res) => __awaiter(void 0, void 0, voi
                 $project: {
                     _id: 1,
                     createdAt: 1,
+                    testresult: 1,
                     testname: 1,
                     updatedAt: 1,
                     testid: 1,
@@ -326,56 +326,30 @@ const listlabreportbypatient = (req, res) => __awaiter(void 0, void 0, void 0, f
 });
 exports.listlabreportbypatient = listlabreportbypatient;
 //this endpoint is use to accept or reject lab order
-const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        //extract option
-        const { option, remark } = req.body;
-        const { id } = req.params;
-        //search for the lab request
-        var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, 'patient');
-        const { testname, testid, patient, amount } = lab;
-        //validate the status
-        let queryresult;
-        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        let paymentreference;
-        //let status;
-        //validate the status
-        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-        if (findAdmission) {
-            paymentreference = findAdmission.admissionid;
-            //status=configuration.status[5];
-        }
-        else {
-            paymentreference = testid;
-            //status=configuration.status[2];
-        }
-        if (option == true && amount > 0) {
-            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
-            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
-            yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
-        }
-        else if (option == true && amount == 0) {
-            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[5], remark });
-        }
-        else {
-            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[13], remark });
-        }
-        res.status(200).json({ queryresult, status: true });
-        //if accept
-        //accept or reject lab order
-        //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-        //paymentids.push(createpaymentqueryresult._id);
-        //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
-        //var testrecord = await createlab({payment:createpaymentqueryresult._id});
-        //change status to 2 or  13 for reject
+//isHMOCover: { $eq: configuration.ishmo[0] }
+exports.confirmlaborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { option, remark } = req.body;
+    const { id } = req.params;
+    (0, otherservices_1.validateinputfaulsyvalue)({ id });
+    const lab = yield (0, lab_1.readonelab)({ _id: id }, {}, "patient");
+    if (lab.status !== config_1.default.status[14]) {
+        throw new Error(config_1.default.error.errorLabStatus);
     }
-    catch (e) {
-        console.log("error", e);
-        res.status(403).json({ status: false, msg: e.message });
-    }
-});
-exports.confirmlaborder = confirmlaborder;
+    const { patient } = lab;
+    // choose strategy based on isHMOCover
+    const strategyFn = !(patient.isHMOCover == config_1.default.ishmo[1] || patient.isHMOCover == true)
+        ? lab_helper_1.HmoLabConfirmationStrategy
+        : lab_helper_1.SelfPayLabConfirmationStrategy;
+    const context = (0, lab_helper_2.LabConfirmationContext)(strategyFn);
+    const queryresult = yield context.execute({
+        id,
+        option,
+        remark,
+        lab,
+        patient
+    });
+    res.status(200).json({ queryresult, status: true });
+}));
 // differentiate hemathology and histopathology
 exports.sorthemathologyandchemicalpathology = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -458,6 +432,7 @@ exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = (0, catchA
                 department: 1,
                 chemicalpathologyreport: 1,
                 peripheralbloodfilmreport: 1,
+                testresult: 1,
                 ADHbonemarrowaspirationreport: 1,
                 firstName: "$patient.firstName",
                 lastName: "$patient.lastName",
@@ -493,8 +468,8 @@ exports.labresultprocessinghemathologychemicalpathology = (0, catchAsync_1.defau
     //find id and validate
     var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
     //if not lab or status !== scheduled return error
-    if (!lab || !(lab.status == config_1.default.hematologyandchemicalpathologystatus[0] || lab.status == config_1.default.hematologyandchemicalpathologystatus[1])) {
-        throw new Error(config_1.default.error.errorservicetray);
+    if (!lab || !(lab.status == config_1.default.status[7])) {
+        throw new Error("Lab Techician is Yet to enter result for this test");
     }
     const peripheralbloodfilmreport = { status: config_1.default.hematologyandchemicalpathologystatus[2], reportedby, summary, redbloodcell, whitebloodcell, platelet, impression, suggestion };
     const ADHbonemarrowaspirationreport = { status: config_1.default.hematologyandchemicalpathologystatus[2], reportedby, clinicalnotes, boneconsistency, aspiration, erythroidratio, erythropoiesis, leucopoesis, megakaryopoiesis, plasmacells, abnomalcells, ironstore, conclusion };
@@ -503,13 +478,13 @@ exports.labresultprocessinghemathologychemicalpathology = (0, catchAsync_1.defau
     var queryresult;
     (0, otherservices_1.validateinputfaulsyvalue)({ lab });
     if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[0]) {
-        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { peripheralbloodfilmreport, status: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { labcategory: config_1.default.labcategory[0], peripheralbloodfilmreport, chemicalpathologyhemathologyreviewtstatus: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
     }
     else if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[1]) {
-        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { ADHbonemarrowaspirationreport, status: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { labcategory: config_1.default.labcategory[0], ADHbonemarrowaspirationreport, chemicalpathologyhemathologyreviewtstatus: config_1.default.hematologyandchemicalpathologystatus[2], processeddate });
     }
     else if (labreporttypehematologychemicalpathology == config_1.default.labreporttypehematologychemicalpathology[2]) {
-        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { chemicalpathologyreport, status: config_1.default.hematologyandchemicalpathologystatus[3], processeddate });
+        queryresult = yield (0, lab_1.updatelab)({ _id: id }, { labcategory: config_1.default.labcategory[1], chemicalpathologyreport, chemicalpathologyhemathologyreviewtstatus: config_1.default.hematologyandchemicalpathologystatus[3], processeddate });
     }
     else {
         throw new Error("Wrong Lab Category report detected");

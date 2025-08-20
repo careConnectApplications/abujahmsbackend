@@ -65,7 +65,8 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             type: Number,
             min: [0, "Amount cannot be negative"],
         },
-       
+        hmopercentagecover:Number,
+        actualcost:Number,
         paymentStatus: {
             type: String,
             default: configuration.status[2],

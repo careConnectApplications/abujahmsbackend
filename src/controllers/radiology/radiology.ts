@@ -5,11 +5,15 @@ import { readoneappointment, updateappointment } from "../../dao/appointment";
 import { readallservicetype } from "../../dao/servicetype";
 import { createradiology, readallradiology, updateradiology, readoneradiology, optimizedreadallradiology } from "../../dao/radiology";
 import { readoneprice } from "../../dao/price";
-import { createpayment, updatepayment, readonepayment } from "../../dao/payment";
+import { readonepayment } from "../../dao/payment";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { readoneadmission } from "../../dao/admissions";
+import { HmoRadiologyConfirmationStrategy, SelfPayRadiologyConfirmationStrategy, RadiologyConfirmationContext } from "./radiology.helper";
+import { Response, NextFunction } from 'express';
+import catchAsync from "../../utils/catchAsync";
+
 const { ObjectId } = mongoose.Types;
 
 
@@ -63,7 +67,8 @@ export var radiologyorder = async (req: any, res: any) => {
       let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-      let testrecord: any=await createradiology({ note, testname: testname[i], patient: id, testid, raiseby, amount });
+      let testrecord: any=await createradiology({ hmopercentagecover,
+        actualcost:testPrice.amount, note, testname: testname[i], patient: id, testid, raiseby, amount });
       //create testrecordn 
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -350,66 +355,35 @@ export var uploadradiologyresult = async (req: any, res: any) => {
   }
 
 }
-
-//confirm radiology order
-//this endpoint is use to accept or reject lab order
-export const confirmradiologyorder = async (req: any, res: any) => {
-  try {
-    //extract option
-    const { option, remark } = req.body;
-    const { id } = req.params;
-    //search for the lab request
-    //var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
-    // if not radiology return error
-
-    //const { testname, testid, patient, amount } = radiology;
-    //validate the status
-    let queryresult;
-    /*
-    let paymentreference;
-    //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-    var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
-    if (findAdmission) {
-      paymentreference = findAdmission.admissionid;
-
-    }
-    else {
-      paymentreference = testid;
-    }
-    if (option == true && amount > 0) {
-      var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
-      queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id, remark });
-      await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id } });
-
-    }
-    else if (option == true && amount == 0) {
-      queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
-
-    }
-    
-      */
-     if(option == true){
-          queryresult= await updateradiology({_id:id},{status:configuration.otherstatus[0],remark});
-    
-       }
-      else{
-        queryresult= await updateradiology({_id:id},{status:configuration.status[13],remark});
-    
-      }
-    res.status(200).json({ queryresult, status: true });
-    //if accept
-    //accept or reject lab order
-    //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-    //paymentids.push(createpaymentqueryresult._id);
-    //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
-    //var testrecord = await createlab({payment:createpaymentqueryresult._id});
-    //change status to 2 or  13 for reject
-
+export const confirmradiologyorder = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+  const { option, remark } = req.body;
+  console.log("option", option, "remark", remark);
+  const { id } = req.params;
+  validateinputfaulsyvalue({ id });
+  const radiology: any = await readoneradiology({ _id: id }, {}, "patient");
+  if (radiology.status !== configuration.status[14]) {
+    throw new Error(configuration.error.errorRadiologyStatus);
   }
-  catch (e: any) {
-    console.log("error", e);
-    res.status(403).json({ status: false, msg: e.message });
 
-  }
-}
+  const { patient } = radiology;
+
+  // choose strategy based on isHMOCover
+  const strategyFn =
+    !(patient.isHMOCover == configuration.ishmo[1] || patient.isHMOCover == true)
+      ? SelfPayRadiologyConfirmationStrategy
+      :HmoRadiologyConfirmationStrategy ;
+
+  const context = RadiologyConfirmationContext(strategyFn);
+
+  const queryresult = await context.execute({
+    id,
+    option,
+    remark,
+    radiology,
+    patient,
+  });
+
+  res.status(200).json({ queryresult, status: true });
+});
+
 

@@ -3,7 +3,7 @@ import {validateinputfaulsyvalue,calculateAmountPaidByHMO} from "../../utils/oth
 import configuration from "../../config";
 import {readoneprice,updateprice} from "../../dao/price";
 import {readonepatient,updatepatient} from "../../dao/patientmanagement";
-import {createpayment,readonepayment} from "../../dao/payment";
+import {readonepayment} from "../../dao/payment";
 import { createprescription,readallprescription,readoneprescription,updateprescription,readprescriptionaggregate,optimizedreadprescriptionaggregate } from "../../dao/prescription";
 import {readoneappointment, updateappointment} from "../../dao/appointment";
 import {readoneadmission} from  "../../dao/admissions";
@@ -175,7 +175,7 @@ export var pharmacyorderwithoutconfirmation= async (req:any, res:any) =>{
       
     //create 
    // console.log("got here");
-    var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.otherstatus[0],amount,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
+    var prescriptionrecord:any = await createprescription({hmopercentagecover,actualcost:Number(orderPrice.amount) * qty,isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.otherstatus[0],amount,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
     pharcyorderid.push(prescriptionrecord ._id);
     //paymentids.push(createpaymentqueryresult._id);
     }

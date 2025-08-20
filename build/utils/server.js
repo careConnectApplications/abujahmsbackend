@@ -75,6 +75,7 @@ const histopathology_tests_route_1 = __importDefault(require("../routes/histopat
 const phisiotherapy_1 = __importDefault(require("../routes/phisiotherapy"));
 const eye_module_route_1 = __importDefault(require("../routes/eye-module.route"));
 const doctor_ward_round_route_1 = __importDefault(require("../routes/doctor-ward-round.route"));
+const insuranceauthorizationandclaims_1 = __importDefault(require("../routes/insuranceauthorizationandclaims"));
 function createServer() {
     const app = (0, express_1.default)();
     if (process.env.NODE_ENV !== "test") {
@@ -97,6 +98,10 @@ function createServer() {
         createParentPath: true,
     }));
     */
+    /****
+     * Cron Jobs
+     */
+    //import("../jobs/checkExpiredSubscriptionDate.job");
     app.use((0, express_fileupload_1.default)());
     app.use('/api/v1/downloads', downloads_1.default);
     app.use('/api/v1/uploads', express_1.default.static('uploads'));
@@ -131,6 +136,7 @@ function createServer() {
     app.use("/api/v1/histopathology-test", middleware_1.protect, histopathology_tests_route_1.default);
     app.use("/api/v1/eye-module", middleware_1.protect, eye_module_route_1.default);
     app.use("/api/v1/doctor-ward-round", middleware_1.protect, doctor_ward_round_route_1.default);
+    app.use("/api/v1/insuranceauthorizationandclaims", middleware_1.protect, insuranceauthorizationandclaims_1.default);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {

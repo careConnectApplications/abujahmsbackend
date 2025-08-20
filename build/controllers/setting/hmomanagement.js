@@ -22,18 +22,17 @@ const audit_1 = require("../../dao/audit");
 //add patiient
 var createhmo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body);
-        const { hmoname, id, hmopercentagecover } = req.body;
+        const { hmoname, id } = req.body;
         const { firstName, lastName } = (req.user).user;
         var actor = `${firstName} ${lastName}`;
-        (0, otherservices_1.validateinputfaulsyvalue)({ hmoname, hmopercentagecover, id });
+        (0, otherservices_1.validateinputfaulsyvalue)({ hmoname, id });
         //var id = `${hmoname[0]}${generateRandomNumber(5)}${hmoname[hmoname.length - 1]}`;
         const foundHmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname }, '');
         //update servicetype for New Patient Registration
         if (foundHmo) {
             throw new Error(`HMO ${config_1.default.error.erroralreadyexit}`);
         }
-        const queryresult = yield (0, hmomanagement_1.createhmomanagement)({ hmoname, id, hmopercentagecover });
+        const queryresult = yield (0, hmomanagement_1.createhmomanagement)({ hmoname, id });
         yield (0, audit_1.createaudit)({ action: "Create HMO", actor, affectedentity: hmoname });
         res.status(200).json({ queryresult, status: true });
     }
@@ -64,13 +63,13 @@ function updatehmo(req, res) {
         try {
             //get id
             const { _id } = req.params;
-            const { hmoname, id, hmopercentagecover } = req.body;
+            const { hmoname, id } = req.body;
             const { firstName, lastName } = (req.user).user;
             var actor = `${firstName} ${lastName}`;
-            (0, otherservices_1.validateinputfaulsyvalue)({ hmoname, _id, id, hmopercentagecover });
+            (0, otherservices_1.validateinputfaulsyvalue)({ hmoname, _id, id });
             yield (0, audit_1.createaudit)({ action: "Update HMO", actor, affectedentity: hmoname });
             //const queryresult = await createhmomanagement({ hmoname, id, insuranceId });
-            var queryresult = yield (0, hmomanagement_1.updatehmomanagement)(_id, { hmoname, id, hmopercentagecover });
+            var queryresult = yield (0, hmomanagement_1.updatehmomanagement)(_id, { hmoname, id });
             res.status(200).json({
                 queryresult,
                 status: true

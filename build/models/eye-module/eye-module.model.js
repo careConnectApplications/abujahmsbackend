@@ -43,6 +43,7 @@ const preliminary_test_model_1 = require("./preliminary-test.model");
 const opthalamology_examination_model_1 = require("./opthalamology-examination.model");
 const opthalmology_operational_test_model_1 = require("./opthalmology-operational-test.model");
 const paginate_1 = require("../../paginate");
+const eyeConsultation_model_1 = require("./eyeConsultation.model");
 const eyeModuleSchema = new mongoose_1.Schema({
     patient: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -95,10 +96,15 @@ const eyeModuleSchema = new mongoose_1.Schema({
         type: opthalamology_examination_model_1.ophthalmologyExaminationSchema,
         default: null
     },
+    eyeConsultation: {
+        type: eyeConsultation_model_1.eyeConsultationSchema,
+        default: null
+    },
     operationalTest: {
         type: [opthalmology_operational_test_model_1.ophthalmologyOperationalTestSchema],
         default: []
-    }
+    },
+    observationalNotes: { type: String }
 }, { timestamps: true });
 eyeModuleSchema.pre(/^find/, function (next) {
     this.populate({

@@ -5,11 +5,6 @@ const hmomanagementSchema = new mongoose_1.Schema({
     hmoname: {
         type: String
     },
-    hmopercentagecover: Number,
-    isprimaryhmo: {
-        type: Boolean,
-        default: false
-    },
     id: {
         type: String,
         required: true,

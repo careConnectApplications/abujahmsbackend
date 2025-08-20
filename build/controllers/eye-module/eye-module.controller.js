@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEyeRecordByPatientId = exports.updateOperationalTest = exports.updateExamination = exports.updatePreliminaryTest = exports.updateLensPrescription = exports.getAllEyeRecordsPaginatedHandler = exports.getAllEyeUtilData = exports.getAllEyeRecords = exports.getEyeRecordById = exports.getEyeRecordByAppointmentIdAndPatientId = exports.createOperationalNotes = exports.createPreliminaryTest = exports.createExamination = exports.createLensPrescription = exports.createEyeModule = void 0;
+exports.updateEyeConsultation = exports.createEyeConsultation = exports.getEyeRecordByPatientId = exports.updateOperationalTest = exports.updateExamination = exports.updatePreliminaryTest = exports.updateLensPrescription = exports.getAllEyeRecordsPaginatedHandler = exports.getAllEyeUtilData = exports.getAllEyeRecords = exports.getEyeRecordById = exports.getEyeRecordByAppointmentIdAndPatientId = exports.createOperationalNotes = exports.createPreliminaryTest = exports.createExamination = exports.createLensPrescription = exports.createEyeModule = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
@@ -473,6 +473,7 @@ exports.createOperationalNotes = (0, catchAsync_1.default)((req, res, next) => _
     /// this is for the media files
     const { patientId, appointmentId } = req.params;
     const files = req.files;
+    const { observationalNotes } = req.body;
     const { _id: userId } = (req.user).user;
     // Validate required IDs
     if (!patientId)
@@ -546,7 +547,8 @@ exports.createOperationalNotes = (0, catchAsync_1.default)((req, res, next) => _
             $push: {
                 operationalTest: { $each: uploadedTests }
             },
-            updatedBy: userId
+            updatedBy: userId,
+            observationalNotes: observationalNotes,
         }, next);
     }
     else {
@@ -558,6 +560,7 @@ exports.createOperationalNotes = (0, catchAsync_1.default)((req, res, next) => _
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             operationalTest: uploadedTests,
+            observationalNotes: observationalNotes,
             createdBy: userId,
             updatedBy: userId
         });
@@ -912,6 +915,7 @@ exports.updateOperationalTest = (0, catchAsync_1.default)((req, res, next) => __
     const { eyeModuleId } = req.params;
     const files = req.files;
     const { _id: userId } = (req.user).user;
+    const { observationalNotes } = req.body;
     if (!mongoose_1.default.Types.ObjectId.isValid(eyeModuleId)) {
         return next(new errors_1.ApiError(400, "Invalid EyeModule ID"));
     }
@@ -942,7 +946,7 @@ exports.updateOperationalTest = (0, catchAsync_1.default)((req, res, next) => __
             }
         }
     }
-    const updatedDoc = yield (0, eye_module_dao_1.updateEyeModule)(eyeModuleId, { operationalTest: uploadedTests, updatedBy: userId }, next);
+    const updatedDoc = yield (0, eye_module_dao_1.updateEyeModule)(eyeModuleId, { operationalTest: uploadedTests, observationalNotes: observationalNotes, updatedBy: userId }, next);
     if (!updatedDoc) {
         return next(new errors_1.ApiError(404, "EyeModule not found"));
     }
@@ -976,5 +980,126 @@ exports.getEyeRecordByPatientId = (0, catchAsync_1.default)((req, res, next) => 
         status: "success",
         message: "Eye record fetched successfully",
         data: doc
+    });
+}));
+exports.createEyeConsultation = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { patientId, appointmentId, comps, historyOfPresentingComplaint, pastMedicalHistory, opticalHistory, familySocialHx, va, IOP, Refraction, externalExamination, opthalmoscopy, slitLamp, diagnosis, treatmentPlan, nextAppointmentDate } = req.body;
+    const { _id: userId } = (req.user).user;
+    if (!patientId)
+        return next(new errors_1.ApiError(400, config_1.default.error.errorPatientIdIsRequired));
+    if (!appointmentId)
+        return next(new errors_1.ApiError(400, "appointment id is required"));
+    const _patientId = new mongoose_1.default.Types.ObjectId(patientId);
+    const _appointmentId = new mongoose_1.default.Types.ObjectId(appointmentId);
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
+    if (!foundPatient) {
+        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    const foundAppointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentId }, {}, '');
+    if (!foundAppointment) {
+        return next(new errors_1.ApiError(404, `appointment do not ${config_1.default.error.erroralreadyexit}`));
+    }
+    /// first check if eye module instance aleady exist if not create one
+    /// if it do check if eyeModule.optometryLensPrescription is null if its null update but if it exist ask user to update lens prescription
+    const existingEyeModule = yield (0, eye_module_dao_1.findOneEyeModule)({ patient: patientId, appointment: appointmentId }, {});
+    let eyeDoc;
+    const consultationData = {
+        comps,
+        historyOfPresentingComplaint,
+        pastMedicalHistory,
+        opticalHistory,
+        familySocialHx,
+        va,
+        IOP,
+        Refraction,
+        externalExamination,
+        opthalmoscopy,
+        slitLamp,
+        diagnosis,
+        treatmentPlan,
+        nextAppointmentDate: nextAppointmentDate ? (0, otherservices_1.parseDate)(nextAppointmentDate) : undefined,
+        createdBy: userId,
+    };
+    if (existingEyeModule) {
+        // Prevent overwrite if test already exists (optional — you may allow update)
+        if (existingEyeModule.eyeConsultation) {
+            return next(new errors_1.ApiError(400, "Eye Consultation already exists. schedule another one."));
+        }
+        // Update existing module
+        eyeDoc = yield (0, eye_module_dao_1.updateEyeModule)(existingEyeModule._id, {
+            eyeConsultation: consultationData,
+            updatedBy: userId
+        }, next);
+    }
+    else {
+        const refNumber = generateRefNumber();
+        // Create new EyeModule
+        const newEyeModule = {
+            patient: _patientId,
+            ref: refNumber,
+            appointment: _appointmentId,
+            appointmentid: foundAppointment.appointmentid,
+            eyeConsultation: consultationData,
+            createdBy: userId,
+            updatedBy: userId
+        };
+        eyeDoc = yield (0, eye_module_dao_1.createEyeService)(newEyeModule);
+    }
+    if (!eyeDoc) {
+        return next(new errors_1.ApiError(500, "Failed to save preliminary test."));
+    }
+    res.status(201).json({
+        status: "success",
+        message: "Eye Consultation recorded successfully",
+        data: eyeDoc
+    });
+}));
+exports.updateEyeConsultation = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { eyeModuleId } = req.params;
+    const { _id: userId } = (req.user).user;
+    if (!mongoose_1.default.Types.ObjectId.isValid(eyeModuleId)) {
+        return next(new errors_1.ApiError(400, "Invalid EyeModule ID"));
+    }
+    const { comps, historyOfPresentingComplaint, pastMedicalHistory, opticalHistory, familySocialHx, va, IOP, Refraction, externalExamination, opthalmoscopy, slitLamp, diagnosis, treatmentPlan, nextAppointmentDate } = req.body;
+    const updateData = {
+        "eyeConsultation.updatedBy": userId
+    };
+    // Only set fields that are provided
+    if (comps !== undefined)
+        updateData["eyeConsultation.comps"] = comps;
+    if (historyOfPresentingComplaint !== undefined)
+        updateData["eyeConsultation.historyOfPresentingComplaint"] = historyOfPresentingComplaint;
+    if (pastMedicalHistory !== undefined)
+        updateData["eyeConsultation.pastMedicalHistory"] = pastMedicalHistory;
+    if (opticalHistory !== undefined)
+        updateData["eyeConsultation.opticalHistory"] = opticalHistory;
+    if (familySocialHx !== undefined)
+        updateData["eyeConsultation.familySocialHx"] = familySocialHx;
+    if (va !== undefined)
+        updateData["eyeConsultation.va"] = va;
+    if (IOP !== undefined)
+        updateData["eyeConsultation.IOP"] = IOP;
+    if (Refraction !== undefined)
+        updateData["eyeConsultation.Refraction"] = Refraction;
+    if (externalExamination !== undefined)
+        updateData["eyeConsultation.externalExamination"] = externalExamination;
+    if (opthalmoscopy !== undefined)
+        updateData["eyeConsultation.opthalmoscopy"] = opthalmoscopy;
+    if (slitLamp !== undefined)
+        updateData["eyeConsultation.slitLamp"] = slitLamp;
+    if (diagnosis !== undefined)
+        updateData["eyeConsultation.diagnosis"] = diagnosis;
+    if (treatmentPlan !== undefined)
+        updateData["eyeConsultation.treatmentPlan"] = treatmentPlan;
+    if (nextAppointmentDate)
+        updateData["eyeConsultation.nextAppointmentDate"] = (0, otherservices_1.parseDate)(nextAppointmentDate);
+    const updatedDoc = yield (0, eye_module_dao_1.updateEyeModule)(eyeModuleId, updateData, next);
+    if (!updatedDoc) {
+        return next(new errors_1.ApiError(404, "EyeModule not found"));
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Eye Consultation updated successfully",
+        data: updatedDoc
     });
 }));

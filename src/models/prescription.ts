@@ -42,6 +42,8 @@ const prescriptionSchema = new Schema({
     required: true
   },
   amount:Number,
+  hmopercentagecover:Number,
+  actualcost:Number,
   orderid:
   {
     type: String, 

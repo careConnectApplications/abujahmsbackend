@@ -21,7 +21,7 @@ const admissions_1 = require("../../dao/admissions");
 const vitalcharts_1 = require("../../dao/vitalcharts");
 const vitalcharts_2 = require("../../dao/vitalcharts");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const hmomanagement_1 = require("../../dao/hmomanagement");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const users_1 = require("../../dao/users");
 const price_1 = require("../../dao/price");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
@@ -60,7 +60,8 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         if (!appointmentPrice) {
             throw new Error(config_1.default.error.errornopriceset);
         }
-        var hmopercentagecover = (_b = (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[0] }, { hmopercentagecover: 1 });
+        var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
         var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(appointmentPrice.amount));
         //create appointment
         //create payment
@@ -731,11 +732,13 @@ var examinepatient = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.examinepatient = examinepatient;
 //lab order
 var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b;
     try {
+        const { firstName, lastName } = (req.user).user;
         //accept _id from request.
         const { id } = req.params;
         const { testname, appointmentunderscoreid, department, note, priority } = req.body;
+        const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
         var testsid = [];
         //var paymentids =[];
@@ -751,7 +754,8 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var hmopercentagecover;
         //insurance
         if (foundPatient) {
-            hmopercentagecover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance._id, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
+            hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
             patientappointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentunderscoreid }, {}, 'patient');
             appointment = {
                 patient: id,
@@ -768,8 +772,8 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
             //read insurance
-            let insurance = yield (0, hmomanagement_1.readonehmomanagement)({ _id: appointment.patient.insurance }, { hmopercentagecover: 1 });
-            hmopercentagecover = (_c = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
+            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: appointment.patient.insurance, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
+            hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
         }
         for (var i = 0; i < testname.length; i++) {
             //    console.log(testname[i]);
@@ -780,7 +784,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create testrecord
-            let testrecord = yield (0, lab_1.createlab)({ note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount });
+            let testrecord = yield (0, lab_1.createlab)({ note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby });
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
