@@ -395,15 +395,15 @@ queryresult=await readallradiology({testid:referencenumber, status:configuration
     }
     else if(referencecategory == configuration.referencecategory[2] ){//procedure
         queryresult=await readallprocedure({procedureid:referencenumber, status:configuration.otherstatus[0]},{},'patient','');
-          }
-          else if(referencecategory == configuration.referencecategory[3] ){//pharmacy
+    }
+    else if(referencecategory == configuration.referencecategory[3] ){//pharmacy
             //pharmacy  
-            queryresult=await readallprescription({orderid:referencenumber, dispensestatus:configuration.otherstatus[0]},{},'patient','','');
+        queryresult=await readallprescription({orderid:referencenumber, dispensestatus:configuration.otherstatus[0]},{},'patient','','');
 
-          }
-          else{
+     }
+     else{
             throw new Error( "Invalid reference category");
-          }
+     }
 
     res.status(200).json({
       queryresult,
