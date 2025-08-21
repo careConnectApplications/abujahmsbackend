@@ -99,6 +99,8 @@ const labSchema = new mongoose_1.Schema({
     priority: { type: String, enum: ["urgent", "routine"] },
     sortbydate: Date,
     amount: Number,
+    hmopercentagecover: Number,
+    actualcost: Number,
     chemicalpathologyhemathologyreviewtstatus: {
         required: true,
         type: String,
@@ -108,7 +110,11 @@ const labSchema = new mongoose_1.Schema({
         required: true,
         type: String,
         default: config_1.default.status[14],
-    }
+    },
+    filename: {
+        type: String,
+        trim: true,
+    },
 }, { timestamps: true });
 const lab = (0, mongoose_1.model)('Lab', labSchema);
 exports.default = lab;

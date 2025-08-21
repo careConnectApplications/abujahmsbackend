@@ -1065,10 +1065,11 @@ const configuration = {
         errorIdIsRequired: "Id not found in params!",
         errorPatientIdIsRequired: "Patient Id is required!",
         errorNotValidPhoneNumber: "not a valid phone number!",
-        errorLabStatus: "Lab must be in awaiting confirmation status"
+        errorLabStatus: "Lab must be in awaiting confirmation status",
+        errorRadiologyStatus: "Radiology must be in awaiting confirmation status"
     },
     validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
-    environment: "test",
-    //environment: "prod",
+    //environment: "test",
+    environment: "prod",
 };
 exports.default = configuration;

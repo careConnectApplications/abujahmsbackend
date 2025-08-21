@@ -30,6 +30,8 @@ const procedureSchema = new mongoose_1.Schema({
         type: String
     },
     amount: Number,
+    hmopercentagecover: Number,
+    actualcost: Number,
     payment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Payment",

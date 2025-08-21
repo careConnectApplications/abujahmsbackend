@@ -89,10 +89,6 @@ function confirmgrouppayment(req, res) {
                 const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
                 let cardFeePaid;
                 let subscriptionfeePaid;
-                console.log('*********', paymentcategory);
-                console.log('*********', config_1.default.category[3]);
-                console.log('*********', config_1.default.category[8]);
-                console.log('*********', config_1.default.category[9]);
                 if (!patientrecord && !(paymentcategory == config_1.default.category[3] || paymentcategory == config_1.default.category[8] || paymentcategory == config_1.default.category[9])) {
                     throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
                 }
@@ -113,7 +109,7 @@ function confirmgrouppayment(req, res) {
                         status: config_1.default.status[2]
                     });
                 }
-                //ensure card fee and annual fee is paid before confirming payment for patient registration
+                //ensure card fee and annual fee is paid before confirming payment for patient registration 
                 if (paymentcategory == config_1.default.category[3] && (cardFeePaid || subscriptionfeePaid)) {
                     throw new Error(`Patient has not paid for ${config_1.default.category[9]} or ${config_1.default.category[8]}`);
                 }
@@ -125,6 +121,7 @@ function confirmgrouppayment(req, res) {
                 //const {paymentype,paymentcategory,paymentreference} = queryresult;
                 //for patient registration
                 if (paymentcategory == config_1.default.category[3]) {
+                    console.log('*********', patient);
                     //update patient registration status
                     yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1], paymentstatus: status, paymentreference });
                 }
@@ -134,9 +131,10 @@ function confirmgrouppayment(req, res) {
                     yield (0, lab_1.updatelabbyquery)({ payment: _id }, { status: config_1.default.status[5] });
                 }
                 else if (paymentcategory == config_1.default.category[8]) {
+                    console.log('*********', config_1.default.category[8]);
                     const nextYear = new Date();
                     nextYear.setFullYear(nextYear.getFullYear() + 1);
-                    yield (0, payment_1.updatepayment)(_id, { subscriptionPaidUntil: nextYear });
+                    yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { subscriptionPaidUntil: nextYear, subscriptionExpired: false });
                 }
             }
             res.status(200).json({

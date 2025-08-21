@@ -59,14 +59,12 @@ const hmomanagement_1 = require("../../dao/hmomanagement");
 const uuid_1 = require("uuid");
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
-const payment_1 = require("../../dao/payment");
 const otherservices_1 = require("../../utils/otherservices");
-const appointment_1 = require("../../dao/appointment");
 const audit_1 = require("../../dao/audit");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const patientmanagement_helper_1 = require("./patientmanagement.helper");
 //search patients 
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -241,40 +239,23 @@ function updateauthorizationcode(req, res) {
         }
     });
 }
-//add patiient
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
     try {
-        const { alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature } = req.body;
-        var appointmentid = String(Date.now());
+        const appointmentid = String(Date.now());
+        const { dateOfBirth, phoneNumber, isHMOCover, alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature } = req.body;
+        const clinicalInformation = {
+            bloodGroup, genotype, bp, heartRate, temperature
+        };
+        req.body.clinicalInformation = clinicalInformation;
+        var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
+        // chaorten the MRN to alphanumeric 
+        req.body.MRN = uniqunumber;
+        req.body.password = config_1.default.defaultPassword;
+        req.body.appointmentcategory = config_1.default.category[3];
+        req.body.appointmenttype = config_1.default.category[3];
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
-        if (!(req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true)) {
-            delete req.body.authorizationcode;
-            delete req.body.facilitypateintreferedfrom;
-        }
-        req.body.appointmentcategory = config_1.default.category[3];
-        req.body.appointmenttype = config_1.default.category[3];
-        var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover, HMOName, HMOId, HMOPlan } = req.body;
-        //validation
-        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, isHMOCover });
-        //define the service type
-        if (authorizationcode) {
-            req.body.patienttype = config_1.default.patienttype[1];
-        }
-        let gethmo;
-        //define the service type
-        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            (0, otherservices_1.validateinputfaulsyvalue)({ HMOName, HMOId, HMOPlan });
-            gethmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname: req.body.HMOName }, { _id: 1, hmopercentagecover: 1 });
-            if (!gethmo) {
-                throw new Error("HMONAME does not exist");
-            }
-            req.body.insurance = gethmo._id;
-        }
-        //get token from header and extract clinic
-        //check for 11 digit
         if (phoneNumber.length !== 11) {
             throw new Error(config_1.default.error.errorelevendigit);
         }
@@ -286,6 +267,10 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //if not dateObirth but age calculate date of birth
         if (!dateOfBirth && req.body.age)
             req.body.dateOfBirth = (0, moment_1.default)().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
+        if (!(isHMOCover == config_1.default.ishmo[1] || isHMOCover == true)) {
+            delete req.body.authorizationcode;
+            delete req.body.facilitypateintreferedfrom;
+        }
         var selectquery = {
             "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
             "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
@@ -295,123 +280,42 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
             throw new Error(`Patient ${config_1.default.error.erroralreadyexit}`);
         }
-        var { isHMOCover } = req.body;
-        var [newRegistrationPrice, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice] = yield Promise.all([
+        // fetch prices
+        const [newRegistrationPrice, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice,] = yield Promise.all([
             (0, price_1.readoneprice)({
                 servicecategory: config_1.default.category[3],
-                servicetype: config_1.default.category[3]
+                servicetype: config_1.default.category[3],
             }),
             (0, price_1.readoneprice)({
                 servicecategory: config_1.default.category[8],
-                servicetype: config_1.default.category[8]
+                servicetype: config_1.default.category[8],
             }),
             (0, price_1.readoneprice)({
                 servicecategory: config_1.default.category[9],
-                servicetype: config_1.default.category[9]
-            })
+                servicetype: config_1.default.category[9],
+            }),
         ]);
-        //use age to calculate price
         if (!newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
-            throw new Error(`Price for ${config_1.default.category[3]}  or ${config_1.default.category[8]} or ${config_1.default.category[9]} is not set`);
+            throw new Error(`Price for ${config_1.default.category[3]} or ${config_1.default.category[8]} or ${config_1.default.category[9]} is not set`);
         }
-        const clinicalInformation = {
-            bloodGroup, genotype, bp, heartRate, temperature
-        };
-        req.body.clinicalInformation = clinicalInformation;
-        var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
-        // chaorten the MRN to alphanumeric 
-        req.body.MRN = uniqunumber;
-        req.body.password = config_1.default.defaultPassword;
-        //other validations
-        var payment = [];
-        //create payment
-        //create payment for only none hmo patient
-        let queryappointmentresult;
-        let queryresult;
-        let vitals;
-        const [insurance, annualsubscription, cardfee] = yield Promise.all([
-            (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[3] }, { hmopercentagecover: 1 }),
-            (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[8] }, { hmopercentagecover: 1 }),
-            (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[9] }, { hmopercentagecover: 1 })
-        ]);
-        var hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
-        var annualsubscriptionhmopercentagecover = (_b = annualsubscription === null || annualsubscription === void 0 ? void 0 : annualsubscription.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
-        var cardfeehmopercentagecover = (_c = cardfee === null || cardfee === void 0 ? void 0 : cardfee.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
-        var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-        var annualsubscriptionamount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(annualsubscriptionhmopercentagecover), Number(annualsubscriptionnewRegistrationPrice.amount));
-        var cardfeeamountamount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(cardfeehmopercentagecover), Number(cardfeenewRegistrationPrice.amount));
-        //var annualsubscriptionamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-        //var cardfeeamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-        if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-            req.body.status = config_1.default.status[1];
-        }
-        const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(req.body);
-        if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-            if (appointmentdate) {
-                queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
-            }
-        }
-        else {
-            //add year suscription fee
-            //add 
-            const [createpaymentqueryresult, annualsubscriptioncreatepaymentqueryresult, cardfeecreatepaymentqueryresult] = yield Promise.all([
-                (0, payment_1.createpayment)({
-                    firstName,
-                    lastName,
-                    MRN: req.body.MRN,
-                    phoneNumber,
-                    paymentreference: req.body.MRN,
-                    paymentype: newRegistrationPrice.servicetype,
-                    paymentcategory: newRegistrationPrice.servicecategory,
-                    patient: createpatientqueryresult._id,
-                    amount
-                }),
-                (0, payment_1.createpayment)({
-                    firstName,
-                    lastName,
-                    MRN: req.body.MRN,
-                    phoneNumber,
-                    paymentreference: req.body.MRN,
-                    paymentype: annualsubscriptionnewRegistrationPrice.servicetype,
-                    paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory,
-                    patient: createpatientqueryresult._id,
-                    amount: annualsubscriptionamount
-                }),
-                (0, payment_1.createpayment)({
-                    firstName,
-                    lastName,
-                    MRN: req.body.MRN,
-                    phoneNumber,
-                    paymentreference: req.body.MRN,
-                    paymentype: cardfeenewRegistrationPrice.servicetype,
-                    paymentcategory: cardfeenewRegistrationPrice.servicecategory,
-                    patient: createpatientqueryresult._id,
-                    amount: cardfeeamountamount
-                })
-            ]);
-            // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
-            payment.push(createpaymentqueryresult._id);
-            payment.push(annualsubscriptioncreatepaymentqueryresult._id);
-            payment.push(cardfeecreatepaymentqueryresult._id);
-            //payment.push(createappointmentpaymentqueryresult._id);
-            //update createpatientquery
-            if (appointmentdate) {
-                queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
-            }
-        }
-        res.status(200).json({
-            queryresult: appointmentdate ? queryresult : createpatientqueryresult,
-            status: true
+        // pick strategy
+        const strategy = (0, patientmanagement_helper_1.selectPatientStrategy)(req.body.isHMOCover);
+        const context = (0, patientmanagement_helper_1.PatientRegistrationContext)(strategy);
+        const result = yield context.execute({
+            reqBody: req.body,
+            appointmentid,
+            newRegistrationPrice,
+            annualsubscriptionnewRegistrationPrice,
+            cardfeenewRegistrationPrice,
         });
+        res.status(200).json({ queryresult: result, status: true });
     }
     catch (error) {
-        console.log(error);
         res.status(403).json({ status: false, msg: error.message });
     }
 });
 exports.createpatients = createpatients;
+//add patiient
 //read all patients
 function getallpatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
