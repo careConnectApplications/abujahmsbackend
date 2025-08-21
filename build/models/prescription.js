@@ -35,6 +35,7 @@ const prescriptionSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    amount: Number,
     orderid: {
         type: String,
         required: true

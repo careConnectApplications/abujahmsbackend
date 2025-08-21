@@ -32,6 +32,9 @@ const procedureSchema = new Schema({
   processby: {
     type: String
   },
+  amount:Number,
+  hmopercentagecover:Number,
+  actualcost:Number,
   payment: {
       type: Schema.Types.ObjectId,
       ref: "Payment",
@@ -53,13 +56,3 @@ export default procedure;
 
 
 
-/*
-
-clinic
-indicationdiagnosisprocedure
-procedure:[]
-appointmentdate
-cptcodes:[]
-dxcodes:[]
-
-*/

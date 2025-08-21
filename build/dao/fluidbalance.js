@@ -17,6 +17,7 @@ exports.createfluidbalances = createfluidbalances;
 exports.readonefluidbalances = readonefluidbalances;
 exports.updatefluidbalances = updatefluidbalances;
 exports.updatefluidbalancequery = updatefluidbalancequery;
+exports.createMultifluidbalances = createMultifluidbalances;
 const fluidbalance_1 = __importDefault(require("../models/fluidbalance"));
 const config_1 = __importDefault(require("../config"));
 //read all patient history
@@ -92,6 +93,17 @@ function updatefluidbalancequery(query, reqbody) {
         catch (err) {
             console.log(err);
             throw new Error(config_1.default.error.erroruserupdate);
+        }
+    });
+}
+function createMultifluidbalances(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield fluidbalance_1.default.create(input);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(config_1.default.error.errorusercreate);
         }
     });
 }

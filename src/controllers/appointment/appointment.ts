@@ -4,17 +4,18 @@ import { readoneadmission } from "../../dao/admissions";
 import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
-import {readonehmomanagement} from "../../dao/hmomanagement";
+import { readonehmocategorycover } from "../../dao/hmocategorycover";
 import { readallservicetype } from "../../dao/servicetype";
-import { readone,readall } from "../../dao/users";
+import { readone, readall } from "../../dao/users";
 import { readoneprice } from "../../dao/price";
 import catchAsync from "../../utils/catchAsync";
 import { createpayment } from "../../dao/payment";
 import mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
 import { createlab } from "../../dao/lab";
-import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable,calculateAmountPaidByHMO } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable, calculateAmountPaidByHMO, uploadbase64image } from "../../utils/otherservices";
 import configuration from "../../config";
+import { ApiError } from "../../errors";
 const { ObjectId } = mongoose.Types;
 
 //add vitals for 
@@ -38,23 +39,24 @@ export const scheduleappointment = async (req: any, res: any) => {
       "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
     };
     //search patient if available and por
-    const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, selectquery, 'insurance', '');
-     
+    const patientrecord: any = await readonepatient({ _id: patient, status: configuration.status[1] }, selectquery, 'insurance', '');
+
     // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
     if (!patientrecord) {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
     }
-    
+
     var { firstName, lastName, MRN, HMOId, HMOName } = patientrecord;
-   
+
     //search for price if available
     var appointmentPrice: any = await readoneprice({ servicecategory: appointmentcategory, servicetype: appointmenttype });
     if (!appointmentPrice) {
       throw new Error(configuration.error.errornopriceset);
 
     }
-    var hmopercentagecover=patientrecord?.insurance?.hmopercentagecover ?? 0;
-     var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
+    let insurance: any = await readonehmocategorycover({ hmoId: patientrecord?.insurance?._id, category: configuration.category[0] }, { hmopercentagecover: 1 });
+    var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+    var amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
 
     //create appointment
     //create payment
@@ -62,18 +64,18 @@ export const scheduleappointment = async (req: any, res: any) => {
     let queryresult;
     if (amount == 0) {
       let vitals = await createvitalcharts({ status: configuration.status[8], patient: patientrecord._id });
-      queryresult = await createappointment({ amount,policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
+      queryresult = await createappointment({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
       await updatepatient(patient, { $push: { appointment: queryresult._id } });
 
     }
-    else if(amount > 0){
+    else if (amount > 0) {
       createpaymentqueryresult = await createpayment({ firstName: patientrecord?.firstName, lastName: patientrecord?.lastName, MRN: patientrecord?.MRN, phoneNumber: patientrecord?.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount });
       let vitals = await createvitalcharts({ status: configuration.status[8], patient: patientrecord._id });
-      queryresult = await createappointment({ amount,policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
+      queryresult = await createappointment({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
       //create vitals
       await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
     }
-   
+
     //create vitals
 
     //update patient
@@ -109,7 +111,7 @@ export const getAllSchedulesoptimized = async (req: any, res: any) => {
     if (appointmenttype) {
       filter.appointmenttype = new RegExp(appointmenttype, 'i'); // Case-insensitive search for email
     }
- 
+
     const referencegroup = [
       //look up patient
       //add query
@@ -120,7 +122,7 @@ export const getAllSchedulesoptimized = async (req: any, res: any) => {
       {
         $project: {
           _id: 1,
-          doctorassigment:1,
+          doctorassigment: 1,
           createdAt: 1,
           updatedAt: 1,
           appointmenttype: 1,
@@ -386,7 +388,7 @@ export const getAllPaidSchedules = async (req: any, res: any) => {
 };
 export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
   try {
-       const { _id } = (req.user).user;
+    const { _id } = (req.user).user;
     //doctor
     //for nursings 
     // Get today's date
@@ -394,7 +396,7 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
     startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
     // Get the start of tomorrow to set the range for "today"
     const endOfDay = new Date(startOfDay);
-    endOfDay.setHours(23, 59, 59, 999); 
+    endOfDay.setHours(23, 59, 59, 999);
 
     //const {clinic} = (req.user).user;
     const { clinic } = req.params;
@@ -402,14 +404,14 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
     var page = parseInt(req.query.page) || 1;
     var size = parseInt(req.query.size) || 150;
     // var statusfilter:any =status?{status,clinic}:{clinic};
-   // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
-    
-   let aggregatequery =(req.query.status == "today_queue")?[
-         {
-        $match: {doctor:new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
-        
+    // const queryresult = await readallappointment({$or:[{status:configuration.status[5]},{status:configuration.status[6]},{status:configuration.status[9]}],clinic},{},'patient','doctor','payment');
+
+    let aggregatequery = (req.query.status == "today_queue") ? [
+      {
+        $match: { doctor: new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
+
       },
-        {
+      {
         $lookup: {
           from: 'payments',
           localField: 'payment',
@@ -460,16 +462,16 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
 
         }  // Deconstruct the patient array (from the lookup)
       }
-        ,
+      ,
 
       {
-        $match: { $or: [{ 'payment.status': configuration.status[3] }, { amount: 0 }]}  // Filter payment
-        
+        $match: { $or: [{ 'payment.status': configuration.status[3] }, { amount: 0 }] }  // Filter payment
+
       }
-        , {
+      , {
         $project: {
           _id: 1,
-          doctorassigment:1,
+          doctorassigment: 1,
           createdAt: 1,
           appointmentid: 1,
           admission: 1,
@@ -504,7 +506,7 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
         }
       },
       { $sort: { createdAt: 1 } },
-      ]:
+    ] :
       [
         { $match: { clinic, ...(status && { status }) } },
 
@@ -566,7 +568,7 @@ export const getAllPaidSchedulesoptimized = async (req: any, res: any) => {
         {
           $project: {
             _id: 1,
-            doctorassigment:1,
+            doctorassigment: 1,
             createdAt: 1,
             reason: 1,
             updatedAt: 1,
@@ -639,105 +641,105 @@ export const getAllPaidQueueSchedules = async (req: any, res: any) => {
 
     let aggregatequery =
       [
-         {
-        $match: {doctor:new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
-        
-      },
         {
-        $lookup: {
-          from: 'payments',
-          localField: 'payment',
-          foreignField: '_id',
-          as: 'payment'
-        }
-      },
-      {
-        $lookup: {
-          from: 'patientsmanagements',
-          localField: 'patient',
-          foreignField: '_id',
-          as: 'patient'
-        }
-      },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'doctor',
-          foreignField: '_id',
-          as: 'doctor'
-        }
-      },
-      {
-        $lookup: {
-          from: 'vitalcharts',
-          localField: 'vitals',
-          foreignField: '_id',
-          as: 'vitals'
-        }
-      },
-      {
-        $unwind: {
-          path: '$payment',
-          preserveNullAndEmptyArrays: true
-        }  // Deconstruct the payment array (from the lookup)
-      },
-      {
-        $unwind: {
-          path: '$vitals',
-          preserveNullAndEmptyArrays: true
-        }  // Deconstruct the payment array (from the lookup)
-      },
-      {
-        $unwind: {
-          path: '$patient',
-          preserveNullAndEmptyArrays: true
+          $match: { doctor: new ObjectId(_id), status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }  // Filter payment
 
-        }  // Deconstruct the patient array (from the lookup)
-      }
+        },
+        {
+          $lookup: {
+            from: 'payments',
+            localField: 'payment',
+            foreignField: '_id',
+            as: 'payment'
+          }
+        },
+        {
+          $lookup: {
+            from: 'patientsmanagements',
+            localField: 'patient',
+            foreignField: '_id',
+            as: 'patient'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'doctor',
+            foreignField: '_id',
+            as: 'doctor'
+          }
+        },
+        {
+          $lookup: {
+            from: 'vitalcharts',
+            localField: 'vitals',
+            foreignField: '_id',
+            as: 'vitals'
+          }
+        },
+        {
+          $unwind: {
+            path: '$payment',
+            preserveNullAndEmptyArrays: true
+          }  // Deconstruct the payment array (from the lookup)
+        },
+        {
+          $unwind: {
+            path: '$vitals',
+            preserveNullAndEmptyArrays: true
+          }  // Deconstruct the payment array (from the lookup)
+        },
+        {
+          $unwind: {
+            path: '$patient',
+            preserveNullAndEmptyArrays: true
+
+          }  // Deconstruct the patient array (from the lookup)
+        }
         ,
 
-      {
-        $match: { $or: [{ 'payment.status': configuration.status[3] }, { amount: 0 }]}  // Filter payment
-        
-      }
-        , {
-        $project: {
-          _id: 1,
-          doctorassigment:1,
-          createdAt: 1,
-          appointmentid: 1,
-          admission: 1,
-          doctor: 1,
-          reason: 1,
-          updatedAt: 1,
-          appointmenttype: 1,
-          appointmentdate: 1,
-          clinic: 1,
-          patient: 1,
-          firstName: "$patient.firstName",
-          lastName: "$patient.lastName",
-          MRN: "$patient.MRN",
-          HMOId: "$patient.HMOId",
-          HMOName: "$patient.HMOName",
-
-          appointmentcategory: 1,
-          vitalstatus: "$vitals.status",
-          vitals: 1,
-          clinicalencounter: 1,
-          status: 1,
-          payment: "$payment",
-          policecase: 1,
-          physicalassault: 1,
-          sexualassault: 1,
-          policaename: 1,
-          servicenumber: 1,
-          policephonenumber: 1,
-
-
+        {
+          $match: { $or: [{ 'payment.status': configuration.status[3] }, { amount: 0 }] }  // Filter payment
 
         }
-      },
-      { $sort: { createdAt: 1 } },
+        , {
+          $project: {
+            _id: 1,
+            doctorassigment: 1,
+            createdAt: 1,
+            appointmentid: 1,
+            admission: 1,
+            doctor: 1,
+            reason: 1,
+            updatedAt: 1,
+            appointmenttype: 1,
+            appointmentdate: 1,
+            clinic: 1,
+            patient: 1,
+            firstName: "$patient.firstName",
+            lastName: "$patient.lastName",
+            MRN: "$patient.MRN",
+            HMOId: "$patient.HMOId",
+            HMOName: "$patient.HMOName",
+
+            appointmentcategory: 1,
+            vitalstatus: "$vitals.status",
+            vitals: 1,
+            clinicalencounter: 1,
+            status: 1,
+            payment: "$payment",
+            policecase: 1,
+            physicalassault: 1,
+            sexualassault: 1,
+            policaename: 1,
+            servicenumber: 1,
+            policephonenumber: 1,
+
+
+
+          }
+        },
+        { $sort: { createdAt: 1 } },
       ];
     const queryresult = await modifiedreadallappointment({ status: configuration.status[5], clinic, appointmentdate: { $gte: startOfDay, $lt: endOfDay } }, aggregatequery);
     console.log('r', queryresult);
@@ -773,15 +775,15 @@ export var examinepatient = async (req: any, res: any) => {
   } catch (error: any) {
     res.status(403).json({ status: false, msg: error.message });
   }
-}
+};
 //lab order
-export var laborder = async (req: any, res: any) => {
+export var laborder = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   try {
-
+    const { firstName, lastName } = (req.user).user;
     //accept _id from request.
     const { id } = req.params;
-    const { testname, appointmentunderscoreid, department,note,priority } = req.body;
-    
+    const { testname, appointmentunderscoreid, department, note, priority, imageBase64 } = req.body;
+    const raiseby = `${firstName} ${lastName}`;
     var testid: any = String(Date.now());
     var testsid = [];
     //var paymentids =[];
@@ -792,15 +794,23 @@ export var laborder = async (req: any, res: any) => {
     const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
     // check is patient is under inssurance
     //var isHMOCover;
-
     // Create a new ObjectId
     var appointment: any;
     let patientappointment: any;
     var hmopercentagecover;
-    
+
+    let fileName;
+    if (imageBase64) fileName = await uploadbase64image(imageBase64);
+
     //insurance
     if (foundPatient) {
-      hmopercentagecover=foundPatient?.insurance?.hmopercentagecover ?? 0;
+
+      if (!foundPatient?.insurance) return next(new ApiError(404, "patient does not have insurance info"))
+
+       //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
+      let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
+     
+      hmopercentagecover = insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
         patient: id,
@@ -820,25 +830,25 @@ export var laborder = async (req: any, res: any) => {
 
       }
       //read insurance
-      let insurance:any = await readonehmomanagement({_id:appointment.patient.insurance},{hmopercentagecover:1});
-    
-      hmopercentagecover=insurance?.hmopercentagecover ?? 0;
+      let insurance: any = await readonehmocategorycover({ hmoId: appointment.patient.insurance, category: configuration.category[2] }, { hmopercentagecover: 1 });
+      hmopercentagecover = insurance?.hmopercentagecover ?? 0;
 
-     
+
     }
 
 
     for (var i = 0; i < testname.length; i++) {
       //    console.log(testname[i]);
       //console.log(isHMOCover);
-      var testPrice: any = await readoneprice({ servicetype: testname[i]});
-     
+      var testPrice: any = await readoneprice({ servicetype: testname[i] });
+
       if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
-      let amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+      let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any = await createlab({ note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount });
+      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName });
+
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
     }
@@ -856,7 +866,7 @@ export var laborder = async (req: any, res: any) => {
 
   }
 
-}
+});
 export async function addclinicalencounter(req: any, res: any) {
   try {
     const { id } = req.params;
@@ -893,7 +903,7 @@ export async function addclinicalencounter(req: any, res: any) {
 
     } else {
 
-      queryresult = await updateappointmentbyquery({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status,  fromclinicalencounter: true });
+      queryresult = await updateappointmentbyquery({ $or: [{ appointmentid: id }, { _id: id }] }, { clinicalencounter, status, fromclinicalencounter: true });
       const { firstName, lastName } = (req.user).user;
       req.body.staffname = `${firstName} ${lastName}`;
       const { height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, staffname } = req.body;
@@ -1118,51 +1128,51 @@ export const readallvitalchartByAppointment = async (req: any, res: any) => {
 };
 
 
-export const assignDoctorToAppointment = catchAsync(async (req:any, res: any) => {
+export const assignDoctorToAppointment = catchAsync(async (req: any, res: any) => {
 
-    const { appointmentId, doctorId } = req.body;
-  
-    //change both to objectid
+  const { appointmentId, doctorId } = req.body;
 
-    // Validate inputs
-    if (!appointmentId || !doctorId) {
-       throw new Error("Appointment ID and Doctor ID are required.");
-    }
-  var _appointmentId=new ObjectId(appointmentId);
-   var _doctorId=new ObjectId(doctorId);
-    // Find appointment
-    const appointment:any= await readoneappointment({ _id: _appointmentId }, {}, 'patient');
-    if (!appointment) {
-      throw new Error("Appointment not found.");
-    }
-console.log("appointment",appointment);
-    // Find doctor
-     const doctor = await readone({ _id:_doctorId });
-    if (!doctor) {
-       throw new Error("Doctor not found.");
-    }
+  //change both to objectid
 
-    // Assign doctor
-    appointment.doctor = doctor._id;
-    appointment.doctorsfirstName = doctor.firstName;
-    appointment.doctorslastName = doctor.lastName;
-    appointment.doctorassigment =configuration.doctorassigment[1],
+  // Validate inputs
+  if (!appointmentId || !doctorId) {
+    throw new Error("Appointment ID and Doctor ID are required.");
+  }
+  var _appointmentId = new ObjectId(appointmentId);
+  var _doctorId = new ObjectId(doctorId);
+  // Find appointment
+  const appointment: any = await readoneappointment({ _id: _appointmentId }, {}, 'patient');
+  if (!appointment) {
+    throw new Error("Appointment not found.");
+  }
+  console.log("appointment", appointment);
+  // Find doctor
+  const doctor = await readone({ _id: _doctorId });
+  if (!doctor) {
+    throw new Error("Doctor not found.");
+  }
+
+  // Assign doctor
+  appointment.doctor = doctor._id;
+  appointment.doctorsfirstName = doctor.firstName;
+  appointment.doctorslastName = doctor.lastName;
+  appointment.doctorassigment = configuration.doctorassigment[1],
 
     await appointment.save();
-     res.status(200).json({
-      queryresult:appointment,
-      status: true
-    });
+  res.status(200).json({
+    queryresult: appointment,
+    status: true
+  });
 
-   
 
-  
+
+
 });
 
 
 
 // Get all doctors in a specific clinic
-export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
+export const getDoctorsByClinic = catchAsync(async (req: any, res: any) => {
   /*const { clinic } = req.params;
    // Validate inputs
     if (!clinic) {
@@ -1177,7 +1187,7 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
       queryresult:doctors
     });
     */
-      const { clinic } = req.params;
+  const { clinic } = req.params;
 
   // Validate inputs
   if (!clinic) {
@@ -1185,12 +1195,12 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
   }
 
   // Step 1: Get all doctors in the clinic
-  const {userdetails} = await readall({
+  const { userdetails } = await readall({
     clinic: clinic,
     status: configuration.status[1],
     roleId: configuration.roles[5].roleId
   });
-  console.log("userdetails",userdetails);
+  console.log("userdetails", userdetails);
 
   // Step 2: Define start and end of today
   const startOfDay = new Date();
@@ -1225,11 +1235,11 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
     }
   ];
 
-  const {appointmentdetails} = await modifiedreadallappointment(
+  const { appointmentdetails } = await modifiedreadallappointment(
     appointmentQuery,
     countPatientsDoctorAggregate
   );
-  console.log("appointmentdetails",appointmentdetails);
+  console.log("appointmentdetails", appointmentdetails);
 
   // Step 4: Merge counts with doctor list
   const doctorListWithCounts = userdetails.map((doc: any) => {
@@ -1249,7 +1259,7 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
   });
 
 
- 
+
 });
 
 
@@ -1259,51 +1269,50 @@ export const getDoctorsByClinic = catchAsync(async (req:any, res:any) => {
 
 
 export const countPatientsPerDoctor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-   const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
-    // Get the start of tomorrow to set the range for "today"
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
-    //const {clinic} = (req.user).user;
-    const { clinic } = req.params;
-    const query={
-          doctor: { $ne: null },  // Only include appointments with assigned doctors
-          patient: { $ne: null },  // Only include appointments with assigned patients
-          status: configuration.status[5], 
-          clinic, 
-          appointmentdate: { $gte: startOfDay, $lt: endOfDay }
-        };
-    const countpatientsdoctoraggregate = [
-      {
-        $match: query
-      },
-      {
-        $group: {
-          _id: "$doctor",
-          uniquePatients: { $addToSet: "$patient" }
-        }
-      },
-      {
-        $project: {
-          doctor: "$_id",
-          _id: 0,
-          patientCount: { $size: "$uniquePatients" }
-        }
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00
+  // Get the start of tomorrow to set the range for "today"
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setHours(23, 59, 59, 999);  // Set the time to 23:59:59  
+  //const {clinic} = (req.user).user;
+  const { clinic } = req.params;
+  const query = {
+    doctor: { $ne: null },  // Only include appointments with assigned doctors
+    patient: { $ne: null },  // Only include appointments with assigned patients
+    status: configuration.status[5],
+    clinic,
+    appointmentdate: { $gte: startOfDay, $lt: endOfDay }
+  };
+  const countpatientsdoctoraggregate = [
+    {
+      $match: query
+    },
+    {
+      $group: {
+        _id: "$doctor",
+        uniquePatients: { $addToSet: "$patient" }
       }
-    ];
-    const queryresult = await modifiedreadallappointment(query, countpatientsdoctoraggregate);
-      res.status(200).json({
-      status: true,
-      queryresult
-    });
-    
-   
+    },
+    {
+      $project: {
+        doctor: "$_id",
+        _id: 0,
+        patientCount: { $size: "$uniquePatients" }
+      }
+    }
+  ];
+  const queryresult = await modifiedreadallappointment(query, countpatientsdoctoraggregate);
+  res.status(200).json({
+    status: true,
+    queryresult
+  });
 
- 
+
+
+
 });
 
 
 
-   
 
- 
+

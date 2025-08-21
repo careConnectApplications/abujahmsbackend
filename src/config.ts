@@ -2,7 +2,8 @@ import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
-  //wardname
+  //wardnames
+  referencecategory:['lab','radiology','procedure','pharmacy','histopathology'],
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
@@ -68,13 +69,14 @@ const configuration: any = {
     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
   defaultphonenumber: "11111111111",
   status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+  otherstatus:["awaiting authorization"],
   doctorassigment:["unassigned", "assigned"],
   hematologyandchemicalpathologystatus:["hemathologyscheduled","chemicalpathologyscheduled","hemathologyprocessed","chemicalpathologyprocessed"],
   admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
   servedstatus: ["served", "unserved"],
   clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
   defaultPassword: "HMSB",
-  category: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure", "Histopathology","Eye Appointment","Annual-Subscription"],
+  category: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure", "Histopathology","Eye Appointment","Annual-Subscription","Card-Fee","Bed-Fee"],
   ishmo: ["No", "Yes"],
   settings: async function () {
     const { clinicdetails } = await readallclinics({}, { "clinic": 1, "id": 1, "_id": 0 });
@@ -93,6 +95,7 @@ const configuration: any = {
 
     return (
       {
+        referencecategory:configuration.referencecategory,
         treatmentPlan:configuration.treatmentPlan,
         intraOral:configuration.intraOral,
         tmjAssessment:configuration.tmjAssessment,
@@ -1131,7 +1134,9 @@ const configuration: any = {
     errorMustBeAnArray: "Exam types are required and must be an array!",
     errorIdIsRequired: "Id not found in params!",
     errorPatientIdIsRequired: "Patient Id is required!",
-    errorNotValidPhoneNumber: "not a valid phone number!"
+    errorNotValidPhoneNumber: "not a valid phone number!",
+    errorLabStatus: "Lab must be in awaiting confirmation status",
+    errorRadiologyStatus: "Radiology must be in awaiting confirmation status"
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   //environment: "test",

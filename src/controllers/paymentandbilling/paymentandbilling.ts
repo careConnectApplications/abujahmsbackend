@@ -68,15 +68,44 @@ export async function confirmgrouppayment(req: any, res: any) {
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
     const { paymentdetails } = response;
+   
+    if (!paymentdetails || paymentdetails.length === 0) throw new Error("no paymentfound for this service");
     for (var i = 0; i < paymentdetails.length; i++) {
+    
       let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
-
       //const {patient} = paymentdetails[i];
       const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
-      if (!patientrecord && paymentcategory !== configuration.category[3]) {
+      let cardFeePaid;
+      let subscriptionfeePaid;
+      if (!patientrecord && !(paymentcategory == configuration.category[3] || paymentcategory == configuration.category[8] || paymentcategory == configuration.category[9])) {
       
         throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
+      }
+      
+      if(paymentcategory == configuration.category[3]){
+
+cardFeePaid = await readonepayment({
+  patient,
+  paymentype: configuration.category[9],
+  paymentreference,
+  paymentcategory: configuration.category[9],
+  status: configuration.status[2] 
+});
+//read payment for subscription fee
+subscriptionfeePaid = await readonepayment({
+  patient,
+  paymentype: configuration.category[8],
+  paymentreference, 
+  paymentcategory: configuration.category[8],
+  status: configuration.status[2] 
+});
+
+
+      }
+      //ensure card fee and annual fee is paid before confirming payment for patient registration 
+      if (paymentcategory == configuration.category[3] && (cardFeePaid || subscriptionfeePaid)) {
+        throw new Error(`Patient has not paid for ${configuration.category[9]} or ${configuration.category[8]}`);
       }
       //var settings =await  configuration.settings();
       const status = configuration.status[3];
@@ -86,6 +115,7 @@ export async function confirmgrouppayment(req: any, res: any) {
       //const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
       if (paymentcategory == configuration.category[3]) {
+        console.log('*********', patient);
         //update patient registration status
         await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1], paymentstatus: status, paymentreference });
       }
@@ -97,10 +127,10 @@ export async function confirmgrouppayment(req: any, res: any) {
         await updatelabbyquery({ payment: _id }, { status: configuration.status[5] })
       }
       else if(paymentcategory ==configuration.category[8]){
+        console.log('*********', configuration.category[8]);
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
-        patientrecord.subscriptionPaidUntil = nextYear;
-        await patientrecord.save();
+        await updatepatientbyanyquery({_id:patient}, { subscriptionPaidUntil: nextYear, subscriptionExpired:false });
       }
 
     }
@@ -360,13 +390,38 @@ export async function confirmpayment(req: any, res: any) {
     const { id } = req.params;
     //check for null of id
     const response: any = await readonepayment({ _id: id });
-    const { patient } = response;
+    if (!response) throw new Error("no payment found for this service");
+    const { patient,paymentcategory, paymentreference } = response;
     const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
-    console.log('patient', patientrecord);
-    if (!patientrecord && response.paymentcategory !== configuration.category[3]) {
+     let cardFeePaid;
+     let subscriptionfeePaid;
+    if (!patientrecord && paymentcategory !== configuration.category[3]) {
       throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
+    if(paymentcategory == configuration.category[3]){
+  cardFeePaid = await readonepayment({
+  patient,
+  paymentype: configuration.category[9],
+  paymentreference,
+  paymentcategory: configuration.category[9],
+  status: configuration.status[2] 
+});
+//read payment for subscription fee
+subscriptionfeePaid = await readonepayment({
+  patient,
+  paymentype: configuration.category[8],
+  paymentreference, 
+  paymentcategory: configuration.category[8],
+  status: configuration.status[2] 
+});
+
+
+      }
+      if (paymentcategory == configuration.category[3] && (cardFeePaid || subscriptionfeePaid)) {
+        throw new Error(`Patient has not paid for ${configuration.category[9]} or ${configuration.category[8]}`);
+      }
+
 
     //var settings =await  configuration.settings();
     const status = configuration.status[3];
@@ -374,9 +429,10 @@ export async function confirmpayment(req: any, res: any) {
     const queryresult: any = await updatepayment(id, { status, cashieremail: email, cashierid: staffId });
     //const queryresult:any =await updatepayment(id,{status});
     //confirm payment of the service paid for 
-    const { paymentype, paymentcategory, paymentreference } = queryresult;
+
     //for patient registration
     if (paymentcategory == configuration.category[3]) {
+
       //update patient registration status
       await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1] });
 

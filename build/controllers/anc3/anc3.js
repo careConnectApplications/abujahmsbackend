@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createancsv3 = exports.readAllancByPatientv3 = exports.createancfollowupsv3 = exports.readAllancfollowupByAncv3 = exports.createAbujaAnc = void 0;
+exports.createancsv3 = exports.readAllancByPatientv3 = exports.createancfollowupsv3 = exports.readAllancfollowupByAncv3 = exports.updateAbujaAnc = exports.createAbujaAnc = void 0;
 exports.updateancfollowupsv3 = updateancfollowupsv3;
 exports.updateancsv3 = updateancsv3;
 const anc3_1 = require("../../dao/anc3");
@@ -90,6 +90,61 @@ exports.createAbujaAnc = (0, catchAsync_1.default)((req, res, next) => __awaiter
         status: true,
         message: "anc created successfully",
         data: queryresult
+    });
+}));
+exports.updateAbujaAnc = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params; // anc id
+    const { lmp, edd, gravida, cycle, breasts, height, weight, cvs, rs, pelvis, abdomen, retroviral, bp, urine, hb, bloodGroup, groupRh, genotype, ega, VDRL, others, comments, bleeding, discharge, swellingAnkles, urinarySymptoms, bookingDate, indication, specialPoint, consultant, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy } = req.body;
+    const { _id: userId } = (req.user).user;
+    const ancrecord = yield (0, anc3_1.readoneanc)({ _id: id }, {}, '');
+    if (!ancrecord)
+        return next(new errors_1.ApiError(404, "anc record does not exist"));
+    const updatedBody = {
+        postmedicalorsurgicalhistory: postmedicalorsurgicalhistory || [],
+        bookingInformation: {
+            bookingDate: (0, otherservices_1.parseDate)(bookingDate),
+            lmp: (0, otherservices_1.parseDate)(lmp),
+            edd: (0, otherservices_1.parseDate)(edd),
+            gravida,
+            indication,
+            specialPoint,
+            consultant,
+            ega
+        },
+        previouspregnancy: previouspregnancy || [],
+        presentPregnancy: {
+            bleeding,
+            discharge,
+            swellingAnkles,
+            urinarySymptoms,
+        },
+        generalexamination: {
+            cycle,
+            breasts,
+            height,
+            weight,
+            cvs,
+            rs,
+            pelvis,
+            abdomen,
+            retroviral,
+            bp,
+            urine,
+            hb,
+            bloodGroup,
+            groupRh,
+            genotype,
+            VDRL,
+            others,
+            comments,
+        },
+        updatedBy: userId,
+        historyofpresentpregnancy: historyofpresentpregnancy || []
+    };
+    var queryresult = yield (0, anc3_1.updateanc)(id, updatedBody);
+    res.status(200).json({
+        queryresult,
+        status: true
     });
 }));
 //get lab order by patient

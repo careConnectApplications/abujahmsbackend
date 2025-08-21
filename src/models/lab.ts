@@ -3,7 +3,7 @@ import configuration from "../config";
 
 export interface labinterface {
   testname: String;
-  patient:any,
+  patient: any,
 
 }
 const testresultSchema = new Schema({
@@ -12,7 +12,7 @@ const testresultSchema = new Schema({
   nranges: String,
   unit: String
 });
-const chemicalpathologyreportSchema=new Schema({
+const chemicalpathologyreportSchema = new Schema({
   comment: String,
   reportedby: { type: String },
   status: String
@@ -47,40 +47,40 @@ const ADHbonemarrowaspirationreportSchema = new Schema({
 
 
 const labSchema = new Schema({
-  processeddate:{
+  processeddate: {
     type: Date
 
   },
   testname:
   {
-    type: String, 
+    type: String,
     required: true
   },
   testid:
   {
-    type: String, 
+    type: String,
     required: true
   },
   department:
   {
-    type: String, 
+    type: String,
     required: true
   },
-  testresult:[testresultSchema ],
-  chemicalpathologyreport:chemicalpathologyreportSchema,
-  peripheralbloodfilmreport:peripheralbloodfilmreportSchema,
-  ADHbonemarrowaspirationreport:ADHbonemarrowaspirationreportSchema,
+  testresult: [testresultSchema],
+  chemicalpathologyreport: chemicalpathologyreportSchema,
+  peripheralbloodfilmreport: peripheralbloodfilmreportSchema,
+  ADHbonemarrowaspirationreport: ADHbonemarrowaspirationreportSchema,
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
     default: null,
   },
-  appointment: 
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Appointment",
-      default: null,
-    }
+  appointment:
+  {
+    type: Schema.Types.ObjectId,
+    ref: "Appointment",
+    default: null,
+  }
   ,
   remark:
   {
@@ -88,7 +88,7 @@ const labSchema = new Schema({
   },
   appointmentid:
   {
-    type: String, 
+    type: String,
     required: true
   },
   staffname: {
@@ -96,30 +96,44 @@ const labSchema = new Schema({
     ref: "Users",
     default: null,
   },
+  raiseby: String,
   payment: {
-      type: Schema.Types.ObjectId,
-      ref: "Payment",
-      default: null,
-    },
-  labcategory:{
+    type: Schema.Types.ObjectId,
+    ref: "Payment",
+    default: null,
+  },
+  labcategory: {
     required: true,
     type: String,
     default: "lab",
 
   },
-  sortby:String,
+  sortby: String,
   note: String,
-  priority:{type:String, enum: ["urgent", "routine"]},
-  sortbydate:Date,
+  priority: { type: String, enum: ["urgent", "routine"] },
+  sortbydate: Date,
   amount: Number,
-  status:{
+  hmopercentagecover:Number,
+  actualcost:Number,
+  chemicalpathologyhemathologyreviewtstatus:{
+
     required: true,
     type: String,
     default: configuration.status[14],
 
-  }
+  },
+  status: {
+    required: true,
+    type: String,
+    default: configuration.status[14],
+
+  },
+  filename: {
+    type: String,
+    trim: true,
+  },
 },
-{ timestamps: true }
+  { timestamps: true }
 );
 
 const lab = model('Lab', labSchema);

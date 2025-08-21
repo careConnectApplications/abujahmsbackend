@@ -8,7 +8,7 @@ const anc3_1 = require("../controllers/anc3/anc3");
 const router = express_1.default.Router();
 router.post('/createancv3/:id', anc3_1.createAbujaAnc);
 router.post("/:id", anc3_1.createAbujaAnc);
-router.put('/updateancsv3/:id', anc3_1.updateancsv3);
+router.put('/updateancsv3/:id', anc3_1.updateAbujaAnc);
 router.get('/readallancbypatientv3/:patient', anc3_1.readAllancByPatientv3);
 //////////////////////anc followup ////////////////////////////////
 router.post('/createancfollowupsv3/:anc', anc3_1.createancfollowupsv3);

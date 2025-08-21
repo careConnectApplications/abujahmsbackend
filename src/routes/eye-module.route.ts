@@ -1,6 +1,7 @@
 import express from "express";
 import {
     createExamination,
+    createEyeConsultation,
     createLensPrescription,
     createOperationalNotes,
     createPreliminaryTest,
@@ -10,6 +11,7 @@ import {
     getEyeRecordById,
     getEyeRecordByPatientId,
     updateExamination,
+    updateEyeConsultation,
     updateLensPrescription,
     updateOperationalTest,
     updatePreliminaryTest
@@ -30,5 +32,7 @@ router.patch("/lens-prescription/:eyeModuleId", updateLensPrescription);
 router.patch("/preliminary-test/:eyeModuleId", updatePreliminaryTest);
 router.patch("/examination/:eyeModuleId", updateExamination);
 router.patch("/operational-notes/:eyeModuleId", updateOperationalTest);
+router.post("/eye-consultation", createEyeConsultation);
+router.put("/eye-consultation/:eyeModuleId", updateEyeConsultation);
 
 export default router;

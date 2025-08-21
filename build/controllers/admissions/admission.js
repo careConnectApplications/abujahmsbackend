@@ -26,7 +26,7 @@ const clinics_1 = require("../../dao/clinics");
 const payment_1 = require("../../dao/payment");
 const bed_1 = require("../../dao/bed");
 const payment_2 = require("../../dao/payment");
-const hmomanagement_1 = require("../../dao/hmomanagement");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const { ObjectId } = mongoose_1.default.Types;
@@ -255,6 +255,9 @@ exports.addBedFee = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
     if (!findAdmission) {
         throw new Error(`Patient admission doesnt ${config_1.default.error.erroralreadyexit}`);
     }
+    //validate bedfee
+    if (findAdmission.bedfee)
+        throw new Error("Bed has been previous generated for this patient");
     const { patient } = findAdmission;
     const paymentreference = findAdmission.admissionid;
     // Update admission record with bed fee
@@ -263,10 +266,9 @@ exports.addBedFee = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
         throw new Error("Failed to update admission bed fee.");
     }
     // get insurance
-    let insurance = yield (0, hmomanagement_1.readonehmomanagement)({ _id: patient.insurance }, { hmopercentagecover: 1 });
+    let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: patient.insurance, category: config_1.default.category[10] }, { hmopercentagecover: 1 });
     let hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
     let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(bedfee));
-    console.log("amount", amount);
     if (amount > 0)
         yield (0, payment_2.createpayment)({
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,

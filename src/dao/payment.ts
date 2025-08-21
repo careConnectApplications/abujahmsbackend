@@ -31,7 +31,7 @@ export async function readpaymentaggregateoptimized(input: any, page: any, size:
 export async function readallpayment(query: any, populatequery: any) {
   try {
 
-    const paymentdetails = await Payment.find(query).populate(populatequery).sort({ createdAt: -1 });;
+    const paymentdetails = await Payment.find(query).populate(populatequery).sort({ createdAt: -1,paymentcategory: 1 });
     const totalpaymentdetails = await Payment.find(query).countDocuments();
     return { paymentdetails, totalpaymentdetails };
   } catch (err) {

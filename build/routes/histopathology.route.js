@@ -10,6 +10,7 @@ router.post("", histopathology_controller_1.CreateHistopatholgyService);
 router.get("", histopathology_controller_1.getAllHistopathologyDashboard); // getAllHistopathologyPaginatedHandler
 router.get("/:id", histopathology_controller_1.getHistopathologyRecordById);
 router.post("/:id/tests", histopathology_controller_1.CreateMultipleTestReport);
+router.get("/patient/:id", histopathology_controller_1.getHistopathologyRecordByPatientId);
 ////test/:id to post to post all exam/result
 /// put /:id to update record details
 exports.default = router;

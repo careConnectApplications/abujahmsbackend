@@ -26,6 +26,7 @@ const audit_1 = require("../../dao/audit");
 const pricingmodel_1 = require("../../dao/pricingmodel");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 //add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -187,7 +188,8 @@ exports.getpriceofservice = (0, catchAsync_1.default)((req, res, next) => __awai
         throw new Error(`${config_1.default.error.errornopriceset} ${servicetype}`);
     }
     // Get HMO coverage percentage or default to 0
-    const hmoPercentageCover = (_b = (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+    let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: price.servicecategory }, { hmopercentagecover: 1 });
+    const hmoPercentageCover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
     // Calculate patient amount
     const amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmoPercentageCover), Number(price.amount));
     // Respond with calculated amount

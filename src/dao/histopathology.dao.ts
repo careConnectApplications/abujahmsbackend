@@ -2,7 +2,14 @@ import { NextFunction } from "express";
 import mongoose from "mongoose";
 import Histopathology from "../models/histopathology";
 import { IOptions, QueryResult } from "../paginate/paginate";
+export const findTestRequiredById = async (subdocId: string) => {
+  const result = await Histopathology.findOne(
+    { "testRequired._id": new mongoose.Types.ObjectId(subdocId) },
+    { "testRequired.$": 1 } // project only the matching subdocument
+  );
 
+  return result;
+};
 export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
     try {
         const histopathology = new Histopathology(body);
@@ -12,6 +19,9 @@ export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
         return next(err);
     }
 }
+export const getHistopathologyByIdPopulate = async (
+    id: mongoose.Types.ObjectId
+): Promise<any | null> => Histopathology.findById(id).populate('patient');
 
 export const getHistopathologyById = async (
     id: mongoose.Types.ObjectId
@@ -47,3 +57,64 @@ export const updateHistopathologyRecord = async (query: any, reqbody: any) => {
 
     return doc;
 }
+export const getAllPaginatedHistopathologyRecords = async (
+  query: any,
+  page: number = 1,
+  size: number = 150
+) => {
+  const skip = (page - 1) * size;
+
+  const [docs, total] = await Promise.all([
+    Histopathology.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(size),
+    Histopathology.countDocuments(query),
+  ]);
+
+  return {
+    docs,
+    total,
+    page,
+    totalPages: Math.ceil(total / size),
+  };
+};
+
+export const getHistopatholofySubdocument = async (id: string) => {
+      const result = await Histopathology.aggregate([
+      { $match: { "testRequired._id": new mongoose.Types.ObjectId(id) } },
+      // lookup patient
+      {
+        $lookup: {
+          from: "patientsmanagements", // collection name (check exact name in MongoDB)
+          localField: "patient",
+          foreignField: "_id",
+          as: "patient"
+        }
+      },
+      { $unwind: "$patient" },
+      {
+        $project: {
+          patient: 1,
+          staffInfo: 1,
+          amount: 1,
+          status: 1,
+          refNumber: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          testRequired: {
+            $filter: {
+              input: "$testRequired",
+              as: "tr",
+              cond: { $eq: ["$$tr._id", new mongoose.Types.ObjectId(id)] }
+            }
+          }
+        }
+      }
+    ]);
+
+    if (!result || result.length === 0)  throw new Error("TestRequired not found");
+    return result;
+     
+    
+  }

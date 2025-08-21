@@ -39,6 +39,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const config_1 = __importDefault(require("../config"));
 const paginate_1 = require("../paginate");
+const consentFormSchema = new mongoose_1.Schema({
+    nameofexplainer: {
+        type: String,
+        // required: true,
+    },
+    filename: String,
+    nameofrepresentive: {
+        type: String,
+        // required: true,
+    },
+    addressofrepresentaive: {
+        type: String,
+        //required: true,
+    },
+    fullnameofwitness: {
+        type: String,
+        //required: true,
+    },
+    createdBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+    updatedBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Users",
+        default: null,
+    },
+}, { timestamps: true });
 const histopathologySchema = new mongoose_1.Schema({
     patient: {
         type: mongoose_1.Schema.Types.ObjectId,
@@ -78,6 +107,7 @@ const histopathologySchema = new mongoose_1.Schema({
         type: String,
         default: config_1.default.status[5],
     },
+    refNumber: String,
     testRequired: [{
             name: { type: String, required: true, trim: true },
             PaymentRef: {
@@ -85,6 +115,7 @@ const histopathologySchema = new mongoose_1.Schema({
                 ref: "Payment",
                 default: null
             },
+            amount: { type: Number, min: [0, "Amount cannot be negative"] },
             paymentStatus: { type: String, default: config_1.default.status[5] }
         }],
     diagnosisForm: {
@@ -112,31 +143,10 @@ const histopathologySchema = new mongoose_1.Schema({
             default: null
         }
     },
-    // LabUse: {
-    //     DateReceived: {
-    //         type: Date,
-    //         default: Date.now
-    //     },
-    //     DateInspected: {
-    //         type: Date,
-    //     },
-    //     DateGrossed: {
-    //         type: Date,
-    //     },
-    //     DatePassed: {
-    //         type: Date,
-    //     },
-    //     NumberOfBlocks: {
-    //         type: Number
-    //     },
-    //     Action: { type: String, trim: true },
-    //     DateRequested: {
-    //         type: Date,
-    //     },
-    //     DateReported: {
-    //         type: Date,
-    //     },
-    // }
+    consentForm: {
+        type: consentFormSchema,
+        default: true,
+    },
 }, {
     timestamps: true,
 });
