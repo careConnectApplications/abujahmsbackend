@@ -31,6 +31,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const lab_1 = require("../../dao/lab");
 const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
+const errors_1 = require("../../errors");
 const { ObjectId } = mongoose_1.default.Types;
 //add vitals for 
 // Create a new schedule
@@ -731,13 +732,13 @@ var examinepatient = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.examinepatient = examinepatient;
 //lab order
-var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
         const { firstName, lastName } = (req.user).user;
         //accept _id from request.
         const { id } = req.params;
-        const { testname, appointmentunderscoreid, department, note, priority } = req.body;
+        const { testname, appointmentunderscoreid, department, note, priority, imageBase64 } = req.body;
         const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
         var testsid = [];
@@ -752,8 +753,14 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var appointment;
         let patientappointment;
         var hmopercentagecover;
+        let fileName;
+        if (imageBase64)
+            fileName = yield (0, otherservices_1.uploadbase64image)(imageBase64);
         //insurance
         if (foundPatient) {
+            if (!(foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance))
+                return next(new errors_1.ApiError(404, "patient does not have insurance info"));
+            //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
             let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance._id, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
             hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
             patientappointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentunderscoreid }, {}, 'patient');
@@ -784,7 +791,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create testrecord
-            let testrecord = yield (0, lab_1.createlab)({ note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby });
+            let testrecord = yield (0, lab_1.createlab)({ hmopercentagecover, actualcost: testPrice.amount, note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby, filename: fileName });
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }
@@ -800,8 +807,7 @@ var laborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("error", error);
         res.status(403).json({ status: false, msg: error.message });
     }
-});
-exports.laborder = laborder;
+}));
 function addclinicalencounter(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

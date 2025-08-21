@@ -58,9 +58,9 @@ jobs:
             # Stop any existing server (optional)
             #pm2 stop 3
             # server commands (or your app, depending on your setup)
-            cd /home/azureuser/apps/hmsbackendabuja
-            npm install
-            npm run build
+            #cd /home/azureuser/apps/hmsbackendabuja
+            #npm install
+            #npm run build
             #pm2 --name "kastina" start /home/hms/hmsbackend/build/index.js
 
           EOF

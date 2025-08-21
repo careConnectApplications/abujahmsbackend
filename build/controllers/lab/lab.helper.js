@@ -12,24 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LabConfirmationContext = exports.SelfPayLabConfirmationStrategy = exports.HmoLabConfirmationStrategy = void 0;
+exports.LabConfirmationContext = exports.HmoLabConfirmationStrategy = exports.SelfPayLabConfirmationStrategy = void 0;
 // strategies/labConfirmation.ts
 const config_1 = __importDefault(require("../../config"));
-const admissions_1 = require("../../dao/admissions");
 const payment_1 = require("../../dao/payment");
 const lab_1 = require("../../dao/lab");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const HmoLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, option, remark, lab, patient }) {
+const otherservices_1 = require("../../utils/otherservices");
+const SelfPayLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, option, remark, lab, patient }) {
     let queryresult;
-    let paymentreference;
-    // Admission check for HMO patients
-    const findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, "");
-    if (findAdmission) {
-        paymentreference = findAdmission.admissionid;
-    }
-    else {
-        paymentreference = lab.testid;
-    }
+    //let paymentreference;
+    const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, lab.testid);
     if (option && lab.amount > 0) {
         const createpaymentqueryresult = yield (0, payment_1.createpayment)({
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
@@ -56,8 +49,8 @@ const HmoLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, funct
     }
     return queryresult;
 });
-exports.HmoLabConfirmationStrategy = HmoLabConfirmationStrategy;
-const SelfPayLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, option, remark }) {
+exports.SelfPayLabConfirmationStrategy = SelfPayLabConfirmationStrategy;
+const HmoLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, option, remark }) {
     if (option) {
         return yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.otherstatus[0], remark });
     }
@@ -65,7 +58,7 @@ const SelfPayLabConfirmationStrategy = (_a) => __awaiter(void 0, [_a], void 0, f
         return yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[13], remark });
     }
 });
-exports.SelfPayLabConfirmationStrategy = SelfPayLabConfirmationStrategy;
+exports.HmoLabConfirmationStrategy = HmoLabConfirmationStrategy;
 // context/labConfirmationContext.ts
 // Context wrapper with proper typing
 const LabConfirmationContext = (strategyFn) => ({

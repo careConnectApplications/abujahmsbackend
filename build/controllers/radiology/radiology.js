@@ -59,6 +59,8 @@ const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
 const admissions_1 = require("../../dao/admissions");
+const radiology_helper_1 = require("./radiology.helper");
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
@@ -67,7 +69,7 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         //accept _id from request
         const { id } = req.params;
-        var { testname, note, appointmentid } = req.body;
+        var { testname, note, appointmentid, imageBase64 } = req.body;
         const { firstName, lastName } = (req.user).user;
         const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
@@ -91,6 +93,9 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
             }
         }
+        let filename;
+        if (imageBase64)
+            filename = yield (0, otherservices_1.uploadbase64image)(imageBase64);
         //loop through all test and create record in lab order
         for (var i = 0; i < testname.length; i++) {
             //search for price of test name
@@ -101,7 +106,8 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create payment
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-            let testrecord = yield (0, radiology_1.createradiology)({ note, testname: testname[i], patient: id, testid, raiseby, amount });
+            let testrecord = yield (0, radiology_1.createradiology)({ hmopercentagecover,
+                actualcost: testPrice.amount, note, testname: testname[i], patient: id, testid, raiseby, amount, filename });
             //create testrecordn 
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
@@ -354,60 +360,27 @@ var uploadradiologyresult = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.uploadradiologyresult = uploadradiologyresult;
-//confirm radiology order
-//this endpoint is use to accept or reject lab order
-const confirmradiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        //extract option
-        const { option, remark } = req.body;
-        const { id } = req.params;
-        //search for the lab request
-        //var radiology: any = await readoneradiology({ _id: id }, {}, 'patient');
-        // if not radiology return error
-        //const { testname, testid, patient, amount } = radiology;
-        //validate the status
-        let queryresult;
-        /*
-        let paymentreference;
-        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-        var findAdmission = await readoneadmission({ patient: patient._id, status: { $ne: configuration.admissionstatus[5] } }, {}, '');
-        if (findAdmission) {
-          paymentreference = findAdmission.admissionid;
-    
-        }
-        else {
-          paymentreference = testid;
-        }
-        if (option == true && amount > 0) {
-          var createpaymentqueryresult = await createpayment({ firstName: patient?.firstName, lastName: patient?.lastName, MRN: patient?.MRN, phoneNumber: patient?.phoneNumber, paymentreference, paymentype: testname, paymentcategory: configuration.category[4], patient, amount });
-          queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], payment: createpaymentqueryresult._id, remark });
-          await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id } });
-    
-        }
-        else if (option == true && amount == 0) {
-          queryresult = await updateradiology({ _id: id }, { status: configuration.status[9], remark });
-    
-        }
-        
-          */
-        if (option == true) {
-            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.otherstatus[0], remark });
-        }
-        else {
-            queryresult = yield (0, radiology_1.updateradiology)({ _id: id }, { status: config_1.default.status[13], remark });
-        }
-        res.status(200).json({ queryresult, status: true });
-        //if accept
-        //accept or reject lab order
-        //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
-        //paymentids.push(createpaymentqueryresult._id);
-        //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
-        //var testrecord = await createlab({payment:createpaymentqueryresult._id});
-        //change status to 2 or  13 for reject
+exports.confirmradiologyorder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { option, remark } = req.body;
+    console.log("option", option, "remark", remark);
+    const { id } = req.params;
+    (0, otherservices_1.validateinputfaulsyvalue)({ id });
+    const radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, "patient");
+    if (radiology.status !== config_1.default.status[14]) {
+        throw new Error(config_1.default.error.errorRadiologyStatus);
     }
-    catch (e) {
-        console.log("error", e);
-        res.status(403).json({ status: false, msg: e.message });
-    }
-});
-exports.confirmradiologyorder = confirmradiologyorder;
+    const { patient } = radiology;
+    // choose strategy based on isHMOCover
+    const strategyFn = !(patient.isHMOCover == config_1.default.ishmo[1] || patient.isHMOCover == true)
+        ? radiology_helper_1.SelfPayRadiologyConfirmationStrategy
+        : radiology_helper_1.HmoRadiologyConfirmationStrategy;
+    const context = (0, radiology_helper_1.RadiologyConfirmationContext)(strategyFn);
+    const queryresult = yield context.execute({
+        id,
+        option,
+        remark,
+        radiology,
+        patient,
+    });
+    res.status(200).json({ queryresult, status: true });
+}));
