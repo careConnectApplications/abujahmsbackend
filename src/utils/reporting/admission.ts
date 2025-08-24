@@ -1,6 +1,95 @@
 
+import status from "http-status";
 import configuration from "../../config";
 export const admissionaggregatereports=(startdate:any,enddate:any)=>{
+const inpatientrecordspipeline = [
+      {
+        $lookup: {
+          from: "patientsmanagements", // collection name of Patientsmanagement
+          localField: "patient",
+          foreignField: "_id",
+          as: "patientInfo",
+        },
+      },
+      { $unwind: "$patientInfo" },
+
+      {
+        $addFields: {
+          gender: "$patientInfo.gender",
+        },
+      },
+
+      {
+        $facet: {
+          // Brought Forward = admissions created BEFORE fromDate and still active
+          broughtForward: [
+            {
+              $match: {
+                createdAt: { $lt: startdate },
+                status: configuration.admissionstatus[1],
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+
+          // New Admission = created within the period
+          newAdmission: [
+            {
+              $match: {
+                createdAt: { $gte: startdate, $lte: enddate},
+                status: configuration.admissionstatus[1]
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+
+          // Discharges
+          discharges: [
+            {
+              $match: {
+                status: configuration.admissionstatus[5],
+                updatedAt: { $gte: startdate, $lte: enddate },
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+
+          // Deaths
+          deaths: [
+            {
+              $match: {
+                dischargeReason: "Death",
+                updatedAt: { $gte: startdate, $lte: enddate },
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+
+          // Referred In
+          referredIn: [
+            {
+              $match: {
+                referredIn: true,
+                updatedAt: { $gte: startdate, $lte: enddate },
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+
+          // Referred Out
+          referredOut: [
+            {
+              $match: {
+                dischargeReason: "Referred Out",
+                updatedAt: { $gte: startdate, $lte: enddate },
+                status: configuration.admissionstatus[5]
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+        },
+      },
+    ];
 
 const admissionaggregateadmited = [
       {
@@ -131,10 +220,22 @@ const admissionaggregateadmited = [
           TotalNumberofadmission:1,
           _id:0
 
-        }
+       }
 
       }
         
     ];
-    return {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions}
+    return {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions,inpatientrecordspipeline}
 }
+
+
+
+
+
+
+
+
+
+
+
+

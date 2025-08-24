@@ -642,6 +642,7 @@ const appointmentSchema = new Schema({
     default: false,
 
   },
+  
   status: {
     required: true,
     type: String,

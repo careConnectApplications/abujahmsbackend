@@ -15,6 +15,7 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
+import {mergeCounts} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -456,7 +457,7 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
     const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
     const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate} = appointmentaggregatereports(startdate,enddate)
-    const {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions} = admissionaggregatereports(startdate,enddate);
+    const {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions,inpatientrecordspipeline} = admissionaggregatereports(startdate,enddate);
     const {procedureaggregatepaid,totalprocedureaggregate} = procedureaggregatereports(startdate, enddate);
     const {nutritionaggregatechildren12to59receiveddeworming,nutritionaggregatechildren0to59givenvitaminasupplement,nutritionaggregatechildren0to5exclusivebreadstfeeding,nutritionaggregatechildren0to59growingwell,nutritionaggregatechildren0to59thatreceivednutirtion} =nutritionaggregatereports(startdate, enddate);
     const {appointmentaggregatebyhmo,aggregatebyhmo} =hmoaggregatereports(startdate, enddate);
@@ -537,6 +538,23 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
        queryresult={newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted};
       
        }
+       else if(querytype == summary[13]){
+      const InpatientRecordsreport = await readadmissionaggregate(inpatientrecordspipeline);
+      queryresult = {
+      InpatientRecords:{
+      broughtForward: InpatientRecordsreport[0].broughtForward,
+      newAdmission: InpatientRecordsreport[0].newAdmission,
+      totalAdmission: mergeCounts(
+        InpatientRecordsreport[0].broughtForward,
+        InpatientRecordsreport[0].newAdmission
+      ),
+      discharges: InpatientRecordsreport[0].discharges,
+      deaths: InpatientRecordsreport[0].deaths,
+      referredIn: InpatientRecordsreport[0].referredIn,
+      referredOut: InpatientRecordsreport[0].referredOut
+    }
+    };
+       }
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
@@ -551,5 +569,4 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
 })
 
 
-//add pharmacy 1 , pharmacy 2
-//add agggreate appointbyicnd10
+/////////////////reports for 
