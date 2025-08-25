@@ -7,9 +7,9 @@ import catchAsync from "../utils/catchAsync";
 
 // Middleware to block unpaid patients
 export const checkSubscription = catchAsync(async (req:any, res:Response, next:NextFunction) => {
-
-  
-    var {patient,id} = req.body;
+   
+const { patient } = req.body;
+const id: string = req.body.id ?? req.params.id;
   const _id = patient || id;
     if (!_id) {
       throw new Error("Unauthorized");

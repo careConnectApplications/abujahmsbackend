@@ -3,6 +3,19 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardnames
+  encounterplanoutcome:["Death","Referred Out","Treated","Others"],
+  arrivalMode:["Walk-in", "Ambulance", "Referral","Death"],
+  unitcategory:["EPU","ICU","Emergency"],
+  cliniccategory:[
+        "Family Medicine",
+        "Paediatrics",
+        "Accident & Emergency",
+        "Surgery",
+        "Obstetrics & Gynaecology",
+        "ENT",
+        "Ophthalmology",
+        "Other"
+  ],
   referencecategory:['lab','radiology','procedure','pharmacy','histopathology'],
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
@@ -95,6 +108,10 @@ const configuration: any = {
 
     return (
       {
+        encounterplanoutcome:configuration.encounterplanoutcome,
+        unitcategory:configuration.unitcategory,
+        arrivalMode: configuration.arrivalMode,
+        cliniccategory:configuration.cliniccategory,
         referencecategory:configuration.referencecategory,
         treatmentPlan:configuration.treatmentPlan,
         intraOral:configuration.intraOral,

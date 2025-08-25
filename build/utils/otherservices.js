@@ -56,6 +56,7 @@ exports.convertexceltojson = convertexceltojson;
 exports.parseDate = parseDate;
 exports.isValidPhoneNumber = isValidPhoneNumber;
 exports.calculateAmountPaidByHMO = calculateAmountPaidByHMO;
+exports.getPaymentReference = getPaymentReference;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const moment_1 = __importDefault(require("moment"));
 const convert_excel_to_json_1 = __importDefault(require("convert-excel-to-json"));
@@ -65,6 +66,7 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const path = __importStar(require("path"));
 const config_1 = __importDefault(require("../config"));
 const patientmanagement_1 = require("../dao/patientmanagement");
+const admissions_1 = require("../dao/admissions");
 const { v4: uuidv4 } = require('uuid');
 var encrypt = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -266,4 +268,10 @@ function isValidPhoneNumber(phoneNumber) {
 function calculateAmountPaidByHMO(hmoCoveragePercentage, totalAmount) {
     const patientResponsibility = (100 - hmoCoveragePercentage) / 100;
     return patientResponsibility * totalAmount;
+}
+function getPaymentReference(patientId, fallbackId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const admission = yield (0, admissions_1.readoneadmission)({ patient: patientId, status: { $ne: config_1.default.admissionstatus[5] } }, {}, "");
+        return admission ? admission.admissionid : fallbackId;
+    });
 }

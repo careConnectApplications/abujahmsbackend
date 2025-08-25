@@ -8,32 +8,19 @@ import clinic from "../../models/clinics";
 export var createclinics = async (req:any,res:any) =>{
    
     try{
-     console.log(req.body);
-       const {clinic,type} = req.body;
+   
+       const {clinic,type,category} = req.body;
        const { firstName, lastName } = (req.user).user;
        var actor = `${firstName} ${lastName}`;
-       validateinputfaulsyvalue({clinic,type});
+       validateinputfaulsyvalue({clinic,type,category});
        var id = `${clinic[0]}${generateRandomNumber(5)}${clinic[clinic.length -1]}`;
-        //validate that category is in the list of accepted category
-        //get token from header
-        /*
-        var settings = await configuration.settings();
-        if(req.body.servicecategory == settings.servicecategory[0]){
-          req.body.servicetype=settings.servicecategory[0]
-        }
-          */
-        
-        //validation
-        
         const foundClinic =  await readoneclinic({clinic},'');
         //update servicetype for New Patient Registration
-       
-        console.log(foundClinic);
         if(foundClinic){
             throw new Error(`clinic ${configuration.error.erroralreadyexit}`);
 
         }
-         const queryresult=await createclinic({clinic,type,id});
+         const queryresult=await createclinic({clinic,type,id,category});
          //create audit log
        
          await createaudit({action:"Created Clinic/Department/Pharmacy",actor,affectedentity:clinic});
@@ -88,11 +75,11 @@ export async function updateclinics(req:any, res:any){
     try{
     //get id
     const {id} = req.params;
-    const {clinic,type} = req.body;
+    const {clinic,type,category} = req.body;
     const { firstName, lastName } = (req.user).user;
     var actor = `${firstName} ${lastName}`;
-    validateinputfaulsyvalue({clinic,id, type});
-    var queryresult = await updateclinic(id, {clinic, type});
+    validateinputfaulsyvalue({clinic,id, type,category});
+    var queryresult = await updateclinic(id, {clinic, type,category});
     await createaudit({action:"Update Clinic/Department/Pharmacy",actor,affectedentity:clinic});
     res.status(200).json({
         queryresult,
@@ -106,24 +93,3 @@ export async function updateclinics(req:any, res:any){
 
   }
   
-/*
-  export async function updatepricestatus(req:any, res:any){
-    const {id} = req.params;
-    try{
-        const response = await readoneprice({_id:id});
-       const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-        const queryresult:any =await updateprice(id,{status});
-        res.status(200).json({
-            queryresult,
-            status:true
-          }); 
-
-    }
-    catch(e:any){
-        console.log(e);
-      res.status(403).json({status: false, msg:e.message});
-
-    }
-
-}
-*/

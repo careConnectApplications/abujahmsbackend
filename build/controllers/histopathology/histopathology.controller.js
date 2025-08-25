@@ -25,78 +25,132 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHistopathologyRecordByPatientId = exports.getAllHistopathologyDashboard = exports.CreateMultipleTestReport = exports.getAllHistopathologyPaginatedHandler = exports.getAllHistopathology = exports.getHistopathologyRecordById = exports.CreateHistopatholgyService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const uuid_1 = require("uuid");
 const config_1 = __importDefault(require("../../config"));
 //import { readoneappointment } from "../../dao/appointment";
 const histopathology_dao_1 = require("../../dao/histopathology.dao");
 const histopathology_tests_dao_1 = require("../../dao/histopathology-tests.dao");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const price_1 = require("../../dao/price");
 const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const pick_1 = __importDefault(require("../../utils/pick"));
 const histopathology_1 = __importDefault(require("../../models/histopathology"));
-const otherservices_1 = require("../../utils/otherservices");
-const otherservices_2 = require("../../utils/otherservices");
 const hmocategorycover_1 = require("../../dao/hmocategorycover");
-const generateRefNumber = () => {
-    const uniqueHistopathologyId = (0, uuid_1.v4)();
-    return `histo-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
-};
-const generateLabNumber = () => {
-    const uniqueHistopathologyId = (0, uuid_1.v4)();
-    return `Lab-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
-};
+const histolopathology_helper_1 = require("./histolopathology.helper");
 exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
     var _a, _b;
-    const { patientId, examTypes, /// this is the service types
-    doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy, diagnosis, imageBase64, nameofexplainer, nameofrepresentive, addressofrepresentaive, fullnameofwitness } = req.body;
-    // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
-    //if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
+    const { patientId, examTypes, doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy, diagnosis, imageBase64, nameofexplainer, nameofrepresentive, addressofrepresentaive, fullnameofwitness } = req.body;
     if (!patientId)
         return next(new errors_1.ApiError(400, "Patient Id is not provided!"));
-    if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0) {
+    if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0)
         return next(new errors_1.ApiError(400, config_1.default.error.errorMustBeAnArray));
-    }
     if (doctorId && !mongoose_1.default.Types.ObjectId.isValid(doctorId))
         return next(new errors_1.ApiError(404, "Invalid doctor id"));
     const _doctorId = doctorId ? new mongoose_1.default.Types.ObjectId(doctorId) : null;
-    if (biopsyType && !config_1.default.validBiopsyType.includes(biopsyType)) {
-        return next(new errors_1.ApiError(400, `Invalid biopsy type. Valid types are: ${config_1.default.validBiopsyType.join(', ')}`));
-    }
-    //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId = new mongoose_1.default.Types.ObjectId(patientId);
-    // check if patient still has a pending record
-    let pendingHistopathologyRecord = yield (0, histopathology_dao_1.queryHistopathologyRecord)({ patient: _patientId, status: config_1.default.status[2] }, null, null);
-    if (pendingHistopathologyRecord)
+    const pending = yield (0, histopathology_dao_1.queryHistopathologyRecord)({ patient: _patientId, status: config_1.default.status[2] }, null, null);
+    if (pending)
         return next(new errors_1.ApiError(400, "this patient still has a pending histopathology record"));
-    const { firstName, lastName, _id: userId } = (req.user).user;
-    ///Step 2: Read the Appointment and populate the patient field.
+    const { _id: userId } = (req.user).user;
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, 'insurance', '');
-    if (!foundPatient) {
+    if (!foundPatient)
         return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
-    }
     let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[6] }, { hmopercentagecover: 1 });
+    console.log("insurance", insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover);
     var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
-    let fileName;
-    if (imageBase64)
-        fileName = yield (0, otherservices_1.uploadbase64image)(imageBase64);
+    // Strategy selection
+    const strategyFn = (foundPatient.isHMOCover == config_1.default.ishmo[1] || foundPatient.isHMOCover == true)
+        ? histolopathology_helper_1.HMOHistopathologyCreationStrategy
+        : histolopathology_helper_1.SelfPayHistopathologyCreationStrategy;
+    const context = (0, histolopathology_helper_1.HistopathologyCreationContext)(strategyFn);
+    const savedHistopathology = yield context.execute({
+        req, next, _patientId, foundPatient, hmopercentagecover, examTypes,
+        userId, _doctorId, lmp, biopsyType, wholeOrgan, previousBiopsy,
+        diagnosis, imageBase64, nameofexplainer, nameofrepresentive,
+        addressofrepresentaive, fullnameofwitness
+    });
+    res.status(201).json({
+        status: true,
+        message: "Histopathology created successfully",
+        data: savedHistopathology
+    });
+}));
+/*
+export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+    //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
+
+    const {
+        patientId,
+        examTypes, /// this is the service types
+        doctorId,
+        lmp,
+        biopsyType,
+        wholeOrgan,
+        previousBiopsy,
+        diagnosis,
+        imageBase64,
+        nameofexplainer,
+        nameofrepresentive,
+        addressofrepresentaive,
+        fullnameofwitness
+    } = req.body;
+
+    // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
+    //if (!mongoose.Types.ObjectId.isValid(appointmentId)) return next(new ApiError(404, "invalid id"));
+    if (!patientId) return next(new ApiError(400, "Patient Id is not provided!"));
+    if (!examTypes || !Array.isArray(examTypes) || examTypes.length === 0) {
+        return next(new ApiError(400, configuration.error.errorMustBeAnArray));
+    }
+    if (doctorId && !mongoose.Types.ObjectId.isValid(doctorId)) return next(new ApiError(404, "Invalid doctor id"));
+    const _doctorId = doctorId ? new mongoose.Types.ObjectId(doctorId) : null;
+
+    if (biopsyType && !configuration.validBiopsyType.includes(biopsyType)) {
+        return next(new ApiError(400, `Invalid biopsy type. Valid types are: ${configuration.validBiopsyType.join(', ')}`));
+    }
+
+    //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
+    const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
+
+
+    // check if patient still has a pending record
+    let pendingHistopathologyRecord = await queryHistopathologyRecord({ patient: _patientId, status: configuration.status[2] }, null, null);
+    if (pendingHistopathologyRecord) return next(new ApiError(400, "this patient still has a pending histopathology record"))
+
+    const { firstName, lastName, _id: userId } = (req.user).user;
+
+    ///Step 2: Read the Appointment and populate the patient field.
+    const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
+
+    if (!foundPatient) {
+        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    }
+let insurance: any = await readonehmocategorycover(
+  { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
+  { hmopercentagecover: 1 }
+);
+var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+
+let fileName;
+if (imageBase64) fileName = await uploadbase64image(imageBase64);
     //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
     let totalAmount = 0;
-    const testRequiredRecords = [];
-    //    const createdPayments = [];
-    const refNumber = generateRefNumber();
+    const testRequiredRecords: any[] = [];
+//    const createdPayments = [];
+     const refNumber = generateRefNumber();
+
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
-        var testPrice = yield (0, price_1.readoneprice)({ servicetype: service });
+
+        var testPrice: any = await readoneprice({ servicetype: service });
+
         if (!testPrice) {
-            return next(new Error(`${config_1.default.error.errornopriceset}  ${service}`));
+            return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
-        const serviceAmount = (0, otherservices_2.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
+        const serviceAmount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
         //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
+
         //const refNumber = generateRefNumber();
+
         /*
 
         const paymentData = {
@@ -111,31 +165,35 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
             amount: Number(serviceAmount)
         }
             */
+/*
         testRequiredRecords.push({
             amount: serviceAmount,
             name: service,
             PaymentRef: null,
-            paymentStatus: config_1.default.status[5] // Scheduled
+            paymentStatus: configuration.status[5] // Scheduled
         });
-        // createdPayments.push(paymentData);
+
+       // createdPayments.push(paymentData);
     }
-    /*
-        for (let i = 0; i < createdPayments.length; i++) {
-    
-            const paymentRecord = await createpayment(createdPayments[i]);
-    
-            testRequiredRecords[i].PaymentRef = paymentRecord._id;
-        }
-            */
+/*
+    for (let i = 0; i < createdPayments.length; i++) {
+
+        const paymentRecord = await createpayment(createdPayments[i]);
+
+        testRequiredRecords[i].PaymentRef = paymentRecord._id;
+    }
+        */
+/*
     const labNo = generateLabNumber();
+
     const newHistopathology = {
         patient: _patientId,
         staffInfo: userId,
         amount: totalAmount,
         refNumber,
         //status: configuration.status[5],
-        status: config_1.default.otherstatus[0],
-        paymentStatus: config_1.default.status[2],
+        status: configuration.otherstatus[0],
+        paymentStatus: configuration.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {
             lmp: lmp || '',
@@ -155,14 +213,18 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
             fullnameofwitness,
             createdBy: userId
         }
+
     };
-    const savedHistopathology = yield (0, histopathology_dao_1.CreateHistopatholgyDao)(newHistopathology, next);
+
+    const savedHistopathology = await CreateHistopatholgyDao(newHistopathology, next);
+
     res.status(201).json({
         status: true,
         message: "Histopathology  created successfully",
         data: savedHistopathology
     });
-}));
+});
+*/
 exports.getHistopathologyRecordById = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     if (!id)

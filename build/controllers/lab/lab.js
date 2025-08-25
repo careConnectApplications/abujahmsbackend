@@ -22,7 +22,6 @@ const users_1 = require("../../dao/users");
 const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const lab_helper_1 = require("./lab.helper");
-const lab_helper_2 = require("./lab.helper");
 //adjust lab to view from department
 // Get all lab records
 const readalllabb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -169,6 +168,7 @@ const readallscheduledlaboptimized = (req, res) => __awaiter(void 0, void 0, voi
                     HMOId: "$patient.HMOId",
                     HMOName: "$patient.HMOName",
                     status: 1,
+                    filename: 1
                 }
             },
             {
@@ -338,9 +338,9 @@ exports.confirmlaborder = (0, catchAsync_1.default)((req, res, next) => __awaite
     const { patient } = lab;
     // choose strategy based on isHMOCover
     const strategyFn = !(patient.isHMOCover == config_1.default.ishmo[1] || patient.isHMOCover == true)
-        ? lab_helper_1.HmoLabConfirmationStrategy
-        : lab_helper_1.SelfPayLabConfirmationStrategy;
-    const context = (0, lab_helper_2.LabConfirmationContext)(strategyFn);
+        ? lab_helper_1.SelfPayLabConfirmationStrategy
+        : lab_helper_1.HmoLabConfirmationStrategy;
+    const context = (0, lab_helper_1.LabConfirmationContext)(strategyFn);
     const queryresult = yield context.execute({
         id,
         option,
@@ -442,6 +442,7 @@ exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = (0, catchA
                 HMOId: "$patient.HMOId",
                 HMOName: "$patient.HMOName",
                 status: 1,
+                filename: 1
             }
         },
         {
