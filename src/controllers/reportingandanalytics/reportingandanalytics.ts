@@ -15,7 +15,7 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
-import {mergeCounts} from "./reportingandanalytics.helper";
+import {mergeCounts,formatRow} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -456,7 +456,7 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     
     const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
     const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
-    const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate} = appointmentaggregatereports(startdate,enddate)
+    const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate,outpatientdepartmentpipeline, accidentEmergencyRecordsPipeline} = appointmentaggregatereports(startdate,enddate)
     const {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions,inpatientrecordspipeline} = admissionaggregatereports(startdate,enddate);
     const {procedureaggregatepaid,totalprocedureaggregate} = procedureaggregatereports(startdate, enddate);
     const {nutritionaggregatechildren12to59receiveddeworming,nutritionaggregatechildren0to59givenvitaminasupplement,nutritionaggregatechildren0to5exclusivebreadstfeeding,nutritionaggregatechildren0to59growingwell,nutritionaggregatechildren0to59thatreceivednutirtion} =nutritionaggregatereports(startdate, enddate);
@@ -539,25 +539,64 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       
        }
        else if(querytype == summary[13]){
+      const outpatientdepartmentreport = await readappointmentaggregate(outpatientdepartmentpipeline);
       const InpatientRecordsreport = await readadmissionaggregate(inpatientrecordspipeline);
+      const accidentEmergencyRecordsReport = await readappointmentaggregate(accidentEmergencyRecordsPipeline);
       queryresult = {
+      accidentEmergencyRecords:{
+          "Accident & Emergency Attendance": formatRow(accidentEmergencyRecordsReport[0].accidentAndEmergencyAttendance),
+          "Road Traffic Accident (RTA)": formatRow(accidentEmergencyRecordsReport[0].roadTrafficAccident),
+          "EPU Attendance": formatRow(accidentEmergencyRecordsReport[0].epuAttendance),
+          //"Dressing": formatRow(accidentEmergencyRecordsReport[0].dressing),
+          "A & E Death": formatRow(accidentEmergencyRecordsReport[0].aAndEDeath),
+          "EPU Death": formatRow(accidentEmergencyRecordsReport[0].epuDeath),
+          "Brought in Death (BID)": formatRow(accidentEmergencyRecordsReport[0].broughtInDeath),
+          "BID in EPU": formatRow(accidentEmergencyRecordsReport[0].bidInEpu),
+          "Outpatients Referred In": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredIn),
+          "Outpatients Referred Out": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredOut)
+      },
+      outpatientDepartment:{  
+      "New Registration Adult": formatRow(outpatientdepartmentreport[0].newAdult),
+      "New Registration Paediatrics": formatRow(outpatientdepartmentreport[0].newPaediatrics),
+      "Family Medicine Attendance": formatRow(outpatientdepartmentreport[0].familyMedicine),
+      "POPD Attendance": formatRow(outpatientdepartmentreport[0].popd)
+          },
       InpatientRecords:{
-      broughtForward: InpatientRecordsreport[0].broughtForward,
-      newAdmission: InpatientRecordsreport[0].newAdmission,
-      totalAdmission: mergeCounts(
+      broughtForward: formatRow(InpatientRecordsreport[0].broughtForward),
+      newAdmission: formatRow(InpatientRecordsreport[0].newAdmission),
+      totalAdmission:formatRow( mergeCounts(
         InpatientRecordsreport[0].broughtForward,
         InpatientRecordsreport[0].newAdmission
-      ),
-      discharges: InpatientRecordsreport[0].discharges,
-      deaths: InpatientRecordsreport[0].deaths,
-      referredIn: InpatientRecordsreport[0].referredIn,
-      referredOut: InpatientRecordsreport[0].referredOut
+      )),
+      discharges:formatRow( InpatientRecordsreport[0].discharges),
+      deaths:formatRow(InpatientRecordsreport[0].deaths),
+      referredIn: formatRow(InpatientRecordsreport[0].referredIn),
+      referredOut: formatRow(InpatientRecordsreport[0].referredOut)
     }
     };
        }
+       /*
+       else if(querytype == summary[14]){
+        const accidentEmergencyRecordsReport = await readappointmentaggregate(accidentEmergencyRecordsPipeline);
+        queryresult = {
+          "Accident & Emergency Attendance": formatRow(accidentEmergencyRecordsReport[0].accidentAndEmergencyAttendance),
+          "Road Traffic Accident (RTA)": formatRow(accidentEmergencyRecordsReport[0].roadTrafficAccident),
+          "EPU Attendance": formatRow(accidentEmergencyRecordsReport[0].epuAttendance),
+          //"Dressing": formatRow(accidentEmergencyRecordsReport[0].dressing),
+          "A & E Death": formatRow(accidentEmergencyRecordsReport[0].aAndEDeath),
+          "EPU Death": formatRow(accidentEmergencyRecordsReport[0].epuDeath),
+          "Brought in Death (BID)": formatRow(accidentEmergencyRecordsReport[0].broughtInDeath),
+          "BID in EPU": formatRow(accidentEmergencyRecordsReport[0].bidInEpu),
+          "Outpatients Referred In": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredIn),
+          "Outpatients Referred Out": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredOut),
+        };
+       }
+        */
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
+  //}
+
     
 
     res.json({ queryresult, status: true });
@@ -569,4 +608,4 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
 })
 
 
-/////////////////reports for 
+/////////////////reports for
