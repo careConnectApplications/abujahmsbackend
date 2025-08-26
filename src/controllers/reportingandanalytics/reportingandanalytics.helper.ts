@@ -27,8 +27,8 @@ const regexFilter = (match: any, key: string, value: any) => {
 
 const dateRangeFilter = (match: any, key: string, value: any, field: string) => {
   if (!match[field]) match[field] = {};
-  if (key === "startdate") match[field].$gte = new Date(value);
- if (key === "enddate") match[field].$lt = new Date(value);
+  if (key === "startDate") match[field].$gte = new Date(value);
+ if (key === "endDate") match[field].$lt = new Date(value);
 };
 
 
