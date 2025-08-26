@@ -12,7 +12,7 @@ validateinputfaulsyvalue({theatreadmission});
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
-    throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Theatre Admission already exists`);
 
 }
 req.body.theatreadmission=theatreadmission;
@@ -63,7 +63,7 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readonepreoperativeprevisit({_id:id},{},'');
       if(!findAdmission){
-        throw new Error(`Preoperative previsit Form ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Preoperative previsit Form already exists`);
     
     }
     //const queryresult:any =await updatethearteadmission(id,{status});

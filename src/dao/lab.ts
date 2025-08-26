@@ -11,7 +11,7 @@ import configuration from "../config";
      
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve lab test data");
     }
   };
   
@@ -21,7 +21,7 @@ import configuration from "../config";
       
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve lab test data");
     }
   };
   export async function readalllab(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
@@ -31,7 +31,7 @@ import configuration from "../config";
       return { labdetails, totallabdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve lab test data");
     }
   };
   export async function optimizedreadalllab(aggregatequery:any,page:any,size:any){
@@ -46,7 +46,7 @@ import configuration from "../config";
       }
       catch(err:any){
         console.log(err);
-            throw new Error(configuration.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
       
       }
       
@@ -59,7 +59,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create lab test");
 
     }
   }
@@ -70,7 +70,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve lab test data");
 
     }
   }
@@ -90,7 +90,7 @@ import configuration from "../config";
       return lab;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update lab test");
 
     }
 
@@ -108,7 +108,7 @@ import configuration from "../config";
       return lab;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update lab test");
 
     }
 
@@ -121,6 +121,6 @@ import configuration from "../config";
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update lab test");
     }
     }

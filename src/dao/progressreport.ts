@@ -9,7 +9,7 @@ import configuration from "../config";
       return { readallprogressreportdetails, totalprogressreportdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve progress report data");
     }
   };
   export async function createprogressreports(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create progress report");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve progress report data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return progressreport;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update progress report");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return medication;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update progress report");
 
     }
 

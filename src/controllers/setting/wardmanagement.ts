@@ -15,7 +15,7 @@ export var createward = async (req:any,res:any) =>{
        //validate that totalbed is created or equal to occupiedbed
        if(occupiedbed >  totalbed){
        
-        throw new Error(`Occupied bed ${configuration.error.errorgreaterthan} Total bed`);
+        throw new Error(`Occupied beds cannot be greater than total beds`);
 
 
        }
@@ -24,7 +24,7 @@ export var createward = async (req:any,res:any) =>{
        //validate specialization
        const foundSpecilization =  await readoneclinic({clinic:bedspecialization},'');
        if(!foundSpecilization){
-           throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Specialization does not exist`);
 
        }
        
@@ -33,7 +33,7 @@ export var createward = async (req:any,res:any) =>{
       // validate ward
         const foundWard =  await readonewardmanagement({wardname},'');
         if(foundWard){
-            throw new Error(`Ward ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Ward already exists`);
 
         }
        
@@ -94,7 +94,7 @@ export async function updateward(req:any, res:any){
     //validate that totalbed is created or equal to occupiedbed
     if(occupiedbed >  totalbed){
     
-     throw new Error(`Occupied bed ${configuration.error.errorgreaterthan} Total bed`);
+     throw new Error(`Occupied beds cannot be greater than total beds`);
 
 
     }

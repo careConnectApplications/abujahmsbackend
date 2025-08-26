@@ -52,7 +52,7 @@ export const createimmunizations = async (req:any, res:any) => {
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
       //console.log(admissionrecord);   
       if(!patientrecord){
-           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Patient does not exist`);
   
        }
     const queryresult=await createimmunization({patient:patientrecord._id,vaccinationlocation,outreachMedications,adverseEffectVaccine,isFullyImmunized,isZeroDoseChild,vaccination,medicationgiventomanageadverseeffect,adverseeffectseverity,anynotedadverseeffect,schedule,vaccinecode,vaccinename,vaccinetype,manufacturer,batchno,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});

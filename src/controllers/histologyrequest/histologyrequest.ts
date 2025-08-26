@@ -18,7 +18,7 @@ validateinputfaulsyvalue({theatreadmission, africannonafrican,historyofpresentil
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
-    throw new Error(`Theatre Admission donot ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Theatre Admission does not exist`);
 
 }
 
@@ -70,7 +70,7 @@ catch(e:any){
     //validate theatre admission
       var  findhistologyrequestform = await readonehistology({_id:id},{},'');
       if(!findhistologyrequestform){
-        throw new Error(`Histology Request Form ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Histology Request Form already exists`);
     
     }
     //const queryresult:any =await updatethearteadmission(id,{status});

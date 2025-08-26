@@ -22,7 +22,7 @@ export const createbeds = catchAsync(async (req: Request | any, res: Response, n
     validateinputfaulsyvalue({ wardid });
     const foundWard =  await readonewardmanagement({_id:id},'');
     if(!foundWard){
-      throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Ward does not exist`);
     
     }
       
@@ -30,7 +30,7 @@ export const createbeds = catchAsync(async (req: Request | any, res: Response, n
     // Check for existing bed with same number in the same ward
     const existing = await readonebed({ bednumber, ward:id }, '');
     if (existing) {
-      throw new Error(`Bed ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Bed already exists`);
     }
 
     const queryresult = await createbed({
@@ -115,7 +115,7 @@ export const updatebeds = catchAsync(async (req: Request | any, res: Response, n
     validateinputfaulsyvalue({ bednumber});
     const existing = await readonebed({ bednumber}, '');
     if (existing) {
-      throw new Error(`Bed ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Bed already exists`);
     }
     const queryresult = await updatebed(id, {
       bednumber

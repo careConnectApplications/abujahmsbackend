@@ -96,7 +96,7 @@ export const createDentalEncounterController = catchAsync(async (req: Request | 
 
   const patient: any = await readonepatient({ _id: id }, {}, '', '');
   if (!patient) {
-    return next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
+    return next(new Error(`Patient does not exist already exists`));
   }
 
   const checkappointmentId = new ObjectId(appointmentoradmissionunderscoreid);

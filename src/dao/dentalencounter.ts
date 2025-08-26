@@ -24,7 +24,7 @@ export async function readAllDentalEncounters(
     return { encounters, total };
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve dental encounter data");
   }
 }
 
@@ -35,7 +35,7 @@ export async function createDentalEncounter(input: any) {
     return await newEncounter.save();
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create dental encounter");
   }
 }
 
@@ -45,7 +45,7 @@ export async function readOneDentalEncounter(query: any, selectquery: any) {
     return await DentalEncounter.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve dental encounter data");
   }
 }
 
@@ -65,7 +65,7 @@ export async function updateDentalEncounterById(id: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update dental encounter");
   }
 }
 
@@ -83,6 +83,6 @@ export async function updateDentalEncounterByQuery(query: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update dental encounter");
   }
 }

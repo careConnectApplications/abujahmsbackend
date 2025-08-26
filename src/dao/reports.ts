@@ -19,7 +19,7 @@ export async function readpatientsmanagementaggregate(input:any) {
   }
   catch(e:any){
     console.log(e);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update report");
   }
   }
 export async function readpaymentaggregate(input:any) {
@@ -28,7 +28,7 @@ export async function readpaymentaggregate(input:any) {
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update report");
     }
     }
 
@@ -38,7 +38,7 @@ export async function readpaymentaggregate(input:any) {
       }
       catch(e:any){
         console.log(e);
-        throw new Error(configuration.error.erroruserupdate);
+        throw new Error("Failed to update report");
       }
       }
   
@@ -49,7 +49,7 @@ export async function readpaymentaggregate(input:any) {
         }
         catch(e:any){
           console.log(e);
-          throw new Error(configuration.error.erroruserupdate);
+          throw new Error("Failed to update report");
         }
         }
         export async function readadmissionaggregate(input:any) {
@@ -58,7 +58,7 @@ export async function readpaymentaggregate(input:any) {
             }
             catch(e:any){
               console.log(e);
-              throw new Error(configuration.error.erroruserupdate);
+              throw new Error("Failed to update report");
             }
             }
 
@@ -69,7 +69,7 @@ export async function readpaymentaggregate(input:any) {
         }
         catch(e:any){
           console.log(e.message);
-          throw new Error(configuration.error.erroruserupdate);
+          throw new Error("Failed to update report");
         }
         }
 
@@ -80,7 +80,7 @@ export async function readpaymentaggregate(input:any) {
             }
             catch(e:any){
               console.log(e);
-              throw new Error(configuration.error.erroruserupdate);
+              throw new Error("Failed to update report");
             }
             }
             export async function readprocedureaggregate(input:any) {
@@ -89,7 +89,7 @@ export async function readpaymentaggregate(input:any) {
               }
               catch(e:any){
                 console.log(e);
-                throw new Error(configuration.error.erroruserupdate);
+                throw new Error("Failed to update report");
               }
               }
 
@@ -101,7 +101,7 @@ export async function readpaymentaggregate(input:any) {
                 }
                 catch(e:any){
                   console.log(e);
-                  throw new Error(configuration.error.erroruserupdate);
+                  throw new Error("Failed to update report");
                 }
                 }
 
@@ -112,7 +112,7 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                     console.log(e);
-                    throw new Error(configuration.error.erroruserupdate);
+                    throw new Error("Failed to update report");
                   }
                   }
                   
@@ -123,7 +123,7 @@ export async function readpaymentaggregate(input:any) {
                     }
                     catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                     }
                     }
 
@@ -134,7 +134,7 @@ export async function readpaymentaggregate(input:any) {
                     }
                     catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                     }
                     }
                     //immunization
@@ -145,7 +145,7 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                   }
               }
               //family planning
@@ -156,6 +156,6 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                   }
               }

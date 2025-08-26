@@ -79,7 +79,7 @@ export async function confirmgrouppayment(req: any, res: any) {
       let subscriptionfeePaid;
       if (!patientrecord && !(paymentcategory == configuration.category[3] || paymentcategory == configuration.category[8] || paymentcategory == configuration.category[9])) {
       
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
       
@@ -396,7 +396,7 @@ export async function confirmpayment(req: any, res: any) {
      let cardFeePaid;
      let subscriptionfeePaid;
     if (!patientrecord && paymentcategory !== configuration.category[3]) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+      throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
     }
     if(paymentcategory == configuration.category[3]){
@@ -540,7 +540,7 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
   const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   const { firstName, lastName, } = foundPatient;

@@ -807,7 +807,7 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       appointment = await readoneappointment({ _id: id }, {}, 'patient');
       if (!appointment) {
         //create an appointment
-        throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Appointment does not exist`);
 
       }
       //read insurance

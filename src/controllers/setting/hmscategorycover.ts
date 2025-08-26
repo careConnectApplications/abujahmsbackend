@@ -20,7 +20,7 @@ export var createhmocategorycovercontroller = async (req: any, res: any) => {
     const foundHmo = await readonehmomanagement({ _id:hmoId }, '');
     //update servicetype for New Patient Registration
     if (!foundHmo) {
-      throw new Error(`HMO doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`HMO does not exist`);
 
     }
     //validate category
@@ -29,14 +29,14 @@ export var createhmocategorycovercontroller = async (req: any, res: any) => {
           
  if(!(configuration.category).includes(category)){
              
-    throw new Error(`service category doesnt ${configuration.error.erroralreadyexit}`);
+    throw new Error(`service category does not exist`);
     
 }
 
     // Check if category already exists for same HMO
     const foundCover = await readonehmocategorycover({ hmoId, category,hmopercentagecover }, "");
     if (foundCover) {
-      throw new Error(`HMO Category Cover ${configuration.error.erroralreadyexit}`);
+      throw new Error(`HMO Category Cover already exists`);
     }
 
     const queryresult = await createhmocategorycover({
@@ -86,7 +86,7 @@ export async function updatehmocategorycovercontroller(req: any, res: any) {
     const foundHmo = await readonehmomanagement({ _id:hmoId }, '');
     //update servicetype for New Patient Registration
     if (!foundHmo) {
-      throw new Error(`HMO doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`HMO does not exist`);
 
     }
 

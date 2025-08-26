@@ -27,8 +27,8 @@ const regexFilter = (match: any, key: string, value: any) => {
 
 const dateRangeFilter = (match: any, key: string, value: any, field: string) => {
   if (!match[field]) match[field] = {};
-  if (key === "startDate") match[field].$gte = new Date(value);
- if (key === "endDate") match[field].$lt = new Date(value);
+  if (key === "startdate") match[field].$gte = new Date(value);
+ if (key === "enddate") match[field].$lt = new Date(value);
 };
 
 
@@ -36,12 +36,25 @@ const wardFilter = (match: any, key: string, value: any) => {
   match["referedward.wardname"] = value;
 };
 
+// Helper function for age range filtering
+const ageRangeFilter = (match: any, min?: number, max?: number) => {
+  if (min !== undefined || max !== undefined) {
+    if (!match["patient.age"]) match["patient.age"] = {};
+    if (min !== undefined) {
+      match["patient.age"].$gte = `${min} years`;
+    }
+    if (max !== undefined) {
+      match["patient.age"].$lte = `${max} years`;
+    }
+  }
+};
+
 // ---------- Strategy Map ----------
 const strategies: Record<string, (match: any, key: string, value: any) => void> = {
   // Admission filters
   wardname: (match, key, value) => (match["referedward.wardname"] = value),
-  startDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
-  endDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  startdate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  enddate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
 
   // Appointment filters
   appointmentStart: (match, key, value) => dateRangeFilter(match, key, value, "appointmentdate"),
@@ -64,6 +77,46 @@ const strategies: Record<string, (match: any, key: string, value: any) => void> 
 
   // Pharmacy secondary service filters
   pharmacy: (match, key, value) => (match[key] = value),
+  
+  // Patient demographic filters
+  firstName: (match, key, value) => regexFilter(match, "patient.firstName", value),
+  lastName: (match, key, value) => regexFilter(match, "patient.lastName", value),
+  gender: (match, key, value) => (match["patient.gender"] = value),
+  
+  // Age-specific filters
+  ageInYears: (match, key, value) => {
+    // Exact age match in years
+    match["patient.age"] = `${value} years`;
+  },
+  
+  ageInMonths: (match, key, value) => {
+    // Exact age match in months
+    match["patient.age"] = `${value} months`;
+  },
+  
+  ageInDays: (match, key, value) => {
+    // Exact age match in days
+    match["patient.age"] = `${value} days`;
+  },
+  
+  minAge: (match, key, value) => {
+    // Minimum age filter (in years)
+    if (!match["patient.age"]) match["patient.age"] = {};
+    match["patient.age"].$gte = `${value} years`;
+  },
+  
+  maxAge: (match, key, value) => {
+    // Maximum age filter (in years)
+    if (!match["patient.age"]) match["patient.age"] = {};
+    match["patient.age"].$lte = `${value} years`;
+  },
+  
+  ageRange: (match, key, value) => {
+    // Age range filter accepting an object with min and/or max properties
+    if (typeof value === "object" && value !== null) {
+      ageRangeFilter(match, value.min, value.max);
+    }
+  },
 };
 
 

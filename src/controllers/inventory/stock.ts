@@ -127,7 +127,7 @@ export var createstock = async (req:any,res:any) =>{
 
     const foundPrice =  await readoneprice({servicecategory,productid,pharmacy});
     if(foundPrice){
-        throw new Error(`${servicetype} ${configuration.error.erroralreadyexit}`);
+        throw new Error(`${servicetype} already exists`);
 
     }
     
@@ -166,7 +166,7 @@ export async function updatestocks(req:any, res:any){
 
   }
   if(foundPrice.servicecategory !== configuration.category[1]){
-    throw new Error(`${foundPrice.servicecategory} ${configuration.error.erroralreadyexit}`);
+    throw new Error(`${foundPrice.servicecategory} already exists`);
 
 }
   //var queryresult = await updateprice(id, req.body);

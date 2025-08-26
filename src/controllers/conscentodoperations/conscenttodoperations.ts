@@ -15,7 +15,7 @@ const filename = await uploadbase64image(imageBase64);
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
 
   if(!findAdmission){
-    throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Theatre Admission already exists`);
 
 }
 //const queryresult:any =await updatethearteadmission(id,{status});
@@ -69,7 +69,7 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readoneconscentooperation({_id:id},{},'');
       if(!findAdmission){
-        throw new Error(`Conscent Form ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Conscent Form already exists`);
     
     }
     //const queryresult:any =await updatethearteaadmission(id,{status});

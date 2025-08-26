@@ -165,7 +165,7 @@ export async function bulkuploadusers(req: any, res: any) {
         validateinputfaulsyvalue({ email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails });
         const foundUser = await readone({ email });
         if (foundUser) {
-          throw new Error(`${email} ${configuration.error.erroralreadyexit}`);
+          throw new Error(`${email} already exists`);
 
         }
         var roleId = (configuration.roles).filter((e: any) => e.role == role)[0].roleId;

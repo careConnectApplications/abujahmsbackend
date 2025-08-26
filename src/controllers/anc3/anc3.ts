@@ -61,7 +61,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
   if (!id) return next(new ApiError(400, "Patient Id is not provided!"));
   const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
   const patientrecord: any = await readonepatient({ _id: _patientId }, {}, '', '');
-  if (!patientrecord) return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+  if (!patientrecord) return next(new ApiError(404, `Patient do not already exists`));
 
 
   const newAnc3 = {
@@ -240,7 +240,7 @@ export const createancfollowupsv3 = async (req: any, res: any) => {
     const ancrecord: any = await readoneanc({ _id: anc }, {}, '');
     //console.log(admissionrecord);   
     if (!ancrecord) {
-      throw new Error(`ANC donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`ANC does not exist`);
 
     }
     const queryresult = await createancfollowup({ anc: ancrecord._id, heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
@@ -329,7 +329,7 @@ export const createancsv3 = async (req: any, res: any) => {
     const patientrecord: any = await readonepatient({ _id: id }, {}, '', '');
     //console.log(admissionrecord);   
     if (!patientrecord) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient does not exist`);
 
     }
     const queryresult = await createanc({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });

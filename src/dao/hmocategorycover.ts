@@ -14,7 +14,7 @@ export async function readallhmocategorycover(query: any, selectquery: any) {
     return { hmocategorycoverdetails, totalhmocategorycoverdetails };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve HMO category cover data");
   }
 }
 
@@ -25,7 +25,7 @@ export async function createhmocategorycover(input: any) {
     return await hmocategorycover.save();
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create HMO category cover");
   }
 }
 
@@ -35,7 +35,7 @@ export async function readonehmocategorycover(query: any, selectquery: any) {
     return await HmoCategoryCover.findOne(query).select(selectquery).populate("hmoId");
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve HMO category cover data");
   }
 }
 
@@ -53,7 +53,7 @@ export async function updatehmocategorycover(id: any, reqbody: any) {
     return hmocategorycover;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update HMO category cover");
   }
 }
 
@@ -71,6 +71,6 @@ export async function updatehmocategorycoverbyquery(query: any, reqbody: any) {
     return hmocategorycover;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update HMO category cover");
   }
 }

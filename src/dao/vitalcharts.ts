@@ -9,7 +9,7 @@ import configuration from "../config";
       return { vitalchartsdetails, totalvitalchartsdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve vital chart data");
     }
   };
   export async function createvitalcharts(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create vital chart");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve vital chart data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return vital;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update vital chart");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return vital;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update vital chart");
 
     }
 

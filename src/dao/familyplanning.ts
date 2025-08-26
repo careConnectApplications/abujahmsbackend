@@ -9,7 +9,7 @@ import configuration from "../config";
       return { familyplanningsdetails, totalfamilyplanningsdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve family planning data");
     }
   };
   export async function createfamilyplannings(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create family planning");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve family planning data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return familyplanning;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update family planning");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return familyplanning;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update family planning");
 
     }
 

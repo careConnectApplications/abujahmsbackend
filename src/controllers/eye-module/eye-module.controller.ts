@@ -43,7 +43,7 @@ export const createEyeModule = catchAsync(async (req: Request | any, res: Respon
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
     const newEyeModule = {
         patient: patientId,
@@ -74,12 +74,12 @@ export const createLensPrescription = catchAsync(async (req: Request | any, res:
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
 
     const foundAppointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
     if (!foundAppointment) {
-        return next(new ApiError(404, `appointment do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `appointment do not already exists`));
     }
 
     /// first check if eye module instance aleady exist if not create one
@@ -1240,12 +1240,12 @@ export const createEyeConsultation = catchAsync(
 
         const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
         if (!foundPatient) {
-            return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+            return next(new ApiError(404, `Patient do not already exists`));
         }
 
         const foundAppointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
         if (!foundAppointment) {
-            return next(new ApiError(404, `appointment do not ${configuration.error.erroralreadyexit}`));
+            return next(new ApiError(404, `appointment do not already exists`));
         }
 
         /// first check if eye module instance aleady exist if not create one

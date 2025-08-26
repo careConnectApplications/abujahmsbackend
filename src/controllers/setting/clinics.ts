@@ -17,7 +17,7 @@ export var createclinics = async (req:any,res:any) =>{
         const foundClinic =  await readoneclinic({clinic},'');
         //update servicetype for New Patient Registration
         if(foundClinic){
-            throw new Error(`clinic ${configuration.error.erroralreadyexit}`);
+            throw new Error(`clinic already exists`);
 
         }
          const queryresult=await createclinic({clinic,type,id,category});
