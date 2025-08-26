@@ -15,7 +15,7 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
-import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,appointmentreportbyhmoreport,secondaryservice,reportprocedure,pharmacysecondaryservice} from "./reportingandanalytics.helper";
+import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -52,20 +52,12 @@ else if(querytype == reports[4].querytype){
 
 }
 else if(querytype == reports[5].querytype){
-  queryresult= await readprescriptionaggregate(reportlab(filters));
+  queryresult= await readprescriptionaggregate(reportpharmacy(filters));
 
 }
+
 else if(querytype == reports[6].querytype){
-  queryresult= await readappointmentaggregate(appointmentreportbyhmoreport(filters));
-
-}
-else if(querytype == reports[7].querytype){
-  queryresult= await readradiologyaggregate(reportlab(filters));
-
-}
-else if(querytype == reports[8].querytype){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readprescriptionaggregate(pharmacysecondaryservice);
+  queryresult= await readradiologyaggregate(reportradiology(filters));
 
 }
 else {

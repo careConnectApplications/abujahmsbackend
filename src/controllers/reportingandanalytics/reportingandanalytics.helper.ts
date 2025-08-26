@@ -372,6 +372,30 @@ export const reportprocedure = (filters: any) => {
     },
     { $match: matchConditions },
     {
+      $addFields: {
+        // Concatenate procedure array values into a single string
+        procedure: {
+          $cond: {
+            if: { $isArray: "$procedure" },
+            then: {
+              $reduce: {
+                input: { $ifNull: ["$procedure", []] },
+                initialValue: "",
+                in: {
+                  $cond: {
+                    if: { $eq: ["$$value", ""] },
+                    then: "$$this",
+                    else: { $concat: ["$$value", ", ", "$$this"] }
+                  }
+                }
+              }
+            },
+            else: "$procedure"
+          }
+        }
+      }
+    },
+    {
       $project: {
         // Procedure specific fields
         procedureid: 1,
@@ -380,9 +404,7 @@ export const reportprocedure = (filters: any) => {
         indicationdiagnosisprocedure: 1,
         appointmentdate: 1,
         clinic: 1,
-        cptcodes: 1,
-        dxcodes: 1,
-        procedureresult: 1,
+       
         
         // Financial information
         amount: 1,
@@ -421,9 +443,9 @@ export const reportprocedure = (filters: any) => {
     }
   ];
 };
-
-export const appointmentreportbyhmoreport = (filters: any) => {
+export const reportpharmacy = (filters: any) => {
   const matchConditions = buildFilters(filters);
+  console.log("matchConditions", matchConditions);
   return [
     {
       $lookup: {
@@ -440,10 +462,79 @@ export const appointmentreportbyhmoreport = (filters: any) => {
       },
     },
     { $match: matchConditions },
+    {
+      $project: {
+        // Prescription specific fields
+        prescription: 1,
+        pharmacy: 1,
+        prescriptionnote: 1,
+        orderid: 1,
+        appointmentid: 1,
+        appointmentdate: 1,
+        clinic: 1,
+        
+        // Dosage information
+        dosageform: 1,
+        strength: 1,
+        dosage: 1,
+        duration: 1,
+        frequency: 1,
+        route: 1,
+        qty: 1,
+        balance: 1,
+        
+        // Financial information
+        amount: 1,
+        hmopercentagecover: 1,
+        actualcost: 1,
+        
+        // Status fields
+        dispensestatus: 1,
+        servedstatus: 1,
+        
+        // Staff information
+        prescribersname: 1,
+        pharmacistname: 1,
+        
+        // Remarks
+        remark: 1,
+        
+        // Patient information (from prescription document)
+        firstName: 1,
+        lastName: 1,
+        MRN: 1,
+        HMOId: 1,
+        HMOName: 1,
+        HMOPlan: 1,
+        isHMOCover: 1,
+        
+        // Patient demographics (from patient lookup)
+        patientGender: "$patient.gender",
+        patientAge: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        patientFirstName: "$patient.firstName",
+        patientLastName: "$patient.lastName",
+        patientMiddleName: "$patient.middleName",
+        patientMRN: "$patient.MRN",
+        
+        // Patient HMO information from lookup
+        patientHMOId: "$patient.HMOId",
+        patientHMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
   ];
 };
 
-export const secondaryservice = (filters: any) => {
+export const reportradiology = (filters: any) => {
   const matchConditions = buildFilters(filters);
   return [
     {
@@ -462,50 +553,56 @@ export const secondaryservice = (filters: any) => {
     },
     { $match: matchConditions },
     {
-      $addFields: {
-        servicetype: {
-          $ifNull: ["$testname", "$appointmenttype"],
-        },
-      },
-    },
-    {
       $project: {
-        servicetype: 1,
-        patient: 1,
-      },
-    },
-  ];
-};
-
-
-export const pharmacysecondaryservice = (filters: any) => {
-  const matchConditions = buildFilters(filters);
-  return [
-    {
-      $lookup: {
-        from: "patientsmanagements",
-        localField: "patient",
-        foreignField: "_id",
-        as: "patient",
-      },
-    },
-    {
-      $unwind: {
-        path: "$patient",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    { $match: matchConditions },
-    {
-      $addFields: {
-        servicetype: "$prescription",
-      },
-    },
-    {
-      $project: {
-        servicetype: 1,
-        patient: 1,
-      },
-    },
+        // Radiology specific fields
+        testname: 1,
+        testid: 1,
+        department: 1,
+        testresult: 1,
+        typetestresult: 1,
+        processeddate: 1,
+        
+        // Processing details
+        note: 1,
+        remark: 1,
+        
+        // Financial information
+        amount: 1,
+        hmopercentagecover: 1,
+        actualcost: 1,
+        
+        // Status field
+        status: 1,
+        
+        // Staff information
+        raiseby: 1,
+        processby: 1,
+        
+        // File attachment
+        filename: 1,
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
   ];
 };
