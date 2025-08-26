@@ -644,8 +644,7 @@ const appointmentSchema = new Schema({
   sexualassault: Boolean,
   policaename: String,
   servicenumber: String,
-  policephonenumber: String,
-  division: String,
+  policephonenumber: String,  division: String,
   fromclinicalencounter: {
     type: Boolean,
     default: false,

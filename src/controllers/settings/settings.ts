@@ -88,8 +88,8 @@ export const settings = async function () {
         //console.log(check2);
         const reports=[
             {querytype:"financialreport",querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]},
-            {querytype:"appointmentreport",querygroup:clinicNames},
-            {querytype:"admissionreport",querygroup:wardNames},
+            {querytype:"outpatient",querygroup:clinicNames},
+            {querytype:"inpatient",querygroup:wardNames},
 
             {querytype:"hmolabreport",querygroup:hmoNames},
             {querytype:"hmoreportforprocedure",querygroup:hmoNames},
