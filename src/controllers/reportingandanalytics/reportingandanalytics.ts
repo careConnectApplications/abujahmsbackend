@@ -15,260 +15,15 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
-import {mergeCounts,formatRow} from "./reportingandanalytics.helper";
+import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportbyhmoreport,appointmentreportbyhmoreport,secondaryservice,proceduresecondaryservice,pharmacysecondaryservice} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
 try{
-
+  const {filters} = req.body;
   //paymentcategory
   //cashieremail
-var { querygroup, querytype, startdate, enddate }: any = req.params;
-if (!querygroup) {
-  throw new Error(`querygroup ${configuration.error.errorisrequired}`);
-}
-
-if (!startdate || !enddate) {
-  var todaydate = new Date();
-  enddate = todaydate;
-  startdate = new Date(
-    todaydate.getFullYear(),
-    todaydate.getMonth() - 6,
-    todaydate.getDate()
-  );
-} else {
-  startdate = new Date(startdate);
-  enddate = new Date(enddate);
-}
-
-const reportbyfinancialreport = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-    {   
-            $match:{$and:[{paymentcategory: querygroup}, {updatedAt:{ $gt: startdate, $lt: enddate }}]}   
-    }
-    
-];
-
-
-
-const reportbyadmissionreport = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $lookup: {
-      from: "wardmanagements",
-      localField: "referedward",
-      foreignField: "_id",
-      as: "referedward",
-    },
-  },
-  {
-    $unwind: {
-      path: "$referedward",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-  {
-    $match:{$and:[{"referedward.wardname": querygroup}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
-  },
-];
-
-const reportbyappointmentreport = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $match:{$and:[{clinic: querygroup}, {
-      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
-  },
-];
-
-const reportbyhmoreport = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $unwind: {
-      path: "$patient",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-  {
-    $match:{$and:[{"patient.HMOName": querygroup}, {
-      createdAt:{ $gt: startdate, $lt: enddate }}]} 
-  },
-];
-const appointmentreportbyhmoreport = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $unwind: {
-      path: "$patient",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-  {
-    $match:{$and:[{"patient.HMOName": querygroup}, {
-      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
-  },
-];
-const secondaryservice = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $unwind: {
-      path: "$patient",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-    {   
-            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-    },
-    {
-      $addFields: {
-        servicetype: {
-          $ifNull: ["$testname", "$appointmenttype"]
-        }
-      }
-    },
-    {
-      $project:{
-        servicetype:1,
-        patient:1
-
-      }
-    }
-    
-];
-const proceduresecondaryservice = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $unwind: {
-      path: "$patient",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-    {   
-            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-    }
-    ,
-    {
-      $addFields: {
-        servicetype: {
-          $reduce: {
-            input: { $ifNull: ["$procedure", []] },
-            initialValue: "",
-            in: {
-              $cond: {
-                if: { $eq: ["$$value", ""] },
-                then: "$$this",
-                else: { $concat: ["$$value", ",", "$$this"] }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      $project:{
-        servicetype:1,
-        patient:1
-
-      }
-    }
-      
-    
-];
-
-const patientsecondaryservice = [
- 
-    {   
-            $match:{$and:[{patienttype: configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-    }
-    
-];
-const pharmacysecondaryservice = [
-  {
-    $lookup: {
-      from: "patientsmanagements",
-      localField: "patient",
-      foreignField: "_id",
-      as: "patient",
-    },
-  },
-  {
-    $unwind: {
-      path: "$patient",
-      preserveNullAndEmptyArrays: true
-    }
-    
-  },
-    {   
-            $match:{$and:[{pharmacy: querygroup},{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
-    },
-    {
-      $addFields: {
-        servicetype:"$prescription"
-      }
-    },
-    {
-      $project:{
-        servicetype:1,
-        patient:1
-
-      }
-    }
-    
-];
-
-
+var { querytype}: any = req.params;
 var queryresult: any;
 
 //var c = await configuration.settings2();
@@ -278,78 +33,36 @@ let {reports}:any = await settings();
 //Financial report
 if (querytype == reports[0].querytype) {
   
-  queryresult = await readpaymentaggregate(reportbyfinancialreport);
+  queryresult = await readpaymentaggregate(reportbyfinancialreport(filters));
 }  
 else if(querytype == reports[1].querytype){
-  queryresult= await readappointmentaggregate(reportbyappointmentreport);
+  queryresult= await readappointmentaggregate(reportbyappointmentreport(filters));
 
 }
 else if(querytype == reports[2].querytype){
-  queryresult= await readadmissionaggregate(reportbyadmissionreport);
+  queryresult= await readadmissionaggregate(reportbyadmissionreport(filters));
 
 }
 else if(querytype == reports[3].querytype){
-  queryresult= await readlabaggregate(reportbyhmoreport);
+  queryresult= await readlabaggregate(reportbyhmoreport(filters));
 
 }
 else if(querytype == reports[4].querytype){
-  queryresult= await readprocedureaggregate(reportbyhmoreport);
+  queryresult= await readprocedureaggregate(reportbyhmoreport(filters));
 
 }
 else if(querytype == reports[5].querytype){
-  queryresult= await readprescriptionaggregate(reportbyhmoreport);
+  queryresult= await readprescriptionaggregate(reportbyhmoreport(filters));
 
 }
 else if(querytype == reports[6].querytype){
-  queryresult= await readappointmentaggregate(appointmentreportbyhmoreport);
+  queryresult= await readappointmentaggregate(appointmentreportbyhmoreport(filters));
 
 }
 else if(querytype == reports[7].querytype){
-  queryresult= await readradiologyaggregate(reportbyhmoreport);
+  queryresult= await readradiologyaggregate(reportbyhmoreport(filters));
 
 }
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[0]){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readappointmentaggregate(secondaryservice);
-
-}
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[1]){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readlabaggregate(secondaryservice);
-
-}
-/*
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readpatientsmanagementaggregate(patientsecondaryservice);
-
-}
-  */
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[2]){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readradiologyaggregate(secondaryservice);
-
-}
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[3]){
-  //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
-  queryresult= await readprocedureaggregate(proceduresecondaryservice);
-
-}
-else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
-
-  const [result1, result2, result3] = await Promise.all([
-    readprocedureaggregate(proceduresecondaryservice),
-    readradiologyaggregate(secondaryservice),
-    readlabaggregate(secondaryservice),
-    readappointmentaggregate(secondaryservice)
-  ]);
-
-  queryresult = [...result1, ...result2, ...result3];
-
-  //queryresult= await readprocedureaggregate(proceduresecondaryservice);
-
-}
-
 else if(querytype == reports[8].querytype){
   //querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]
   queryresult= await readprescriptionaggregate(pharmacysecondaryservice);
@@ -575,23 +288,7 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     }
     };
        }
-       /*
-       else if(querytype == summary[14]){
-        const accidentEmergencyRecordsReport = await readappointmentaggregate(accidentEmergencyRecordsPipeline);
-        queryresult = {
-          "Accident & Emergency Attendance": formatRow(accidentEmergencyRecordsReport[0].accidentAndEmergencyAttendance),
-          "Road Traffic Accident (RTA)": formatRow(accidentEmergencyRecordsReport[0].roadTrafficAccident),
-          "EPU Attendance": formatRow(accidentEmergencyRecordsReport[0].epuAttendance),
-          //"Dressing": formatRow(accidentEmergencyRecordsReport[0].dressing),
-          "A & E Death": formatRow(accidentEmergencyRecordsReport[0].aAndEDeath),
-          "EPU Death": formatRow(accidentEmergencyRecordsReport[0].epuDeath),
-          "Brought in Death (BID)": formatRow(accidentEmergencyRecordsReport[0].broughtInDeath),
-          "BID in EPU": formatRow(accidentEmergencyRecordsReport[0].bidInEpu),
-          "Outpatients Referred In": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredIn),
-          "Outpatients Referred Out": formatRow(accidentEmergencyRecordsReport[0].outpatientsReferredOut),
-        };
-       }
-        */
+     
     else{
       return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
     }
