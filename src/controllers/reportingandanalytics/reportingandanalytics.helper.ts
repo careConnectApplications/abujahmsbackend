@@ -40,8 +40,8 @@ const wardFilter = (match: any, key: string, value: any) => {
 const strategies: Record<string, (match: any, key: string, value: any) => void> = {
   // Admission filters
   wardname: (match, key, value) => (match["referedward.wardname"] = value),
-  startdate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
-  enddate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  startDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  endDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
 
   // Appointment filters
   appointmentStart: (match, key, value) => dateRangeFilter(match, key, value, "appointmentdate"),
