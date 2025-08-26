@@ -95,7 +95,7 @@ export const reportbyappointmentreport = (filters: any) => {
  
   return [
     {
-      $lookup: {
+     $lookup: {
         from: "patientsmanagements",
         localField: "patient",
         foreignField: "_id",
@@ -154,6 +154,12 @@ export const reportbyadmissionreport = (filters: any) => {
       },
     },
     {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true, // keeps documents even if no patient found
+      },
+    },
+    {
       $lookup: {
         from: "wardmanagements",
         localField: "referedward",
@@ -163,6 +169,46 @@ export const reportbyadmissionreport = (filters: any) => {
     },
     { $unwind: { path: "$referedward", preserveNullAndEmptyArrays: true } },
     { $match: matchConditions },
+    {
+      $project: {
+        // Admission specific fields
+        admissionid: 1,
+        status: 1,
+        referredIn: 1,
+        referredFrom: 1,
+        admittospecialization: 1,
+        referddate: 1,
+        dischargeReason: 1,
+        bedfee: 1,
+      
+        
+        // Ward information
+        wardname: "$referedward.wardname",
+        wardtype: "$referedward.wardtype",
+        
+        // Staff information
+        doctorname: 1,
+        staffname: 1,
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
   ];
 };
 
@@ -177,11 +223,59 @@ export const reportbyfinancialreport = (filters: any) => {
         as: "patient",
       },
     },
+    {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true, // keeps documents even if no patient found
+      },
+    },
     { $match: matchConditions },
+    {
+      $project: {
+        // Payment specific fields
+        paymentype: 1,
+        paymentcategory: 1,
+        paymentreference: 1,
+        amount: 1,
+        qty: 1,
+        status: 1,
+        numberoftimesprinted: 1,
+        confirmationdate: 1,
+        
+        // Cashier information
+        cashieremail: 1,
+        cashiername: 1,
+        cashierid: 1,
+        
+        // Patient information (from payment document)
+        firstName: 1,
+        lastName: 1,
+        MRN: 1,
+        HMOId: 1,
+        phoneNumber: 1,
+        
+        // Patient demographics (from patient lookup)
+        patientGender: "$patient.gender",
+        patientAge: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        patientFirstName: "$patient.firstName",
+        patientLastName: "$patient.lastName",
+        patientMRN: "$patient.MRN",
+        
+        // Patient HMO information
+        patientHMOId: "$patient.HMOId",
+        patientHMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
   ];
 };
 
-export const reportbyhmoreport = (filters: any) => {
+export const reportlab = (filters: any) => {
   const matchConditions = buildFilters(filters);
   return [
     {
@@ -199,6 +293,132 @@ export const reportbyhmoreport = (filters: any) => {
       },
     },
     { $match: matchConditions },
+    {
+      $project: {
+        // Lab specific fields
+        testname: 1,
+        testid: 1,
+        department: 1,
+        labcategory: 1,
+        appointmentid: 1,
+        processeddate: 1,
+        
+    
+        
+        // Lab processing details
+        priority: 1,
+        sortby: 1,
+        sortbydate: 1,
+        remark: 1,
+        note: 1,
+        
+        // Financial information
+        amount: 1,
+        hmopercentagecover: 1,
+        actualcost: 1,
+        
+        // Status fields
+        status: 1,
+        chemicalpathologyhemathologyreviewtstatus: 1,
+        
+        // Staff information
+        raiseby: 1,
+        staffname: 1,
+        
+        // File attachment
+        filename: 1,
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
+  ];
+};
+export const reportprocedure = (filters: any) => {
+  const matchConditions = buildFilters(filters);
+  return [
+    {
+      $lookup: {
+        from: "patientsmanagements",
+        localField: "patient",
+        foreignField: "_id",
+        as: "patient",
+      },
+    },
+    {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $match: matchConditions },
+    {
+      $project: {
+        // Procedure specific fields
+        procedureid: 1,
+        procedure: 1,
+        procedureoutcome: 1,
+        indicationdiagnosisprocedure: 1,
+        appointmentdate: 1,
+        clinic: 1,
+        cptcodes: 1,
+        dxcodes: 1,
+        procedureresult: 1,
+        
+        // Financial information
+        amount: 1,
+        hmopercentagecover: 1,
+        actualcost: 1,
+        
+        // Status
+        status: 1,
+        
+        // Staff information
+        raiseby: 1,
+        processby: 1,
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
   ];
 };
 
@@ -257,49 +477,6 @@ export const secondaryservice = (filters: any) => {
   ];
 };
 
-export const proceduresecondaryservice = (filters: any) => {
-  const matchConditions = buildFilters(filters);
-  return [
-    {
-      $lookup: {
-        from: "patientsmanagements",
-        localField: "patient",
-        foreignField: "_id",
-        as: "patient",
-      },
-    },
-    {
-      $unwind: {
-        path: "$patient",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    { $match: matchConditions },
-    {
-      $addFields: {
-        servicetype: {
-          $reduce: {
-            input: { $ifNull: ["$procedure", []] },
-            initialValue: "",
-            in: {
-              $cond: {
-                if: { $eq: ["$$value", ""] },
-                then: "$$this",
-                else: { $concat: ["$$value", ",", "$$this"] },
-              },
-            },
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        servicetype: 1,
-        patient: 1,
-      },
-    },
-  ];
-};
 
 export const pharmacysecondaryservice = (filters: any) => {
   const matchConditions = buildFilters(filters);
@@ -332,4 +509,3 @@ export const pharmacysecondaryservice = (filters: any) => {
     },
   ];
 };
-
