@@ -15,7 +15,7 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
-import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportbyhmoreport,appointmentreportbyhmoreport,secondaryservice,proceduresecondaryservice,pharmacysecondaryservice} from "./reportingandanalytics.helper";
+import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,appointmentreportbyhmoreport,secondaryservice,reportprocedure,pharmacysecondaryservice} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 export const reports = async (req:any, res:any) => {
@@ -44,15 +44,15 @@ else if(querytype == reports[2].querytype){
 
 }
 else if(querytype == reports[3].querytype){
-  queryresult= await readlabaggregate(reportbyhmoreport(filters));
+  queryresult= await readlabaggregate(reportlab(filters));
 
 }
 else if(querytype == reports[4].querytype){
-  queryresult= await readprocedureaggregate(reportbyhmoreport(filters));
+  queryresult= await readprocedureaggregate(reportprocedure(filters));
 
 }
 else if(querytype == reports[5].querytype){
-  queryresult= await readprescriptionaggregate(reportbyhmoreport(filters));
+  queryresult= await readprescriptionaggregate(reportlab(filters));
 
 }
 else if(querytype == reports[6].querytype){
@@ -60,7 +60,7 @@ else if(querytype == reports[6].querytype){
 
 }
 else if(querytype == reports[7].querytype){
-  queryresult= await readradiologyaggregate(reportbyhmoreport(filters));
+  queryresult= await readradiologyaggregate(reportlab(filters));
 
 }
 else if(querytype == reports[8].querytype){
