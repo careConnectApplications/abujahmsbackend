@@ -16,11 +16,10 @@ export const settings = async function () {
             {querytype:"inpatient"},
             {querytype:"labreport"},
             {querytype:"procedurereport"},
+            {querytype:"pharmacyreport"},
+            {querytype:"radiologyreport"},
 
-            {querytype:"hmoreportforpharmacy"},
-            {querytype:"hmoappointmentreport"},
-            {querytype:"hmoradiologyreport"},
-            {querytype:"secondaryservicereport"},
+            
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
           ];
