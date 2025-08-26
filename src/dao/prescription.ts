@@ -10,7 +10,7 @@ import configuration from "../config";
       return { prescriptiondetails, totalprescriptiondetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve prescription data");
     }
   };
 
@@ -22,7 +22,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create prescription");
 
     }
   }
@@ -33,7 +33,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve prescription data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return lab;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update prescription");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return lab;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update prescription");
 
     }
 
@@ -87,7 +87,7 @@ import configuration from "../config";
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update prescription");
     }
     }
 
@@ -97,6 +97,6 @@ import configuration from "../config";
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update prescription");
     }
     }

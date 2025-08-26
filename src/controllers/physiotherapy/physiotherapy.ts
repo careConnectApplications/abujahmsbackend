@@ -69,7 +69,7 @@ export const createPhysiotherapyAssessments = catchAsync(async (req: Request | a
   validateinputfaulsyvalue({ id, appointmentoradmissionunderscoreid });
 //const appointmentId = new ObjectId(appointmentunderscoreid);
   const patient = await readonepatient({ _id: id }, {}, '', '');
-  if (!patient) return next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
+  if (!patient) return next(new Error(`Patient does not exist already exists`));
   var checkappointmentId=new ObjectId(appointmentoradmissionunderscoreid);
   const appointment = await readoneappointment({ _id: checkappointmentId }, {}, '');
   var checkadimmison = await readoneadmission({ _id: checkappointmentId }, {}, '');
@@ -82,7 +82,7 @@ export const createPhysiotherapyAssessments = catchAsync(async (req: Request | a
           if (appointment) {
     appointmentId=checkappointmentId;
   }
-  //if (!appointment) return next(new Error(`Appointment does not exist ${configuration.error.erroralreadyexit}`));
+  //if (!appointment) return next(new Error(`Appointment does not exist already exists`));
   
 
    

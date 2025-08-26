@@ -10,7 +10,7 @@ export async function countappointment(query:any) {
    
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve appointment data");
   }
 };
 export async function modifiedreadallappointment(query:any, aggregatequery:any){
@@ -23,7 +23,7 @@ return { appointmentdetails, totalappointmentdetails };
 }
 catch(err:any){
   console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve appointment data");
 
 }
 
@@ -41,7 +41,7 @@ export async function optimizedreadallappointment(aggregatequery:any,page:any,si
   }
   catch(err:any){
     console.log(err);
-        throw new Error(configuration.error.erroruserread);
+        throw new Error("Failed to retrieve appointment data");
   
   }
   
@@ -55,7 +55,7 @@ export async function readallappointmentfirstfive(query:any,selectquery:any,popu
    
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve appointment data");
   }
 };
 export async function readallappointmentpaginated(input:any,page:any,size:any) {
@@ -68,7 +68,7 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
   }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update appointment");
     }
     }
 
@@ -83,7 +83,7 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
       return { appointmentdetails, totalappointmentdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve appointment data");
     }
   };
   export async function createappointment(input:any){
@@ -94,7 +94,7 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create appointment");
 
     }
   }
@@ -105,7 +105,7 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve appointment data");
 
     }
   }
@@ -128,7 +128,7 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
       return appointment;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update appointment");
 
     }
 
@@ -147,9 +147,9 @@ export async function readallappointmentpaginated(input:any,page:any,size:any) {
       return appointment;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update appointment");
 
     }
 
   }
-  
+    

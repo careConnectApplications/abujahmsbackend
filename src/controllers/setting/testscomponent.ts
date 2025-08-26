@@ -33,7 +33,7 @@ export var createtestcomponents = async (req:any,res:any) =>{
       
         if(foundtestname){
          
-            throw new Error(`Test name ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Test name already exists`);
 
         
       }
@@ -151,7 +151,7 @@ export async function gettestcomponent(req:Request, res:any){
 if(foundservicetype){
           for(var i =0; i < servicetype.length; i++){
             if((foundservicetype.type).includes(servicetype[i]))
-            throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+            throw new Error(`${servicetype[i]} already exists`);
 
         }
   export async function updatepricestatus(req:any, res:any){

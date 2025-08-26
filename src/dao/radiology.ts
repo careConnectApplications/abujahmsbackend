@@ -8,7 +8,7 @@ export async function countradiology(query:any) {
      
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve radiology test data");
     }
   };
 
@@ -20,7 +20,7 @@ export async function countradiology(query:any) {
       return { radiologydetails, totalradiologydetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve radiology test data");
     }
   };
   export async function optimizedreadallradiology(aggregatequery:any,page:any,size:any){
@@ -35,7 +35,7 @@ export async function countradiology(query:any) {
     }
     catch(err:any){
       console.log(err);
-          throw new Error(configuration.error.erroruserread);
+          throw new Error("Failed to retrieve radiology test data");
     
     }
     
@@ -49,7 +49,7 @@ export async function countradiology(query:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create radiology test");
 
     }
   }
@@ -60,7 +60,7 @@ export async function countradiology(query:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve radiology test data");
 
     }
   }
@@ -80,7 +80,7 @@ export async function countradiology(query:any) {
       return radiology;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update radiology test");
 
     }
 
@@ -98,7 +98,7 @@ export async function countradiology(query:any) {
       return radiology;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update radiology test");
 
     }
 
@@ -111,6 +111,6 @@ export async function countradiology(query:any) {
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update radiology test");
     }
     }

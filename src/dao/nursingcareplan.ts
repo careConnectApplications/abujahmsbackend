@@ -9,7 +9,7 @@ import configuration from "../config";
       return { nursingcareplandetails, totalnursingcareplandetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve nursing care plan data");
     }
   };
   export async function createnursingcareplan(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create nursing care plan");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve nursing care plan data");
 
     }
   }
@@ -49,7 +49,7 @@ import configuration from "../config";
       return nursingcareplan;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update nursing care plan");
 
     }
 
@@ -67,7 +67,7 @@ import configuration from "../config";
       return nursingcareplan;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update nursing care plan");
 
     }
 

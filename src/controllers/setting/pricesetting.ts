@@ -42,7 +42,7 @@ export var createprices = async (req:any,res:any) =>{
        
        
         if(foundPrice){
-            throw new Error(`service category and type ${configuration.error.erroralreadyexit}`);
+            throw new Error(`service category and type already exists`);
 
         }
          const queryresult=await createprice(req.body);
@@ -187,7 +187,7 @@ export const getpriceofservice = catchAsync(async (req: Request | any, res: Resp
   );
 
   if (!foundPatient) {
-    throw new Error(`Patient does not ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient does not exist`);
   }
 
   // Fetch price for the service type

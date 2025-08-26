@@ -79,7 +79,7 @@ export const createfluidbalancev1 = catchAsync(async (req: Request | any, res: R
   const admissionrecord: any = await readoneadmission({ _id: id }, {}, '');
   //console.log(admissionrecord);   
   if (!admissionrecord) {
-    throw new Error(`Admission do not ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Admission do not already exists`);
   }
 
   const balance = (inputamount || 0) - (outputamount || 0);
@@ -126,7 +126,7 @@ export async function updatefluidbalance(req: any, res: any) {
     const fluidRecord: any = await readonefluidbalances({ _id: id }, {});
     //console.log(admissionrecord);   
     if (!fluidRecord) {
-      throw new Error(`fluid record do not ${configuration.error.erroralreadyexit}`);
+      throw new Error(`fluid record do not already exists`);
     }
 
     const balance = (inputamount || 0) - (outputamount || 0);
@@ -177,7 +177,7 @@ export const createfluidbalance = catchAsync(async (req: Request | any, res: Res
 
   const admissionrecord: any = await readoneadmission({ _id: id }, {}, '');
   if (!admissionrecord) {
-    return next(new ApiError(404, `Admission do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Admission do not already exists`));
   }
 
 

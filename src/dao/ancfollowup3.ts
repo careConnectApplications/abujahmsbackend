@@ -9,7 +9,7 @@ import configuration from "../config";
       return { ancfollowupdetails, totalancfollowupdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ANC follow-up data");
     }
   };
   export async function createancfollowup(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create ANC follow-up");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ANC follow-up data");
 
     }
   }
@@ -49,7 +49,7 @@ import configuration from "../config";
       return ancfollowup;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ANC follow-up");
 
     }
 
@@ -67,7 +67,7 @@ import configuration from "../config";
       return ancfollowup;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ANC follow-up");
 
     }
 

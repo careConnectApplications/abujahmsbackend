@@ -32,12 +32,12 @@ export var referadmission= async (req:any, res:any) =>{
       const bed = new ObjectId(bed_id);
       const foundWard:any =  await readonewardmanagement({_id:referedwardid},'');
       if(!foundWard){
-          throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Ward does not exist`);
 
       }
       const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
        if(!foundBed){
-          throw new Error(`Bed doesnt ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Bed does not exist`);
 
       }
       //validate bed status
@@ -54,7 +54,7 @@ export var referadmission= async (req:any, res:any) =>{
                    console.log("appointment",appointment);
                         if(!appointment){
                           //create an appointment
-                          throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+                          throw new Error(`Appointment does not exist`);
             
                       }
             
@@ -64,7 +64,7 @@ export var referadmission= async (req:any, res:any) =>{
       //validate specialization
           const foundSpecilization =  await readoneclinic({clinic:admittospecialization},'');
           if(!foundSpecilization){
-              throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
+              throw new Error(`Specialization does not exist`);
       
           }
 
@@ -73,14 +73,14 @@ export var referadmission= async (req:any, res:any) =>{
     var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
    
   //check that patient have not been admitted
   var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
-    throw new Error(`Patient Admission ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient Admission already exists`);
 
 }
 
@@ -163,14 +163,14 @@ if (bed_id) {
   try{
     //validate that status is included in te status choice
     if(![ "transfered",  "discharged"].includes(status))
-      throw new Error(`${status} status doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`${status} status does not exist`);
 
     //if status = discharge
     
       const response = await readoneadmission({_id:id},{},'');
       // check for availability of bed spaces in ward only for admitted
       if(!response){
-          throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Admission does not exist`);
       }
       
      
@@ -183,7 +183,7 @@ if (bed_id) {
             foundBed=await readonebed({_id:bed_id, ward:transftertoward._id, status:configuration.bedstatus[0], isDeleted:false},'');
 
     }
-    if(transfterto && (status != configuration.admissionstatus[3] ||  !transftertoward || !foundBed)) throw new Error(`Ward or Bed to be transfered donot  ${configuration.error.erroralreadyexit} or ${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
+    if(transfterto && (status != configuration.admissionstatus[3] ||  !transftertoward || !foundBed)) throw new Error(`Ward or Bed to be transfered does not  ${configuration.error.erroralreadyexit} or ${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
       
       //validate if permitted base on status
      //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
@@ -326,7 +326,7 @@ export const addBedFee = catchAsync(async (req: Request | any, res: Response, ne
       "patient"
     );
     if (!findAdmission) {
-      throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient admission does not exist`);
     }
     
     //validate bedfee

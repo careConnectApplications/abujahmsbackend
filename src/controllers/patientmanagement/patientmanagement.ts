@@ -167,7 +167,7 @@ export async function bulkuploadhmopatients(req: any, res: any) {
         const foundUser:any =  await readonepatient({phoneNumber},{},'','');
         //category
         if(foundUser && phoneNumber !== configuration.defaultphonenumber){
-            throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Patient already exists`);
  
         }
             */
@@ -257,7 +257,7 @@ export var createpatients = async (req: any, res: any) => {
     const foundUser: any = await readonepatient({ phoneNumber }, selectquery, '', '');
     //category
     if (foundUser && phoneNumber !== configuration.defaultphonenumber) {
-      throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient already exists`);
 
     }
     // fetch prices
@@ -408,7 +408,7 @@ export const updatepatients = catchAsync(async (req: Request | any, res: Respons
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
   const clinicalInformation = {
     bloodGroup, genotype, bp, heartRate, temperature
@@ -472,7 +472,7 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
   /// fetch patient info
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   /// check if patient hmo is false
@@ -507,7 +507,7 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   const clinicalInformation = {

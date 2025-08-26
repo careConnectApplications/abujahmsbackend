@@ -42,7 +42,7 @@ export const createreferrers = async (req:any, res:any) => {
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
       //console.log(admissionrecord);   
       if(!patientrecord){
-           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Patient does not exist`);
   
        }
        preferredconsultant = new ObjectId(preferredconsultant);
@@ -152,7 +152,7 @@ export const scheduleappointment = async (req:any, res:any) => {
        var patients = await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
             
             if(!patients){
-              throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+              throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
       
             }
       var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});

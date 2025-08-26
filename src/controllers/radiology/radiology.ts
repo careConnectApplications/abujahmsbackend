@@ -39,7 +39,7 @@ export var radiologyorder = async (req: any, res: any) => {
     const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
     //category
     if (!foundPatient) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient does not exist`);
 
     }
     let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[4] }, { hmopercentagecover: 1 });
@@ -50,7 +50,7 @@ export var radiologyorder = async (req: any, res: any) => {
       appointment = await readoneappointment({ _id: appointmentid }, {}, '');
       if (!appointment) {
         //create an appointment
-        throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Appointment does not exist`);
 
       }
 
@@ -250,7 +250,7 @@ export async function updateradiologys(req: any, res: any) {
     var testsetting = servicetypedetails.filter(item => (item.type).includes(testname));
 
     if (!testsetting || testsetting.length < 1) {
-      throw new Error(`${testname} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
+      throw new Error(`${testname} does not ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
     }
 
 

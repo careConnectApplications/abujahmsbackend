@@ -9,7 +9,7 @@ import configuration from "../config";
       return { pathographdetails, totalpathographdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pathograph data");
     }
   };
   export async function createpathograph(input:any){
@@ -19,7 +19,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create pathograph");
 
     }
   }
@@ -30,7 +30,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pathograph data");
 
     }
   }
@@ -48,7 +48,7 @@ import configuration from "../config";
       return pathograph;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pathograph");
 
     }
 
@@ -66,7 +66,7 @@ import configuration from "../config";
       return pathograph;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pathograph");
 
     }
 

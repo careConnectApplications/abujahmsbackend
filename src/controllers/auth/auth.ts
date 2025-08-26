@@ -72,7 +72,7 @@ export var signup = catchAsync(async (req: Request | any, res: Response, next: N
     const foundUser = await readone({ $or: [{ email }, { phoneNumber }] });
 
     if (foundUser) {
-        return next(new ApiError(401, `User with this email or phonenumber  ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(401, `User with this email or phonenumber  already exists`));
     }
 
     if (!isValidPhoneNumber(phoneNumber)) {

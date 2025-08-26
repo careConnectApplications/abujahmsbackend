@@ -61,7 +61,7 @@ else if(querytype == reports[6].querytype){
 
 }
 else {
-  throw new Error(`querytype ${configuration.error.errorisrequired}`);
+  throw new Error(`Query type ${configuration.error.errorisrequired}`);
 }
 res.json({ queryresult, status: true });
 
@@ -282,7 +282,7 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
        }
      
     else{
-      return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
+      return next(new ApiError(400,`Query type ${configuration.error.errorisrequired}`))
     }
   //}
 

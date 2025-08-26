@@ -30,7 +30,7 @@ export const createnutritions = async (req:any, res:any) => {
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
       //console.log(admissionrecord);   
       if(!patientrecord){
-           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Patient does not exist`);
   
        }
     const queryresult=await createnutrition({patient:patientrecord._id,date,ageinmonths,typeofvisit,infactandyoungchildfeeding,complementaryfeeding,counsellingprovided,referedtosupportgroup,anthropometryheight,anthropometryweight,anthropometrybilateraloedema,muacred,muacyellow,muacgreen,growthaccordingtothechildhealthcard,vitaminasupplement,deworming,staffname});

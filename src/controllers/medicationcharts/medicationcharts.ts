@@ -65,7 +65,7 @@ export const createmedicationchart = async (req:any, res:any) => {
        else{
         admissionrecord=  await readoneadmission({_id:id},{},'');       
           if(!admissionrecord){
-           throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Admission does not exist`);
   
           }
 

@@ -14,7 +14,7 @@ import configuration from "../config";
       return { ancdetails, totalancdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ANC data");
     }
   };
   export async function createanc(input:any){
@@ -25,7 +25,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create ANC");
 
     }
   }
@@ -36,7 +36,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ANC data");
 
     }
   }
@@ -59,7 +59,7 @@ import configuration from "../config";
       return anc;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ANC");
 
     }
 
@@ -77,7 +77,7 @@ import configuration from "../config";
       return anc;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ANC");
 
     }
 

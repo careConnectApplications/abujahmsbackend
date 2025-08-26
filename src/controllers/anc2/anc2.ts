@@ -33,7 +33,7 @@ export const createancfollowupsv2 = async (req: any, res: any) => {
     const ancrecord: any = await readoneanc({ _id: anc }, {}, '');
     //console.log(admissionrecord);   
     if (!ancrecord) {
-      throw new Error(`ANC donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`ANC does not exist`);
 
     }
     const queryresult = await createancfollowup({ anc: ancrecord._id, ga, sfh, wt, lie, presentation, position, fhr, urine, bp, remark, followup, riskidentified, currentmedication, staffname });
@@ -102,7 +102,7 @@ export const createancsv2 = async (req: any, res: any) => {
     const patientrecord: any = await readonepatient({ _id: id }, {}, '', '');
     //console.log(admissionrecord);   
     if (!patientrecord) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient does not exist`);
 
     }
     const queryresult = await createanc({ patient: patientrecord._id, generalmedicalhistory, reproductiveprofile, pastobstetrichistory, presentingcomplaints, historyofpresentingcomplaints, historyofindexpregnancy, gynaehistory, passsurgicalhistory, drughistory, familyandsocialhistory, systematicreview, staffname });
