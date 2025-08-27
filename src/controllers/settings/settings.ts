@@ -18,6 +18,8 @@ export const settings = async function () {
             {querytype:"procedurereport"},
             {querytype:"pharmacyreport"},
             {querytype:"radiologyreport"},
+            {querytype:"immunizationreport"},
+            {querytype:"deathreport"},
 
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},

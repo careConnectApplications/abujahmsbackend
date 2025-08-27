@@ -108,7 +108,7 @@ const strategies: Record<string, (match: any, key: string, value: any) => void> 
   maxAge: (match, key, value) => {
     // Maximum age filter (in years)
     if (!match["patient.age"]) match["patient.age"] = {};
-    match["patient.age"].$lte = `${value} years`;
+     match["patient.age"].$lte = `${value} years`;
   },
   
   ageRange: (match, key, value) => {
@@ -124,11 +124,11 @@ export const buildFilters = (filters: Record<string, any> = {}) => {
   const match: any = {};
 
   Object.entries(filters).forEach(([key, value]) => {
-    console.log("key", key, "value", value);
+    //console.log("key", key, "value", value);
     if (!value) return;
 
     const strategy = strategies[key];
-    console.log("strategy", strategy);
+    //console.log("strategy", strategy);
    
     if (strategy) {
       strategy(match, key, value);
@@ -655,6 +655,358 @@ export const reportradiology = (filters: any) => {
         // Timestamps
         createdAt: 1,
         updatedAt: 1
+      }
+    }
+  ];
+};
+
+export const reportimmunization = (filters: any) => {
+  const matchConditions = buildFilters(filters);
+  return [
+    {
+      $lookup: {
+        from: "patientsmanagements",
+        localField: "patient",
+        foreignField: "_id",
+        as: "patient",
+      },
+    },
+    {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $match: matchConditions },
+    {
+      $addFields: {
+        // Concatenate vaccination array values into a single string
+        vaccination: {
+          $cond: {
+            if: { $isArray: "$vaccination" },
+            then: {
+              $reduce: {
+                input: { $ifNull: ["$vaccination", []] },
+                initialValue: "",
+                in: {
+                  $cond: {
+                    if: { $eq: ["$$value", ""] },
+                    then: "$$this",
+                    else: { $concat: ["$$value", ", ", "$$this"] }
+                  }
+                }
+              }
+            },
+            else: "$vaccination"
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        // Immunization specific fields
+        vaccination: 1,
+        vaccinationlocation: 1,
+        outreachMedications: 1,
+        isFullyImmunized: 1,
+        isZeroDoseChild: 1,
+        
+        // Vaccine details
+        schedule: 1,
+        vaccinecode: 1,
+        vaccinename: 1,
+        vaccinetype: 1,
+        manufacturer: 1,
+        batchno: 1,
+        expirydate: 1,
+        dose: 1,
+        doseamount: 1,
+        
+        // Administration details
+        administrationsite: 1,
+        administrationroute: 1,
+        consent: 1,
+        immunizationstatus: 1,
+        comment: 1,
+        
+        // Adverse effects
+        anynotedadverseeffect: 1,
+        adverseeffectseverity: 1,
+        medicationgiventomanageadverseeffect: 1,
+        adverseEffectVaccine: 1,
+        onsetdateofreaction: 1,
+        reactcode: 1,
+        
+        // Reporting information
+        reporter: 1,
+        reportingsource: 1,
+        staffname: 1,
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    }
+  ];
+};
+
+export const reportdeath = (filters: any) => {
+  const matchConditions = buildFilters(filters);
+  
+  // Enhanced death report combining appointments and admissions
+  return [
+    // First, query appointment deaths
+    {
+      $lookup: {
+        from: "patientsmanagements",
+        localField: "patient",
+        foreignField: "_id",
+        as: "patient",
+      },
+    },
+    {
+      $unwind: {
+        path: "$patient",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $match: {
+        ...matchConditions,
+        $or: [
+          { "clinicalencounter.outcome": "Death" },
+          { arrivalMode: "Death" }
+        ]
+      }
+    },
+    {
+      $project: {
+        // Source identifier
+        deathSource: { $literal: "appointment" },
+        
+        // Appointment specific fields
+        appointmentid: 1,
+        deathDate: "$appointmentdate",
+        appointmenttype: 1,
+        appointmentcategory: 1,
+        
+        // Death indicators
+        outcome: "$clinicalencounter.outcome",
+        arrivalMode: 1,
+        dischargeReason: { $literal: null },
+        
+        // Clinical information
+        unit: 1,
+        clinic: 1,
+        category: 1,
+        reason: 1,
+        findings: 1,
+        diagnosis: 1,
+        
+        // Ward information (null for appointments)
+        wardname: { $literal: null },
+        wardtype: { $literal: null },
+        admissionid: { $literal: null },
+        admissionDate: { $literal: null },
+        
+        // Police case information (if applicable)
+        policecase: 1,
+        accidentType: 1,
+        dateOfAccident: 1,
+        physicalassault: 1,
+        sexualassault: 1,
+        policaename: 1,
+        
+        // Clinical encounter details
+        clinicalnote: "$clinicalencounter.clinicalnote",
+        diagnosisnote: "$clinicalencounter.diagnosisnote",
+        assessmentnote: "$clinicalencounter.assessmentnote",
+        
+        // Doctor information
+        doctorsfirstName: 1,
+        doctorslastName: 1,
+        doctorname: { $literal: null },
+        staffname: { $literal: null },
+        
+        // Patient demographic information
+        gender: "$patient.gender",
+        age: "$patient.age",
+        patientCreatedAt: "$patient.createdAt",
+        firstName: "$patient.firstName",
+        lastName: "$patient.lastName",
+        middleName: "$patient.middleName",
+        MRN: "$patient.MRN",
+        
+        // Patient HMO information
+        HMOId: "$patient.HMOId",
+        HMOName: "$patient.HMOName",
+        patienttype: "$patient.patienttype",
+        
+        // Contact information
+        phoneNumber: "$patient.phoneNumber",
+        email: "$patient.email",
+        
+        // Next of kin information
+        nextOfKinName: "$patient.nextOfKinName",
+        nextOfKinRelationship: "$patient.nextOfKinRelationship",
+        nextOfKinPhoneNumber: "$patient.nextOfKinPhoneNumber",
+        nextOfKinAddress: "$patient.nextOfKinAddress",
+        
+        // Timestamps
+        createdAt: 1,
+        updatedAt: 1
+      }
+    },
+    
+    // Union with admission deaths
+    {
+      $unionWith: {
+        coll: "admissions",
+        pipeline: [
+          {
+            $lookup: {
+              from: "patientsmanagements",
+              localField: "patient",
+              foreignField: "_id",
+              as: "patient",
+            },
+          },
+          {
+            $unwind: {
+              path: "$patient",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: "wardmanagements",
+              localField: "referedward",
+              foreignField: "_id",
+              as: "referedward",
+            },
+          },
+          {
+            $unwind: {
+              path: "$referedward",
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $match: {
+              ...matchConditions,
+              $or: [
+                { dischargeReason: { $regex: /death/i } },
+                { dischargeReason: { $regex: /died/i } },
+                { dischargeReason: { $regex: /deceased/i } },
+                { dischargeReason: { $regex: /expired/i } },
+                { dischargeReason: "Death" }
+              ]
+            }
+          },
+          {
+            $project: {
+              // Source identifier
+              deathSource: { $literal: "admission" },
+              
+              // Death date from admission
+              deathDate: "$updatedAt", // Using updatedAt as discharge/death date
+              appointmentid: { $literal: null },
+              appointmenttype: { $literal: null },
+              appointmentcategory: { $literal: null },
+              
+              // Death indicators
+              outcome: { $literal: "Death" },
+              arrivalMode: { $literal: null },
+              dischargeReason: 1,
+              
+              // Clinical information
+              unit: { $literal: null },
+              clinic: { $literal: null },
+              category: { $literal: null },
+              reason: "$alldiagnosis",
+              findings: { $literal: null },
+              diagnosis: "$alldiagnosis",
+              
+              // Ward information
+              wardname: "$referedward.wardname",
+              wardtype: "$referedward.wardtype",
+              admissionid: 1,
+              admissionDate: "$referddate",
+              
+              // Police case information (null for admissions)
+              policecase: { $literal: null },
+              accidentType: { $literal: null },
+              dateOfAccident: { $literal: null },
+              physicalassault: { $literal: null },
+              sexualassault: { $literal: null },
+              policaename: { $literal: null },
+              
+              // Clinical notes (null for admissions)
+              clinicalnote: { $literal: null },
+              diagnosisnote: { $literal: null },
+              assessmentnote: { $literal: null },
+              
+              // Doctor/Staff information
+              doctorsfirstName: { $literal: null },
+              doctorslastName: { $literal: null },
+              doctorname: 1,
+              staffname: 1,
+              
+              // Patient demographic information
+              gender: "$patient.gender",
+              age: "$patient.age",
+              patientCreatedAt: "$patient.createdAt",
+              firstName: "$patient.firstName",
+              lastName: "$patient.lastName",
+              middleName: "$patient.middleName",
+              MRN: "$patient.MRN",
+              
+              // Patient HMO information
+              HMOId: "$patient.HMOId",
+              HMOName: "$patient.HMOName",
+              patienttype: "$patient.patienttype",
+              
+              // Contact information
+              phoneNumber: "$patient.phoneNumber",
+              email: "$patient.email",
+              
+              // Next of kin information
+              nextOfKinName: "$patient.nextOfKinName",
+              nextOfKinRelationship: "$patient.nextOfKinRelationship",
+              nextOfKinPhoneNumber: "$patient.nextOfKinPhoneNumber",
+              nextOfKinAddress: "$patient.nextOfKinAddress",
+              
+              // Timestamps
+              createdAt: 1,
+              updatedAt: 1
+            }
+          }
+        ]
+      }
+    },
+    
+    // Sort by death date
+    {
+      $sort: {
+        deathDate: -1
       }
     }
   ];
