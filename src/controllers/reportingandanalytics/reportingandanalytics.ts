@@ -15,12 +15,19 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
-import {mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
+import {removeEmptyStrings,mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
+
+// Utility function to remove empty string values from an object
+
+
 export const reports = async (req:any, res:any) => {
 try{
-  const {filters} = req.body;
+  let {filters} = req.body;
+  // Remove empty string values from filters
+  filters = removeEmptyStrings(filters);
+  
   //paymentcategory
   //cashieremail
 var { querytype}: any = req.params;
