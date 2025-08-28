@@ -94,5 +94,42 @@ const aggregatebyhmo = [
 
       }
     ];
-    return {appointmentaggregatebyhmo,aggregatebyhmo}
+    const insurancePatientsByGenderAndName = [
+    {
+      $match: {
+        $and: [
+          {
+            isHMOCover: configuration.ishmo[1] // Only insurance covered patients
+          },
+          { createdAt: { $gt: startdate, $lt: enddate } }
+        ]
+      }
+    },
+    {
+      $group: {
+        _id: {
+          gender: { $ifNull: ["$gender", "Unknown"] },
+          insuranceName: { $ifNull: ["$HMOName", "Insurance Not Found"] }
+        },
+        TotalNumber: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        Gender: "$_id.gender",
+        InsuranceName: "$_id.insuranceName",
+        TotalNumber: 1,
+        _id: 0
+      }
+    },
+    {
+      $sort: {
+        InsuranceName: 1,
+        Gender: 1
+      }
+    }
+  ];
+
+
+    return {appointmentaggregatebyhmo,aggregatebyhmo,insurancePatientsByGenderAndName}
 }

@@ -24,7 +24,7 @@ export const settings = async function () {
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning","Hospital Monthly Data"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning","INPATIENTS RECORDS","OUTPATIENTS RECORDS","ACCIDENT AND EMERGENCY RECORDS","NATIONAL HEALTH INSURANCE SERVICES"];
           return {reports,summary};
     }
     catch (error: any) {
