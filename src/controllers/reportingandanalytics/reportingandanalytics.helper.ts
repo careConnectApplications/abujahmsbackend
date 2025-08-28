@@ -54,8 +54,8 @@ const regexFilter = (match: any, key: string, value: any) => {
 
 const dateRangeFilter = (match: any, key: string, value: any, field: string) => {
   if (!match[field]) match[field] = {};
-  if (key === "startdate") match[field].$gte = new Date(value);
- if (key === "enddate") match[field].$lt = new Date(value);
+  if (key === "startDate") match[field].$gte = new Date(value);
+ if (key === "endDate") match[field].$lt = new Date(value);
 };
 
 
@@ -80,8 +80,8 @@ const ageRangeFilter = (match: any, min?: number, max?: number) => {
 const strategies: Record<string, (match: any, key: string, value: any) => void> = {
   // Admission filters
   wardname: (match, key, value) => (match["referedward.wardname"] = value),
-  startdate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
-  enddate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  startDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
+  endDate: (match, key, value) => dateRangeFilter(match, key, value, "createdAt"),
 
   // Appointment filters
   appointmentStart: (match, key, value) => dateRangeFilter(match, key, value, "appointmentdate"),
@@ -223,6 +223,7 @@ export const reportbyappointmentreport = (filters: any) => {
 
 export const reportbyadmissionreport = (filters: any) => {
   const matchConditions = buildFilters(filters);
+  console.log("matchConditions", matchConditions);
 
   return [
     {
