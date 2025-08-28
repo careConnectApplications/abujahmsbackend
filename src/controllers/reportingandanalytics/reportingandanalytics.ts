@@ -27,6 +27,7 @@ try{
   let {filters} = req.body;
   // Remove empty string values from filters
   filters = removeEmptyStrings(filters);
+  console.log("filter", filters);
   
   //paymentcategory
   //cashieremail
