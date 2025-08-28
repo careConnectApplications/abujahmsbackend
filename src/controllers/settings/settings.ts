@@ -24,7 +24,7 @@ export const settings = async function () {
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning","inpatients records","outpatients records","accident and emergency records","national health insurance services"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning","inpatients records","outpatients records","accident and emergency records","national health insurance services","lab investigation report","radio diagnosis report","operation report","special consultative report","maternity return report","total facility attendance report"];
           return {reports,summary};
     }
     catch (error: any) {

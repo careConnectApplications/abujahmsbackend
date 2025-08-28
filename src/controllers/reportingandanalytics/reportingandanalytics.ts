@@ -15,6 +15,12 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
+import {labinvestigationreports} from "../../utils/reporting/labinvestigation";
+import {radiodiagnosisreports} from "../../utils/reporting/radiodiagnosis";
+import {operationreports} from "../../utils/reporting/operation";
+import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
+import {maternityReturnAggregates} from "../../utils/reporting/maternityreturn";
+import {facilityAttendanceAggregates} from "../../utils/reporting/facilityattendance";
 import {removeEmptyStrings,mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
@@ -186,6 +192,12 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
     const {immunizationpipeline,AEFIcasesreported} = immunizationaggregatereports(startdate, enddate);
     const {newfamilyplanningacceptorsByGender,counselCountByGender,moderncontraceptionbyagegroup,clientsgivenoralpills,totaloralpillcyclesdispensed,emergencyContraceptiveDispensed,injectablesByName,implantsInsertedByType,iudInserted,sterilizationByGender,maleCondomsDistributed,femaleCondomsDistributed,postpartumCounsellingCount,postPartumImplanonInsertions,postPartumJadelleInsertions,postPartumIUDInsertions}=familyplanningreports(startdate, enddate);
+    const {labInvestigationPipeline} = labinvestigationreports(startdate, enddate);
+    const {radioDiagnosisPipeline} = radiodiagnosisreports(startdate, enddate);
+    const {operationPipeline} = operationreports(startdate, enddate);
+    const {specialConsultativePipeline} = specialconsultativereports(startdate, enddate);
+    const {babiesData, mothersData} = maternityReturnAggregates(startdate, enddate);
+    const {totalFacilityAttendance, monthlyAttendanceTrends, departmentAttendance} = facilityAttendanceAggregates(startdate, enddate);
   
     let queryresult:any; 
    
@@ -304,7 +316,182 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     else if(querytype == summary[16]){
       queryresult=await readpatientsmanagementaggregate(insurancePatientsByGenderAndName);
     }
+    else if(querytype == summary[17]){
+      // Lab Investigation Report - Section F
+      const labReport = await readlabaggregate(labInvestigationPipeline);
      
+        queryresult = {
+        "Haematology": formatRow(labReport[0]?.hematology || []),
+        "Parasitology": formatRow(labReport[0]?.parasitology || []),
+        "Chemistry": formatRow(labReport[0]?.chemicalpathology || []),
+        "Microbiology": formatRow(labReport[0]?.microbiology || []),
+        "Blood Transfusion": formatRow(labReport[0]?.bloodfransfusion || []),
+        "Blood Donation": formatRow(labReport[0]?.blooddonation || []),
+        "Histology": formatRow(labReport[0]?.histology || []),
+        "Histopathology (Autopsy)": formatRow(labReport[0]?.histopathologyAutopsy || []),
+        "Cytology": formatRow(labReport[0]?.cytology || [])
+      };
+      
+    }
+    else if(querytype == summary[18]){
+      // Radio Diagnosis Report - Section G
+      const radioReport = await readradiologyaggregate(radioDiagnosisPipeline);
+      queryresult = {
+        // Plain X-Ray
+        "Plain X-Ray Inpatients": formatRow(radioReport[0]?.plainXrayInpatients || []),
+        "Plain X-Ray Outpatients": formatRow(radioReport[0]?.plainXrayOutpatients || []),
+        "Plain X-Ray Referral": formatRow(radioReport[0]?.plainXrayReferral || []),
+        // Ultrasound
+        "Ultrasound Inpatients": formatRow(radioReport[0]?.ultrasoundInpatients || []),
+        "Ultrasound Outpatients": formatRow(radioReport[0]?.ultrasoundOutpatients || []),
+        "Ultrasound Referral": formatRow(radioReport[0]?.ultrasoundReferral || []),
+        // Other scans
+        "CT Scan": formatRow(radioReport[0]?.ctScan || []),
+        "Mammogram": formatRow(radioReport[0]?.mammogram || []),
+        "MRI": formatRow(radioReport[0]?.mri || []),
+        // Contrast procedures
+        "HSG": formatRow(radioReport[0]?.hsg || []),
+        "IVU": formatRow(radioReport[0]?.ivu || []),
+        "MCUG": formatRow(radioReport[0]?.mcug || []),
+        "RUG": formatRow(radioReport[0]?.rug || []),
+        // Other readings
+        "ECG": formatRow(radioReport[0]?.ecg || []),
+        "Echo": formatRow(radioReport[0]?.echo || [])
+      };
+    }
+    else if(querytype == summary[19]){
+      // Operation Report - Section H
+      const operationReport = await readprocedureaggregate(operationPipeline);
+      queryresult = {
+        "Major Operation": formatRow(operationReport[0]?.majorOperation || []),
+        "Intermediate Operation": formatRow(operationReport[0]?.intermediateOperation || []),
+        "Minor Operation": formatRow(operationReport[0]?.minorOperation || []),
+        "Circumcision": formatRow(operationReport[0]?.circumcision || [])
+      };
+    }
+    else if(querytype == summary[20]){
+      // Special Consultative Report - Section I
+      const specialReport = await readappointmentaggregate(specialConsultativePipeline);
+      queryresult = {
+        // Obstetrics & Gynecology
+        "Obstetrics & Gynecology Attendance": formatRow(specialReport[0]?.obstetricsGynecologyAttendance || []),
+        "Ante-Natal Registration (New)": formatRow(specialReport[0]?.antenatalRegistrationNew || []),
+        "Ante-Natal Follow up": formatRow(specialReport[0]?.antenatalFollowUp || []),
+        "Post-Natal Attendance": formatRow(specialReport[0]?.postNatalAttendance || []),
+        // Internal Medicine (MOPD)
+        "Cardiology": formatRow(specialReport[0]?.cardiology || []),
+        "Gastroenterology": formatRow(specialReport[0]?.gastroenterology || []),
+        "Neurology": formatRow(specialReport[0]?.neurology || []),
+        "Nephrology": formatRow(specialReport[0]?.nephrology || []),
+        "Endocrinology": formatRow(specialReport[0]?.endocrinology || []),
+        "Comprehensive Clinic (New Cases)": formatRow(specialReport[0]?.comprehensiveClinicNew || []),
+        "Comprehensive Clinic (Old Cases)": formatRow(specialReport[0]?.comprehensiveClinicOld || []),
+        "Dermatology Clinic": formatRow(specialReport[0]?.dermatologyClinic || []),
+        "Haematology": formatRow(specialReport[0]?.haematology || []),
+        "Dialysis": formatRow(specialReport[0]?.dialysis || []),
+        // Surgical Outpatient Clinic (SOPD)
+        "Pediatric Surgery Clinic": formatRow(specialReport[0]?.pediatricSurgeryClinic || []),
+        "Neuro Surgery Clinic": formatRow(specialReport[0]?.neuroSurgeryClinic || []),
+        "Urology Clinic": formatRow(specialReport[0]?.urologyClinic || []),
+        "Orthopedic Clinic": formatRow(specialReport[0]?.orthopedicClinic || []),
+        "General Surgery Clinic": formatRow(specialReport[0]?.generalSurgeryClinic || []),
+        "Plastic Surgery Clinic": formatRow(specialReport[0]?.plasticSurgeryClinic || []),
+        // Dental Unit
+        "Dental Surgery": formatRow(specialReport[0]?.dentalSurgery || []),
+        "Dental Clinic": formatRow(specialReport[0]?.dentalClinic || []),
+        "Maxillofacial Surgery": formatRow(specialReport[0]?.maxillofacialSurgery || []),
+        // ENT Unit
+        "ENT Clinic": formatRow(specialReport[0]?.entClinic || []),
+        "ENT Surgery": formatRow(specialReport[0]?.entSurgery || []),
+        // Ophthalmology Unit
+        "Ophthalmology Clinic": formatRow(specialReport[0]?.ophthalmologyClinic || []),
+        "Ophthalmologic Surgery": formatRow(specialReport[0]?.ophthalmologicSurgery || []),
+        "Optometric Unit": formatRow(specialReport[0]?.optometricUnit || []),
+        // Behavioral/Mental Unit
+        "Behavior/Mental Unit Adult": formatRow(specialReport[0]?.behaviorMentalUnitAdult || []),
+        "Behavior/Mental Unit Paed": formatRow(specialReport[0]?.behaviorMentalUnitPaed || []),
+        "Psychology Counselling": formatRow(specialReport[0]?.psychologyCounselling || []),
+        // Other Clinics
+        "DOT Clinic (New Cases)": formatRow(specialReport[0]?.dotClinicNew || []),
+        "DOT Clinic (Old Cases)": formatRow(specialReport[0]?.dotClinicOld || []),
+        "Physiotherapy Unit": formatRow(specialReport[0]?.physiotherapyUnit || []),
+        "Nutrition": formatRow(specialReport[0]?.nutritionClinic || []),
+        "Paediatric Clinic": formatRow(specialReport[0]?.paediatricClinic || []),
+        "Family Planning Attendance (New)": formatRow(specialReport[0]?.familyPlanningNew || []),
+        "Family Planning Attendance (Follow-up)": formatRow(specialReport[0]?.familyPlanningFollowUp || [])
+      };
+    }
+    else if(querytype == summary[21]){
+      // Maternity Return Report - Section J
+      const babyReport = await readappointmentaggregate(babiesData);
+      const motherReport = await readappointmentaggregate(mothersData);
+      
+      queryresult = {
+        // Babies Data
+        "Live Birth": formatRow(babyReport[0]?.liveBirth || []),
+        "Still Birth": formatRow(babyReport[0]?.stillBirth || []),
+        "Asphyxia": formatRow(babyReport[0]?.asphyxia || []),
+        "Low Birth Weight": formatRow(babyReport[0]?.lowBirthWeight || []),
+        "Newborn Death": formatRow(babyReport[0]?.newbornDeath || []),
+        "Normal Birth": formatRow(babyReport[0]?.normalBirth || []),
+        "Birth Asphyxia With Resuscitation": formatRow(babyReport[0]?.birthAsphyxiaWithResuscitation || []),
+        "Preterm Birth": formatRow(babyReport[0]?.pretermBirth || []),
+        "Birth Defects": formatRow(babyReport[0]?.birthDefects || []),
+        
+        // Mothers Data - Booking Status
+        "Booked": formatRow(motherReport[0]?.bookingStatus?.booked || []),
+        "Unbooked": formatRow(motherReport[0]?.bookingStatus?.unbooked || []),
+        
+        // Type of Delivery
+        "Normal Vaginal Delivery": formatRow(motherReport[0]?.typeOfDelivery?.normalVaginal || []),
+        "Assisted Vaginal Delivery": formatRow(motherReport[0]?.typeOfDelivery?.assistedVaginal || []),
+        "Caesarean Section": formatRow(motherReport[0]?.typeOfDelivery?.caesarean || []),
+        
+        // Obstetric Complications
+        "PPH": formatRow(motherReport[0]?.obstetricComplications?.pph || []),
+        "Eclampsia": formatRow(motherReport[0]?.obstetricComplications?.eclampsia || []),
+        "Obstructed Labour": formatRow(motherReport[0]?.obstetricComplications?.obstructedLabour || []),
+        "Sepsis": formatRow(motherReport[0]?.obstetricComplications?.sepsis || []),
+        "Ruptured Uterus": formatRow(motherReport[0]?.obstetricComplications?.rupturredUterus || []),
+        "Retained Placenta": formatRow(motherReport[0]?.obstetricComplications?.retainedPlacenta || []),
+        
+        // MVA and Fistula Services
+        "MVA Services": formatRow(motherReport[0]?.mvaServices || []),
+        "Fistula Screening": formatRow(motherReport[0]?.fistulaServices?.screening || []),
+        "Fistula Repair": formatRow(motherReport[0]?.fistulaServices?.repair || []),
+        "Fistula Rehabilitation": formatRow(motherReport[0]?.fistulaServices?.rehabilitation || []),
+        "Maternal Death": formatRow(motherReport[0]?.maternalDeath || [])
+      };
+    }
+    else if(querytype == summary[22]){
+      // Total Facility Attendance Report - Section L
+      const facilityReport = await readappointmentaggregate(totalFacilityAttendance);
+      const monthlyTrends = await readappointmentaggregate(monthlyAttendanceTrends);
+      const deptAttendance = await readappointmentaggregate(departmentAttendance);
+      
+      queryresult = {
+        // Total Facility Attendance
+        "Total Patients": formatRow(facilityReport[0]?.totalPatients || []),
+        "New Patients": formatRow(facilityReport[0]?.newPatients || []),
+        "Revisit Patients": formatRow(facilityReport[0]?.revisitPatients || []),
+        "Referred In": formatRow(facilityReport[0]?.referredIn || []),
+        "Referred Out": formatRow(facilityReport[0]?.referredOut || []),
+        "Emergency Visits": formatRow(facilityReport[0]?.emergencyVisits || []),
+        "Outpatient Visits": formatRow(facilityReport[0]?.outpatientVisits || []),
+        "Inpatient Admissions": formatRow(facilityReport[0]?.inpatientAdmissions || []),
+        "Day Case": formatRow(facilityReport[0]?.dayCase || []),
+        "Pediatric Attendance": formatRow(facilityReport[0]?.pediatricAttendance || []),
+        "Adult Attendance": formatRow(facilityReport[0]?.adultAttendance || []),
+        "NHIS Patients": formatRow(facilityReport[0]?.nhisPatients || []),
+        "Private Patients": formatRow(facilityReport[0]?.privatePatients || []),
+        
+        // Monthly Attendance Trends
+        "Monthly Trends": monthlyTrends || [],
+        
+        // Department-wise Attendance
+        "Department Attendance": deptAttendance || []
+      };
+    }
     else{
       return next(new ApiError(400,`Query type ${configuration.error.errorisrequired}`))
     }
