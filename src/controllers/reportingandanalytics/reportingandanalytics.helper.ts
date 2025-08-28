@@ -1,4 +1,31 @@
 // helper to merge counts by gender
+export const removeEmptyStrings = (obj: any): any => {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  
+  if (typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => removeEmptyStrings(item));
+  }
+  
+  const cleanedObj: any = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+      // Skip empty strings
+      if (value === '') {
+        continue;
+      }
+      // Recursively clean nested objects
+      cleanedObj[key] = removeEmptyStrings(value);
+    }
+  }
+  return cleanedObj;
+};
 export function mergeCounts(arr1:any, arr2:any) {
   const map = new Map();
   [...arr1, ...arr2].forEach(({ _id, count }) => {

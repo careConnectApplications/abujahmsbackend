@@ -95,6 +95,58 @@ const aggregatebyhmo = [
       }
     ];
     const insurancePatientsByGenderAndName = [
+      {
+        $match: {
+          $and: [
+            {
+              isHMOCover: configuration.ishmo[1] // Only insurance covered patients
+            },
+            { createdAt: { $gt: startdate, $lt: enddate } }
+          ]
+        }
+      },
+      {
+        $project: {
+          gender: 1,
+          HMOName: { $ifNull: ["$HMOName", "Insurance Not Found"] }
+        }
+      },
+      {
+        $facet: {
+          // Group by insurance names dynamically
+          totalPatientsByInsurance: [
+            {
+              $group: {
+                _id: {
+                  insuranceName: "$HMOName",
+                  gender: "$gender"
+                },
+                count: { $sum: 1 }
+              }
+            },
+            {
+              $group: {
+                _id: "$_id.insuranceName",
+                data: {
+                  $push: {
+                    _id: "$_id.gender",
+                    count: "$count"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ];
+
+
+    return {appointmentaggregatebyhmo,aggregatebyhmo,insurancePatientsByGenderAndName}
+}
+
+export const insuranceservices = (startdate: any, enddate: any) => {
+  // Simple aggregation for insurance patients grouped by gender and insurance name
+  const insurancePatientsByGenderAndName = [
     {
       $match: {
         $and: [
@@ -106,19 +158,25 @@ const aggregatebyhmo = [
       }
     },
     {
+      $project: {
+        gender: { $ifNull: ["$gender", "Unknown"] },
+        HMOName: { $ifNull: ["$HMOName", "Insurance Not Found"] }
+      }
+    },
+    {
       $group: {
         _id: {
-          gender: { $ifNull: ["$gender", "Unknown"] },
-          insuranceName: { $ifNull: ["$HMOName", "Insurance Not Found"] }
+          insuranceName: "$HMOName",
+          gender: "$gender"
         },
-        TotalNumber: { $sum: 1 }
+        count: { $sum: 1 }
       }
     },
     {
       $project: {
-        Gender: "$_id.gender",
         InsuranceName: "$_id.insuranceName",
-        TotalNumber: 1,
+        Gender: "$_id.gender",
+        TotalNumber: "$count",
         _id: 0
       }
     },
@@ -130,6 +188,7 @@ const aggregatebyhmo = [
     }
   ];
 
-
-    return {appointmentaggregatebyhmo,aggregatebyhmo,insurancePatientsByGenderAndName}
-}
+  return {
+    insurancePatientsByGenderAndName
+  };
+};
