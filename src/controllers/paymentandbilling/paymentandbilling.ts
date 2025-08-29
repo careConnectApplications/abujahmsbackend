@@ -62,8 +62,7 @@ export const getCashierTotal = catchAsync(async (req: Request | any, res: Respon
 //cashieremail:email,cashierid:staffId
 //confirm payment
 export async function confirmgrouppayment(req: any, res: any) {
-  //console.log(req.user);
-  try {
+    try {
     const { paymentreferenceid } = req.params;
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
@@ -437,8 +436,7 @@ subscriptionfeePaid = await readonepayment({
       await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1] });
 
 
-    }
-    /*
+    }    /*
     
     //for appointment
     else if(paymentcategory == configuration.category[0]){
@@ -457,6 +455,7 @@ subscriptionfeePaid = await readonepayment({
     else if(paymentcategory ==configuration.category[8]){
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
+        patientrecord.subscriptionExpired=false;
         patientrecord.subscriptionPaidUntil = nextYear;
         await patientrecord.save();
       }
