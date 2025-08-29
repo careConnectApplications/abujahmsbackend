@@ -18,13 +18,13 @@ import { Response, NextFunction } from 'express';
 import configuration from "../../config";
 export const scheduleprocedureorder = catchAsync(async (req: any, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
+  let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid,proceduretype } = req.body;
 
   const { firstName, lastName } = (req.user).user;
   const raiseby = `${firstName} ${lastName}`;
   const procedureid: string = String(Date.now());
 
-  validateinputfaulsyvalue({ id, procedure });
+  validateinputfaulsyvalue({ id, procedure,proceduretype });
 
   // find patient
   const foundPatient: any = await readonepatient({ _id: id }, {}, "", "");
@@ -60,8 +60,7 @@ console.log("foundPatient", foundPatient?.insurance);
 
   const queryresult = await context.execute({
     id,
-    procedure,
-    clinic,
+    procedure,    clinic,
     indicationdiagnosisprocedure,
     appointmentdate,
     cptcodes,
@@ -71,6 +70,7 @@ console.log("foundPatient", foundPatient?.insurance);
     procedureid,
     foundPatient,
     hmopercentagecover,
+    proceduretype
   });
 
   res.status(200).json({ queryresult, status: true });

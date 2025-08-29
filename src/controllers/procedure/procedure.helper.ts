@@ -22,6 +22,7 @@ type ProcedureArgs = {
   procedureid: string;
   foundPatient: any;
   hmopercentagecover: number;
+  proceduretype:string;
 };
 
 type ProcedureStrategyFn = (args: ProcedureArgs) => Promise<any>;
@@ -43,6 +44,8 @@ export const SelfPayProcedureStrategy: ProcedureStrategyFn = async ({
   procedureid,
   foundPatient,
   hmopercentagecover,
+  proceduretype
+  
 }) => {
   const proceduresid: any[] = [];
   const paymentids: any[] = [];
@@ -80,6 +83,7 @@ export const SelfPayProcedureStrategy: ProcedureStrategyFn = async ({
       cptcodes,
       dxcodes,
       raiseby,
+      proceduretype,
     });
 
     proceduresid.push(procedurerecord._id);
@@ -108,6 +112,7 @@ export const HmoProcedureStrategy: ProcedureStrategyFn = async ({
   raiseby,
   procedureid,
   hmopercentagecover,
+  proceduretype
 }) => {
   const proceduresid: any[] = [];
 
@@ -133,6 +138,7 @@ export const HmoProcedureStrategy: ProcedureStrategyFn = async ({
       raiseby,
       status: configuration.otherstatus[0],
       amount,
+      proceduretype,
     });
 
     proceduresid.push(procedurerecord._id);

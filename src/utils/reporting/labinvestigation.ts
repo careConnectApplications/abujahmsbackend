@@ -146,57 +146,7 @@ export const labinvestigationreports = (startdate: any, enddate: any) => {
     }
   ];
 
-  // Separate pipeline for histology from histologyrequests collection
-  const histologyPipeline = [
-    {
-      $match: {
-        createdAt: { $gte: startdate, $lt: enddate }
-      }
-    },
-    {
-      $lookup: {
-        from: "patientsmanagements",
-        localField: "patient",
-        foreignField: "_id",
-        as: "patientInfo"
-      }
-    },
-    { $unwind: "$patientInfo" },
-    {
-      $group: { 
-        _id: "$patientInfo.gender", 
-        count: { $sum: 1 } 
-      }
-    }
-  ];
-
-  // Separate pipeline for histopathology from histopathologies collection
-  const histopathologyPipeline = [
-    {
-      $match: {
-        createdAt: { $gte: startdate, $lt: enddate }
-      }
-    },
-    {
-      $lookup: {
-        from: "patientsmanagements",
-        localField: "patient",
-        foreignField: "_id",
-        as: "patientInfo"
-      }
-    },
-    { $unwind: "$patientInfo" },
-    {
-      $group: { 
-        _id: "$patientInfo.gender", 
-        count: { $sum: 1 } 
-      }
-    }
-  ];
-
   return { 
-    labInvestigationPipeline,
-    histologyPipeline,
-    histopathologyPipeline
+    labInvestigationPipeline
   };
 };

@@ -27,172 +27,199 @@ export const specialconsultativereports = (startdate: any, enddate: any) => {
     },
     {
       $facet: {
-        // 1. Obstetrics & Gynecology Unit
-        obstetricsGynecologyAttendance: [
-          { $match: { clinic: "Obstetrics & Gynecology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        antenatalRegistrationNew: [
-          { $match: { clinic: "Ante-Natal", appointmenttype: "New" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        antenatalFollowUp: [
-          { $match: { clinic: "Ante-Natal", appointmenttype: "Follow-up" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        postNatalAttendance: [
-          { $match: { clinic: "Post-Natal" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+        // Group all appointments by clinic and gender (excluding special cases)
+        appointmentsByClinic: [
+         
+          {
+            $group: {
+              _id: {
+                clinic: "$clinic",
+                gender: "$gender"
+              },
+              count: { $sum: 1 }
+            }
+          }
         ],
         
-        // 2. Internal Medicine (MOPD)
-        cardiology: [
-          { $match: { clinic: "Cardiology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        gastroenterology: [
-          { $match: { clinic: "Gastroenterology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        neurology: [
-          { $match: { clinic: "Neurology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        nephrology: [
-          { $match: { clinic: "Nephrology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        endocrinology: [
-          { $match: { clinic: "Endocrinology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        comprehensiveClinicNew: [
-          { $match: { clinic: "Comprehensive Clinic", appointmenttype: "New" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        comprehensiveClinicOld: [
-          { $match: { clinic: "Comprehensive Clinic", appointmenttype: "Follow-up" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        dermatologyClinic: [
-          { $match: { clinic: "Dermatology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        haematology: [
-          { $match: { clinic: "Haematology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        dialysis: [
-          { $match: { clinic: "Dialysis" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        
-        // 3. Surgical Outpatient Clinic (SOPD)
-        pediatricSurgeryClinic: [
-          { $match: { clinic: "Pediatric Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        neuroSurgeryClinic: [
-          { $match: { clinic: "Neuro Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        urologyClinic: [
-          { $match: { clinic: "Urology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        orthopedicClinic: [
-          { $match: { clinic: "Orthopedic" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        generalSurgeryClinic: [
-          { $match: { clinic: "General Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        plasticSurgeryClinic: [
-          { $match: { clinic: "Plastic Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        
-        // 4. Dental Unit
-        dentalSurgery: [
-          { $match: { clinic: "Dental Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
+        // Dental Clinic from dentalencounters collection
         dentalClinic: [
-          { $match: { clinic: "Dental Clinic" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        maxillofacialSurgery: [
-          { $match: { clinic: "Maxillofacial Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        
-        // 5. ENT Unit
-        entClinic: [
-          { $match: { clinic: "ENT Clinic" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        entSurgery: [
-          { $match: { clinic: "ENT Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        
-        // 6. Ophthalmology Unit
-        ophthalmologyClinic: [
-          { $match: { clinic: "Ophthalmology" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        ophthalmologicSurgery: [
-          { $match: { clinic: "Ophthalmologic Surgery" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        optometricUnit: [
-          { $match: { clinic: "Optometry" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        
-        // 7. Behavioural/Mental Unit
-        behaviorMentalUnitAdult: [
-          { $match: { clinic: "Mental Health", category: "Adult" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        behaviorMentalUnitPaed: [
-          { $match: { clinic: "Mental Health", category: "Paediatrics" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        psychologyCounselling: [
-          { $match: { clinic: "Psychology Counselling" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+          {
+            $lookup: {
+              from: "dentalencounters",
+              pipeline: [
+                {
+                  $match: {
+                    createdAt: { $gte: startdate, $lt: enddate }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patientId",
+                    foreignField: "_id",
+                    as: "patientInfo"
+                  }
+                },
+                { $unwind: "$patientInfo" },
+                {
+                  $group: {
+                    _id: "$patientInfo.gender",
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              as: "dentalData"
+            }
+          },
+          { $unwind: { path: "$dentalData", preserveNullAndEmptyArrays: true } },
+          { $replaceRoot: { newRoot: { $ifNull: ["$dentalData", { _id: null, count: 0 }] } } }
         ],
         
-        // 8. Other Clinics
-        dotClinicNew: [
-          { $match: { clinic: "DOT Clinic", appointmenttype: "New" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+        // Antenatal Registration New from anc3s collection
+        antenatalRegistrationNew: [
+          {
+            $lookup: {
+              from: "anc3s",
+              pipeline: [
+                {
+                  $match: {
+                    createdAt: { $gte: startdate, $lt: enddate }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patientInfo"
+                  }
+                },
+                { $unwind: "$patientInfo" },
+                {
+                  $group: {
+                    _id: "$patientInfo.gender",
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              as: "ancNewData"
+            }
+          },
+          { $unwind: { path: "$ancNewData", preserveNullAndEmptyArrays: true } },
+          { $replaceRoot: { newRoot: { $ifNull: ["$ancNewData", { _id: null, count: 0 }] } } }
         ],
-        dotClinicOld: [
-          { $match: { clinic: "DOT Clinic", appointmenttype: "Follow-up" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+        
+        // Antenatal Follow-up from ancfollowup3s collection
+        antenatalFollowUp: [
+          {
+            $lookup: {
+              from: "ancfollowup3s",
+              pipeline: [
+                {
+                  $match: {
+                    createdAt: { $gte: startdate, $lt: enddate }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "anc3s",
+                    localField: "anc",
+                    foreignField: "_id",
+                    as: "ancInfo"
+                  }
+                },
+                { $unwind: "$ancInfo" },
+                {
+                  $lookup: {
+                    from: "patientsmanagements",
+                    localField: "ancInfo.patient",
+                    foreignField: "_id",
+                    as: "patientInfo"
+                  }
+                },
+                { $unwind: "$patientInfo" },
+                {
+                  $group: {
+                    _id: "$patientInfo.gender",
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              as: "ancFollowUpData"
+            }
+          },
+          { $unwind: { path: "$ancFollowUpData", preserveNullAndEmptyArrays: true } },
+          { $replaceRoot: { newRoot: { $ifNull: ["$ancFollowUpData", { _id: null, count: 0 }] } } }
         ],
-        physiotherapyUnit: [
-          { $match: { clinic: "Physiotherapy" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        nutritionClinic: [
-          { $match: { clinic: "Nutrition" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
-        paediatricClinic: [
-          { $match: { clinic: "Paediatric Clinic" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
-        ],
+        
+        // Family Planning New from familyplannings collection
         familyPlanningNew: [
-          { $match: { clinic: "Family Planning", appointmenttype: "New" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+          {
+            $lookup: {
+              from: "familyplannings",
+              pipeline: [
+                {
+                  $match: {
+                    createdAt: { $gte: startdate, $lt: enddate },
+                    firsttimemodernfamilyplanninguser: "Yes"
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patientInfo"
+                  }
+                },
+                { $unwind: "$patientInfo" },
+                {
+                  $group: {
+                    _id: "$patientInfo.gender",
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              as: "familyPlanningNewData"
+            }
+          },
+          { $unwind: { path: "$familyPlanningNewData", preserveNullAndEmptyArrays: true } },
+          { $replaceRoot: { newRoot: { $ifNull: ["$familyPlanningNewData", { _id: null, count: 0 }] } } }
         ],
+        
+        // Family Planning Follow-up from familyplannings collection
         familyPlanningFollowUp: [
-          { $match: { clinic: "Family Planning", appointmenttype: "Follow-up" } },
-          { $group: { _id: "$gender", count: { $sum: 1 } } }
+          {
+            $lookup: {
+              from: "familyplannings",
+              pipeline: [
+                {
+                  $match: {
+                    createdAt: { $gte: startdate, $lt: enddate },
+                    firsttimemodernfamilyplanninguser: "No"
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "patientsmanagements",
+                    localField: "patient",
+                    foreignField: "_id",
+                    as: "patientInfo"
+                  }
+                },
+                { $unwind: "$patientInfo" },
+                {
+                  $group: {
+                    _id: "$patientInfo.gender",
+                    count: { $sum: 1 }
+                  }
+                }
+              ],
+              as: "familyPlanningFollowUpData"
+            }
+          },
+          { $unwind: { path: "$familyPlanningFollowUpData", preserveNullAndEmptyArrays: true } },
+          { $replaceRoot: { newRoot: { $ifNull: ["$familyPlanningFollowUpData", { _id: null, count: 0 }] } } }
         ]
       }
     }

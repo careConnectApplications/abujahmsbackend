@@ -32,6 +32,16 @@ const procedureSchema = new Schema({
   processby: {
     type: String
   },
+  proceduretype: {
+      type: String,
+      enum: [
+        "Major Operation",
+        "Intermediate Operation",
+        "Minor Operation",
+        "Circumcision",
+      ],
+      required: true,
+    },
   amount:Number,
   hmopercentagecover:Number,
   actualcost:Number,

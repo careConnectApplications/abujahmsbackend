@@ -116,5 +116,53 @@ const AEFIcasesreported = [
   }
 ];
 
-   return {immunizationpipeline,AEFIcasesreported}
+// New pipeline for immunization grouped by gender and vaccination
+const immunizationByGenderAndVaccination = [
+  {   
+    $match: { createdAt: { $gt: startdate, $lt: enddate } }
+  },
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patientInfo"
+    }
+  },
+  { $unwind: "$patientInfo" },
+  
+  // Unwind vaccination array to process each vaccination
+  { $unwind: "$vaccination" },
+  
+  // Group by vaccination and gender
+  {
+    $group: {
+      _id: {
+        vaccination: "$vaccination",
+        gender: "$patientInfo.gender"
+      },
+      count: { $sum: 1 }
+    }
+  },
+  
+  // Reshape to have vaccination as the key and gender counts
+  {
+    $project: {
+      _id: 0,
+      vaccination: "$_id.vaccination",
+      gender: "$_id.gender",
+      count: 1
+    }
+  },
+  
+  // Sort by vaccination name and gender
+  {
+    $sort: {
+      vaccination: 1,
+      gender: 1
+    }
+  }
+];
+
+   return {immunizationpipeline,AEFIcasesreported,immunizationByGenderAndVaccination}
 }
