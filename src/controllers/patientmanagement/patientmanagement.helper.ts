@@ -39,6 +39,7 @@ const SelfPayPatientStrategy: PatientRegistrationStrategy = {
 
     // Prices
     const amount = Number(newRegistrationPrice.amount);
+    console.log("a")
     const annualsubscriptionamount = Number(annualsubscriptionnewRegistrationPrice.amount);
     const cardfeeamountamount = Number(cardfeenewRegistrationPrice.amount);
 

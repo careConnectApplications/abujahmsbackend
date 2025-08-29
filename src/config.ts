@@ -3,6 +3,7 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardnames
+  proceduretype:["Major Operation","Intermediate Operation","Minor Operation","Circumcision"],
   encounterplanoutcome:["Death","Referred Out","Treated","Others"],
   arrivalMode:["Walk-in", "Ambulance", "Referral","Death"],
   unitcategory:["EPU","ICU","Emergency"],
@@ -27,7 +28,7 @@ const configuration: any = {
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
   familyplanningyesnooption: ["Yes", "No"],
-  labcategory:["hematology", "chemicalpathology"],
+  labcategory:["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology"],
   labreporttypehematologychemicalpathology:["peripheralbloodfilmreport","ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
   gender:["Male", "Female"],
   pricingtype: ["Standard", "Age and Clinic Aware"],

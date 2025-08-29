@@ -763,12 +763,12 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
     const { firstName, lastName } = (req.user).user;
     //accept _id from request.
     const { id } = req.params;
-    const { testname, appointmentunderscoreid, department, note, priority, imageBase64 } = req.body;
+    const { testname, appointmentunderscoreid, department, note, priority, imageBase64, labcategory } = req.body;
     const raiseby = `${firstName} ${lastName}`;
     var testid: any = String(Date.now());
     var testsid = [];
     //var paymentids =[];
-    validateinputfaulsyvalue({ id, testname, department });
+    validateinputfaulsyvalue({ id, testname, department, labcategory });
     //find the record in appointment and validate
 
     //find patient
@@ -828,7 +828,7 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       }
       let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName });
+      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName, labcategory });
 
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -1292,8 +1292,3 @@ export const countPatientsPerDoctor = catchAsync(async (req: Request, res: Respo
 
 
 });
-
-
-
-
-
