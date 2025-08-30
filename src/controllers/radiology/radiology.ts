@@ -43,8 +43,7 @@ export var radiologyorder = async (req: any, res: any) => {
 
     }
 
-    let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[4] }, { hmopercentagecover: 1 });
-    console.log("insurance", insurance);
+    let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance?._id, category: configuration.category[4] }, { hmopercentagecover: 1 });
     var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
