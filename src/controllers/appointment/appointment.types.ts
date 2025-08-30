@@ -32,6 +32,7 @@ export interface FreeAppointmentArgs {
   req: AppointmentReq;
   configuration: any; // or make a stricter enum type if you want
   services: Services;
+  amount: number;
 }
 export interface PaidAppointmentStrategyParams {
   patientrecord: PatientRecord;

@@ -25,10 +25,10 @@ import { AppointmentContext, FreeAppointmentStrategy,PaidAppointmentStrategy  } 
 
 export const scheduleappointment = catchAsync(async (req: any, res: Response, next: NextFunction) => {
     const appointmentid = String(Date.now());
-    const { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
+    const { clinic,unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
 
     // validate input
-    validateinputfaulsyvalue({ clinic, appointmentdate, appointmentcategory, appointmenttype, patient });
+    validateinputfaulsyvalue({ clinic,unit, appointmentdate, appointmentcategory, appointmenttype, patient });
 
     // check patient
     const selectquery = { firstName: 1, lastName: 1, MRN: 1, HMOId: 1, HMOName: 1, phoneNumber: 1 };

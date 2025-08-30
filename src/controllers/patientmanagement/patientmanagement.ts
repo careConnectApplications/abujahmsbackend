@@ -19,7 +19,7 @@ import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 import { createDeflateRaw } from "zlib";
 import {selectPatientStrategy,PatientRegistrationContext} from "./patientmanagement.helper"
-
+import {readoneclinic} from "../../dao/clinics";
 
 
 
@@ -215,7 +215,7 @@ export async function updateauthorizationcode(req: any, res: any) {
 export var createpatients = async (req: any, res: any) => {
   try {
     const appointmentid: any = String(Date.now());
-    const { dateOfBirth,phoneNumber,isHMOCover,alternatePhoneNumber,bloodGroup, genotype, bp, heartRate, temperature } = req.body;
+    const { unit,clinic,dateOfBirth,phoneNumber,isHMOCover,alternatePhoneNumber,bloodGroup, genotype, bp, heartRate, temperature, appointmentdate, appointmentcategory, appointmenttype } = req.body;
     const clinicalInformation = {
       bloodGroup, genotype, bp, heartRate, temperature
     }
@@ -225,9 +225,6 @@ export var createpatients = async (req: any, res: any) => {
     // chaorten the MRN to alphanumeric 
     req.body.MRN = uniqunumber;
     req.body.password = configuration.defaultPassword;
-    req.body.appointmentcategory = configuration.category[3];
-    req.body.appointmenttype = configuration.category[3];
-
 
     if (!(req.body.isHMOCover)) {
       req.body.isHMOCover = configuration.ishmo[0];
@@ -260,16 +257,11 @@ export var createpatients = async (req: any, res: any) => {
       throw new Error(`Patient already exists`);
 
     }
-    // fetch prices
+    // fetch prices for optional services only
     const [
-      newRegistrationPrice,
       annualsubscriptionnewRegistrationPrice,
       cardfeenewRegistrationPrice,
     ] = await Promise.all([
-      readoneprice({
-        servicecategory: configuration.category[3],
-        servicetype: configuration.category[3],
-      }),
       readoneprice({
         servicecategory: configuration.category[8],
         servicetype: configuration.category[8],
@@ -280,10 +272,26 @@ export var createpatients = async (req: any, res: any) => {
       }),
     ]);
 
-    if (!newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
+    if (!annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
       throw new Error(
-        `Price for ${configuration.category[3]} or ${configuration.category[8]} or ${configuration.category[9]} is not set`
+        `Price for ${configuration.category[8]} or ${configuration.category[9]} is not set`
       );
+    }
+    // Fetch appointment price if appointment details are provided
+    let appointmentPrice = null;
+    if (appointmentdate && appointmentcategory && appointmenttype) {
+      appointmentPrice = await readoneprice({
+        servicecategory: appointmentcategory,
+        servicetype: appointmenttype,
+      });
+      
+      if (!appointmentPrice) {
+        throw new Error(`Price for ${appointmentcategory}/${appointmenttype} is not set`);
+      }
+       const foundclinic = await readoneclinic({ clinic }, {});
+          if (!foundclinic || !foundclinic.category || !unit) throw new Error("Clinic invalid or missing category or missing unit");
+          req.body.category = foundclinic.category;
+      
     }
 
     // pick strategy
@@ -293,9 +301,9 @@ export var createpatients = async (req: any, res: any) => {
     const result = await context.execute({
       reqBody: req.body,
       appointmentid,
-      newRegistrationPrice,
       annualsubscriptionnewRegistrationPrice,
       cardfeenewRegistrationPrice,
+      appointmentPrice,
     });
 
     res.status(200).json({ queryresult: result, status: true });

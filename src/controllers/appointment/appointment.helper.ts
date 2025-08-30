@@ -1,7 +1,7 @@
 
 import {FreeAppointmentArgs,PaidAppointmentStrategyParams} from "./appointment.types"
 // strategies/paymentStrategies.ts
-export const FreeAppointmentStrategy = async ({ patientrecord, appointmentid, req, configuration, services }:FreeAppointmentArgs) => {
+export const FreeAppointmentStrategy = async ({ patientrecord, appointmentid, req, configuration, services, amount }:FreeAppointmentArgs) => {
   const { createvitalcharts, createappointment, updatepatient } = services;
   let vitals = await createvitalcharts({ status: configuration.status[8], patient: patientrecord._id });
   let appointment = await createappointment({
@@ -14,6 +14,7 @@ export const FreeAppointmentStrategy = async ({ patientrecord, appointmentid, re
     MRN: patientrecord.MRN,
     HMOId: patientrecord.HMOId,
     HMOName: patientrecord.HMOName,
+    amount:amount
   });
   await updatepatient(patientrecord._id, { $push: { appointment: appointment._id } });
   return appointment;
@@ -45,6 +46,7 @@ export const PaidAppointmentStrategy = async ({ patientrecord, appointmentid, re
     MRN: patientrecord.MRN,
     HMOId: patientrecord.HMOId,
     HMOName: patientrecord.HMOName,
+    amount
   });
   await updatepatient(patientrecord._id, { $push: { payment: payment._id, appointment: appointment._id } });
   return appointment;

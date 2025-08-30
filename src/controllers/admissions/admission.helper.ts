@@ -10,12 +10,12 @@ const dischargeStrategy = async (admission: any, reqBody: any) => {
   if (!dischargeReason) {
     throw new Error("Discharge reason must be provided for discharged patients");
   }
-
+/*
   const allowedReasons = ["Recovered", "Improved", "Referred Out", "Death", "Against Medical Advice", "Other"];
   if (!allowedReasons.includes(dischargeReason)) {
     throw new Error("Invalid discharge reason");
   }
-
+*/
   // check payments
   const paymentrecord: any = await readallpayment(
     { paymentreference: admission.admissionid, status: { $ne: configuration.status[3] } },
