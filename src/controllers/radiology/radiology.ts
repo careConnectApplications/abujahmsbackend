@@ -42,7 +42,9 @@ export var radiologyorder = async (req: any, res: any) => {
       throw new Error(`Patient does not exist`);
 
     }
+
     let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[4] }, { hmopercentagecover: 1 });
+    console.log("insurance", insurance);
     var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
     var appointment: any;
     if (appointmentid) {
@@ -66,10 +68,13 @@ export var radiologyorder = async (req: any, res: any) => {
 
       //search for price of test name
       var testPrice: any = await readoneprice({ servicetype: testname[i] });
+      console.log("testPrice",testPrice);
       if (!testPrice) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
+      console.log("hmopercentage", hmopercentagecover);
       let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
+      console.log("amount", amount);
       //create payment
       //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
 
