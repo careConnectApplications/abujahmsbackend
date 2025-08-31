@@ -109,6 +109,7 @@ const configuration: any = {
 
     return (
       {
+        proceduretype:configuration.proceduretype,
         encounterplanoutcome:configuration.encounterplanoutcome,
         unitcategory:configuration.unitcategory,
         arrivalMode: configuration.arrivalMode,
