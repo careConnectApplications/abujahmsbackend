@@ -13,7 +13,7 @@ import { createpayment } from "../../dao/payment";
 import mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
 import { createlab } from "../../dao/lab";
-import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable, calculateAmountPaidByHMO, uploadbase64image } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable, calculateAmountPaidByHMO, uploadbase64image,removeEmpty } from "../../utils/otherservices";
 import configuration from "../../config";
 import { ApiError } from "../../errors";
 const { ObjectId } = mongoose.Types;
@@ -25,7 +25,8 @@ import { AppointmentContext, FreeAppointmentStrategy,PaidAppointmentStrategy  } 
 
 export const scheduleappointment = catchAsync(async (req: any, res: Response, next: NextFunction) => {
     const appointmentid = String(Date.now());
-    console.log("req.body", req.body);
+    //clean the req body
+    req.body=removeEmpty(req.body);
     const { clinic,unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
 
     // validate input
