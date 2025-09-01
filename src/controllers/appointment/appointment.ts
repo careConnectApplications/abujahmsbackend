@@ -27,6 +27,7 @@ export const scheduleappointment = catchAsync(async (req: any, res: Response, ne
     const appointmentid = String(Date.now());
     //clean the req body
     req.body=removeEmpty(req.body);
+    console.log("req.body",req.body);
     const { clinic,unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
 
     // validate input
@@ -775,6 +776,7 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
 
     //find patient
     const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
+   
     // check is patient is under inssurance
     //var isHMOCover;
     // Create a new ObjectId
@@ -788,10 +790,10 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
     //insurance
     if (foundPatient) {
 
-      if (!foundPatient?.insurance) return next(new ApiError(404, "patient does not have insurance info"))
+      if (!foundPatient) return next(new ApiError(404, "patient do not exist"))
 
        //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
-      let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
+      let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance?._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
      
       hmopercentagecover = insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
