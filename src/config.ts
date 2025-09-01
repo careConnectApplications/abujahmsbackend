@@ -3,6 +3,7 @@ import { readallservicetype } from "./dao/servicetype";
 const configuration: any = {
   //clinic name
   //wardnames
+  accidentType:  ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"],
   proceduretype:["Major Operation","Intermediate Operation","Minor Operation","Circumcision"],
   encounterplanoutcome:["Death","Referred Out","Treated","Others"],
   arrivalMode:["Walk-in", "Ambulance", "Referral","Death"],
@@ -109,6 +110,7 @@ const configuration: any = {
 
     return (
       {
+        accidentType: configuration.accidentType,
         proceduretype:configuration.proceduretype,
         encounterplanoutcome:configuration.encounterplanoutcome,
         unitcategory:configuration.unitcategory,
