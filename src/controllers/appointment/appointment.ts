@@ -27,6 +27,7 @@ export const scheduleappointment = catchAsync(async (req: any, res: Response, ne
     const appointmentid = String(Date.now());
     //clean the req body
     req.body=removeEmpty(req.body);
+    console.log("req.body",req.body);
     const { clinic,unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
 
     // validate input
