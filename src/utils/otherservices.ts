@@ -9,6 +9,14 @@ import configuration from "../config";
 import { readonepatient } from '../dao/patientmanagement';
 import {readoneadmission} from "../dao/admissions";
 const { v4: uuidv4 } = require('uuid');
+export function removeEmpty(obj:any) {
+  for (let key in obj) {
+    if (obj[key] === '' || obj[key] === null || obj[key] === undefined) {
+      delete obj[key];
+    }
+  }
+  return obj;
+}
 
 export var encrypt = async function (password: any) {
   try {
