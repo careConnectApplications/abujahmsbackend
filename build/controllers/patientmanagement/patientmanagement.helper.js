@@ -27,55 +27,48 @@ const PatientRegistrationContext = (strategy) => ({
 exports.PatientRegistrationContext = PatientRegistrationContext;
 const SelfPayPatientStrategy = {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, appointmentid, newRegistrationPrice, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice, vitals }) {
-            var _b;
-            // Create patient
-            const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(reqBody);
-            // Prices
-            const amount = Number(newRegistrationPrice.amount);
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, appointmentid, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice, appointmentPrice, vitals }) {
+            // Prices for optional services only
             const annualsubscriptionamount = Number(annualsubscriptionnewRegistrationPrice.amount);
             const cardfeeamountamount = Number(cardfeenewRegistrationPrice.amount);
+            // Appointment amount (if appointment is being scheduled)
+            const appointmentAmount = appointmentPrice ? Number(appointmentPrice.amount) : 0;
+            if (cardfeeamountamount == 0)
+                reqBody.status = config_1.default.status[1];
+            // Create patient
+            const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(reqBody);
             let queryappointmentresult;
             let queryresult;
             let payment = [];
-            if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-                reqBody.status = config_1.default.status[1];
-                if (reqBody.appointmentdate) {
-                    queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN }));
-                    queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, {
-                        $push: { appointment: queryappointmentresult._id },
-                    });
-                }
-                return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
+            // Create payments for all services that have non-zero amounts
+            const payments = yield Promise.all([
+                annualsubscriptionamount > 0
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: annualsubscriptionnewRegistrationPrice.servicetype, paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: annualsubscriptionamount }))
+                    : null,
+                cardfeeamountamount > 0
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: cardfeenewRegistrationPrice.servicetype, paymentcategory: cardfeenewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: cardfeeamountamount }))
+                    : null,
+                appointmentAmount > 0 && reqBody.appointmentdate
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: reqBody.appointmenttype, paymentcategory: reqBody.appointmentcategory, patient: createpatientqueryresult._id, amount: appointmentAmount }))
+                    : null,
+            ]);
+            payments.filter(Boolean).forEach((p) => payment.push(p._id));
+            if (reqBody.appointmentdate) {
+                // Find appointment payment or any other payment for linking
+                const appointmentPayment = appointmentAmount > 0 ? payments[2] : null;
+                queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, payment: appointmentPayment === null || appointmentPayment === void 0 ? void 0 : appointmentPayment._id, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, amount: appointmentAmount }));
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, Object.assign(Object.assign({}, (payment.length > 0 ? { payment } : {})), { $push: { appointment: queryappointmentresult._id } }));
             }
-            else {
-                const payments = yield Promise.all([
-                    amount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount }))
-                        : null,
-                    annualsubscriptionamount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: annualsubscriptionnewRegistrationPrice.servicetype, paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: annualsubscriptionamount }))
-                        : null,
-                    cardfeeamountamount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: cardfeenewRegistrationPrice.servicetype, paymentcategory: cardfeenewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: cardfeeamountamount }))
-                        : null,
-                ]);
-                payments.filter(Boolean).forEach((p) => payment.push(p._id));
-                if (reqBody.appointmentdate) {
-                    queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, payment: (_b = payments[0]) === null || _b === void 0 ? void 0 : _b._id, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN }));
-                    queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, {
-                        payment,
-                        $push: { appointment: queryappointmentresult._id },
-                    });
-                }
-                return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
+            else if (payment.length > 0) {
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment });
             }
+            return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
         });
     },
 };
 const HMOPatientStrategy = {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, appointmentid, newRegistrationPrice, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice, vitals }) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, appointmentid, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice, appointmentPrice, vitals }) {
             var _b, _c, _d;
             let { HMOName, HMOId, HMOPlan } = reqBody;
             let gethmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname: reqBody.HMOName }, { _id: 1, hmopercentagecover: 1 });
@@ -84,56 +77,58 @@ const HMOPatientStrategy = {
             if (!gethmo) {
                 throw new Error("HMONAME does not exist");
             }
-            // Create patient
-            const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(reqBody);
-            // Cover percentages
-            const [insurance, annualsubscription, cardfee] = yield Promise.all([
-                (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[3] }, { hmopercentagecover: 1 }),
+            // Get HMO coverage for all services including appointments
+            const coveragePromises = [
                 (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[8] }, { hmopercentagecover: 1 }),
                 (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[9] }, { hmopercentagecover: 1 }),
-            ]);
-            const hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
-            const annualsubscriptionhmopercentagecover = (_c = annualsubscription === null || annualsubscription === void 0 ? void 0 : annualsubscription.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
-            const cardfeehmopercentagecover = (_d = cardfee === null || cardfee === void 0 ? void 0 : cardfee.hmopercentagecover) !== null && _d !== void 0 ? _d : 0;
-            const amount = (0, otherservices_1.calculateAmountPaidByHMO)(hmopercentagecover, Number(newRegistrationPrice.amount));
+            ];
+            // Add appointment coverage if appointment is being scheduled
+            if (reqBody.appointmentdate && appointmentPrice) {
+                coveragePromises.push((0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo === null || gethmo === void 0 ? void 0 : gethmo._id, category: config_1.default.category[0] }, { hmopercentagecover: 1 }));
+            }
+            const coverageResults = yield Promise.all(coveragePromises);
+            const [annualsubscription, cardfee, appointmentCoverage] = coverageResults;
+            const annualsubscriptionhmopercentagecover = (_b = annualsubscription === null || annualsubscription === void 0 ? void 0 : annualsubscription.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+            const cardfeehmopercentagecover = (_c = cardfee === null || cardfee === void 0 ? void 0 : cardfee.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
+            const appointmenthmopercentagecover = (_d = appointmentCoverage === null || appointmentCoverage === void 0 ? void 0 : appointmentCoverage.hmopercentagecover) !== null && _d !== void 0 ? _d : 0;
+            // Calculate amounts after HMO coverage
             const annualsubscriptionamount = (0, otherservices_1.calculateAmountPaidByHMO)(annualsubscriptionhmopercentagecover, Number(annualsubscriptionnewRegistrationPrice.amount));
             const cardfeeamountamount = (0, otherservices_1.calculateAmountPaidByHMO)(cardfeehmopercentagecover, Number(cardfeenewRegistrationPrice.amount));
+            const appointmentAmount = appointmentPrice ?
+                (0, otherservices_1.calculateAmountPaidByHMO)(appointmenthmopercentagecover, Number(appointmentPrice.amount)) : 0;
+            console.log("appointmentAmount", appointmentAmount);
+            console.log("cardfeeamountamount", cardfeeamountamount);
+            console.log("annualsubscriptionamount", annualsubscriptionamount);
+            if (cardfeeamountamount == 0)
+                reqBody.status = config_1.default.status[1];
+            // Create patient
+            const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(reqBody);
             let queryappointmentresult;
             let queryresult;
             let payment = [];
-            if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-                reqBody.status = config_1.default.status[1];
-                if (reqBody.appointmentdate) {
-                    queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN }));
-                    queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, {
-                        $push: { appointment: queryappointmentresult._id },
-                    });
-                }
-                return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
+            // Create payments for all services that have non-zero amounts after HMO coverage
+            const payments = yield Promise.all([
+                annualsubscriptionamount > 0
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: annualsubscriptionnewRegistrationPrice.servicetype, paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: annualsubscriptionamount }))
+                    : null,
+                cardfeeamountamount > 0
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: cardfeenewRegistrationPrice.servicetype, paymentcategory: cardfeenewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: cardfeeamountamount }))
+                    : null,
+                appointmentAmount > 0 && reqBody.appointmentdate
+                    ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: appointmentid, paymentype: reqBody.appointmenttype, paymentcategory: reqBody.appointmentcategory, patient: createpatientqueryresult._id, amount: appointmentAmount }))
+                    : null,
+            ]);
+            payments.filter(Boolean).forEach((p) => payment.push(p._id));
+            if (reqBody.appointmentdate) {
+                // Find appointment payment for linking
+                const appointmentPayment = appointmentAmount > 0 ? payments[2] : null;
+                queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, payment: appointmentPayment === null || appointmentPayment === void 0 ? void 0 : appointmentPayment._id, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, amount: appointmentAmount }));
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, Object.assign(Object.assign({}, (payment.length > 0 ? { payment } : {})), { $push: { appointment: queryappointmentresult._id } }));
             }
-            else {
-                const payments = yield Promise.all([
-                    amount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount }))
-                        : null,
-                    annualsubscriptionamount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: annualsubscriptionnewRegistrationPrice.servicetype, paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: annualsubscriptionamount }))
-                        : null,
-                    cardfeeamountamount > 0
-                        ? (0, payment_1.createpayment)(Object.assign(Object.assign({}, reqBody), { paymentreference: reqBody.MRN, paymentype: cardfeenewRegistrationPrice.servicetype, paymentcategory: cardfeenewRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: cardfeeamountamount }))
-                        : null,
-                ]);
-                payments.filter(Boolean).forEach((p) => payment.push(p._id));
-                // HMO → no self-pay createpayment, just mark approved with zero cost
-                if (reqBody.appointmentdate) {
-                    queryappointmentresult = yield (0, appointment_1.createappointment)(Object.assign(Object.assign({}, reqBody), { appointmentid, vitals: vitals === null || vitals === void 0 ? void 0 : vitals._id, patient: createpatientqueryresult._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN }));
-                    queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, {
-                        payment,
-                        $push: { appointment: queryappointmentresult._id },
-                    });
-                }
-                return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
+            else if (payment.length > 0) {
+                queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment });
             }
+            return queryresult !== null && queryresult !== void 0 ? queryresult : createpatientqueryresult;
         });
     },
 };

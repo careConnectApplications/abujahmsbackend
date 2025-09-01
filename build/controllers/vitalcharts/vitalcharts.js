@@ -76,7 +76,7 @@ const createvitalchart = (req, res) => __awaiter(void 0, void 0, void 0, functio
         else {
             admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
             if (!admissionrecord) {
-                throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Admission does not exist`);
             }
         }
         const queryresult = yield (0, vitalcharts_1.createvitalcharts)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, bmi, height, weight, temperature, heartrate, bloodpressuresystolic, bloodpressurediastolic, respiration, saturation, painscore, rbs, gcs, staffname });

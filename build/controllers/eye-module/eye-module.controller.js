@@ -84,7 +84,7 @@ exports.createEyeModule = (0, catchAsync_1.default)((req, res, next) => __awaite
     const _patientId = new mongoose_1.default.Types.ObjectId(patientId);
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const newEyeModule = {
         patient: patientId,
@@ -106,11 +106,11 @@ exports.createLensPrescription = (0, catchAsync_1.default)((req, res, next) => _
     const _appointmentId = new mongoose_1.default.Types.ObjectId(appointmentId);
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const foundAppointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentId }, {}, '');
     if (!foundAppointment) {
-        return next(new errors_1.ApiError(404, `appointment do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `appointment do not already exists`));
     }
     /// first check if eye module instance aleady exist if not create one
     /// if it do check if eyeModule.optometryLensPrescription is null if its null update but if it exist ask user to update lens prescription
@@ -993,11 +993,11 @@ exports.createEyeConsultation = (0, catchAsync_1.default)((req, res, next) => __
     const _appointmentId = new mongoose_1.default.Types.ObjectId(appointmentId);
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const foundAppointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentId }, {}, '');
     if (!foundAppointment) {
-        return next(new errors_1.ApiError(404, `appointment do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `appointment do not already exists`));
     }
     /// first check if eye module instance aleady exist if not create one
     /// if it do check if eyeModule.optometryLensPrescription is null if its null update but if it exist ask user to update lens prescription

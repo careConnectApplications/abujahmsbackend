@@ -29,7 +29,7 @@ function readallpreanathetics(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pre-anaesthetic data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createpreanathetics(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create pre-anaesthetic");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonepreanathetics(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pre-anaesthetic data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatepreanathetics(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pre-anaesthetic");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatepreanatheticsquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pre-anaesthetic");
         }
     });
 }

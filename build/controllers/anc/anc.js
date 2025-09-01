@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createancs = exports.readAllancByPatient = exports.createancfollowups = exports.readAllancfollowupByAnc = void 0;
 exports.updateancfollowups = updateancfollowups;
@@ -19,7 +16,6 @@ const anc_1 = require("../../dao/anc");
 const ancfollowup_1 = require("../../dao/ancfollowup");
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const config_1 = __importDefault(require("../../config"));
 //get lab order by patient
 ///////////////////////////anc followup/////////////////////////
 const readAllancfollowupByAnc = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,7 +45,7 @@ const createancfollowups = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const ancrecord = yield (0, anc_1.readoneanc)({ _id: anc }, {}, '');
         //console.log(admissionrecord);   
         if (!ancrecord) {
-            throw new Error(`ANC donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`ANC does not exist`);
         }
         const queryresult = yield (0, ancfollowup_1.createancfollowup)({ anc: ancrecord._id, ga, sfh, wf, lie, presentation, position, fhr, urine, bp, remark, followup, riskidentified, currentmedication, staffname });
         res.status(200).json({ queryresult, status: true });
@@ -150,7 +146,7 @@ const createancs = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, anc_1.createanc)({ patient: patientrecord._id, obstetrichistory, pregnancysummary, medicalobsterichistory, currenthistory, generalmedicalhistory, physicalexamination, laboratory, healtheducationtopicscovered, tetanustoxod, ironfolategiven, ipt, currentmedication, allergies, staffname });
         res.status(200).json({ queryresult, status: true });

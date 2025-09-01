@@ -29,7 +29,7 @@ function readallnutrition(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve nutrition data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createnutrition(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create nutrition");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonenutrition(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve nutrition data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updatenutrition(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update nutrition");
         }
     });
 }
@@ -91,7 +91,7 @@ function updatenutritionquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update nutrition");
         }
     });
 }

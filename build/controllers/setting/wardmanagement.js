@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createward = void 0;
 exports.getallward = getallward;
 exports.updateward = updateward;
-const config_1 = __importDefault(require("../../config"));
 const wardmanagement_1 = require("../../dao/wardmanagement");
 const clinics_1 = require("../../dao/clinics");
 const otherservices_1 = require("../../utils/otherservices");
@@ -30,19 +26,19 @@ var createward = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         (0, otherservices_1.validateinputfornumber)({ totalbed, occupiedbed });
         //validate that totalbed is created or equal to occupiedbed
         if (occupiedbed > totalbed) {
-            throw new Error(`Occupied bed ${config_1.default.error.errorgreaterthan} Total bed`);
+            throw new Error(`Occupied beds cannot be greater than total beds`);
         }
         const vacantbed = totalbed - occupiedbed;
         var wardid = `${wardname[0]}${(0, otherservices_1.generateRandomNumber)(5)}${wardname[wardname.length - 1]}`;
         //validate specialization
         const foundSpecilization = yield (0, clinics_1.readoneclinic)({ clinic: bedspecialization }, '');
         if (!foundSpecilization) {
-            throw new Error(`Specialization doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Specialization does not exist`);
         }
         // validate ward
         const foundWard = yield (0, wardmanagement_1.readonewardmanagement)({ wardname }, '');
         if (foundWard) {
-            throw new Error(`Ward ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Ward already exists`);
         }
         const queryresult = yield (0, wardmanagement_1.createwardmanagement)({ bedspecialization, vacantbed, wardname, totalbed, occupiedbed, wardid });
         // Step 2: Create beds as separate documents
@@ -94,7 +90,7 @@ function updateward(req, res) {
             (0, otherservices_1.validateinputfornumber)({ totalbed, occupiedbed });
             //validate that totalbed is created or equal to occupiedbed
             if (occupiedbed > totalbed) {
-                throw new Error(`Occupied bed ${config_1.default.error.errorgreaterthan} Total bed`);
+                throw new Error(`Occupied beds cannot be greater than total beds`);
             }
             const vacantbed = totalbed - occupiedbed;
             var queryresult = yield (0, wardmanagement_1.updatewardmanagement)(id, { bedspecialization, vacantbed, totalbed, occupiedbed });

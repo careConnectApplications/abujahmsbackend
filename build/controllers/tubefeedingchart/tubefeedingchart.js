@@ -19,7 +19,6 @@ const admissions_1 = require("../../dao/admissions");
 const otherservices_1 = require("../../utils/otherservices");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
-const config_1 = __importDefault(require("../../config"));
 // Get all lab records
 const readalltubefeedingchartByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -62,7 +61,7 @@ const createtubefeedingchart = (req, res) => __awaiter(void 0, void 0, void 0, f
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
         console.log(admissionrecord);
         if (!admissionrecord) {
-            throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Admission does not exist`);
         }
         const queryresult = yield (0, tubefeedingchart_1.createtubefeedingcharts)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, Datetimefeeds, amount, feed, staffname });
         res.status(200).json({ queryresult, status: true });

@@ -29,7 +29,7 @@ function countradiology(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve radiology test data");
         }
     });
 }
@@ -44,7 +44,7 @@ function readallradiology(query, selectquery, populatequery, populatesecondquery
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve radiology test data");
         }
     });
 }
@@ -61,7 +61,7 @@ function optimizedreadallradiology(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve radiology test data");
         }
     });
 }
@@ -73,7 +73,7 @@ function createradiology(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create radiology test");
         }
     });
 }
@@ -85,7 +85,7 @@ function readoneradiology(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve radiology test data");
         }
     });
 }
@@ -104,7 +104,7 @@ function updateradiology(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update radiology test");
         }
     });
 }
@@ -123,7 +123,7 @@ function updateradiologybyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update radiology test");
         }
     });
 }
@@ -134,7 +134,7 @@ function readradiologyaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update radiology test");
         }
     });
 }

@@ -11,6 +11,20 @@ const clinicSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    category: {
+        type: String,
+        enum: [
+            "Family Medicine",
+            "Paediatrics",
+            "Accident & Emergency",
+            "Surgery",
+            "Obstetrics & Gynaecology",
+            "ENT",
+            "Ophthalmology",
+            "Other",
+        ],
+        required: true
+    },
     type: {
         type: String,
         required: true,

@@ -29,7 +29,7 @@ function readalldruggivens(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve drug administration data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createdruggiven(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create drug administration");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonedruggiven(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve drug administration data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatedruggiven(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update drug administration");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatedruggivenquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update drug administration");
         }
     });
 }

@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createhmo = void 0;
 exports.getallhmo = getallhmo;
 exports.updatehmo = updatehmo;
-const config_1 = __importDefault(require("../../config"));
 const hmomanagement_1 = require("../../dao/hmomanagement");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
@@ -30,7 +26,7 @@ var createhmo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const foundHmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname }, '');
         //update servicetype for New Patient Registration
         if (foundHmo) {
-            throw new Error(`HMO ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`HMO already exists`);
         }
         const queryresult = yield (0, hmomanagement_1.createhmomanagement)({ hmoname, id });
         yield (0, audit_1.createaudit)({ action: "Create HMO", actor, affectedentity: hmoname });

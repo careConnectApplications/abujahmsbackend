@@ -38,7 +38,6 @@ const radiology_1 = __importDefault(require("../models/radiology"));
 const prescription_1 = __importDefault(require("../models/prescription"));
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const nutrition_1 = __importDefault(require("../models/nutrition"));
-const config_1 = __importDefault(require("../config"));
 const immunization_1 = __importDefault(require("../models/immunization"));
 const familyplanning_1 = __importDefault(require("../models/familyplanning"));
 function readpatientsmanagementaggregate(input) {
@@ -48,7 +47,7 @@ function readpatientsmanagementaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -59,7 +58,7 @@ function readpaymentaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -70,7 +69,7 @@ function readhmoaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -81,7 +80,7 @@ function readappointmentaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -92,7 +91,7 @@ function readadmissionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -103,7 +102,7 @@ function readclinicaggregate(input) {
         }
         catch (e) {
             console.log(e.message);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -114,7 +113,7 @@ function readwardaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -125,7 +124,7 @@ function readprocedureaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -137,7 +136,7 @@ function readlabaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -149,7 +148,7 @@ function readradiologyaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -161,7 +160,7 @@ function readprescriptionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -173,7 +172,7 @@ function readnutritionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -185,7 +184,7 @@ function readimmunizationaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -197,7 +196,7 @@ function readfamilyaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }

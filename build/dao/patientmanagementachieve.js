@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createpatientachieve = createpatientachieve;
 const patientmanagementachieve_1 = __importDefault(require("../models/patientmanagementachieve"));
-const config_1 = __importDefault(require("../config"));
 function createpatientachieve(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -22,7 +21,7 @@ function createpatientachieve(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create patient archive");
         }
     });
 }

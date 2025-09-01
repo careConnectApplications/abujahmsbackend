@@ -31,7 +31,7 @@ function readallprescription(query, selectquery, populatequery, populatesecondqu
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve prescription data");
         }
     });
 }
@@ -44,7 +44,7 @@ function createprescription(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create prescription");
         }
     });
 }
@@ -56,7 +56,7 @@ function readoneprescription(query, selectquery, populatequery, populatesecondqu
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve prescription data");
         }
     });
 }
@@ -75,7 +75,7 @@ function updateprescription(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update prescription");
         }
     });
 }
@@ -94,7 +94,7 @@ function updateprescriptionbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update prescription");
         }
     });
 }
@@ -109,7 +109,7 @@ function optimizedreadprescriptionaggregate(input, page, size) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update prescription");
         }
     });
 }
@@ -120,7 +120,7 @@ function readprescriptionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update prescription");
         }
     });
 }

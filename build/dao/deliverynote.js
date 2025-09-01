@@ -29,7 +29,7 @@ function readalldeliverynotes(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve delivery note data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createdeliverynotes(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create delivery note");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonedeliverynotes(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve delivery note data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatedeliverynotes(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update delivery note");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatedeliverynotequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update delivery note");
         }
     });
 }

@@ -499,6 +499,9 @@ const appointmentSchema = new mongoose_1.Schema({
         ref: "Patientsmanagement",
         default: null,
     },
+    category: String,
+    unit: { type: String, required: true },
+    arrivalMode: { type: String, enum: ["Walk-in", "Ambulance", "Referral", "Death"], default: "Walk-in" },
     admission: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Admission",
@@ -588,12 +591,16 @@ const appointmentSchema = new mongoose_1.Schema({
         required: true
     },
     policecase: Boolean,
+    accidentType: {
+        type: String,
+        enum: ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"]
+    },
+    dateOfAccident: { type: Date },
     physicalassault: Boolean,
     sexualassault: Boolean,
     policaename: String,
     servicenumber: String,
-    policephonenumber: String,
-    division: String,
+    policephonenumber: String, division: String,
     fromclinicalencounter: {
         type: Boolean,
         default: false,

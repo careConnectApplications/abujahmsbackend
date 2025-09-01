@@ -52,7 +52,7 @@ var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const foundPrice = yield (0, price_1.readoneprice)({ servicecategory, servicetype, isHMOCover });
         //update servicetype for New Patient Registration
         if (foundPrice) {
-            throw new Error(`service category and type ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`service category and type already exists`);
         }
         const queryresult = yield (0, price_1.createprice)(req.body);
         const { firstName, lastName } = (req.user).user;
@@ -180,7 +180,7 @@ exports.getpriceofservice = (0, catchAsync_1.default)((req, res, next) => __awai
     // Fetch patient with insurance populated
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, "insurance", "");
     if (!foundPatient) {
-        throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Patient does not exist`);
     }
     // Fetch price for the service type
     const price = yield (0, price_1.readoneprice)({ servicetype });

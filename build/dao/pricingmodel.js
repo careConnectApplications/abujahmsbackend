@@ -25,7 +25,7 @@ function createpricemodel(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create pricing model");
         }
     });
 }
@@ -37,7 +37,7 @@ function readonepricemodel(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pricing model data");
         }
     });
 }
@@ -56,7 +56,7 @@ function updatepricemodel(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pricing model");
         }
     });
 }

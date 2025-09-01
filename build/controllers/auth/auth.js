@@ -19,7 +19,6 @@ const users_1 = require("../../dao/users");
 const otherservices_1 = require("../../utils/otherservices");
 const roles_1 = require("../../dao/roles");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const errors_1 = require("../../errors");
 //sign in
 var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -71,10 +70,10 @@ exports.signup = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0,
     (0, otherservices_1.validateinputfaulsyvalue)({ email, firstName, phoneNumber, lastName, gender, role, clinic });
     const foundUser = yield (0, users_1.readone)({ $or: [{ email }, { phoneNumber }] });
     if (foundUser) {
-        return next(new errors_1.ApiError(401, `User with this email or phonenumber  ${config_1.default.error.erroralreadyexit}`));
+        throw new Error(`User with this email or phonenumber  already exists`);
     }
     if (!(0, otherservices_1.isValidPhoneNumber)(phoneNumber)) {
-        return next(new errors_1.ApiError(409, config_1.default.error.errorNotValidPhoneNumber));
+        throw new Error(config_1.default.error.errorNotValidPhoneNumber);
     }
     req.body.password = config_1.default.defaultPassword;
     //get user permissions
@@ -83,7 +82,7 @@ exports.signup = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0,
     //other validations
     const queryresult = yield (0, users_1.createuser)(req.body);
     if (!queryresult) {
-        return next(new errors_1.ApiError(403, 'operation failed!'));
+        throw new Error('operation failed!');
     }
     //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
     //await mail(email, "Account Registration Confrimation", message);

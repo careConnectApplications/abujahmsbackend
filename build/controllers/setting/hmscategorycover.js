@@ -30,17 +30,17 @@ var createhmocategorycovercontroller = (req, res) => __awaiter(void 0, void 0, v
         const foundHmo = yield (0, hmomanagement_1.readonehmomanagement)({ _id: hmoId }, '');
         //update servicetype for New Patient Registration
         if (!foundHmo) {
-            throw new Error(`HMO doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`HMO does not exist`);
         }
         //validate category
         //update servicetype for New Patient Registration
         if (!(config_1.default.category).includes(category)) {
-            throw new Error(`service category doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`service category does not exist`);
         }
         // Check if category already exists for same HMO
         const foundCover = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId, category, hmopercentagecover }, "");
         if (foundCover) {
-            throw new Error(`HMO Category Cover ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`HMO Category Cover already exists`);
         }
         const queryresult = yield (0, hmocategorycover_1.createhmocategorycover)({
             hmoId: foundHmo._id,
@@ -89,7 +89,7 @@ function updatehmocategorycovercontroller(req, res) {
             const foundHmo = yield (0, hmomanagement_1.readonehmomanagement)({ _id: hmoId }, '');
             //update servicetype for New Patient Registration
             if (!foundHmo) {
-                throw new Error(`HMO doesnt ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`HMO does not exist`);
             }
             yield (0, audit_1.createaudit)({
                 action: "Update HMO Category Cover",
