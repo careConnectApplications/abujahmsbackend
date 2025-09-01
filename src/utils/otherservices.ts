@@ -234,7 +234,7 @@ export function parseDate(input: string): Date | null {
 }
 
 export function isValidPhoneNumber(phoneNumber: string): boolean {
-  if (!phoneNumber || typeof phoneNumber === 'string') {
+  if (!phoneNumber ) {
     return false;
   }
 
