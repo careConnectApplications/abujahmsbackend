@@ -29,7 +29,7 @@ function readallpostanaetheticrecoverychart(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve post-anaesthetic recovery chart data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createpostanaetheticrecoverychart(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create post-anaesthetic recovery chart");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonepostanaetheticrecoverychart(query, selectquery, populatequery, p
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve post-anaesthetic recovery chart data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatepostanaetheticrecoverychart(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update post-anaesthetic recovery chart");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatepostanaetheticrecoverychartquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update post-anaesthetic recovery chart");
         }
     });
 }

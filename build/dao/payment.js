@@ -30,7 +30,7 @@ function readpaymentaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update payment");
         }
     });
 }
@@ -45,7 +45,7 @@ function readpaymentaggregateoptimized(input, page, size) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update payment");
         }
     });
 }
@@ -59,7 +59,7 @@ function readallpayment(query, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve payment data");
         }
     });
 }
@@ -70,7 +70,7 @@ function readallpaymentaggregate(input) {
             return yield payment_1.default.aggregate(input);
         }
         catch (e) {
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve payment data");
         }
     });
 }
@@ -82,7 +82,7 @@ function createpayment(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create payment");
         }
     });
 }
@@ -94,7 +94,7 @@ function createpaymentSession(input, session) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create payment");
         }
     });
 }
@@ -106,7 +106,7 @@ function readonepayment(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve payment data");
         }
     });
 }
@@ -125,7 +125,7 @@ function updatepayment(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update payment");
         }
     });
 }
@@ -146,7 +146,7 @@ function updatepaymentbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update payment");
         }
     });
 }

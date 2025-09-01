@@ -29,7 +29,7 @@ function readallthearteadmission(query, selectquery, populatequery, populateseco
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve theatre admission data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createthearteadmission(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create theatre admission");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonethearteadmission(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve theatre admission data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatethearteadmission(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update theatre admission");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatethearteadmissionbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update theatre admission");
         }
     });
 }

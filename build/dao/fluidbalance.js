@@ -30,7 +30,7 @@ function readallfluidbalances(query, selectquery, populatequery, populatesecondq
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve fluid balance data");
         }
     });
 }
@@ -44,7 +44,7 @@ function createfluidbalances(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create fluid balance");
         }
     });
 }
@@ -56,7 +56,7 @@ function readonefluidbalances(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve fluid balance data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatefluidbalances(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update fluid balance");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatefluidbalancequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update fluid balance");
         }
     });
 }
@@ -103,7 +103,7 @@ function createMultifluidbalances(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create fluid balance");
         }
     });
 }

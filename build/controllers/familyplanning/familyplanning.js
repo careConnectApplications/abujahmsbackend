@@ -19,7 +19,6 @@ const patientmanagement_1 = require("../../dao/patientmanagement");
 const otherservices_1 = require("../../utils/otherservices");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
-const config_1 = __importDefault(require("../../config"));
 //get lab order by patient
 const readAllfamilyplanningByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -54,7 +53,7 @@ const createfamilyplanning = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, familyplanning_1.createfamilyplannings)({ patient: patientrecord._id, weight, bloodpressuresystolic, parity, counsellingonfamilyplanning, counsellingonpostpartumfamilyplanning, firsttimemodernfamilyplanninguser, emergencycontraception, typeoffamilyplanningclient, oralpillsname, orapillsquantity, oralnewacceptor, oralrevisit, nameofinjectable, injectablequantity, selfinjection, injectableacceptor, injectablerevisit, typeofiud, iudinnewacceptor, iudinrevisit, iudoutnewacceptor, iudoutrevisit, typeofbarriermethods, barrierquantity, barriernewacceptor, barrierrevisit, typeofimplants, implantsinnewacceptor, implantsinrevisit, implantsoutnewacceptor, implantsoutrevisit, voluntorysterilization, naturalemthodsnewacceptorforcyclebeads, naturalemthodsrevisitforcyclebeads, naturalemthodsnewacceptorforothers, naturalemthodsrevisitforothers, referredoralpills, referredinjectable, referredip, referredintrauterinedevice, referredsurgicalreferred, referredmedicalreferred, staffname });
         res.status(200).json({ queryresult, status: true });

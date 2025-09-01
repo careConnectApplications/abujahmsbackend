@@ -35,7 +35,7 @@ function readAllPhysiotherapyAssessments() {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve physiotherapy assessment data");
         }
     });
 }
@@ -48,7 +48,7 @@ function createPhysiotherapyAssessment(input) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create physiotherapy assessment");
         }
     });
 }
@@ -60,7 +60,7 @@ function readOnePhysiotherapyAssessment(query_1) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve physiotherapy assessment data");
         }
     });
 }
@@ -76,7 +76,7 @@ function updatePhysiotherapyAssessmentById(id, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update physiotherapy assessment");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatePhysiotherapyAssessmentByQuery(query, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update physiotherapy assessment");
         }
     });
 }

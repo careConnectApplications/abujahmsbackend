@@ -32,7 +32,7 @@ function readallhmocategorycover(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve HMO category cover data");
         }
     });
 }
@@ -45,7 +45,7 @@ function createhmocategorycover(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create HMO category cover");
         }
     });
 }
@@ -57,7 +57,7 @@ function readonehmocategorycover(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve HMO category cover data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatehmocategorycover(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update HMO category cover");
         }
     });
 }
@@ -89,7 +89,7 @@ function updatehmocategorycoverbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update HMO category cover");
         }
     });
 }

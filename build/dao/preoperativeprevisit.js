@@ -29,7 +29,7 @@ function readallpreoperativeprevisits(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pre-operative visit data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createpreoperativeprevisit(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create pre-operative visit");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonepreoperativeprevisit(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pre-operative visit data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatepreoperativeprevisit(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pre-operative visit");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatepreoperativeprevisitquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pre-operative visit");
         }
     });
 }

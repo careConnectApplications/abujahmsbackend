@@ -32,7 +32,7 @@ function countlab(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -44,7 +44,7 @@ function readalllablimitfive(query, selectquery, populatequery, populatesecondqu
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -58,7 +58,7 @@ function readalllab(query, selectquery, populatequery, populatesecondquery, popu
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -75,7 +75,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -87,7 +87,7 @@ function createlab(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create lab test");
         }
     });
 }
@@ -99,7 +99,7 @@ function readonelab(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -118,7 +118,7 @@ function updatelab(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }
@@ -137,7 +137,7 @@ function updatelabbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }
@@ -148,7 +148,7 @@ function readlabaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }

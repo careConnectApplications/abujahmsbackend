@@ -19,7 +19,6 @@ const admissions_1 = require("../../dao/admissions");
 const otherservices_1 = require("../../utils/otherservices");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
-const config_1 = __importDefault(require("../../config"));
 // Get all lab records
 const readallinsulinByAdmission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -74,7 +73,7 @@ const createinsulin = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
         //console.log(admissionrecord);   
         if (!admissionrecord) {
-            throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Admission does not exist`);
         }
         //const queryresult=await createinsulins({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,dateandtimeofbloodglucosemonitoring,premealbloodglucoselevel,postmealbloodglucoselevel,fastingbloodglucose,dateandtimeofinsulinadministration,typeofinsulin,dosage,route,mealtimes,carbonhydrateintakeestimation,symtoms,interventionprovided,staffname});
         const queryresult = yield (0, insulin_1.createinsulins)({ referedward: admissionrecord.referedward, admission: admissionrecord._id, patient: admissionrecord.patient, dateandtimeofinsulinadministration, typeofinsulin, rbsvalue, dosage, route, staffname });

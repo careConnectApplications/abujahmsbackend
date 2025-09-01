@@ -30,7 +30,7 @@ function readalltestcomponent(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve test component data");
         }
     });
 }
@@ -44,7 +44,7 @@ function createtestcomponent(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create test component");
         }
     });
 }
@@ -56,7 +56,7 @@ function readonetestcomponent(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve test component data");
         }
     });
 }
@@ -75,7 +75,7 @@ function updatetestcomponent(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update test component");
         }
     });
 }
@@ -94,7 +94,7 @@ function updatetestcomponentyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update test component");
         }
     });
 }
@@ -106,7 +106,7 @@ function createmanytestcomponent(filterinput, input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create test component");
         }
     });
 }

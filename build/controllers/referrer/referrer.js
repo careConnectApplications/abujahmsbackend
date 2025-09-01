@@ -54,7 +54,7 @@ const createreferrers = (req, res) => __awaiter(void 0, void 0, void 0, function
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         preferredconsultant = new ObjectId(preferredconsultant);
         const queryresult = yield (0, referrer_1.createreferrer)({ patient: patientrecord._id, diagnosis, referredclinic, referraldate, receivingclinic, preferredconsultant, priority, reasonforreferral, presentingcomplaints, presentingcomplaintsnotes, additionalnotes, salienthistory, findingsonexamination, investigationdoneifany, laboratoryfindings, requiredinputintervention });
@@ -148,7 +148,7 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         //search for price if available
         var patients = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
         if (!patients) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
         }
         var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
         if (!appointmentPrice) {

@@ -29,7 +29,7 @@ function readallhmomanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve HMO data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createhmomanagement(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create HMO");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonehmomanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve HMO data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatehmomanagement(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update HMO");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatehmomanagementbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update HMO");
         }
     });
 }

@@ -29,7 +29,7 @@ function readallwardmanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ward data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createwardmanagement(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create ward");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonewardmanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ward data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatewardmanagement(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ward");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatewardmanagementbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ward");
         }
     });
 }

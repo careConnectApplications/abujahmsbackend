@@ -29,7 +29,7 @@ function countprocedure(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve procedure data");
         }
     });
 }
@@ -44,7 +44,7 @@ function readallprocedure(query, selectquery, populatequery, populatesecondquery
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve procedure data");
         }
     });
 }
@@ -57,7 +57,7 @@ function createprocedure(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create procedure");
         }
     });
 }
@@ -69,7 +69,7 @@ function readoneprocedure(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve procedure data");
         }
     });
 }
@@ -88,7 +88,7 @@ function updateprocedure(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update procedure");
         }
     });
 }
@@ -107,7 +107,7 @@ function updateprocedurebyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update procedure");
         }
     });
 }
@@ -122,7 +122,7 @@ function readprocedureaggregateoptimized(input, page, size) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update procedure");
         }
     });
 }
@@ -133,7 +133,7 @@ function readprocedureaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update procedure");
         }
     });
 }

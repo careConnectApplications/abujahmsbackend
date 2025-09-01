@@ -52,7 +52,9 @@ const jwt = __importStar(require("jsonwebtoken"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 // Middleware to block unpaid patients
 exports.checkSubscription = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var { patient, id } = req.body;
+    var _a;
+    const { patient } = req.body;
+    const id = (_a = req.body.id) !== null && _a !== void 0 ? _a : req.params.id;
     const _id = patient || id;
     if (!_id) {
         throw new Error("Unauthorized");

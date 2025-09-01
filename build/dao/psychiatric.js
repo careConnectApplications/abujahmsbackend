@@ -36,7 +36,7 @@ function readAllPsychiatricEvaluations(query_1, selectquery_1, populatequery_1, 
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve psychiatric data");
         }
     });
 }
@@ -49,7 +49,7 @@ function createPsychiatricEvaluation(input) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create psychiatric");
         }
     });
 }
@@ -61,7 +61,7 @@ function readOnePsychiatricEvaluation(query, selectquery) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve psychiatric data");
         }
     });
 }
@@ -77,7 +77,7 @@ function updatePsychiatricEvaluationById(id, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update psychiatric");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatePsychiatricEvaluationByQuery(query, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update psychiatric");
         }
     });
 }

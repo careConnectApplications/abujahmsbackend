@@ -64,15 +64,15 @@ const config_1 = __importDefault(require("../../config"));
 exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
-    let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
+    let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid, proceduretype } = req.body;
     const { firstName, lastName } = (req.user).user;
     const raiseby = `${firstName} ${lastName}`;
     const procedureid = String(Date.now());
-    (0, otherservices_1.validateinputfaulsyvalue)({ id, procedure });
+    (0, otherservices_1.validateinputfaulsyvalue)({ id, procedure, proceduretype });
     // find patient
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, "", "");
     if (!foundPatient) {
-        throw new Error(`Patient ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Patient already exists`);
     }
     console.log("foundPatient", foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance);
     // HMO coverage %
@@ -85,7 +85,7 @@ exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => _
         appointmentid = new ObjectId(appointmentid);
         appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, "");
         if (!appointment) {
-            throw new Error(`Appointment ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Appointment already exists`);
         }
     }
     // 🔑 Strategy: HMO vs Self-Pay
@@ -95,8 +95,7 @@ exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => _
     const context = (0, procedure_helper_1.ProcedureScheduleContext)(strategyFn);
     const queryresult = yield context.execute({
         id,
-        procedure,
-        clinic,
+        procedure, clinic,
         indicationdiagnosisprocedure,
         appointmentdate,
         cptcodes,
@@ -106,6 +105,7 @@ exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => _
         procedureid,
         foundPatient,
         hmopercentagecover,
+        proceduretype
     });
     res.status(200).json({ queryresult, status: true });
 }));
@@ -126,7 +126,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
     const foundPatient: any = await readonepatient({ _id: id }, {}, '', '');
     //category
     if (!foundPatient) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient does not exist`);
 
     }
     let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance, category:configuration.category[5]},{hmopercentagecover:1});
@@ -137,7 +137,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
       appointment = await readoneappointment({ _id: appointmentid }, {}, '');
       if (!appointment) {
         //create an appointment
-        throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Appointment does not exist`);
 
       }
 
@@ -264,7 +264,7 @@ function updateprocedures(req, res) {
             //  var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
             /*
             if(!testsetting || testsetting.length < 1){
-              throw new Error(`${procedure} donot ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
+              throw new Error(`${procedure} does not ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
           }
               */
             //check that the status is not complete

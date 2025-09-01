@@ -19,7 +19,6 @@ const anc3_1 = require("../../dao/anc3");
 const ancfollowup3_1 = require("../../dao/ancfollowup3");
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const errors_1 = require("../../errors");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -40,7 +39,7 @@ exports.createAbujaAnc = (0, catchAsync_1.default)((req, res, next) => __awaiter
     const _patientId = new mongoose_1.default.Types.ObjectId(id);
     const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: _patientId }, {}, '', '');
     if (!patientrecord)
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     const newAnc3 = {
         patient: _patientId,
         postmedicalorsurgicalhistory: postmedicalorsurgicalhistory || [],
@@ -175,7 +174,7 @@ const createancfollowupsv3 = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const ancrecord = yield (0, anc3_1.readoneanc)({ _id: anc }, {}, '');
         //console.log(admissionrecord);   
         if (!ancrecord) {
-            throw new Error(`ANC donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`ANC does not exist`);
         }
         const queryresult = yield (0, ancfollowup3_1.createancfollowup)({ anc: ancrecord._id, heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
         res.status(200).json({ queryresult, status: true });
@@ -243,7 +242,7 @@ const createancsv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, anc3_1.createanc)({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });
         /////////////////////////////create first followup ////////////////////////////

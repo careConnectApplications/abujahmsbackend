@@ -28,7 +28,7 @@ exports.createDoctorWardNote = (0, catchAsync_1.default)((req, res, next) => __a
     const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: admissionId }, {}, '');
     //console.log(admissionrecord);   
     if (!admissionrecord) {
-        throw new Error(`Admission do not ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Admission do not already exists`);
     }
     const note = yield (0, doctor_ward_round_dao_1.CreateDoctorWardRoundDao)({
         admissionId,

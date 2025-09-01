@@ -29,7 +29,7 @@ function readallpathograph(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pathograph data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createpathograph(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create pathograph");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonepathograph(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve pathograph data");
         }
     });
 }
@@ -71,7 +71,7 @@ function updatepathograph(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pathograph");
         }
     });
 }
@@ -90,7 +90,7 @@ function updatepathographquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update pathograph");
         }
     });
 }

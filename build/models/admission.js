@@ -15,6 +15,14 @@ const admissionSchema = new mongoose_1.Schema({
         ref: "Wardmanagement",
         default: null,
     },
+    referredIn: {
+        type: Boolean,
+        default: false, // false = not referred, true = referred-in
+    },
+    referredFrom: {
+        type: String,
+        default: null, // optional: store hospital/clinic/doctor name
+    },
     previousward: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Wardmanagement",
@@ -51,6 +59,9 @@ const admissionSchema = new mongoose_1.Schema({
         required: true
     },
     staffname: {
+        type: String
+    },
+    dischargeReason: {
         type: String
     },
     status: {

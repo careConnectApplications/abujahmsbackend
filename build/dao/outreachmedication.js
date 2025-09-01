@@ -29,7 +29,7 @@ function readalloutreachmedication(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve outreach medication data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createoutreachmedication(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create outreach medication");
         }
     });
 }
@@ -54,7 +54,7 @@ function readoneoutreachmedication(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve outreach medication data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updateoutreachmedication(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update outreach medication");
         }
     });
 }
@@ -92,7 +92,7 @@ function updateoutreachmedicationbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update outreach medication");
         }
     });
 }
