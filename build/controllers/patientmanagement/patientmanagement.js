@@ -65,6 +65,7 @@ const patientmanagement_1 = require("../../dao/patientmanagement");
 const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const patientmanagement_helper_1 = require("./patientmanagement.helper");
+const clinics_1 = require("../../dao/clinics");
 //search patients 
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -199,7 +200,7 @@ function bulkuploadhmopatients(req, res) {
                     const foundUser:any =  await readonepatient({phoneNumber},{},'','');
                     //category
                     if(foundUser && phoneNumber !== configuration.defaultphonenumber){
-                        throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+                        throw new Error(`Patient already exists`);
              
                     }
                         */
@@ -242,7 +243,7 @@ function updateauthorizationcode(req, res) {
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const appointmentid = String(Date.now());
-        const { dateOfBirth, phoneNumber, isHMOCover, alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature } = req.body;
+        const { unit, clinic, dateOfBirth, phoneNumber, isHMOCover, alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature, appointmentdate, appointmentcategory, appointmenttype } = req.body;
         const clinicalInformation = {
             bloodGroup, genotype, bp, heartRate, temperature
         };
@@ -251,8 +252,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // chaorten the MRN to alphanumeric 
         req.body.MRN = uniqunumber;
         req.body.password = config_1.default.defaultPassword;
-        req.body.appointmentcategory = config_1.default.category[3];
-        req.body.appointmenttype = config_1.default.category[3];
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
@@ -278,14 +277,10 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const foundUser = yield (0, patientmanagement_1.readonepatient)({ phoneNumber }, selectquery, '', '');
         //category
         if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
-            throw new Error(`Patient ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient already exists`);
         }
-        // fetch prices
-        const [newRegistrationPrice, annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice,] = yield Promise.all([
-            (0, price_1.readoneprice)({
-                servicecategory: config_1.default.category[3],
-                servicetype: config_1.default.category[3],
-            }),
+        // fetch prices for optional services only
+        const [annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice,] = yield Promise.all([
             (0, price_1.readoneprice)({
                 servicecategory: config_1.default.category[8],
                 servicetype: config_1.default.category[8],
@@ -295,8 +290,23 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 servicetype: config_1.default.category[9],
             }),
         ]);
-        if (!newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
-            throw new Error(`Price for ${config_1.default.category[3]} or ${config_1.default.category[8]} or ${config_1.default.category[9]} is not set`);
+        if (!annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
+            throw new Error(`Price for ${config_1.default.category[8]} or ${config_1.default.category[9]} is not set`);
+        }
+        // Fetch appointment price if appointment details are provided
+        let appointmentPrice = null;
+        if (appointmentdate && appointmentcategory && appointmenttype) {
+            appointmentPrice = yield (0, price_1.readoneprice)({
+                servicecategory: appointmentcategory,
+                servicetype: appointmenttype,
+            });
+            if (!appointmentPrice) {
+                throw new Error(`Price for ${appointmentcategory}/${appointmenttype} is not set`);
+            }
+            const foundclinic = yield (0, clinics_1.readoneclinic)({ clinic }, {});
+            if (!foundclinic || !foundclinic.category || !unit)
+                throw new Error("Clinic invalid or missing category or missing unit");
+            req.body.category = foundclinic.category;
         }
         // pick strategy
         const strategy = (0, patientmanagement_helper_1.selectPatientStrategy)(req.body.isHMOCover);
@@ -304,9 +314,9 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const result = yield context.execute({
             reqBody: req.body,
             appointmentid,
-            newRegistrationPrice,
             annualsubscriptionnewRegistrationPrice,
             cardfeenewRegistrationPrice,
+            appointmentPrice,
         });
         res.status(200).json({ queryresult: result, status: true });
     }
@@ -347,7 +357,7 @@ function getallpatients(req, res) {
             //var settings = await configuration.settings();
             var selectquery = {
                 "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-                "maritalStatus": 1, "disability": 1, "subscriptionPaidUntil": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
+                "maritalStatus": 1, "disability": 1, "subscriptionPaidUntil": 1, "subscriptionExpired": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
             };
             //var populatequery="payment";
             var populatequery = {
@@ -406,7 +416,7 @@ exports.updatepatients = (0, catchAsync_1.default)((req, res, next) => __awaiter
     const _Id = new mongoose_1.default.Types.ObjectId(id);
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const clinicalInformation = {
         bloodGroup, genotype, bp, heartRate, temperature
@@ -457,7 +467,7 @@ exports.updatePatientToHmo = (0, catchAsync_1.default)((req, res, next) => __awa
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
     /// fetch patient info
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     /// check if patient hmo is false
     if (foundPatient.isHMOCover === config_1.default.ishmo[1]) {
@@ -482,7 +492,7 @@ exports.updatePatientClinicalInformation = (0, catchAsync_1.default)((req, res, 
     const { _id: userId } = (req.user).user;
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: _Id }, {}, '', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const clinicalInformation = {
         bloodGroup, genotype, bp, heartRate, temperature

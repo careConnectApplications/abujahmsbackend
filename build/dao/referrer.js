@@ -30,7 +30,7 @@ function readallreferrer(query, selectquery, populatequery, populatesecondquery)
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve referrer data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createreferrer(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create referrer");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonereferrer(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve referrer data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatereferrer(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update referrer");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatereferrerbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update referrer");
         }
     });
 }
@@ -104,7 +104,7 @@ function readreferreraggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update referrer");
         }
     });
 }

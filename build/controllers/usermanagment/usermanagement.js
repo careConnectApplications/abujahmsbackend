@@ -179,7 +179,7 @@ function bulkuploadusers(req, res) {
                     (0, otherservices_1.validateinputfaulsyvalue)({ email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails });
                     const foundUser = yield (0, users_1.readone)({ email });
                     if (foundUser) {
-                        throw new Error(`${email} ${config_1.default.error.erroralreadyexit}`);
+                        throw new Error(`${email} already exists`);
                     }
                     var roleId = (config_1.default.roles).filter((e) => e.role == role)[0].roleId;
                     userslist[i].roleId = roleId;

@@ -29,7 +29,7 @@ function readallvitalsignscores(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve vital sign score data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createvitalsignscore(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create vital sign score");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonevitalsignscore(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve vital sign score data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatevitalsignscore(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update vital sign score");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatevitalsignscorequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update vital sign score");
         }
     });
 }

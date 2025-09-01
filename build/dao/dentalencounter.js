@@ -35,7 +35,7 @@ function readAllDentalEncounters(query_1, selectquery_1, populatequery_1, popula
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve dental encounter data");
         }
     });
 }
@@ -48,7 +48,7 @@ function createDentalEncounter(input) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create dental encounter");
         }
     });
 }
@@ -60,7 +60,7 @@ function readOneDentalEncounter(query, selectquery) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve dental encounter data");
         }
     });
 }
@@ -76,7 +76,7 @@ function updateDentalEncounterById(id, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update dental encounter");
         }
     });
 }
@@ -94,7 +94,7 @@ function updateDentalEncounterByQuery(query, reqbody) {
         }
         catch (err) {
             console.error(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update dental encounter");
         }
     });
 }

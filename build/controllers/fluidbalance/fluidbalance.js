@@ -93,7 +93,7 @@ exports.createfluidbalancev1 = (0, catchAsync_1.default)((req, res, next) => __a
     const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
     //console.log(admissionrecord);   
     if (!admissionrecord) {
-        throw new Error(`Admission do not ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Admission do not already exists`);
     }
     const balance = (inputamount || 0) - (outputamount || 0);
     const newFluidRecord = {
@@ -125,7 +125,7 @@ function updatefluidbalance(req, res) {
             const fluidRecord = yield (0, fluidbalance_1.readonefluidbalances)({ _id: id }, {});
             //console.log(admissionrecord);   
             if (!fluidRecord) {
-                throw new Error(`fluid record do not ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`fluid record do not already exists`);
             }
             const balance = (inputamount || 0) - (outputamount || 0);
             const newFluidRecord = {
@@ -168,7 +168,7 @@ exports.createfluidbalance = (0, catchAsync_1.default)((req, res, next) => __awa
     }
     const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
     if (!admissionrecord) {
-        return next(new errors_1.ApiError(404, `Admission do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Admission do not already exists`));
     }
     let newFluidRecord = [];
     for (const record of fluidRecords) {

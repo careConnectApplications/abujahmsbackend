@@ -51,7 +51,7 @@ const createpathographs = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, pathograph_1.createpathograph)({ patient: patientrecord._id, selectdate, temperature, pulse, bloodpressuresystolic, bloodpressurediastolic, respiratoryrate, foetalheartrate, liquor, moulding, cervicaldilationb, descentofhead, contraction, doseofoxytocinadministered, urineprotein, urineacetone, urinevolume, effecement, staffname });
         res.status(200).json({ queryresult, status: true });

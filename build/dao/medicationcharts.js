@@ -29,7 +29,7 @@ function readallmedicationcharts(query, selectquery, populatequery, populateseco
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve medication chart data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createmedicationcharts(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create medication chart");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonemedicationcharts(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve medication chart data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatemedicationcharts(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update medication chart");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatemedicationyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update medication chart");
         }
     });
 }

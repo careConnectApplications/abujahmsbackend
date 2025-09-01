@@ -29,7 +29,7 @@ function readallanc(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ANC data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createanc(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create ANC");
         }
     });
 }
@@ -54,7 +54,7 @@ function readoneanc(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ANC data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updateanc(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ANC");
         }
     });
 }
@@ -92,7 +92,7 @@ function updateancbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ANC");
         }
     });
 }

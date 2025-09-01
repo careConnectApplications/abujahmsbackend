@@ -40,7 +40,7 @@ var createtestcomponents = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const foundtestname = yield (0, testcomponent_1.readonetestcomponent)({ testname }, '');
         //update servicetype for New Patient Registration
         if (foundtestname) {
-            throw new Error(`Test name ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Test name already exists`);
         }
         const queryresult = yield (0, testcomponent_1.createtestcomponent)({ testname, subcomponients });
         const { firstName, lastName } = (req.user).user;
@@ -136,7 +136,7 @@ export async function gettestcomponent(req:Request, res:any){
 if(foundservicetype){
           for(var i =0; i < servicetype.length; i++){
             if((foundservicetype.type).includes(servicetype[i]))
-            throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+            throw new Error(`${servicetype[i]} already exists`);
 
         }
   export async function updatepricestatus(req:any, res:any){

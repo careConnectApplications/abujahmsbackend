@@ -23,10 +23,10 @@ const admissions_1 = require("../../dao/admissions");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const wardmanagement_1 = require("../../dao/wardmanagement");
 const clinics_1 = require("../../dao/clinics");
-const payment_1 = require("../../dao/payment");
 const bed_1 = require("../../dao/bed");
-const payment_2 = require("../../dao/payment");
+const payment_1 = require("../../dao/payment");
 const hmocategorycover_1 = require("../../dao/hmocategorycover");
+const admission_helper_1 = require("./admission.helper");
 const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const { ObjectId } = mongoose_1.default.Types;
@@ -38,18 +38,18 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //accept _id from request
         const { id } = req.params;
         //doctorname,patient,appointment
-        var { alldiagnosis, referedward, admittospecialization, referddate, appointmentid, bed_id } = req.body;
+        var { alldiagnosis, referedward, admittospecialization, referddate, appointmentid, bed_id, referredIn, referredFrom } = req.body;
         (0, otherservices_1.validateinputfaulsyvalue)({ id, alldiagnosis, referedward, admittospecialization, referddate, bed_id });
         //confirm ward
         const referedwardid = new ObjectId(referedward);
         const bed = new ObjectId(bed_id);
         const foundWard = yield (0, wardmanagement_1.readonewardmanagement)({ _id: referedwardid }, '');
         if (!foundWard) {
-            throw new Error(`Ward doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Ward does not exist`);
         }
         const foundBed = yield (0, bed_1.readonebed)({ _id: bed, ward: foundWard._id }, '');
         if (!foundBed) {
-            throw new Error(`Bed doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Bed does not exist`);
         }
         //validate bed status
         if (foundBed.status == config_1.default.bedstatus[1]) {
@@ -64,27 +64,27 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             console.log("appointment", appointment);
             if (!appointment) {
                 //create an appointment
-                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Appointment does not exist`);
             }
         }
         //confrim admittospecialization
         //validate specialization
         const foundSpecilization = yield (0, clinics_1.readoneclinic)({ clinic: admittospecialization }, '');
         if (!foundSpecilization) {
-            throw new Error(`Specialization doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Specialization does not exist`);
         }
         //find the record in patient and validate
         var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
         if (!patient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
         }
         //check that patient have not been admitted
         var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
         if (findAdmission) {
-            throw new Error(`Patient Admission ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient Admission already exists`);
         }
         //create admission
-        var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id, admissionid, bed });
+        var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id, admissionid, bed, referredIn, referredFrom });
         // Update ward and bed status simultaneously using Promise.all
         yield Promise.all([
             (0, wardmanagement_1.updatewardmanagement)(referedwardid, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
@@ -141,68 +141,26 @@ function getalladmissionbypatient(req, res) {
 function updateadmissionstatus(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = req.params;
-        var { status, transfterto, bed_id } = req.body;
-        if (transfterto) {
-            transfterto = new ObjectId(transfterto);
-        }
-        if (bed_id) {
-            bed_id = new ObjectId(bed_id);
-        }
+        const { status } = req.body;
         try {
-            //validate that status is included in te status choice
-            if (!["transfered", "discharged"].includes(status))
-                throw new Error(`${status} status doesnt ${config_1.default.error.erroralreadyexit}`);
-            //if status = discharge
-            const response = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
-            // check for availability of bed spaces in ward only for admitted
-            if (!response) {
-                throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
+            if (![config_1.default.admissionstatus[3], config_1.default.admissionstatus[5]].includes(status)) {
+                throw new Error(`${status} is not a valid admission status`);
             }
-            var transftertoward;
-            var foundBed;
-            console.log("transftertoward", transfterto);
-            if (transfterto) {
-                console.log("insidetransftertoward", transfterto);
-                transftertoward = yield (0, wardmanagement_1.readonewardmanagement)({ _id: transfterto }, {});
-                foundBed = yield (0, bed_1.readonebed)({ _id: bed_id, ward: transftertoward._id, status: config_1.default.bedstatus[0], isDeleted: false }, '');
+            //validate reason for discharge
+            if (status === config_1.default.admissionstatus[5] && !req.body.dischargeReason) {
+                throw new Error("Discharge reason must be provided for discharged patients");
             }
-            if (transfterto && (status != config_1.default.admissionstatus[3] || !transftertoward || !foundBed))
-                throw new Error(`Ward or Bed to be transfered donot  ${config_1.default.error.erroralreadyexit} or ${transftertoward.wardname}  ${config_1.default.error.errorvacantspace}`);
-            //validate if permitted base on status
-            //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-            if (status == config_1.default.admissionstatus[5]) {
-                //check that the patient is not owing
-                var paymentrecord = yield (0, payment_1.readallpayment)({ paymentreference: response.admissionid, status: { $ne: config_1.default.status[3] } }, '');
-                if ((paymentrecord.paymentdetails).length > 0) {
-                    throw new Error(config_1.default.error.errorpayment);
-                }
-                //increase vancant and reduce occupied for current ward update appointment
-                yield Promise.all([
-                    (0, wardmanagement_1.updatewardmanagement)(response.referedward, { $inc: { occupiedbed: -1, vacantbed: 1 } }),
-                    (0, bed_1.updatebed)(response.bed, { status: config_1.default.bedstatus[0] }),
-                    (0, admissions_1.updateadmission)(id, { status })
-                ]);
-                //update bed
-            }
-            // status is equal to  transfer reduce target ward and increase 
-            if (status == config_1.default.admissionstatus[3]) {
-                ////increase vancant and reduce occupied for current ward use parallelism
-                yield Promise.all([
-                    (0, wardmanagement_1.updatewardmanagement)(response.referedward, { $inc: { occupiedbed: -1, vacantbed: 1 } }),
-                    (0, wardmanagement_1.updatewardmanagement)(transfterto, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
-                    (0, bed_1.updatebed)(response.bed, { status: config_1.default.bedstatus[0] }),
-                    (0, bed_1.updatebed)(bed_id, { status: config_1.default.bedstatus[1] }),
-                    (0, admissions_1.updateadmission)(id, { bed: bed_id, previousward: response.referedward, referedward: transfterto }),
-                ]);
-            }
-            const queryresult = "Succefully updated the admission status";
-            res.status(200).json({
-                queryresult,
-                status: true
-            });
+            const admission = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, "");
+            if (!admission)
+                throw new Error("Admission not found");
+            const strategy = admission_helper_1.strategies[status];
+            if (!strategy)
+                throw new Error(`No strategy found for status: ${status}`);
+            yield strategy(admission, Object.assign(Object.assign({}, req.body), { id }));
+            res.status(200).json({ status: true, message: "Successfully updated admission status" });
         }
         catch (e) {
-            console.log(e);
+            console.error(e);
             res.status(403).json({ status: false, msg: e.message });
         }
     });
@@ -253,7 +211,7 @@ exports.addBedFee = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
     // Read admission (excluding discharged/completed status)
     const findAdmission = yield (0, admissions_1.readoneadmission)({ _id: id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, "patient");
     if (!findAdmission) {
-        throw new Error(`Patient admission doesnt ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Patient admission does not exist`);
     }
     //validate bedfee
     if (findAdmission.bedfee)
@@ -270,7 +228,7 @@ exports.addBedFee = (0, catchAsync_1.default)((req, res, next) => __awaiter(void
     let hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
     let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(bedfee));
     if (amount > 0)
-        yield (0, payment_2.createpayment)({
+        yield (0, payment_1.createpayment)({
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
             MRN: patient === null || patient === void 0 ? void 0 : patient.MRN,

@@ -27,7 +27,7 @@ function countadmission(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve admission data");
         }
     });
 }
@@ -55,7 +55,7 @@ function createadmission(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create admission");
         }
     });
 }

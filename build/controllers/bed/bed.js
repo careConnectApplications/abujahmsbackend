@@ -30,12 +30,12 @@ exports.createbeds = (0, catchAsync_1.default)((req, res, next) => __awaiter(voi
     (0, otherservices_1.validateinputfaulsyvalue)({ wardid });
     const foundWard = yield (0, wardmanagement_1.readonewardmanagement)({ _id: id }, '');
     if (!foundWard) {
-        throw new Error(`Ward doesnt ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Ward does not exist`);
     }
     // Check for existing bed with same number in the same ward
     const existing = yield (0, bed_1.readonebed)({ bednumber, ward: id }, '');
     if (existing) {
-        throw new Error(`Bed ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Bed already exists`);
     }
     const queryresult = yield (0, bed_1.createbed)({
         bednumber,
@@ -101,7 +101,7 @@ exports.updatebeds = (0, catchAsync_1.default)((req, res, next) => __awaiter(voi
     (0, otherservices_1.validateinputfaulsyvalue)({ bednumber });
     const existing = yield (0, bed_1.readonebed)({ bednumber }, '');
     if (existing) {
-        throw new Error(`Bed ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Bed already exists`);
     }
     const queryresult = yield (0, bed_1.updatebed)(id, {
         bednumber

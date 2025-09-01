@@ -44,7 +44,7 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         //search patient
         var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
         if (!patient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
         }
         var appointment;
         if (appointmentid) {
@@ -52,7 +52,7 @@ var pharmacyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
             if (!appointment) {
                 //create an appointment
-                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Appointment does not exist`);
             }
         }
         else {
@@ -93,7 +93,7 @@ function readdrugprice(req, res) {
             (0, otherservices_1.validateinputfaulsyvalue)({ drug, pharmacy, qty });
             var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
             if (!patient) {
-                throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+                throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
             }
             var orderPrice = yield (0, price_1.readoneprice)({ servicetype: drug, servicecategory: config_1.default.category[1], pharmacy });
             if (!orderPrice) {
@@ -122,7 +122,7 @@ const pharmacyorderwithoutconfirmation = (req, res) => __awaiter(void 0, void 0,
         (0, otherservices_1.validateinputfaulsyvalue)({ id, products });
         const patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, "insurance", "");
         if (!patient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
         }
         const appointment = {
             _id: id,
@@ -615,7 +615,7 @@ const dispense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         /*
         if(!orderPrice.qty || orderPrice.qty <=0){
-          throw new Error(`${response.prescription} ${configuration.error.erroravailability} or qty not defined in inventory`);
+          throw new Error(`${response.prescription} ${configuration.error.erroravailability} or quantity not defined in inventory`);
       
         }
           */

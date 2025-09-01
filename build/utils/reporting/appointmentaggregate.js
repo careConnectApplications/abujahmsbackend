@@ -6,6 +6,54 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.appointmentaggregatereports = void 0;
 const config_1 = __importDefault(require("../../config"));
 const appointmentaggregatereports = (startdate, enddate) => {
+    const outpatientdepartmentpipeline = [
+        {
+            $match: {
+                createdAt: { $gte: startdate, $lt: enddate },
+            },
+        },
+        {
+            $lookup: {
+                from: "patientsmanagements", // collection name of Patientsmanagement
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientInfo",
+            },
+        },
+        { $unwind: "$patientInfo" },
+        {
+            $project: {
+                clinic: 1,
+                appointmenttype: 1,
+                category: 1,
+                gender: "$patientInfo.gender",
+                patientCreatedAt: "$patientInfo.createdAt",
+                patient: "$patient",
+            },
+        },
+        {
+            $facet: {
+                newAdult: [
+                    { $match: { category: config_1.default.cliniccategory[0], patientCreatedAt: { $gte: startdate, $lt: enddate } } },
+                    { $group: { _id: { patient: "$patient", gender: "$gender" } } },
+                    { $group: { _id: "$_id.gender", count: { $sum: 1 } } },
+                ],
+                newPaediatrics: [
+                    { $match: { category: config_1.default.cliniccategory[1], patientCreatedAt: { $gte: startdate, $lt: enddate }, } },
+                    { $group: { _id: { patient: "$patient", gender: "$gender" } } },
+                    { $group: { _id: "$_id.gender", count: { $sum: 1 } } },
+                ],
+                familyMedicine: [
+                    { $match: { category: config_1.default.cliniccategory[0] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                popd: [
+                    { $match: { category: config_1.default.cliniccategory[1] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+            },
+        },
+    ];
     const appointmentaggregatescheduled = [
         {
             $match: { $and: [{ status: config_1.default.status[5] }, {
@@ -106,6 +154,86 @@ const appointmentaggregatereports = (startdate, enddate) => {
             }
         }
     ];
-    return { appointmentaggregatescheduled, appointmentaggregatecomplete, appointmentaggregateinprogress, appointmentaggregatetotalnumberofappointments, clinicalaggregate };
+    const accidentEmergencyRecordsPipeline = [
+        {
+            $match: {
+                createdAt: { $gte: startdate, $lt: enddate },
+                category: config_1.default.cliniccategory[2], // Assuming "Accident & Emergency" is represented by "Adult"
+            },
+        },
+        {
+            $lookup: { from: "patientsmanagements",
+                localField: "patient",
+                foreignField: "_id",
+                as: "patientInfo",
+            },
+        },
+        { $unwind: "$patientInfo" },
+        {
+            $project: {
+                appointmenttype: 1,
+                gender: "$patientInfo.gender",
+                category: 1,
+                "clinicalencounter.outcome": 1,
+                referredIn: 1,
+            },
+        },
+        {
+            $facet: {
+                accidentAndEmergencyAttendance: [
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                roadTrafficAccident: [
+                    { $match: { accidentType: { $ne: null } } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                epuAttendance: [
+                    { $match: { unit: config_1.default.unitcategory[0] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                /*
+                dressing: [
+                  { $match: { appointmenttype: "Dressing" } },
+                  { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                */
+                aAndEDeath: [
+                    { $match: { "clinicalencounter.outcome": config_1.default.encounterplanoutcome[0] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                epuDeath: [
+                    {
+                        $match: {
+                            unit: config_1.default.unitcategory[0],
+                            "clinicalencounter.outcome": config_1.default.encounterplanoutcome[0],
+                        },
+                    },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                broughtInDeath: [
+                    { $match: { arrivalMode: config_1.default.arrivalMode[3] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                bidInEpu: [
+                    {
+                        $match: {
+                            arrivalMode: config_1.default.arrivalMode[3],
+                            unit: config_1.default.unitcategory[0]
+                        },
+                    },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                outpatientsReferredIn: [
+                    { $match: { arrivalMode: config_1.default.arrivalMode[2] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+                outpatientsReferredOut: [
+                    { $match: { "clinicalencounter.outcome": config_1.default.encounterplanoutcome[1] } },
+                    { $group: { _id: "$gender", count: { $sum: 1 } } },
+                ],
+            },
+        },
+    ];
+    return { appointmentaggregatescheduled, appointmentaggregatecomplete, appointmentaggregateinprogress, appointmentaggregatetotalnumberofappointments, clinicalaggregate, outpatientdepartmentpipeline, accidentEmergencyRecordsPipeline };
 };
 exports.appointmentaggregatereports = appointmentaggregatereports;

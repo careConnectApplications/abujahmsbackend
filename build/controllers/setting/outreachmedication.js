@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createoutreachmedications = void 0;
 exports.getalloutreachmedications = getalloutreachmedications;
 exports.updateoutreachmedications = updateoutreachmedications;
-const config_1 = __importDefault(require("../../config"));
 const outreachmedication_1 = require("../../dao/outreachmedication");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
@@ -28,7 +24,7 @@ var createoutreachmedications = (req, res) => __awaiter(void 0, void 0, void 0, 
         // validate Outreachmedication
         const foundOutreachmedicationname = yield (0, outreachmedication_1.readoneoutreachmedication)({ outreachmedicationname }, '');
         if (foundOutreachmedicationname) {
-            throw new Error(`Outreachmedication ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Outreachmedication already exists`);
         }
         const queryresult = yield (0, outreachmedication_1.createoutreachmedication)({ outreachmedicationname, outreachmedicationid });
         const { firstName, lastName } = (req.user).user;

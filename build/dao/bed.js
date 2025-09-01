@@ -28,7 +28,7 @@ function createbed(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create bed");
         }
     });
 }
@@ -42,7 +42,7 @@ function readallbeds(query, selectquery, populate) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve bed data");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonebed(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve bed data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updatebed(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update bed");
         }
     });
 }
@@ -90,7 +90,7 @@ function updatebedbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update bed");
         }
     });
 }

@@ -29,7 +29,7 @@ function readallancfollowup(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ANC follow-up data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createancfollowup(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create ANC follow-up");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneancfollowup(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve ANC follow-up data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updateancfollowup(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ANC follow-up");
         }
     });
 }
@@ -91,7 +91,7 @@ function updateancfollowupquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update ANC follow-up");
         }
     });
 }

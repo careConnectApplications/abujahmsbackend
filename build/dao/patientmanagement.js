@@ -35,7 +35,7 @@ function countpatient(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve patient data");
         }
     });
 }
@@ -48,7 +48,7 @@ function deletePatietsByCondition(query) {
             return result;
         }
         catch (err) {
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve patient data");
         }
     });
 }
@@ -62,7 +62,7 @@ function readallpatient(query, selectquery, populatequery, populateappointmentqu
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve patient data");
         }
     });
 }
@@ -80,7 +80,7 @@ function readallpatientpaginated(query, selectquery, populatequery, populateappo
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve patient data");
         }
     });
 }
@@ -93,7 +93,7 @@ function createpatient(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create patient");
         }
     });
 }
@@ -105,7 +105,7 @@ function readonepatient(query, selectquery, populatequery, appoitmentpopulateque
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve patient data");
         }
     });
 }
@@ -129,7 +129,7 @@ function updatepatient(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update patient");
         }
     });
 }
@@ -148,7 +148,7 @@ function updatepatientbyanyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update patient");
         }
     });
 }
@@ -166,7 +166,7 @@ function updatepatientmanybyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update patient");
         }
     });
 }
@@ -178,7 +178,7 @@ function createpatientifnotexit(filterinput, input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create patient");
         }
     });
 }

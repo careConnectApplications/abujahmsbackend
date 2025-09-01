@@ -23,28 +23,17 @@ const audit_1 = require("../../dao/audit");
 //add patiient
 var createclinics = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.body);
-        const { clinic, type } = req.body;
+        const { clinic, type, category } = req.body;
         const { firstName, lastName } = (req.user).user;
         var actor = `${firstName} ${lastName}`;
-        (0, otherservices_1.validateinputfaulsyvalue)({ clinic, type });
+        (0, otherservices_1.validateinputfaulsyvalue)({ clinic, type, category });
         var id = `${clinic[0]}${(0, otherservices_1.generateRandomNumber)(5)}${clinic[clinic.length - 1]}`;
-        //validate that category is in the list of accepted category
-        //get token from header
-        /*
-        var settings = await configuration.settings();
-        if(req.body.servicecategory == settings.servicecategory[0]){
-          req.body.servicetype=settings.servicecategory[0]
-        }
-          */
-        //validation
         const foundClinic = yield (0, clinics_1.readoneclinic)({ clinic }, '');
         //update servicetype for New Patient Registration
-        console.log(foundClinic);
         if (foundClinic) {
-            throw new Error(`clinic ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`clinic already exists`);
         }
-        const queryresult = yield (0, clinics_1.createclinic)({ clinic, type, id });
+        const queryresult = yield (0, clinics_1.createclinic)({ clinic, type, id, category });
         //create audit log
         yield (0, audit_1.createaudit)({ action: "Created Clinic/Department/Pharmacy", actor, affectedentity: clinic });
         res.status(200).json({ queryresult, status: true });
@@ -92,11 +81,11 @@ function updateclinics(req, res) {
         try {
             //get id
             const { id } = req.params;
-            const { clinic, type } = req.body;
+            const { clinic, type, category } = req.body;
             const { firstName, lastName } = (req.user).user;
             var actor = `${firstName} ${lastName}`;
-            (0, otherservices_1.validateinputfaulsyvalue)({ clinic, id, type });
-            var queryresult = yield (0, clinics_1.updateclinic)(id, { clinic, type });
+            (0, otherservices_1.validateinputfaulsyvalue)({ clinic, id, type, category });
+            var queryresult = yield (0, clinics_1.updateclinic)(id, { clinic, type, category });
             yield (0, audit_1.createaudit)({ action: "Update Clinic/Department/Pharmacy", actor, affectedentity: clinic });
             res.status(200).json({
                 queryresult,
@@ -109,24 +98,3 @@ function updateclinics(req, res) {
         }
     });
 }
-/*
-  export async function updatepricestatus(req:any, res:any){
-    const {id} = req.params;
-    try{
-        const response = await readoneprice({_id:id});
-       const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-        const queryresult:any =await updateprice(id,{status});
-        res.status(200).json({
-            queryresult,
-            status:true
-          });
-
-    }
-    catch(e:any){
-        console.log(e);
-      res.status(403).json({status: false, msg:e.message});
-
-    }
-
-}
-*/

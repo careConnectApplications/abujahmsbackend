@@ -29,7 +29,7 @@ function readallanaethesias(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve anaesthesia data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createanaethesia(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create anaesthesia");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneanaethesia(query, selectquery, populatequery, populatequerysecon
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve anaesthesia data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updateanaethesia(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update anaesthesia");
         }
     });
 }
@@ -93,7 +93,7 @@ function updateanaethesiaquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update anaesthesia");
         }
     });
 }

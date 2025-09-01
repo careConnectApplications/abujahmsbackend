@@ -32,7 +32,7 @@ function getallEyeModules(query, selectquery, populatequery, next) {
         }
         catch (err) {
             console.log(err);
-            return next(new errors_1.ApiError(401, config_1.default.error.erroruserread));
+            return next(new errors_1.ApiError(401, "Failed to retrieve eye module data"));
         }
     });
 }
@@ -63,7 +63,7 @@ function updateEyeModule(id, reqbody, next) {
             return doc;
         }
         catch (err) {
-            return next(new errors_1.ApiError(401, config_1.default.error.erroruserupdate));
+            return next(new errors_1.ApiError(401, "Failed to update eye module"));
         }
     });
 }
@@ -83,7 +83,7 @@ function updateappointmentbyquery(query, reqbody, next) {
         }
         catch (err) {
             console.log(err);
-            return next(new errors_1.ApiError(409, config_1.default.error.erroruserupdate));
+            return next(new errors_1.ApiError(409, "Failed to update eye module"));
         }
     });
 }
