@@ -42,7 +42,7 @@ export const createfamilyplanning = async (req:any, res:any) => {
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
       //console.log(admissionrecord);   
       if(!patientrecord){
-           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Patient does not exist`);
   
        }
     const queryresult=await createfamilyplannings({patient:patientrecord._id,weight,bloodpressuresystolic,parity,counsellingonfamilyplanning,counsellingonpostpartumfamilyplanning,firsttimemodernfamilyplanninguser,emergencycontraception,typeoffamilyplanningclient,oralpillsname,orapillsquantity,oralnewacceptor,oralrevisit,nameofinjectable,injectablequantity,selfinjection,injectableacceptor,injectablerevisit,typeofiud,iudinnewacceptor,iudinrevisit,iudoutnewacceptor,iudoutrevisit,typeofbarriermethods,barrierquantity,barriernewacceptor,barrierrevisit,typeofimplants,implantsinnewacceptor,implantsinrevisit,implantsoutnewacceptor,implantsoutrevisit,voluntorysterilization,naturalemthodsnewacceptorforcyclebeads,naturalemthodsrevisitforcyclebeads,naturalemthodsnewacceptorforothers,naturalemthodsrevisitforothers,referredoralpills,referredinjectable,referredip,referredintrauterinedevice,referredsurgicalreferred,referredmedicalreferred,staffname});

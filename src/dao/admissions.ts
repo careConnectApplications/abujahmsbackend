@@ -11,7 +11,7 @@ export async function countadmission(query:any) {
    
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve admission data");
   }
 };
   //read all patient history
@@ -33,7 +33,7 @@ export async function countadmission(query:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create admission");
 
     }
   }

@@ -52,7 +52,7 @@ export const createnursingcareplans = async (req:any, res:any) => {
       const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
       //console.log(admissionrecord);   
       if(!admissionrecord){
-           throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Admission does not exist`);
   
        }
     const queryresult=await createnursingcareplan({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,nursingdiagnosis,objectives,actionintervention,evaluation,staffname});

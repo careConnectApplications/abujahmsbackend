@@ -18,7 +18,7 @@ export const createDoctorWardNote = catchAsync(
         const admissionrecord: any = await readoneadmission({ _id: admissionId }, {}, '');
         //console.log(admissionrecord);   
         if (!admissionrecord) {
-            throw new Error(`Admission do not ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Admission do not already exists`);
         }
 
         const note = await CreateDoctorWardRoundDao({

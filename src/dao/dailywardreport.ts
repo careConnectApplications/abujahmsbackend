@@ -9,7 +9,7 @@ import configuration from "../config";
       return { dailywardreportsdetails, totaldailywardreportsdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve daily ward report data");
     }
   };
   export async function createdailywardreports(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create daily ward report");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve daily ward report data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return dailywardreport;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update daily ward report");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return dailywardreport;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update daily ward report");
 
     }
 

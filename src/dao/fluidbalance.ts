@@ -9,7 +9,7 @@ export async function readallfluidbalances(query: any, selectquery: any, populat
     return { fluidbalancesdetails, totalfluidbalancesdetails };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve fluid balance data");
   }
 };
 export async function createfluidbalances(input: any) {
@@ -20,7 +20,7 @@ export async function createfluidbalances(input: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create fluid balance");
 
   }
 }
@@ -31,7 +31,7 @@ export async function readonefluidbalances(query: any, selectquery: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve fluid balance data");
 
   }
 }
@@ -49,7 +49,7 @@ export async function updatefluidbalances(id: any, reqbody: any) {
     return fluidbalance;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update fluid balance");
 
   }
 
@@ -67,7 +67,7 @@ export async function updatefluidbalancequery(query: any, reqbody: any) {
     return fluidbalance;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update fluid balance");
 
   }
 
@@ -80,7 +80,7 @@ export async function createMultifluidbalances(input: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create fluid balance");
 
   }
 }

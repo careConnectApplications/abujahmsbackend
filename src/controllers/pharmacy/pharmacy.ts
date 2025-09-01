@@ -28,7 +28,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       var patient:any = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
       
@@ -39,7 +39,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       appointment = await readoneappointment({_id:appointmentid},{},'');
             if(!appointment){
               //create an appointment
-              throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+              throw new Error(`Appointment does not exist`);
 
           }
 
@@ -92,7 +92,7 @@ export var pharmacyorder= async (req:any, res:any) =>{
       var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
     
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
   
       }
       var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
@@ -132,7 +132,7 @@ export const pharmacyorderwithoutconfirmation = async (req: any, res: any) => {
 
     if (!patient) {
       throw new Error(
-        `Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`
+        `Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`
       );
     }
 
@@ -723,7 +723,7 @@ export const confirmpharmacyorder = async (req: any, res: any) => {
   }
   /*
   if(!orderPrice.qty || orderPrice.qty <=0){
-    throw new Error(`${response.prescription} ${configuration.error.erroravailability} or qty not defined in inventory`);
+    throw new Error(`${response.prescription} ${configuration.error.erroravailability} or quantity not defined in inventory`);
 
   }
     */

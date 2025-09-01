@@ -16,6 +16,14 @@ const admissionSchema = new Schema({
     ref: "Wardmanagement",
     default: null,
   },
+  referredIn: {
+      type: Boolean,
+      default: false,   // false = not referred, true = referred-in
+    },
+  referredFrom: {
+      type: String,
+      default: null,    // optional: store hospital/clinic/doctor name
+    },
   previousward:
   {
     type: Schema.Types.ObjectId,
@@ -62,7 +70,11 @@ const admissionSchema = new Schema({
   staffname:
   {
     type: String
-  }, 
+  },
+  dischargeReason: {
+      type: String
+    },
+   
   status:{
     type: String,
     default: configuration.admissionstatus[1],

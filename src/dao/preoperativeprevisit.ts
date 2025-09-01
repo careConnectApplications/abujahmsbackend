@@ -10,7 +10,7 @@ import configuration from "../config";
       return { preoperativeprevisitdetails, totalpreoperativeprevisitdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pre-operative visit data");
     }
   };
   export async function createpreoperativeprevisit(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create pre-operative visit");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pre-operative visit data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return preoperativeprevisit;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pre-operative visit");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return preoperativeprevisit;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pre-operative visit");
 
     }
 

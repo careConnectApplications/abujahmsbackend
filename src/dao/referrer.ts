@@ -9,7 +9,7 @@ import configuration from "../config";
       return { referrerdetails, totalreferrerdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve referrer data");
     }
   };
   export async function createreferrer(input:any){
@@ -19,7 +19,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create referrer");
 
     }
   }
@@ -30,7 +30,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve referrer data");
 
     }
   }
@@ -50,7 +50,7 @@ import configuration from "../config";
       return referrer;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update referrer");
 
     }
 
@@ -68,7 +68,7 @@ import configuration from "../config";
       return referrer;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update referrer");
 
     }
 
@@ -81,6 +81,6 @@ import configuration from "../config";
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update referrer");
     }
     }

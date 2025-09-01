@@ -10,7 +10,7 @@ import configuration from "../config";
       return { foodgivendetails, totalfoodgivendetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve food administration data");
     }
   };
   export async function createfoodgiven(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create food administration");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve food administration data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return foodgiven;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update food administration");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return foodgiven;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update food administration");
 
     }
 

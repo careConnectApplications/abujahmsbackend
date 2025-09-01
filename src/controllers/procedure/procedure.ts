@@ -18,18 +18,18 @@ import { Response, NextFunction } from 'express';
 import configuration from "../../config";
 export const scheduleprocedureorder = catchAsync(async (req: any, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
+  let { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid,proceduretype } = req.body;
 
   const { firstName, lastName } = (req.user).user;
   const raiseby = `${firstName} ${lastName}`;
   const procedureid: string = String(Date.now());
 
-  validateinputfaulsyvalue({ id, procedure });
+  validateinputfaulsyvalue({ id, procedure,proceduretype });
 
   // find patient
   const foundPatient: any = await readonepatient({ _id: id }, {}, "", "");
   if (!foundPatient) {
-    throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient already exists`);
   }
 console.log("foundPatient", foundPatient?.insurance);
   // HMO coverage %
@@ -46,7 +46,7 @@ console.log("foundPatient", foundPatient?.insurance);
     appointmentid = new ObjectId(appointmentid);
     appointment = await readoneappointment({ _id: appointmentid }, {}, "");
     if (!appointment) {
-      throw new Error(`Appointment ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Appointment already exists`);
     }
   }
 
@@ -60,8 +60,7 @@ console.log("foundPatient", foundPatient?.insurance);
 
   const queryresult = await context.execute({
     id,
-    procedure,
-    clinic,
+    procedure,    clinic,
     indicationdiagnosisprocedure,
     appointmentdate,
     cptcodes,
@@ -71,6 +70,7 @@ console.log("foundPatient", foundPatient?.insurance);
     procedureid,
     foundPatient,
     hmopercentagecover,
+    proceduretype
   });
 
   res.status(200).json({ queryresult, status: true });
@@ -93,7 +93,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
     const foundPatient: any = await readonepatient({ _id: id }, {}, '', '');
     //category
     if (!foundPatient) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient does not exist`);
 
     }
     let insurance:any = await readonehmocategorycover({hmoId:foundPatient?.insurance, category:configuration.category[5]},{hmopercentagecover:1});
@@ -104,7 +104,7 @@ export var scheduleprocedureorder = async (req: any, res: any) => {
       appointment = await readoneappointment({ _id: appointmentid }, {}, '');
       if (!appointment) {
         //create an appointment
-        throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Appointment does not exist`);
 
       }
 
@@ -230,7 +230,7 @@ export async function updateprocedures(req: any, res: any) {
     //  var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
     /*
     if(!testsetting || testsetting.length < 1){
-      throw new Error(`${procedure} donot ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
+      throw new Error(`${procedure} does not ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
   }
       */
 

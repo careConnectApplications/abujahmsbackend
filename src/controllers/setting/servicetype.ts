@@ -27,7 +27,7 @@ export var createservicetypes = async (req:any,res:any) =>{
       
         if(foundservicetype){
          
-            throw new Error(`service category ${configuration.error.erroralreadyexit}`);
+            throw new Error(`service category already exists`);
 
         
       }
@@ -86,7 +86,7 @@ export async function updateservicetypes(req:any, res:any){
  /*
     for(var i =0; i < servicetype.length; i++){
       if((foundservicetype.type).includes(servicetype[i]))
-      throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+      throw new Error(`${servicetype[i]} already exists`);
 
   }
       */
@@ -134,7 +134,7 @@ export async function getpharmacyservicetype(req:Request, res:any){
 if(foundservicetype){
           for(var i =0; i < servicetype.length; i++){
             if((foundservicetype.type).includes(servicetype[i]))
-            throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+            throw new Error(`${servicetype[i]} already exists`);
 
         }
   export async function updatepricestatus(req:any, res:any){

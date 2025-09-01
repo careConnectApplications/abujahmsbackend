@@ -38,7 +38,7 @@ export const createpathographs = async (req:any, res:any) => {
       const patientrecord:any =  await readonepatient({_id:id},{},'','');    
       //console.log(admissionrecord);   
       if(!patientrecord){
-           throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Patient does not exist`);
   
        }
     const queryresult=await createpathograph({patient:patientrecord._id,selectdate,temperature,pulse,bloodpressuresystolic,bloodpressurediastolic,respiratoryrate,foetalheartrate,liquor,moulding,cervicaldilationb,descentofhead,contraction,doseofoxytocinadministered,urineprotein,urineacetone,urinevolume,effecement,staffname});

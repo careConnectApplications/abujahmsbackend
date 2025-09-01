@@ -9,7 +9,7 @@ import configuration from "../config";
       return { immunizationdetails, totalimmunizationdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve immunization data");
     }
   };
   export async function createimmunization(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create immunization");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve immunization data");
 
     }
   }
@@ -49,7 +49,7 @@ import configuration from "../config";
       return immunization;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update immunization");
 
     }
 
@@ -67,7 +67,7 @@ import configuration from "../config";
       return immunization;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update immunization");
 
     }
 

@@ -9,7 +9,7 @@ import configuration from "../config";
       return { inventorydetails, totalinventorydetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve inventory data");
     }
   };
   export async function createinventory(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create inventory");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve inventory data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return inventory;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update inventory");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return inventory;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update inventory");
 
     }
 

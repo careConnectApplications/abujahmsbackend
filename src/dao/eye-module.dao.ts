@@ -11,7 +11,7 @@ export async function getallEyeModules(query: any, selectquery: any, populateque
         return { eyedetails, totaleyedetails };
     } catch (err) {
         console.log(err);
-        return next(new ApiError(401, configuration.error.erroruserread));
+        return next(new ApiError(401, "Failed to retrieve eye module data"));
     }
 };
 
@@ -39,7 +39,7 @@ export async function updateEyeModule(id: any, reqbody: any, next: NextFunction)
 
         return doc;
     } catch (err) {
-        return next(new ApiError(401, configuration.error.erroruserupdate))
+        return next(new ApiError(401, "Failed to update eye module"))
     }
 
 }
@@ -57,7 +57,7 @@ export async function updateappointmentbyquery(query: any, reqbody: any, next: N
         return doc;
     } catch (err) {
         console.log(err);
-        return next(new ApiError(409, configuration.error.erroruserupdate));
+        return next(new ApiError(409, "Failed to update eye module"));
     }
 }
 

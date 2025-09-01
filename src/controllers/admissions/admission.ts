@@ -10,6 +10,7 @@ import {readallpayment} from "../../dao/payment";
 import {readonebed,updatebed} from "../../dao/bed";
 import {createpayment} from "../../dao/payment";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
+import { strategies } from "./admission.helper";
 
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
@@ -24,19 +25,19 @@ export var referadmission= async (req:any, res:any) =>{
       //accept _id from request
       const {id} = req.params;
       //doctorname,patient,appointment
-      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid,bed_id} = req.body;
+      var {alldiagnosis,referedward,admittospecialization, referddate,appointmentid,bed_id,referredIn,referredFrom} = req.body;
       validateinputfaulsyvalue({id,alldiagnosis,referedward,admittospecialization, referddate,bed_id});
       //confirm ward
       const referedwardid = new ObjectId(referedward);
       const bed = new ObjectId(bed_id);
       const foundWard:any =  await readonewardmanagement({_id:referedwardid},'');
       if(!foundWard){
-          throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Ward does not exist`);
 
       }
       const foundBed = await readonebed({_id:bed, ward:foundWard._id},'');
        if(!foundBed){
-          throw new Error(`Bed doesnt ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Bed does not exist`);
 
       }
       //validate bed status
@@ -53,7 +54,7 @@ export var referadmission= async (req:any, res:any) =>{
                    console.log("appointment",appointment);
                         if(!appointment){
                           //create an appointment
-                          throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+                          throw new Error(`Appointment does not exist`);
             
                       }
             
@@ -63,7 +64,7 @@ export var referadmission= async (req:any, res:any) =>{
       //validate specialization
           const foundSpecilization =  await readoneclinic({clinic:admittospecialization},'');
           if(!foundSpecilization){
-              throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
+              throw new Error(`Specialization does not exist`);
       
           }
 
@@ -72,20 +73,20 @@ export var referadmission= async (req:any, res:any) =>{
     var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
    
   //check that patient have not been admitted
   var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
-    throw new Error(`Patient Admission ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient Admission already exists`);
 
 }
 
 
 //create admission
-var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed});
+var admissionrecord:any = await createadmission({alldiagnosis,referedward,admittospecialization, referddate,doctorname:firstName + " " + lastName,appointment:id,patient:patient._id,admissionid,bed,referredIn,referredFrom});
 // Update ward and bed status simultaneously using Promise.all
 await Promise.all([
   updatewardmanagement(referedwardid, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
@@ -147,88 +148,33 @@ export async function getalladmissionbypatient(req:any, res:any){
 
 }
 //admited,to transfer,transfer,to discharge, discharge
-export async function updateadmissionstatus(req:any, res:any){
-  const {id} = req.params;
-  var {status, transfterto,bed_id} = req.body;
-  if (transfterto) {
-  transfterto = new ObjectId(transfterto);
-}
+export async function updateadmissionstatus(req: any, res: any) {
+  const { id } = req.params;
+  const { status } = req.body;
 
-if (bed_id) {
-  bed_id = new ObjectId(bed_id);
-}
-  try{
-    //validate that status is included in te status choice
-    if(![ "transfered",  "discharged"].includes(status))
-      throw new Error(`${status} status doesnt ${configuration.error.erroralreadyexit}`);
-
-    //if status = discharge
-    
-      const response = await readoneadmission({_id:id},{},'');
-      // check for availability of bed spaces in ward only for admitted
-      if(!response){
-          throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
-      }
-      
-     
-      var transftertoward:any;
-      var foundBed;
-      console.log("transftertoward",transfterto);
-     
-    if(transfterto){
-       console.log("insidetransftertoward",transfterto);
-            transftertoward= await readonewardmanagement({_id:transfterto},{});
-            foundBed=await readonebed({_id:bed_id, ward:transftertoward._id, status:configuration.bedstatus[0], isDeleted:false},'');
-
+  try {
+    if (![configuration.admissionstatus[3], configuration.admissionstatus[5]].includes(status)) {
+      throw new Error(`${status} is not a valid admission status`);
     }
-    if(transfterto && (status != configuration.admissionstatus[3] ||  !transftertoward || !foundBed)) throw new Error(`Ward or Bed to be transfered donot  ${configuration.error.erroralreadyexit} or ${transftertoward.wardname}  ${configuration.error.errorvacantspace}`);
-      
-      //validate if permitted base on status
-     //const status= response?.status == configuration.status[0]? configuration.status[1]: configuration.status[0];
-   
-      if(status == configuration.admissionstatus[5]){
-        //check that the patient is not owing
-        var paymentrecord:any = await readallpayment({paymentreference:response.admissionid,status:{$ne: configuration.status[3]}},'');
-        if((paymentrecord.paymentdetails).length > 0){
-          throw new Error(configuration.error.errorpayment);
-    
-        }
-        //increase vancant and reduce occupied for current ward update appointment
-        await Promise.all([
-          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
-          updatebed(response.bed,{status:configuration.bedstatus[0]}),
-          updateadmission(id,{status})
+    //validate reason for discharge
+    if (status === configuration.admissionstatus[5] && !req.body.dischargeReason) {
+      throw new Error("Discharge reason must be provided for discharged patients");
+    }
 
-        ]);
-        //update bed
-      }
-      // status is equal to  transfer reduce target ward and increase 
-      if(status == configuration.admissionstatus[3] ){
-        ////increase vancant and reduce occupied for current ward use parallelism
-         await Promise.all([
-         
-          updatewardmanagement(response.referedward,{$inc:{occupiedbed:-1,vacantbed:1}}),
-          updatewardmanagement(transfterto,{$inc:{occupiedbed:1,vacantbed:-1}}),
-          updatebed(response.bed,{status:configuration.bedstatus[0]}),
-          updatebed(bed_id,{status:configuration.bedstatus[1]}),
-          updateadmission(id,{bed:bed_id,previousward:response.referedward,referedward:transfterto}),
-         ]);
-      }
-    const queryresult="Succefully updated the admission status"; 
-      res.status(200).json({
-          queryresult,
-          status:true
-        }); 
+    const admission = await readoneadmission({ _id: id }, {}, "");
+    if (!admission) throw new Error("Admission not found");
 
+    const strategy = strategies[status];
+    if (!strategy) throw new Error(`No strategy found for status: ${status}`);
+
+    await strategy(admission, { ...req.body, id });
+
+    res.status(200).json({ status: true, message: "Successfully updated admission status" });
+  } catch (e: any) {
+    console.error(e);
+    res.status(403).json({ status: false, msg: e.message });
   }
-  catch(e:any){
-      console.log(e);
-    res.status(403).json({status: false, msg:e.message});
-
-  }
-
 }
-
 
 export const searchAdmissionRecords =catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
 
@@ -294,7 +240,7 @@ export const addBedFee = catchAsync(async (req: Request | any, res: Response, ne
       "patient"
     );
     if (!findAdmission) {
-      throw new Error(`Patient admission doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient admission does not exist`);
     }
     
     //validate bedfee

@@ -3,104 +3,28 @@ import { readwardaggregate, readclinicaggregate, readpaymentaggregate,readhmoagg
 import configuration from "../../config";
 export const settings = async function () {
     try {
-        const clinic: any = [
-
-            {
-                $group: {
-                    _id: "$clinic",  // Group by 'userId'
-
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",  // Rename _id to userId
-                    _id: 0           // Exclude _id
-                }
-            }
-
-
-        ];
-        const ward = [
-            {
-                $group: {
-                    _id: "$wardname",  // Group by 'userId'
-
-                }
-            },
-            {
-                $project: {
-                    wardname: "$_id",  // Rename _id to userId
-                    _id: 0           // Exclude _id
-                }
-            }
-
-        ];
-        const wards = await readwardaggregate(ward);
-        const clinics = await readclinicaggregate(clinic);
-        const wardNames = wards.map(ward => ward.wardname);
-        const clinicNames = clinics.map(clinicname => clinicname.clinic);
+       
+       
         //search pharmacy and spread the array
         const query = { type: configuration.clinictype[2] };
-         const pharmacyselection : any = [
-            {
-                $match:query
-            },
 
-            {
-                $group: {
-                    _id: "$clinic",  // Group by 'userId'
-
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",  // Rename _id to userId
-                    _id: 0           // Exclude _id
-                }
-            }
-
-
-        ];
-        const pharmacy = await readclinicaggregate(pharmacyselection);
-        const pharmacyNames = pharmacy.map((clinicname:any) => clinicname.clinic);
-        //get all hmos
-        const hmoselection : any = [
-            {
-                $group: {
-                    _id: "$hmoname",  // Group by 'userId'
-                    
-
-                }
-            },
-            {
-                $project: {
-                    hmoname: "$_id",  // Rename _id to userId
-                    _id: 0           // Exclude _id
-                }
-            }
-
-
-        ];
-        const hmo=await readhmoaggregate(hmoselection);
-        const hmoNames = hmo.map((hmoname:any) => hmoname.hmoname);
-        console.log(hmoNames);
-
+        
         //console.log(check2);
         const reports=[
-            {querytype:"financialreport",querygroup:[ "Appointment", "Lab","Patient Registration","Radiology","Procedure",...pharmacyNames]},
-            {querytype:"appointmentreport",querygroup:clinicNames},
-            {querytype:"admissionreport",querygroup:wardNames},
+            {querytype:"financialreport"},
+            {querytype:"outpatient"},
+            {querytype:"inpatient"},
+            {querytype:"labreport"},
+            {querytype:"procedurereport"},
+            {querytype:"pharmacyreport"},
+            {querytype:"radiologyreport"},
+            {querytype:"immunizationreport"},
+            {querytype:"deathreport"},
 
-            {querytype:"hmolabreport",querygroup:hmoNames},
-            {querytype:"hmoreportforprocedure",querygroup:hmoNames},
-            {querytype:"hmoreportforpharmacy",querygroup:hmoNames},
-            {querytype:"hmoappointmentreport",querygroup:hmoNames},
-            {querytype:"hmoradiologyreport",querygroup:hmoNames},
-            {querytype:"secondaryservicereport",querygroup:[ "Appointment", "Lab","Radiology","Procedure","All",...pharmacyNames]},
             
            // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
           ];
-        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning"];
+        const summary=["financialaggregate","cashieraggregate","appointmentaggregate","admissionaggregate","procedureaggregate","clinicalaggregate","hmoaggregate","nutritionaggregate","health facility attendance","inpatient care","immunization(Antigen received)","Immunization (Adverse Events Following Immunization, AEFI)","Family Planning","inpatients records","outpatients records","accident and emergency records","national health insurance services","lab investigation report","radiology diagnosis","operation","special consultative","immunization"];
           return {reports,summary};
     }
     catch (error: any) {

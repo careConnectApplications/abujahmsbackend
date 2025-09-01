@@ -11,7 +11,7 @@ import configuration from "../config";
       return { pricedetails, totalpricedetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve price data");
     }
   };
   export async function createmanyprice(filterinput:any,input:any){
@@ -26,7 +26,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create price");
 
     }
   }
@@ -37,7 +37,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create price");
 
     }
   }
@@ -48,7 +48,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve price data");
 
     }
   }
@@ -68,7 +68,7 @@ import configuration from "../config";
       return user;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update price");
 
     }
 

@@ -8,7 +8,7 @@ export async function createbed(input: any) {
     return await bed.save();
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create bed");
   }
 }
 
@@ -20,7 +20,7 @@ export async function readallbeds(query: any, selectquery: any, populate:any) {
     return { bedDetails, totalBeds };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve bed data");
   }
 }
 
@@ -30,7 +30,7 @@ export async function readonebed(query: any, selectquery: any) {
     return await Bed.findOne(query).select(selectquery);
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve bed data");
   }
 }
 
@@ -46,7 +46,7 @@ export async function updatebed(id: any, reqbody: any) {
     return bed;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update bed");
   }
 }
 
@@ -62,6 +62,6 @@ export async function updatebedbyquery(query: any, reqbody: any) {
     return bed;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update bed");
   }
 }

@@ -195,7 +195,7 @@ const patientSchema = new Schema(
     },
     subscriptionExpired: {
       type: Boolean,
-      default: null
+      default: true
     },
     status: {
       required: true,

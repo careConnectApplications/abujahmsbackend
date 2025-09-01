@@ -9,7 +9,7 @@ import configuration from "../config";
       return { deliverynotesdetails, totaldeliverynotesdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve delivery note data");
     }
   };
   export async function createdeliverynotes(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create delivery note");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve delivery note data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return deliverynote;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update delivery note");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return deliverynote;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update delivery note");
 
     }
 

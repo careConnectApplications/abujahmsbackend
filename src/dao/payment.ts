@@ -10,7 +10,7 @@ export async function readpaymentaggregate(input: any) {
   }
   catch (e: any) {
     console.log(e);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update payment");
   }
 }
 export async function readpaymentaggregateoptimized(input: any, page: any, size: any) {
@@ -23,7 +23,7 @@ export async function readpaymentaggregateoptimized(input: any, page: any, size:
   }
   catch (e: any) {
     console.log(e);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update payment");
   }
 }
 
@@ -36,7 +36,7 @@ export async function readallpayment(query: any, populatequery: any) {
     return { paymentdetails, totalpaymentdetails };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve payment data");
   }
 };
 export async function readallpaymentaggregate(input: any) {
@@ -44,7 +44,7 @@ export async function readallpaymentaggregate(input: any) {
     return await Payment.aggregate(input);
   }
   catch (e: any) {
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve payment data");
 
   }
 }
@@ -55,7 +55,7 @@ export async function createpayment(input: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create payment");
 
   }
 }
@@ -66,7 +66,7 @@ export async function createpaymentSession(input: any, session: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create payment");
 
   }
 }
@@ -77,7 +77,7 @@ export async function readonepayment(query: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve payment data");
 
   }
 }
@@ -98,7 +98,7 @@ export async function updatepayment(id: any, reqbody: any) {
     return transaction;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update payment");
 
   }
 
@@ -119,7 +119,7 @@ export async function updatepaymentbyquery(query: any, reqbody: any) {
     return payment;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update payment");
 
   }
 
