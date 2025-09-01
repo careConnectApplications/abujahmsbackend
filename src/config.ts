@@ -1168,7 +1168,7 @@ const configuration: any = {
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   environment: "test",
 
-  //environment: "prod",
+ // environment: "prod",
 
 }
 export default configuration;
