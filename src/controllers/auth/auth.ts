@@ -72,11 +72,11 @@ export var signup = catchAsync(async (req: Request | any, res: Response, next: N
     const foundUser = await readone({ $or: [{ email }, { phoneNumber }] });
 
     if (foundUser) {
-        return next(new ApiError(401, `User with this email or phonenumber  already exists`));
+       throw new Error(`User with this email or phonenumber  already exists`);
     }
 
     if (!isValidPhoneNumber(phoneNumber)) {
-        return next(new ApiError(409, configuration.error.errorNotValidPhoneNumber))
+        throw new Error(configuration.error.errorNotValidPhoneNumber)
     }
 
     req.body.password = configuration.defaultPassword;
@@ -89,7 +89,7 @@ export var signup = catchAsync(async (req: Request | any, res: Response, next: N
     const queryresult = await createuser(req.body);
 
     if (!queryresult) {
-        return next(new ApiError(403, 'operation failed!'));
+        throw new Error('operation failed!');
     }
 
     //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
