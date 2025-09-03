@@ -61,8 +61,7 @@ export var signin = async (req: any, res: any) => {
 
 
 //signup users 
-export var signup = async (req: Request | any, res: Response, next: NextFunction) => {
-     try {
+export var signup = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
 
     //get token from header
     const { email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails } = req.body;
@@ -96,12 +95,7 @@ export var signup = async (req: Request | any, res: Response, next: NextFunction
     //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;
     //await mail(email, "Account Registration Confrimation", message);
     res.status(200).json({ queryresult, status: true });
-}
-catch (e: any) {
-        res.json({ status: false, msg: e.message });
-
-    }
-}
+})
 
 //settings
 export async function settings(req: Request, res: any) {
