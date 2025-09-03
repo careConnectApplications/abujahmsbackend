@@ -20,6 +20,11 @@ import catchAsync from "../../utils/catchAsync";
 import { createDeflateRaw } from "zlib";
 import {selectPatientStrategy,PatientRegistrationContext} from "./patientmanagement.helper"
 import {readoneclinic} from "../../dao/clinics";
+import { cachePatientList, invalidateAllPatientCache } from "../../utils/cache/patientCache";
+import { initializeRedis } from "../../utils/redisClient";
+
+// Initialize Redis on module load
+initializeRedis().catch(console.error);
 
 
 
@@ -182,6 +187,10 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     }
 
     await createaudit({ action: "Bulk Uploaded HMO Patient", actor, affectedentity: HMOName });
+    
+    // Invalidate cache after bulk upload
+    await invalidateAllPatientCache();
+    
     res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
   }
   catch (e: any) {
@@ -200,6 +209,10 @@ export async function updateauthorizationcode(req: any, res: any) {
     const { id } = req.params;
     const { authorizationcode } = req.body;
     var queryresult = await updatepatient(id, { authorizationcode });
+    
+    // Invalidate cache after update
+    await invalidateAllPatientCache();
+    
     res.status(200).json({
       queryresult,
       status: true
@@ -306,6 +319,9 @@ export var createpatients = async (req: any, res: any) => {
       appointmentPrice,
     });
 
+    // Invalidate cache after patient creation
+    await invalidateAllPatientCache();
+
     res.status(200).json({ queryresult: result, status: true });
   } catch (error: any) {
     res.status(403).json({ status: false, msg: error.message });
@@ -361,7 +377,18 @@ export async function getallpatients(req: any, res: any) {
       },
     };
     var populateappointmentquery = "appointment";
-    const queryresult = await readallpatientpaginated(filter, selectquery, populatequery, populateappointmentquery, page, size);
+    
+    // Implement cache-aside pattern
+    const queryresult = await cachePatientList(
+      page, 
+      size, 
+      filter,
+      async () => {
+        // This function is called only if data is not in cache
+        return await readallpatientpaginated(filter, selectquery, populatequery, populateappointmentquery, page, size);
+      }
+    );
+    
     res.status(200).json({
       queryresult,
       status: true
@@ -428,6 +455,9 @@ export const updatepatients = catchAsync(async (req: Request | any, res: Respons
 
   if (!queryresult) return next(new ApiError(401, "update failed"));
 
+  // Invalidate cache after patient update
+  await invalidateAllPatientCache();
+
   res.status(200).json({
     queryresult,
     status: true
@@ -451,6 +481,10 @@ export var uploadpix = async (req: any, res: any) => {
 
     //update pix name in patient
     const queryresult = await updatepatient(id, { passport: renamedurl });
+    
+    // Invalidate cache after patient update
+    await invalidateAllPatientCache();
+    
     res.json({
       queryresult,
       status: true
@@ -494,6 +528,9 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
   const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1], previouslyNotHmo: true });
   /// save db
 
+  // Invalidate cache after HMO update
+  await invalidateAllPatientCache();
+
   res.status(200).json({
     status: true,
     message: "patient hmo info updated successfully",
@@ -527,6 +564,9 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
     specialNeeds,
     updatedBy: userId
   });
+
+  // Invalidate cache after clinical information update
+  await invalidateAllPatientCache();
 
   res.status(200).json({
     status: true,
@@ -564,6 +604,9 @@ export const updatePatientFluidBalancing = catchAsync(async (req: Request | any,
       fluidBalance: newFluidRecord
     }
   });
+
+  // Invalidate cache after fluid balance update
+  await invalidateAllPatientCache();
 
   res.status(200).json({
     status: true,
