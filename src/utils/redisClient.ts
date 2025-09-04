@@ -10,7 +10,7 @@ const redisClient = createClient({
 });
 
 // Redis connection state
-let isRedisConnected = false;
+let isRedisConnected = true;
 
 // Connect to Redis with error handling
 redisClient.on('error', (err) => {

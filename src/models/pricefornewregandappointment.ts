@@ -30,8 +30,10 @@ const priceappointmentnewregistrationSchema = new Schema({
   },
   category:
   {
+    required: true,
     type: String
   },
+
   productid:{
     type: String
 

@@ -103,7 +103,6 @@ const labSchema = new Schema({
     default: null,
   },
   labcategory: {
-    required: true,
     type: String,
     default: "lab",
 

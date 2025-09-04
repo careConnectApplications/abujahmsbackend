@@ -13,7 +13,7 @@ export var createprices = async (req:any,res:any) =>{
    
     try{
     
-       var {servicecategory,amount,servicetype,isHMOCover} = req.body;
+       var {servicecategory,amount,servicetype,isHMOCover, category} = req.body;
       if(!isHMOCover){
         isHMOCover =configuration.ishmo[0];
       }
@@ -36,7 +36,7 @@ export var createprices = async (req:any,res:any) =>{
         }
        
         //validation
-        validateinputfaulsyvalue({servicecategory,amount,servicetype});
+        validateinputfaulsyvalue({servicecategory,amount,servicetype,category});
         const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        

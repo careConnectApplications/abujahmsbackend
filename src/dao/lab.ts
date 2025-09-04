@@ -17,7 +17,7 @@ import configuration from "../config";
   
   export async function readalllablimitfive(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      return await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({createdAt: -1}).limit(5);
+      return await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({createdAt: 1}).limit(5);
       
     } catch (err) {
       console.log(err);
@@ -26,7 +26,7 @@ import configuration from "../config";
   };
   export async function readalllab(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
     try {
-      const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+      const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 });
       const totallabdetails = await Lab.find(query).countDocuments();
       return { labdetails, totallabdetails };
     } catch (err) {
@@ -38,7 +38,7 @@ import configuration from "../config";
     
       try{
         const skip = (page - 1) * size;
-       var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });;
+       var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });;
       const totallabdetails = (await Lab.aggregate(aggregatequery)).length;
       const totalPages = Math.ceil(totallabdetails / size);
       return { labdetails, totalPages,totallabdetails, size, page};
