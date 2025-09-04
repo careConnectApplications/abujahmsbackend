@@ -21,7 +21,7 @@ const clinicSchema = new Schema({
         "Obstetrics & Gynaecology",
         "ENT",
         "Ophthalmology",
-        "Other",
+        "Other"
       ],
       required: true
   },

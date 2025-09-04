@@ -766,12 +766,12 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
     const { firstName, lastName } = (req.user).user;
     //accept _id from request.
     const { id } = req.params;
-    const { testname, appointmentunderscoreid, department, note, priority, imageBase64, labcategory } = req.body;
+    const { testname, appointmentunderscoreid, department, note, priority, imageBase64 } = req.body;
     const raiseby = `${firstName} ${lastName}`;
     var testid: any = String(Date.now());
     var testsid = [];
     //var paymentids =[];
-    validateinputfaulsyvalue({ id, testname, department, labcategory });
+    validateinputfaulsyvalue({ id, testname, department });
     //find the record in appointment and validate
 
     //find patient
@@ -794,7 +794,6 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
 
        //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
       let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance?._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
-     
       hmopercentagecover = insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
@@ -826,10 +825,13 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       //    console.log(testname[i]);
       //console.log(isHMOCover);
       var testPrice: any = await readoneprice({ servicetype: testname[i] });
+      //search in clinic
+      
 
       if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
+      let labcategory= testPrice?.category;
       let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
       let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName, labcategory });

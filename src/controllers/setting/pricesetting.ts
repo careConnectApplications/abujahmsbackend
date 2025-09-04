@@ -13,7 +13,7 @@ export var createprices = async (req:any,res:any) =>{
    
     try{
     
-       var {servicecategory,amount,servicetype,isHMOCover} = req.body;
+       var {servicecategory,amount,servicetype,isHMOCover, category} = req.body;
       if(!isHMOCover){
         isHMOCover =configuration.ishmo[0];
       }

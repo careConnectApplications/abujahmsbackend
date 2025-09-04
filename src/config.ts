@@ -45,7 +45,7 @@ const configuration: any = {
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
   familyplanningyesnooption: ["Yes", "No"],
-  labcategory:["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology"],
+  labcategory:["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology", "medical", "non - medical"],
   labreporttypehematologychemicalpathology:["peripheralbloodfilmreport","ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
   gender:["Male", "Female"],
   pricingtype: ["Standard", "Age and Clinic Aware"],
