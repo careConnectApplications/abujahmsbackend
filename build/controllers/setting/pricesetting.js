@@ -30,7 +30,7 @@ const hmocategorycover_1 = require("../../dao/hmocategorycover");
 //add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        var { servicecategory, amount, servicetype, isHMOCover } = req.body;
+        var { servicecategory, amount, servicetype, isHMOCover, category } = req.body;
         if (!isHMOCover) {
             isHMOCover = config_1.default.ishmo[0];
         }

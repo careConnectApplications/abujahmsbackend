@@ -90,7 +90,6 @@ const labSchema = new mongoose_1.Schema({
         default: null,
     },
     labcategory: {
-        required: true,
         type: String,
         default: "lab",
     },

@@ -40,7 +40,7 @@ function countlab(query) {
 function readalllablimitfive(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 }).limit(5);
+            return yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 }).limit(5);
         }
         catch (err) {
             console.log(err);
@@ -52,7 +52,7 @@ function readalllablimitfive(query, selectquery, populatequery, populatesecondqu
 function readalllab(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const labdetails = yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+            const labdetails = yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 });
             const totallabdetails = yield lab_1.default.find(query).countDocuments();
             return { labdetails, totallabdetails };
         }
@@ -67,7 +67,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const skip = (page - 1) * size;
-            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
+            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });
             ;
             const totallabdetails = (yield lab_1.default.aggregate(aggregatequery)).length;
             const totalPages = Math.ceil(totallabdetails / size);

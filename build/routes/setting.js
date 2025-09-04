@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const pricesetting_1 = require("../controllers/setting/pricesetting");
 const clinics_1 = require("../controllers/setting/clinics");
+const units_1 = require("../controllers/setting/units");
 const servicetype_1 = require("../controllers/setting/servicetype");
 const wardmanagement_1 = require("../controllers/setting/wardmanagement");
 const theatremanagement_1 = require("../controllers/setting/theatremanagement");
@@ -28,6 +29,11 @@ router.get('/getallclinic', clinics_1.getallclinic);
 router.get('/getonlyclinic', clinics_1.getonlyclinic);
 //getonlyclinic
 router.put('/updateclinics/:id', clinics_1.updateclinics);
+//units management
+router.post('/createunits', units_1.createunits);
+router.get('/getallunits', units_1.getallunits);
+router.get('/getunitsbyclinic/:clinicId', units_1.getunitsbyclinic);
+router.put('/updateunits/:id', units_1.updateunits);
 router.put('/updateprices/:id', pricesetting_1.updateprices);
 router.put('/updatepricestatus/:id', pricesetting_1.updatepricestatus);
 router.post('/createservicetypes', servicetype_1.createservicetypes);
