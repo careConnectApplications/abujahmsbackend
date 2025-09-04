@@ -36,7 +36,7 @@ export var createprices = async (req:any,res:any) =>{
         }
        
         //validation
-        validateinputfaulsyvalue({servicecategory,amount,servicetype});
+        validateinputfaulsyvalue({servicecategory,amount,servicetype,category});
         const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        
@@ -140,7 +140,7 @@ export async function searchprocedure(req:any, res:any){
     const queryresult = await readallprices({servicecategory:configuration.category[5],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
     res.status(200).json({
         queryresult:queryresult.pricedetails,
-        status:true
+       status:true
       }); 
 
 }

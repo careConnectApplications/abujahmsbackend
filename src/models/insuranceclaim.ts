@@ -13,6 +13,7 @@ export interface IInsuranceClaim extends Document {
   status: "Submitted" | "Re-submitted" | "Cancelled" | "Rejected" | "Paid";
   amountClaimed: number;
   amountApproved?: number;
+  action?: "approve" | "reject";
   insurer?: string;
   createdBy?: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -30,6 +31,7 @@ const InsuranceClaimSchema: Schema<IInsuranceClaim> = new Schema(
     histopathology: { type: Schema.Types.ObjectId, ref: "Histopathology" },
     authorizationCode: { type: String },
     approvalCode: { type: String },
+    action: String,
     status: {
       type: String,
       enum: ["Submitted", "Re-submitted", "Cancelled", "Rejected", "Paid"],
