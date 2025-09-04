@@ -431,8 +431,15 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   const page = parseInt(req.query.page) || 1;
   const size = parseInt(req.query.size) || 150;
   const filter: any = {};
-  var statusfilter: any = status ? { status } : testname ? { testname } : {};
+  var statusfilter: any = testname ? { testname } : {};
   statusfilter.labcategory = labcategory;
+  
+  // Use $or to match either configuration.status[7] or req.body.status
+  const statusConditions = [{ status: configuration.status[7] }];
+  if (status) {
+    statusConditions.push({ status });
+  }
+  statusfilter.$or = statusConditions;
   if (firstName) {
     filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
   }
