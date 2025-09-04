@@ -30,7 +30,7 @@ const priceappointmentnewregistrationSchema = new Schema({
   },
   category:
   {
-    required: true,
+    //required: true,
     type: String
   },
 

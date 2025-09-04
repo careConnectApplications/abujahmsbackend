@@ -725,12 +725,12 @@ exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
         const { firstName, lastName } = (req.user).user;
         //accept _id from request.
         const { id } = req.params;
-        const { testname, appointmentunderscoreid, department, note, priority, imageBase64, labcategory } = req.body;
+        const { testname, appointmentunderscoreid, department, note, priority, imageBase64 } = req.body;
         const raiseby = `${firstName} ${lastName}`;
         var testid = String(Date.now());
         var testsid = [];
         //var paymentids =[];
-        (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, department, labcategory });
+        (0, otherservices_1.validateinputfaulsyvalue)({ id, testname, department });
         //find the record in appointment and validate
         //find patient
         const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, 'insurance', '');
@@ -773,9 +773,11 @@ exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
             //    console.log(testname[i]);
             //console.log(isHMOCover);
             var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i] });
+            //search in clinic
             if ((testPrice === null || testPrice === void 0 ? void 0 : testPrice.amount) == null) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
+            let labcategory = testPrice === null || testPrice === void 0 ? void 0 : testPrice.category;
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create testrecord
             let testrecord = yield (0, lab_1.createlab)({ hmopercentagecover, actualcost: testPrice.amount, note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby, filename: fileName, labcategory });
