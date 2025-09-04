@@ -66,6 +66,10 @@ const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const patientmanagement_helper_1 = require("./patientmanagement.helper");
 const clinics_1 = require("../../dao/clinics");
+const patientCache_1 = require("../../utils/cache/patientCache");
+const redisClient_1 = require("../../utils/redisClient");
+// Initialize Redis on module load
+(0, redisClient_1.initializeRedis)().catch(console.error);
 //search patients 
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -213,6 +217,8 @@ function bulkuploadhmopatients(req, res) {
                 }
             }
             yield (0, audit_1.createaudit)({ action: "Bulk Uploaded HMO Patient", actor, affectedentity: HMOName });
+            // Invalidate cache after bulk upload
+            yield (0, patientCache_1.invalidateAllPatientCache)();
             res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
         }
         catch (e) {
@@ -229,6 +235,8 @@ function updateauthorizationcode(req, res) {
             const { id } = req.params;
             const { authorizationcode } = req.body;
             var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { authorizationcode });
+            // Invalidate cache after update
+            yield (0, patientCache_1.invalidateAllPatientCache)();
             res.status(200).json({
                 queryresult,
                 status: true
@@ -318,6 +326,8 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             cardfeenewRegistrationPrice,
             appointmentPrice,
         });
+        // Invalidate cache after patient creation
+        yield (0, patientCache_1.invalidateAllPatientCache)();
         res.status(200).json({ queryresult: result, status: true });
     }
     catch (error) {
@@ -370,7 +380,11 @@ function getallpatients(req, res) {
                 },
             };
             var populateappointmentquery = "appointment";
-            const queryresult = yield (0, patientmanagement_1.readallpatientpaginated)(filter, selectquery, populatequery, populateappointmentquery, page, size);
+            // Implement cache-aside pattern
+            const queryresult = yield (0, patientCache_1.cachePatientList)(page, size, filter, () => __awaiter(this, void 0, void 0, function* () {
+                // This function is called only if data is not in cache
+                return yield (0, patientmanagement_1.readallpatientpaginated)(filter, selectquery, populatequery, populateappointmentquery, page, size);
+            }));
             res.status(200).json({
                 queryresult,
                 status: true
@@ -425,6 +439,8 @@ exports.updatepatients = (0, catchAsync_1.default)((req, res, next) => __awaiter
     var queryresult = yield (0, patientmanagement_1.updatepatient)(id, req.body);
     if (!queryresult)
         return next(new errors_1.ApiError(401, "update failed"));
+    // Invalidate cache after patient update
+    yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         queryresult,
         status: true
@@ -446,6 +462,8 @@ var uploadpix = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         //update pix name in patient
         const queryresult = yield (0, patientmanagement_1.updatepatient)(id, { passport: renamedurl });
+        // Invalidate cache after patient update
+        yield (0, patientCache_1.invalidateAllPatientCache)();
         res.json({
             queryresult,
             status: true
@@ -477,6 +495,8 @@ exports.updatePatientToHmo = (0, catchAsync_1.default)((req, res, next) => __awa
     /// then convert to true
     const updatedPatient = yield (0, patientmanagement_1.updatepatient)(id, { isHMOCover: config_1.default.ishmo[1], previouslyNotHmo: true });
     /// save db
+    // Invalidate cache after HMO update
+    yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
         message: "patient hmo info updated successfully",
@@ -502,6 +522,8 @@ exports.updatePatientClinicalInformation = (0, catchAsync_1.default)((req, res, 
         specialNeeds,
         updatedBy: userId
     });
+    // Invalidate cache after clinical information update
+    yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
         data: updatedPatient
@@ -531,6 +553,8 @@ exports.updatePatientFluidBalancing = (0, catchAsync_1.default)((req, res, next)
             fluidBalance: newFluidRecord
         }
     });
+    // Invalidate cache after fluid balance update
+    yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
         data: updatedPatient

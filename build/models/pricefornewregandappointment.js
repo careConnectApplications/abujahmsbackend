@@ -23,6 +23,7 @@ const priceappointmentnewregistrationSchema = new mongoose_1.Schema({
         default: config_1.default.ishmo[0],
     },
     category: {
+        //required: true,
         type: String
     },
     productid: {

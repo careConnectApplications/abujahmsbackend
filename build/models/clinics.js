@@ -21,7 +21,7 @@ const clinicSchema = new mongoose_1.Schema({
             "Obstetrics & Gynaecology",
             "ENT",
             "Ophthalmology",
-            "Other",
+            "Other"
         ],
         required: true
     },

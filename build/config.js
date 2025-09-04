@@ -18,7 +18,23 @@ const configuration = {
     proceduretype: ["Major Operation", "Intermediate Operation", "Minor Operation", "Circumcision"],
     encounterplanoutcome: ["Death", "Referred Out", "Treated", "Others"],
     arrivalMode: ["Walk-in", "Ambulance", "Referral", "Death"],
-    unitcategory: ["EPU", "ICU", "Emergency"],
+    unitcategory: [
+        "EPU",
+        "ICU",
+        "Emergency",
+        "Cardiology",
+        "Gastroenterology",
+        "Neurology",
+        "Nephrology",
+        "Endocrinology",
+        "Haematology",
+        "Dialysis",
+        "Cardiology",
+        "Gastroenterology",
+        "Neurology",
+        "Endocrinology",
+        "Dialysis"
+    ],
     cliniccategory: [
         "Family Medicine",
         "Paediatrics",
@@ -40,7 +56,7 @@ const configuration = {
     typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
     typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
     familyplanningyesnooption: ["Yes", "No"],
-    labcategory: ["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology"],
+    labcategory: ["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology", "medical", "non - medical"],
     labreporttypehematologychemicalpathology: ["peripheralbloodfilmreport", "ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
     gender: ["Male", "Female"],
     pricingtype: ["Standard", "Age and Clinic Aware"],
@@ -1096,7 +1112,7 @@ const configuration = {
         errornotfoundgeneric: "Record not found."
     },
     validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
-    // environment: "test",
+    //environment: "test",
     environment: "prod",
 };
 exports.default = configuration;
