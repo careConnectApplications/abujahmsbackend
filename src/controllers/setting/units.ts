@@ -22,7 +22,7 @@ export var createunits = async (req: any, res: any) => {
     }
 
     var id = `${unit[0]}${generateRandomNumber(5)}${unit[unit.length - 1]}`;
-    const foundUnit = await readoneunit({ unit, clinicId }, '');
+    const foundUnit = await readoneunit({ unit, clinicId }, '','');
     
     // Check if unit already exists for this clinic
     if (foundUnit) {
@@ -44,7 +44,7 @@ export var createunits = async (req: any, res: any) => {
 export async function getallunits(req: Request, res: any) {
   try {
 
-    const queryresult = await readallunits({}, '');
+    const queryresult = await readallunits({}, '','clinicId',);
     res.status(200).json({
       queryresult,
       status: true
@@ -63,7 +63,29 @@ export async function getunitsbyclinic(req: any, res: any) {
     const { clinicId } = req.params;
     validateinputfaulsyvalue({ clinicId });
     
-    const queryresult = await readunitsbyclinic(clinicId, '');
+    const queryresult = await readunitsbyclinic(clinicId, '', 'clinicId');
+    res.status(200).json({
+      queryresult,
+      status: true
+    });
+
+  }
+  catch (e: any) {
+    res.status(403).json({ status: false, msg: e.message });
+  }
+}
+
+export async function getunitsbyclinicname(req: any, res: any) {
+  try {
+
+    const { clinic } = req.params;
+    validateinputfaulsyvalue({ clinic });
+     const foundClinic:any = await readoneclinic({ clinic }, '');
+    if (!foundClinic) {
+      throw new Error(`Clinic with name ${clinic} does not exist`);
+    }
+    
+    const queryresult = await readunitsbyclinic(foundClinic._id, '', 'clinicId');
     res.status(200).json({
       queryresult,
       status: true
