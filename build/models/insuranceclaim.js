@@ -44,6 +44,7 @@ const InsuranceClaimSchema = new mongoose_1.Schema({
     histopathology: { type: mongoose_1.Schema.Types.ObjectId, ref: "Histopathology" },
     authorizationCode: { type: String },
     approvalCode: { type: String },
+    action: String,
     status: {
         type: String,
         enum: ["Submitted", "Re-submitted", "Cancelled", "Rejected", "Paid"],

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.labresultprocessinghemathologychemicalpathology = exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = exports.sorthemathologyandchemicalpathology = exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+exports.validatelabresult = exports.labresultprocessinghemathologychemicalpathology = exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = exports.sorthemathologyandchemicalpathology = exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
 const otherservices_1 = require("../../utils/otherservices");
@@ -387,8 +387,14 @@ exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = (0, catchA
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 150;
     const filter = {};
-    var statusfilter = status ? { status } : testname ? { testname } : {};
-    statusfilter.labcategory = labcategory;
+    var statusfilter = testname ? { testname } : {};
+    //statusfilter.labcategory = labcategory;
+    // Use $or to match either configuration.status[7] or req.body.status
+    const statusConditions = [{ status: config_1.default.status[7] }, { labcategory }];
+    if (status) {
+        statusConditions.push({ status });
+    }
+    statusfilter.$or = statusConditions;
     if (firstName) {
         filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
     }
@@ -494,6 +500,44 @@ exports.labresultprocessinghemathologychemicalpathology = (0, catchAsync_1.defau
     res.status(200).json({
         queryresult,
         status: true
+    });
+}));
+// Validate lab result
+exports.validatelabresult = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    // Get lab ID from params
+    const { id } = req.params;
+    // Get validation remarks from body
+    const { validationremarks } = req.body;
+    // Get user details from authenticated user
+    const { firstName, lastName, email } = (req.user).user;
+    // Validate required inputs
+    (0, otherservices_1.validateinputfaulsyvalue)({ id, validationremarks });
+    // Find the lab and check if it exists
+    const lab = yield (0, lab_1.readonelab)({ _id: id }, {}, '');
+    if (!lab) {
+        throw new Error(config_1.default.error.errorinvalidcredentials);
+    }
+    // Check if lab has been processed (status must be "processed")
+    if (lab.status !== config_1.default.status[7]) {
+        throw new Error("Lab result must be processed before validation");
+    }
+    // Check if lab has already been validated
+    if (lab.validatedby && lab.validateddate) {
+        throw new Error("Lab result has already been validated");
+    }
+    // Prepare validation data
+    const validatedby = `${firstName} ${lastName}`;
+    const validateddate = new Date();
+    // Update lab with validation information
+    const queryresult = yield (0, lab_1.updatelab)({ _id: id }, {
+        validatedby,
+        validateddate,
+        validationremarks
+    });
+    res.status(200).json({
+        queryresult,
+        status: true,
+        message: "Lab result validated successfully"
     });
 }));
 // get all rejected orders
