@@ -4,12 +4,15 @@ import { updateappointmentbyquery } from "../../dao/appointment";
 import { updatepatientbyanyquery, readonepatient } from "../../dao/patientmanagement";
 import { updatelabbyquery } from "../../dao/lab";
 import configuration from "../../config";
-import { validateinputfaulsyvalue } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, calculateAmountPaidByHMO } from "../../utils/otherservices";
 import catchAsync from "../../utils/catchAsync";
 import mongoose from "mongoose";
 import { ApiError } from "../../errors";
 import { readoneprice } from "../../dao/price";
 import { v4 as uuidv4 } from 'uuid';
+import { createInsuranceClaim } from "../../dao/insuranceclaim";
+import { readonehmomanagement } from "../../dao/hmomanagement";
+import { readonehmocategorycover } from "../../dao/hmocategorycover";
 
 const generatePaymentNumber = () => {
   const uniqueId = uuidv4();
@@ -17,21 +20,93 @@ const generatePaymentNumber = () => {
 }
 export const payAnnualSubscription = catchAsync(async (req: Request | any, res: Response) => {
     const { patientId } = req.body;
+    const { _id: userId } = (req.user).user;
+    
     // Check patient exists
-   const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
+    const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
     if (!patient) {
       throw new Error("Patient not found" );
     }
-    const subscriptionPrice: any = await readoneprice({ servicecategory:configuration.category[8], servicetype: configuration.category[8] });
-         if (!subscriptionPrice) {
-           throw new Error(configuration.error.errornopriceset);
-     
-         }
-    const {amount} = subscriptionPrice;
-    var payment =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:patient._id,paymentype:configuration.category[8],paymentcategory:configuration.category[8],patient:patient._id,amount});
+    
+    const subscriptionPrice: any = await readoneprice({ 
+      servicecategory: configuration.category[8], 
+      servicetype: configuration.category[8] 
+    });
+    if (!subscriptionPrice) {
+      throw new Error(configuration.error.errornopriceset);
+    }
+    
+    let paymentAmount = Number(subscriptionPrice.amount);
+    let hmoCoveragePercentage = 0;
+    let gethmo: any = null;
+    
+    // Check if patient has HMO coverage
+    if (patient.isHMOCover === configuration.ishmo[1] || patient.isHMOCover === true) {
+      // Get HMO details
+      if (patient.HMOName) {
+        gethmo = await readonehmomanagement(
+          { hmoname: patient.HMOName }, 
+          { _id: 1, hmopercentagecover: 1 }
+        );
+        
+        if (gethmo) {
+          // Get HMO coverage percentage for annual subscription
+          const hmoCoverage = await readonehmocategorycover(
+            { hmoId: gethmo._id, category: configuration.category[8] },
+            { hmopercentagecover: 1 }
+          );
+          
+          hmoCoveragePercentage = hmoCoverage?.hmopercentagecover ?? 0;
+          
+          // Calculate patient payment amount after HMO coverage
+          if (hmoCoveragePercentage > 0) {
+            paymentAmount = calculateAmountPaidByHMO(
+              hmoCoveragePercentage,
+              Number(subscriptionPrice.amount)
+            );
+          }
+        }
+      }
+    }
+    
+    // Create payment with adjusted amount
+    const payment = await createpayment({
+      firstName: patient?.firstName,
+      lastName: patient?.lastName,
+      MRN: patient?.MRN,
+      phoneNumber: patient?.phoneNumber,
+      paymentreference: patient._id,
+      paymentype: configuration.category[8],
+      paymentcategory: configuration.category[8],
+      patient: patient._id,
+      amount: paymentAmount
+    });
+    
+    // Create insurance claim for HMO patients
+    if ((patient.isHMOCover === configuration.ishmo[1] || patient.isHMOCover === true) && 
+        hmoCoveragePercentage > 0 && payment) {
+      const insuranceClaim = {
+        patient: patient._id,
+        serviceCategory: configuration.category[8],
+        payment: payment._id,
+        authorizationCode: patient.authorizationCode || req.body.authorizationCode || "",
+        approvalCode: patient.approvalCode || req.body.approvalCode || "",
+        amountClaimed: Number(subscriptionPrice.amount),
+        amountApproved: Number(subscriptionPrice.amount),
+        insurer: patient.HMOName,
+        createdBy: userId,
+        action: "approve"
+      };
+      
+      await createInsuranceClaim(insuranceClaim);
+    }
+    
     // Extend subscription by 1 year
-    res.status(201).json({ queryresult: "Subscription payment recorded", payment,status: true });
- 
+    res.status(201).json({ 
+      queryresult: "Subscription payment recorded", 
+      payment,
+      status: true 
+    });
 });
 ///deactivate a user
 //show total for each login cashier
