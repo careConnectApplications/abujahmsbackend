@@ -2,9 +2,9 @@ import Unit from "../models/units";
 import configuration from "../config";
 
 // read all units
-export async function readallunits(query: any, selectquery: any) {
+export async function readallunits(query: any, selectquery: any,populatesecondquery:any) {
   try {
-    const unitdetails = await Unit.find(query).select(selectquery).sort({ createdAt: -1 });
+    const unitdetails = await Unit.find(query).select(selectquery).populate(populatesecondquery).sort({ createdAt: -1 });
     const totalunitdetails = await Unit.find(query).countDocuments();
     return { unitdetails, totalunitdetails };
   } catch (err) {
@@ -27,9 +27,9 @@ export async function createunit(input: any) {
 }
 
 // find one unit
-export async function readoneunit(query: any, selectquery: any) {
+export async function readoneunit(query: any, selectquery: any,populatesecondquery:any) {
   try {
-    return await Unit.findOne(query).select(selectquery);
+    return await Unit.findOne(query).select(selectquery).populate(populatesecondquery);
   }
   catch (err) {
     console.log(err);
@@ -38,9 +38,9 @@ export async function readoneunit(query: any, selectquery: any) {
 }
 
 // read units by clinic
-export async function readunitsbyclinic(clinicId: string, selectquery: any) {
+export async function readunitsbyclinic(clinicId: string, selectquery: any,populatesecondquery:any) {
   try {
-    const unitdetails = await Unit.find({ clinicId }).select(selectquery).sort({ createdAt: -1 });
+    const unitdetails = await Unit.find({ clinicId }).select(selectquery).populate(populatesecondquery).sort({ createdAt: -1 });
     const totalunitdetails = await Unit.find({ clinicId }).countDocuments();
     return { unitdetails, totalunitdetails };
   } catch (err) {

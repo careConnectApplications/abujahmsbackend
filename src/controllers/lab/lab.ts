@@ -431,8 +431,16 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   const page = parseInt(req.query.page) || 1;
   const size = parseInt(req.query.size) || 150;
   const filter: any = {};
-  var statusfilter: any = status ? { status } : testname ? { testname } : {};
-  statusfilter.labcategory = labcategory;
+  var statusfilter: any = testname ? { testname } : {};
+  //statusfilter.labcategory = labcategory;
+    
+  // Use $or to match either configuration.status[7] or req.body.status
+  const statusConditions = [{ status: configuration.status[7] },{labcategory}];
+  if (status) {
+    statusConditions.push({ status });
+  }
+  statusfilter.$or = statusConditions;
+
   if (firstName) {
     filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
   }
@@ -562,6 +570,58 @@ export const labresultprocessinghemathologychemicalpathology = catchAsync(async 
   });
 
 })
+
+// Validate lab result
+export const validatelabresult = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+  // Get lab ID from params
+  const { id } = req.params;
+  
+  // Get validation remarks from body
+  const { validationremarks } = req.body;
+  
+  // Get user details from authenticated user
+  const { firstName, lastName, email } = (req.user).user;
+  
+  // Validate required inputs
+  validateinputfaulsyvalue({ id, validationremarks });
+  
+  // Find the lab and check if it exists
+  const lab = await readonelab({ _id: id }, {}, '');
+  
+  if (!lab) {
+    throw new Error(configuration.error.errorinvalidcredentials);
+  }
+  
+  // Check if lab has been processed (status must be "processed")
+  if (lab.status !== configuration.status[7]) {
+    throw new Error("Lab result must be processed before validation");
+  }
+  
+  // Check if lab has already been validated
+  if (lab.validatedby && lab.validateddate) {
+    throw new Error("Lab result has already been validated");
+  }
+  
+  // Prepare validation data
+  const validatedby = `${firstName} ${lastName}`;
+  const validateddate = new Date();
+  
+  // Update lab with validation information
+  const queryresult = await updatelab(
+    { _id: id },
+    {
+      validatedby,
+      validateddate,
+      validationremarks
+    }
+  );
+  
+  res.status(200).json({
+    queryresult,
+    status: true,
+    message: "Lab result validated successfully"
+  });
+});
 
 // get all rejected orders
 

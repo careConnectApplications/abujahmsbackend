@@ -33,6 +33,7 @@ router.put('/updateclinics/:id', clinics_1.updateclinics);
 router.post('/createunits', units_1.createunits);
 router.get('/getallunits', units_1.getallunits);
 router.get('/getunitsbyclinic/:clinicId', units_1.getunitsbyclinic);
+router.get('/getunitsbyclinicname/:clinic', units_1.getunitsbyclinicname);
 router.put('/updateunits/:id', units_1.updateunits);
 router.put('/updateprices/:id', pricesetting_1.updateprices);
 router.put('/updatepricestatus/:id', pricesetting_1.updatepricestatus);

@@ -414,30 +414,32 @@ queryresult=await readallradiology({testid:referencenumber, status:configuration
 
 //////////////////////////authorize transaction individually   ///////////////////////
 export const authorizeTransaction = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
-  const { authorizationCode, approvalCode } = req.body;
+  const { authorizationCode, approvalCode, action } = req.body;
   const { id, referencecategory } = req.params;
   const { _id} = (req.user).user;
   const createdBy = `${_id}`;
-  validateinputfaulsyvalue({ authorizationCode, approvalCode, referencecategory, id });
+  validateinputfaulsyvalue({ referencecategory, id,action });
+  if(action == "approve")  validateinputfaulsyvalue({ authorizationCode, approvalCode });
+
 
   let insuranceClaim: any = null;
 
   if (referencecategory === configuration.referencecategory[0]) {
-    insuranceClaim = await processLab(id, { authorizationCode, approvalCode, createdBy });
+    insuranceClaim = await processLab(id, { authorizationCode, approvalCode, createdBy, action });
   } else if (referencecategory === configuration.referencecategory[1]) {
-    insuranceClaim = await processRadiology(id, { authorizationCode, approvalCode, createdBy });
+    insuranceClaim = await processRadiology(id, { authorizationCode, approvalCode, createdBy,action });
   } else if (referencecategory === configuration.referencecategory[2]) {
-    insuranceClaim = await processProcedure(id, { authorizationCode, approvalCode, createdBy });
+    insuranceClaim = await processProcedure(id, { authorizationCode, approvalCode, createdBy, action });
   } else if (referencecategory === configuration.referencecategory[3]) {
-    insuranceClaim = await processPharmacy(id, { authorizationCode, approvalCode, createdBy });
+    insuranceClaim = await processPharmacy(id, { authorizationCode, approvalCode, createdBy, action });
   } 
   else if (referencecategory === configuration.referencecategory[4]) {
-    insuranceClaim = await processHistopathology(id, { authorizationCode, approvalCode, createdBy });
+    insuranceClaim = await processHistopathology(id, { authorizationCode, approvalCode, createdBy, action });
   }
   
   else {    throw new Error("Invalid reference category");
   }
-
+console.log(insuranceClaim);
   if (insuranceClaim) {
     await createInsuranceClaim(insuranceClaim);
   }
@@ -450,17 +452,17 @@ export const authorizeTransaction = catchAsync(async (req: Request | any, res: R
 
 export const authorizeTransactiongroup = catchAsync(
   async (req: Request | any, res: Response, next: NextFunction) => {
-    const { authorizationCode, approvalCode } = req.body;
+    const { authorizationCode, approvalCode, action } = req.body;
     const { testid, referencecategory } = req.params; // 🔹 use testId instead of single id
     const { _id } = (req.user).user;
     const createdBy = `${_id}`;
 
     validateinputfaulsyvalue({
-      authorizationCode,
-      approvalCode,
       referencecategory,
+      action,
       testid,
     });
+      if(action == "approve")  validateinputfaulsyvalue({ authorizationCode, approvalCode });
 
     let insuranceClaims: any[] = [];
 
@@ -496,24 +498,28 @@ export const authorizeTransactiongroup = catchAsync(
           authorizationCode,
           approvalCode,
           createdBy,
+          action
         });
       } else if (referencecategory === configuration.referencecategory[1]) {
         insuranceClaim = await processRadiology(record._id, {
           authorizationCode,
           approvalCode,
           createdBy,
+          action
         });
       } else if (referencecategory === configuration.referencecategory[2]) {
         insuranceClaim = await processProcedure(record._id, {
           authorizationCode,
           approvalCode,
           createdBy,
+          action
         });
       } else if (referencecategory === configuration.referencecategory[3]) {
         insuranceClaim = await processPharmacy(record._id, {
           authorizationCode,
           approvalCode,
           createdBy,
+          action
         });
       }
 
