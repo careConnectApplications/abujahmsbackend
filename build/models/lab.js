@@ -98,6 +98,9 @@ const labSchema = new mongoose_1.Schema({
     priority: { type: String, enum: ["urgent", "routine"] },
     sortbydate: Date,
     amount: Number,
+    validatedby: String,
+    validateddate: Date,
+    validationremarks: String,
     hmopercentagecover: Number,
     actualcost: Number,
     chemicalpathologyhemathologyreviewtstatus: {

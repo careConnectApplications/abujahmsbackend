@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createunits = void 0;
 exports.getallunits = getallunits;
 exports.getunitsbyclinic = getunitsbyclinic;
+exports.getunitsbyclinicname = getunitsbyclinicname;
 exports.updateunits = updateunits;
 const units_1 = require("../../dao/units");
 const clinics_1 = require("../../dao/clinics");
@@ -30,7 +31,7 @@ var createunits = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error(`Clinic with ID ${clinicId} does not exist`);
         }
         var id = `${unit[0]}${(0, otherservices_1.generateRandomNumber)(5)}${unit[unit.length - 1]}`;
-        const foundUnit = yield (0, units_1.readoneunit)({ unit, clinicId }, '');
+        const foundUnit = yield (0, units_1.readoneunit)({ unit, clinicId }, '', '');
         // Check if unit already exists for this clinic
         if (foundUnit) {
             throw new Error(`Unit already exists for this clinic`);
@@ -50,7 +51,7 @@ exports.createunits = createunits;
 function getallunits(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const queryresult = yield (0, units_1.readallunits)({}, '');
+            const queryresult = yield (0, units_1.readallunits)({}, '', 'clinicId');
             res.status(200).json({
                 queryresult,
                 status: true
@@ -67,7 +68,27 @@ function getunitsbyclinic(req, res) {
         try {
             const { clinicId } = req.params;
             (0, otherservices_1.validateinputfaulsyvalue)({ clinicId });
-            const queryresult = yield (0, units_1.readunitsbyclinic)(clinicId, '');
+            const queryresult = yield (0, units_1.readunitsbyclinic)(clinicId, '', 'clinicId');
+            res.status(200).json({
+                queryresult,
+                status: true
+            });
+        }
+        catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}
+function getunitsbyclinicname(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { clinic } = req.params;
+            (0, otherservices_1.validateinputfaulsyvalue)({ clinic });
+            const foundClinic = yield (0, clinics_1.readoneclinic)({ clinic }, '');
+            if (!foundClinic) {
+                throw new Error(`Clinic with name ${clinic} does not exist`);
+            }
+            const queryresult = yield (0, units_1.readunitsbyclinic)(foundClinic._id, '', 'clinicId');
             res.status(200).json({
                 queryresult,
                 status: true

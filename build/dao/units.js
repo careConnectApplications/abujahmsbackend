@@ -21,10 +21,10 @@ exports.updateunitbyquery = updateunitbyquery;
 const units_1 = __importDefault(require("../models/units"));
 const config_1 = __importDefault(require("../config"));
 // read all units
-function readallunits(query, selectquery) {
+function readallunits(query, selectquery, populatesecondquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const unitdetails = yield units_1.default.find(query).select(selectquery).sort({ createdAt: -1 });
+            const unitdetails = yield units_1.default.find(query).select(selectquery).populate(populatesecondquery).sort({ createdAt: -1 });
             const totalunitdetails = yield units_1.default.find(query).countDocuments();
             return { unitdetails, totalunitdetails };
         }
@@ -50,10 +50,10 @@ function createunit(input) {
     });
 }
 // find one unit
-function readoneunit(query, selectquery) {
+function readoneunit(query, selectquery, populatesecondquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield units_1.default.findOne(query).select(selectquery);
+            return yield units_1.default.findOne(query).select(selectquery).populate(populatesecondquery);
         }
         catch (err) {
             console.log(err);
@@ -62,10 +62,10 @@ function readoneunit(query, selectquery) {
     });
 }
 // read units by clinic
-function readunitsbyclinic(clinicId, selectquery) {
+function readunitsbyclinic(clinicId, selectquery, populatesecondquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const unitdetails = yield units_1.default.find({ clinicId }).select(selectquery).sort({ createdAt: -1 });
+            const unitdetails = yield units_1.default.find({ clinicId }).select(selectquery).populate(populatesecondquery).sort({ createdAt: -1 });
             const totalunitdetails = yield units_1.default.find({ clinicId }).countDocuments();
             return { unitdetails, totalunitdetails };
         }

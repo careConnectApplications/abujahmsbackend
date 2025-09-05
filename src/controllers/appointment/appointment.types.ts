@@ -33,6 +33,9 @@ export interface FreeAppointmentArgs {
   configuration: any; // or make a stricter enum type if you want
   services: Services;
   amount: number;
+  hmopercentagecover?: number;
+  appointmentPrice?: any;
+  createdBy?: string;
 }
 export interface PaidAppointmentStrategyParams {
   patientrecord: PatientRecord;
@@ -46,5 +49,7 @@ export interface PaidAppointmentStrategyParams {
     updatepatient: (id: string, update: any) => Promise<any>;
   };
   amount: number;
+  hmopercentagecover?: number;
+  appointmentPrice?: any;
+  createdBy?: string;
 }
-

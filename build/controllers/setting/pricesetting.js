@@ -48,7 +48,7 @@ var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             req.body.servicetype = config_1.default.category[3];
         }
         //validation
-        (0, otherservices_1.validateinputfaulsyvalue)({ servicecategory, amount, servicetype });
+        (0, otherservices_1.validateinputfaulsyvalue)({ servicecategory, amount, servicetype, category });
         const foundPrice = yield (0, price_1.readoneprice)({ servicecategory, servicetype, isHMOCover });
         //update servicetype for New Patient Registration
         if (foundPrice) {

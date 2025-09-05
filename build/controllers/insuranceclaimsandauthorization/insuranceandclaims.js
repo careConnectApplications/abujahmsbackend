@@ -348,30 +348,33 @@ exports.readallbyreferenceid = (0, catchAsync_1.default)((req, res, next) => __a
 }));
 //////////////////////////authorize transaction individually   ///////////////////////
 exports.authorizeTransaction = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { authorizationCode, approvalCode } = req.body;
+    const { authorizationCode, approvalCode, action } = req.body;
     const { id, referencecategory } = req.params;
     const { _id } = (req.user).user;
     const createdBy = `${_id}`;
-    (0, otherservices_1.validateinputfaulsyvalue)({ authorizationCode, approvalCode, referencecategory, id });
+    (0, otherservices_1.validateinputfaulsyvalue)({ referencecategory, id, action });
+    if (action == "approve")
+        (0, otherservices_1.validateinputfaulsyvalue)({ authorizationCode, approvalCode });
     let insuranceClaim = null;
     if (referencecategory === config_1.default.referencecategory[0]) {
-        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processLab)(id, { authorizationCode, approvalCode, createdBy });
+        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processLab)(id, { authorizationCode, approvalCode, createdBy, action });
     }
     else if (referencecategory === config_1.default.referencecategory[1]) {
-        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processRadiology)(id, { authorizationCode, approvalCode, createdBy });
+        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processRadiology)(id, { authorizationCode, approvalCode, createdBy, action });
     }
     else if (referencecategory === config_1.default.referencecategory[2]) {
-        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processProcedure)(id, { authorizationCode, approvalCode, createdBy });
+        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processProcedure)(id, { authorizationCode, approvalCode, createdBy, action });
     }
     else if (referencecategory === config_1.default.referencecategory[3]) {
-        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processPharmacy)(id, { authorizationCode, approvalCode, createdBy });
+        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processPharmacy)(id, { authorizationCode, approvalCode, createdBy, action });
     }
     else if (referencecategory === config_1.default.referencecategory[4]) {
-        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processHistopathology)(id, { authorizationCode, approvalCode, createdBy });
+        insuranceClaim = yield (0, insuranceclaimandauthorization_helper_1.processHistopathology)(id, { authorizationCode, approvalCode, createdBy, action });
     }
     else {
         throw new Error("Invalid reference category");
     }
+    console.log(insuranceClaim);
     if (insuranceClaim) {
         yield (0, insuranceclaim_1.createInsuranceClaim)(insuranceClaim);
     }
@@ -381,16 +384,17 @@ exports.authorizeTransaction = (0, catchAsync_1.default)((req, res, next) => __a
     });
 }));
 exports.authorizeTransactiongroup = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { authorizationCode, approvalCode } = req.body;
+    const { authorizationCode, approvalCode, action } = req.body;
     const { testid, referencecategory } = req.params; // 🔹 use testId instead of single id
     const { _id } = (req.user).user;
     const createdBy = `${_id}`;
     (0, otherservices_1.validateinputfaulsyvalue)({
-        authorizationCode,
-        approvalCode,
         referencecategory,
+        action,
         testid,
     });
+    if (action == "approve")
+        (0, otherservices_1.validateinputfaulsyvalue)({ authorizationCode, approvalCode });
     let insuranceClaims = [];
     // Fetch all records that match the group testId
     let records = [];
@@ -426,6 +430,7 @@ exports.authorizeTransactiongroup = (0, catchAsync_1.default)((req, res, next) =
                 authorizationCode,
                 approvalCode,
                 createdBy,
+                action
             });
         }
         else if (referencecategory === config_1.default.referencecategory[1]) {
@@ -433,6 +438,7 @@ exports.authorizeTransactiongroup = (0, catchAsync_1.default)((req, res, next) =
                 authorizationCode,
                 approvalCode,
                 createdBy,
+                action
             });
         }
         else if (referencecategory === config_1.default.referencecategory[2]) {
@@ -440,6 +446,7 @@ exports.authorizeTransactiongroup = (0, catchAsync_1.default)((req, res, next) =
                 authorizationCode,
                 approvalCode,
                 createdBy,
+                action
             });
         }
         else if (referencecategory === config_1.default.referencecategory[3]) {
@@ -447,6 +454,7 @@ exports.authorizeTransactiongroup = (0, catchAsync_1.default)((req, res, next) =
                 authorizationCode,
                 approvalCode,
                 createdBy,
+                action
             });
         }
         if (insuranceClaim) {
