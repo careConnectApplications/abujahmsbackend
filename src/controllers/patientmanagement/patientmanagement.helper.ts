@@ -239,11 +239,12 @@ const HMOPatientStrategy: PatientRegistrationStrategy = {
         payment: payments[0]._id,
         authorizationCode: reqBody.authorizationcode || "",
         approvalCode: reqBody.approvalCode || "",
-        amountClaimed: Number(annualsubscriptionnewRegistrationPrice.amount),
-        amountApproved: Number(annualsubscriptionnewRegistrationPrice.amount) - annualsubscriptionamount,
+        amountClaimed: annualsubscriptionamount,
+        amountApproved: annualsubscriptionamount,
         insurer: HMOName,
         createdBy: reqBody.createdBy,
-        action: "approve"
+        action: "approve",
+        actualcost: Number(annualsubscriptionnewRegistrationPrice.amount)
       });
     }
     
@@ -255,11 +256,12 @@ const HMOPatientStrategy: PatientRegistrationStrategy = {
         payment: payments[1]._id,
         authorizationCode: reqBody.authorizationcode || "",
         approvalCode: reqBody.approvalCode || "",
-        amountClaimed: Number(cardfeenewRegistrationPrice.amount),
-        amountApproved: Number(cardfeenewRegistrationPrice.amount) - cardfeeamountamount,
+        amountClaimed: cardfeeamountamount,
+        amountApproved: cardfeeamountamount,
         insurer: HMOName,
         createdBy: reqBody.createdBy,
-        action: "approve"
+        action: "approve",
+        actualcost: Number(cardfeenewRegistrationPrice.amount)
       });
     }
 
@@ -286,11 +288,12 @@ const HMOPatientStrategy: PatientRegistrationStrategy = {
           payment: payments[2]._id,
           authorizationCode: reqBody.authorizationcode || "",
           approvalCode: reqBody.approvalCode || "",
-          amountClaimed: Number(appointmentPrice.amount),
-          amountApproved: Number(appointmentPrice.amount) - appointmentAmount,
+          amountClaimed: appointmentAmount,
+          amountApproved: appointmentAmount,
           insurer: HMOName,
           createdBy: reqBody.createdBy,
-          action: "approve"
+          action: "approve",
+          actualcost: Number(appointmentPrice.amount)
         });
       }
 
