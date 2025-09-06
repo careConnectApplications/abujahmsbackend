@@ -18,6 +18,7 @@ const paymentSchema = new Schema(
     MRN:String,
     HMOId:String,
     phoneNumber:String,
+    department: String,
     paymentype: {
       required: true,
       type: String,
