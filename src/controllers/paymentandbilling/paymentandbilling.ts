@@ -562,11 +562,12 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
   const { patientId } = req.params;
   const {
     serviceCategory, amount,
-    serviceType, phoneNumber } = req.body;
+    serviceType, phoneNumber, option, department } = req.body;
 
   const { _id: userId } = (req.user).user;
 
-  const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+  // Fetch patient with insurance populated (like laborder does)
+  const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
   if (!foundPatient) {
     return next(new ApiError(404, `Patient do not already exists`));
@@ -574,20 +575,83 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
 
   const { firstName, lastName, } = foundPatient;
 
+  // Handle fixed pricing option
+  let finalAmount = Number(amount);
+  let actualAmount = Number(amount); // Store original amount for insurance claims
+  
+  if (option === "fixed") {
+    // Fetch price from database like laborder does
+    const servicePrice: any = await readoneprice({ 
+      servicecategory: serviceCategory,
+      servicetype: serviceType 
+    });
+    
+    if (!servicePrice || servicePrice.amount == null) {
+      throw new Error(`${configuration.error.errornopriceset} for ${serviceCategory}/${serviceType}`);
+    }
+    
+    finalAmount = Number(servicePrice.amount);
+    actualAmount = Number(servicePrice.amount);
+  }
+
+  // Calculate HMO coverage for insurance patients (like laborder)
+  let hmopercentagecover = 0;
+  if (foundPatient.insurance) {
+    const insurance: any = await readonehmocategorycover(
+      { 
+        hmoId: foundPatient.insurance._id, 
+        category: serviceCategory 
+      }, 
+      { hmopercentagecover: 1 }
+    );
+    
+    hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+    
+    // Adjust amount based on HMO coverage
+    if (hmopercentagecover > 0) {
+      finalAmount = calculateAmountPaidByHMO(
+        Number(hmopercentagecover), 
+        actualAmount
+      );
+    }
+  }
+
   const refNumber = generatePaymentNumber();
+  
 
   const paymentInfo = await createpayment({
     firstName,
     lastName,
-    MRN: req.body.MRN,
+    MRN: req.body.MRN || foundPatient.MRN,
     phoneNumber,
+    billingtype:"custom-billing",
+    department, // Add department to payment
     paymentreference: refNumber,
     paymentype: serviceType,
     paymentcategory: serviceCategory,
     patient: foundPatient._id,
-    amount: Number(amount),
+    amount: finalAmount,
     createdById: userId,
   });
+
+  // Create insurance claim for HMO patients with coverage > 0
+  if (hmopercentagecover > 0 && paymentInfo) {
+    const insuranceClaim = {
+      patient: foundPatient._id,
+      serviceCategory: serviceCategory,
+      payment: paymentInfo._id,
+      authorizationCode: foundPatient.authorizationCode || req.body.authorizationCode || "",
+      approvalCode: foundPatient.approvalCode || req.body.approvalCode || "",
+      amountClaimed: finalAmount, // Original amount before HMO adjustment
+      amountApproved: finalAmount,
+      insurer: foundPatient.HMOName,
+      createdBy: userId,
+      action: "approve",
+      actualcost: actualAmount
+    };
+    
+    await createInsuranceClaim(insuranceClaim);
+  }
 
   res.status(201).json({
     status: true,
