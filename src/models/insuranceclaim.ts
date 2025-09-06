@@ -13,6 +13,7 @@ export interface IInsuranceClaim extends Document {
   status: "Submitted" | "Re-submitted" | "Cancelled" | "Rejected" | "Paid";
   amountClaimed: number;
   amountApproved?: number;
+  actualcost?: number;
   action?: "approve" | "reject";
   insurer?: string;
   createdBy?: mongoose.Types.ObjectId;
@@ -39,6 +40,7 @@ const InsuranceClaimSchema: Schema<IInsuranceClaim> = new Schema(
     },
     amountClaimed: { type: Number, required: true },
     amountApproved: { type: Number },
+    actualcost:{ type: Number },
     insurer: { type: String },
     createdBy: { type: Schema.Types.ObjectId, ref: "Users" },
   },

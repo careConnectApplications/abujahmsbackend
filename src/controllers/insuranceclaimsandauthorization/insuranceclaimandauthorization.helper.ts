@@ -27,7 +27,7 @@ async function handlePayment(patient: any, paymentData: any, updateFn: Function,
 
 
 // 🔹 Generate insurance claim
-function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action }: any) {
+function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action,actualcost }: any) {
   return {
     patient: patient._id,
     serviceCategory,
@@ -38,7 +38,8 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
     amountApproved: amount,
     insurer: patient.HMOName,
     createdBy,
-    action
+    action,
+    actualcost
   };
 }
 
@@ -85,7 +86,8 @@ export async function processLab(id: string, ctx: any) {
     approvalCode,
     amount:approvedamount,
     createdBy,
-    action
+    action,
+    actualcost
   });
 }
 
@@ -123,7 +125,8 @@ export async function processRadiology(id: string, ctx: any) {
     approvalCode,
     amount:approvedamount,
     createdBy,
-    action
+    action,
+    actualcost
   });
 }
 
@@ -160,7 +163,8 @@ export async function processProcedure(id: string, ctx: any) {
     approvalCode,
     amount:approvedamount,
     createdBy,
-    action
+    action,
+    actualcost
   });
 }
 
@@ -197,7 +201,8 @@ export async function processPharmacy(id: string, ctx: any) {
     approvalCode,
     amount:approvedamount,
     createdBy,
-    action
+    action,
+    actualcost
   });
 }
 
@@ -228,7 +233,8 @@ export async function processHistopathology(id: any, ctx: any){
     approvalCode,
     amount:approvedamount,
     createdBy,
-    action
+    action,
+    actualcost
   });
     
     

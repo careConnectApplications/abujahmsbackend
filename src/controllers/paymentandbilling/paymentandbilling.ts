@@ -617,12 +617,14 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
   }
 
   const refNumber = generatePaymentNumber();
+  
 
   const paymentInfo = await createpayment({
     firstName,
     lastName,
     MRN: req.body.MRN || foundPatient.MRN,
     phoneNumber,
+    billingtype:"custom-billing",
     department, // Add department to payment
     paymentreference: refNumber,
     paymentype: serviceType,
@@ -640,11 +642,12 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
       payment: paymentInfo._id,
       authorizationCode: foundPatient.authorizationCode || req.body.authorizationCode || "",
       approvalCode: foundPatient.approvalCode || req.body.approvalCode || "",
-      amountClaimed: actualAmount, // Original amount before HMO adjustment
-      amountApproved: actualAmount,
+      amountClaimed: finalAmount, // Original amount before HMO adjustment
+      amountApproved: finalAmount,
       insurer: foundPatient.HMOName,
       createdBy: userId,
-      action: "approve"
+      action: "approve",
+      actualcost: actualAmount
     };
     
     await createInsuranceClaim(insuranceClaim);
