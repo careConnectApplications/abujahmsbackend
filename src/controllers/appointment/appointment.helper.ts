@@ -46,9 +46,10 @@ export const FreeAppointmentStrategy = async ({ patientrecord, appointmentid, re
       entityKey: "appointment",
       authorizationCode: "",
       approvalCode: "",
-      amount: appointmentPrice?.amount || 0, // Use the full appointment price for claim
+      amount,
       createdBy: createdBy,
-      action: "approve"
+      action: "approve",
+       actualcost: appointmentPrice?.amount
     });
     await createInsuranceClaim(insuranceClaim);
   }
@@ -95,9 +96,10 @@ export const PaidAppointmentStrategy = async ({ patientrecord, appointmentid, re
       entityKey: "appointment",
       authorizationCode: "",
       approvalCode: "",
-      amount: appointmentPrice?.amount || 0, // Use the full appointment price for claim
+      amount,
       createdBy: createdBy,
-      action: "approve"
+      action: "approve",
+      actualcost: appointmentPrice?.amount
     });
     await createInsuranceClaim(insuranceClaim);
   }
