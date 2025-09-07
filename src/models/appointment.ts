@@ -533,6 +533,14 @@ const appointmentSchema = new Schema({
     required: true
   },
   additionalnote: String,
+  inprogressStartDate: {
+    type: Date,
+    default: null
+  },
+  completedDate: {
+    type: Date,
+    default: null
+  },
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
@@ -673,7 +681,101 @@ appointmentSchema.index({ status: 1 });                           // Filter by s
 appointmentSchema.index({ createdAt: -1 }); // Sort by creation time
 
 appointmentSchema.index({ clinic: 1, status: 1 });
+
+// Middleware to track status changes and set corresponding dates
+// Pre-save middleware (for new documents and .save() operations)
+appointmentSchema.pre('save', function(next) {
+  // Check if status field is being modified
+  if (this.isModified('status')) {
+    const currentStatus = this.status;
+    
+    // Set inprogressStartDate when status changes to "inprogress"
+    if (currentStatus === configuration.status[9] && !this.inprogressStartDate) {
+      this.inprogressStartDate = new Date();
+    }
+    
+    // Set completedDate when status changes to "complete"
+    if (currentStatus === configuration.status[6] && !this.completedDate) {
+      this.completedDate = new Date();
+    }
+  }
+  
+  next();
+});
+
+// Pre-findOneAndUpdate middleware (for update operations like in addclinicalencounter)
+appointmentSchema.pre('findOneAndUpdate', async function(next) {
+  const update = this.getUpdate() as any;
+  
+  // Check if status is being updated
+  if (update.status || update.$set?.status) {
+    const newStatus = update.status || update.$set?.status;
+    
+    // Prepare update object if not using $set
+    if (!update.$set) {
+      update.$set = {};
+    }
+    
+    // Get the current document to check existing dates
+    const conditions = this.getQuery();
+    const currentDoc = await this.model.findOne(conditions).select('inprogressStartDate completedDate');
+    
+    // Set inprogressStartDate when status changes to "inprogress"
+    if (newStatus === configuration.status[9]) {
+      // Only set if not already set in the document
+      if (currentDoc && !currentDoc.inprogressStartDate && !update.$set.inprogressStartDate) {
+        update.$set.inprogressStartDate = new Date();
+      }
+    }
+    
+    // Set completedDate when status changes to "complete"
+    if (newStatus === configuration.status[6]) {
+      // Only set if not already set in the document
+      if (currentDoc && !currentDoc.completedDate && !update.$set.completedDate) {
+        update.$set.completedDate = new Date();
+      }
+    }
+  }
+  
+  next();
+});
+
+// Pre-updateOne middleware (for direct update operations)
+appointmentSchema.pre('updateOne', async function(next) {
+  const update = this.getUpdate() as any;
+  
+  // Check if status is being updated
+  if (update.status || update.$set?.status) {
+    const newStatus = update.status || update.$set?.status;
+    
+    // Prepare update object if not using $set
+    if (!update.$set) {
+      update.$set = {};
+    }
+    
+    // Get the current document to check existing dates
+    const conditions = this.getQuery();
+    const currentDoc = await this.model.findOne(conditions).select('inprogressStartDate completedDate');
+    
+    // Set inprogressStartDate when status changes to "inprogress"
+    if (newStatus === configuration.status[9]) {
+      // Only set if not already set in the document
+      if (currentDoc && !currentDoc.inprogressStartDate && !update.$set.inprogressStartDate) {
+        update.$set.inprogressStartDate = new Date();
+      }
+    }
+    
+    // Set completedDate when status changes to "complete"
+    if (newStatus === configuration.status[6]) {
+      // Only set if not already set in the document
+      if (currentDoc && !currentDoc.completedDate && !update.$set.completedDate) {
+        update.$set.completedDate = new Date();
+      }
+    }
+  }
+  
+  next();
+});
+
 const appointment = model('Appointment', appointmentSchema);
 export default appointment;
-
-

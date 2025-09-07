@@ -85,6 +85,23 @@ const admissionSchema = new Schema({
 { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+admissionSchema.index({ patient: 1 });
+admissionSchema.index({ appointment: 1 });
+admissionSchema.index({ bed: 1 });
+admissionSchema.index({ admissionid: 1 });
+admissionSchema.index({ status: 1 });
+admissionSchema.index({ referedward: 1 });
+admissionSchema.index({ createdAt: -1 });
+admissionSchema.index({ referddate: 1 });
+
+// Compound indexes for common query patterns
+admissionSchema.index({ patient: 1, status: 1 });
+admissionSchema.index({ bed: 1, status: 1 });
+admissionSchema.index({ status: 1, createdAt: -1 });
+admissionSchema.index({ admissionid: 1, status: 1 });
+
 const admission= model('Admission', admissionSchema);
 export default admission;
 

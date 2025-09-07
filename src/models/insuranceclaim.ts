@@ -47,6 +47,27 @@ const InsuranceClaimSchema: Schema<IInsuranceClaim> = new Schema(
   { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+InsuranceClaimSchema.index({ patient: 1 });
+InsuranceClaimSchema.index({ status: 1 });
+InsuranceClaimSchema.index({ serviceCategory: 1 });
+InsuranceClaimSchema.index({ insurer: 1 });
+InsuranceClaimSchema.index({ createdAt: -1 });
+InsuranceClaimSchema.index({ authorizationCode: 1 });
+InsuranceClaimSchema.index({ approvalCode: 1 });
+InsuranceClaimSchema.index({ lab: 1 });
+InsuranceClaimSchema.index({ radiology: 1 });
+InsuranceClaimSchema.index({ procedure: 1 });
+InsuranceClaimSchema.index({ pharmacy: 1 });
+InsuranceClaimSchema.index({ histopathology: 1 });
+
+// Compound indexes for common query patterns
+InsuranceClaimSchema.index({ patient: 1, status: 1 });
+InsuranceClaimSchema.index({ status: 1, createdAt: -1 });
+InsuranceClaimSchema.index({ serviceCategory: 1, status: 1 });
+InsuranceClaimSchema.index({ insurer: 1, status: 1 });
+
 export default mongoose.model<IInsuranceClaim>(
   "InsuranceClaim",
   InsuranceClaimSchema

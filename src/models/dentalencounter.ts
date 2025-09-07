@@ -124,6 +124,18 @@ const dentalEncounterSchema = new Schema({
   timestamps: true
 });
 
+// Add indexes for performance optimization
+// Single field indexes
+dentalEncounterSchema.index({ patientId: 1 });
+dentalEncounterSchema.index({ appointmentId: 1 });
+dentalEncounterSchema.index({ admissionId: 1 });
+dentalEncounterSchema.index({ createdAt: -1 });
+dentalEncounterSchema.index({ 'procedurePerformed.procedureDate': 1 });
+
+// Compound indexes for common query patterns
+dentalEncounterSchema.index({ patientId: 1, createdAt: -1 });
+dentalEncounterSchema.index({ appointmentId: 1, patientId: 1 });
+
 const DentalRecord = model("DentalEncounter", dentalEncounterSchema);
 export default DentalRecord;
 
