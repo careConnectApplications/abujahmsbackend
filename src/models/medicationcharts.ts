@@ -33,6 +33,21 @@ const medicalchartsSchema = new Schema({
 { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+medicalchartsSchema.index({ patient: 1 });
+medicalchartsSchema.index({ admission: 1 });
+medicalchartsSchema.index({ prescription: 1 });
+medicalchartsSchema.index({ referedward: 1 });
+medicalchartsSchema.index({ drug: 1 });
+medicalchartsSchema.index({ createdAt: -1 });
+
+// Compound indexes for common query patterns
+medicalchartsSchema.index({ patient: 1, createdAt: -1 });
+medicalchartsSchema.index({ admission: 1, createdAt: -1 });
+medicalchartsSchema.index({ patient: 1, admission: 1 });
+medicalchartsSchema.index({ referedward: 1, createdAt: -1 });
+
 const medicationchart= model('Medicationchart', medicalchartsSchema);
 export default medicationchart;
 

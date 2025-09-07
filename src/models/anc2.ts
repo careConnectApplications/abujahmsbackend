@@ -64,5 +64,16 @@ const anc2Schema = new Schema({
 
 })
 
+// Add indexes for performance optimization
+// Single field indexes
+anc2Schema.index({ patient: 1 });
+anc2Schema.index({ 'reproductiveprofile.lmp': 1 });
+anc2Schema.index({ 'reproductiveprofile.edd': 1 });
+anc2Schema.index({ 'reproductiveprofile.bookingstatus': 1 });
+
+// Compound indexes for common query patterns
+anc2Schema.index({ patient: 1, 'reproductiveprofile.edd': 1 });
+anc2Schema.index({ patient: 1, 'reproductiveprofile.lmp': 1 });
+
 const anc2 = model('Anc2', anc2Schema);
 export default anc2;
