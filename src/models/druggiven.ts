@@ -39,5 +39,15 @@ const druggivenSchema = new Schema({
 },
 { timestamps: true }
 );
+
+// Single field indexes
+druggivenSchema.index({ anathesia: 1 }); // For looking up drugs given for a specific anesthesia
+druggivenSchema.index({ timegiven: -1 }); // For sorting by administration time
+druggivenSchema.index({ staffname: 1 }); // For staff-based queries
+druggivenSchema.index({ createdAt: -1 }); // For sorting by creation date
+
+// Compound indexes for common query patterns
+druggivenSchema.index({ anathesia: 1, timegiven: -1 }); // For finding recent drug administrations for a specific anesthesia
+
 const druggiven = model('Druggiven', druggivenSchema);
 export default druggiven;

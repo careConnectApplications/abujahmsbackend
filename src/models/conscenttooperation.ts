@@ -30,5 +30,14 @@ const conscenttooperationSchema = new Schema({
 },
     { timestamps: true }
 );
+
+// Single field indexes
+conscenttooperationSchema.index({ theatreadmission: 1 }); // For looking up consent by theatre admission
+conscenttooperationSchema.index({ conscentdate: -1 }); // For sorting by consent date
+conscenttooperationSchema.index({ createdAt: -1 }); // For sorting by creation date
+
+// Compound indexes for common query patterns
+conscenttooperationSchema.index({ theatreadmission: 1, conscentdate: -1 }); // For finding recent consents for a specific admission
+
 const conscenttooperation = model('Conscenttooperation', conscenttooperationSchema);
 export default conscenttooperation;
