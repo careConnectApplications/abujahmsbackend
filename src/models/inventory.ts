@@ -48,6 +48,22 @@ const inventorySchema = new Schema({
 { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes for primary lookups
+inventorySchema.index({ name: 1 });
+inventorySchema.index({ category: 1 });
+inventorySchema.index({ qty: 1 });
+inventorySchema.index({ lowstocklevel: 1 });
+inventorySchema.index({ expirationdate: 1 });
+inventorySchema.index({ lastrestockdate: 1 });
+inventorySchema.index({ price: 1 });
+
+// Compound indexes for common query patterns
+inventorySchema.index({ category: 1, name: 1 }); // Category-based item lookup
+inventorySchema.index({ qty: 1, lowstocklevel: 1 }); // Low stock monitoring
+inventorySchema.index({ expirationdate: 1, category: 1 }); // Expiry tracking by category
+inventorySchema.index({ name: 1, category: 1, qty: 1 }); // Inventory search and status
+
 const inventory = model('Inventory', inventorySchema);
 export default inventory;
 

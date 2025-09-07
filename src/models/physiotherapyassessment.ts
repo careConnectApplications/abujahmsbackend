@@ -105,10 +105,21 @@ const physiotherapyAssessmentSchema = new Schema({
   timestamps: true
 });
 
+// Add indexes for performance optimization
+// Single field indexes for primary lookups
+physiotherapyAssessmentSchema.index({ patientId: 1 });
+physiotherapyAssessmentSchema.index({ appointmentId: 1 });
+physiotherapyAssessmentSchema.index({ admissionId: 1 });
+physiotherapyAssessmentSchema.index({ createdAt: -1 });
+
+// Compound indexes for common query patterns
+physiotherapyAssessmentSchema.index({ patientId: 1, createdAt: -1 }); // Patient assessment history
+physiotherapyAssessmentSchema.index({ appointmentId: 1, patientId: 1 }); // Assessment for specific appointment
+physiotherapyAssessmentSchema.index({ admissionId: 1, createdAt: -1 }); // Admission assessments timeline
+
 const PhysiotherapyAssessment = mongoose.model(
   "PhysiotherapyAssessment",
   physiotherapyAssessmentSchema
 );
 
 export default PhysiotherapyAssessment;
-
