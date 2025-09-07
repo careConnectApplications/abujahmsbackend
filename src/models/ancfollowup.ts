@@ -1,4 +1,3 @@
-
 import { Schema, model } from "mongoose";
 import configuration from "../config";
 const ancfollowupSchema = new Schema({
@@ -26,10 +25,13 @@ staffname:String
 { timestamps: true }
 );
 
+// Single field indexes
+ancfollowupSchema.index({ anc: 1 }); // For looking up follow-ups for a specific ANC record
+ancfollowupSchema.index({ createdAt: -1 }); // For sorting by date
+ancfollowupSchema.index({ staffname: 1 }); // For staff-based queries
+
+// Compound indexes for common query patterns
+ancfollowupSchema.index({ anc: 1, createdAt: -1 }); // For finding recent follow-ups for a specific ANC
+
 const ancfollowup= model('Ancfollowup', ancfollowupSchema);
 export default ancfollowup;
-
-
-
-
-

@@ -19,6 +19,14 @@ const doctorWardRoundSchema = new Schema({
     }
 }, { timestamps: true });
 
+// Additional indexes for performance
+doctorWardRoundSchema.index({ createdBy: 1 }); // For staff-based queries
+doctorWardRoundSchema.index({ createdAt: -1 }); // For sorting by date
+
+// Compound indexes for common query patterns
+doctorWardRoundSchema.index({ admissionId: 1, createdAt: -1 }); // For finding recent rounds for an admission
+doctorWardRoundSchema.index({ createdBy: 1, createdAt: -1 }); // For finding recent rounds by a specific doctor
+
 doctorWardRoundSchema.pre<any>(/^find/, function (next) {
     this.populate({
         path: "admissionId createdBy",

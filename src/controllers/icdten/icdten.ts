@@ -17,9 +17,7 @@ export const readicdten = async (req:any, res:any) => {
   export const readicdeleven = async (req:any, res:any) => {
     try {
      const {diagnosis} = req.body;
-     let result = await axios.get(`https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${diagnosis}`);
-     let resultica10 = await axios.get(`https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code,name&terms=${diagnosis}`);
-
+     
     const [icd11Res, icd10Res]:any = await Promise.all([
       axios.get(
         `https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${encodeURIComponent(diagnosis)}`
