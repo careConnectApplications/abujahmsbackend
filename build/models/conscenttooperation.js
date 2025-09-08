@@ -27,5 +27,11 @@ const conscenttooperationSchema = new mongoose_1.Schema({
         default: null,
     },
 }, { timestamps: true });
+// Single field indexes
+conscenttooperationSchema.index({ theatreadmission: 1 }); // For looking up consent by theatre admission
+conscenttooperationSchema.index({ conscentdate: -1 }); // For sorting by consent date
+conscenttooperationSchema.index({ createdAt: -1 }); // For sorting by creation date
+// Compound indexes for common query patterns
+conscenttooperationSchema.index({ theatreadmission: 1, conscentdate: -1 }); // For finding recent consents for a specific admission
 const conscenttooperation = (0, mongoose_1.model)('Conscenttooperation', conscenttooperationSchema);
 exports.default = conscenttooperation;
