@@ -63,6 +63,18 @@ const vitalchartsSchema = new mongoose_1.Schema({
     },
     staffname: String,
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes for primary lookups
+vitalchartsSchema.index({ patient: 1 });
+vitalchartsSchema.index({ admission: 1 });
+vitalchartsSchema.index({ referedward: 1 });
+vitalchartsSchema.index({ status: 1 });
+vitalchartsSchema.index({ createdAt: -1 });
+// Compound indexes for common query patterns
+vitalchartsSchema.index({ patient: 1, createdAt: -1 }); // Patient vital history
+vitalchartsSchema.index({ admission: 1, createdAt: -1 }); // Admission vital tracking
+vitalchartsSchema.index({ referedward: 1, createdAt: -1 }); // Ward-specific vitals
+vitalchartsSchema.index({ patient: 1, status: 1 }); // Patient vitals by status
 const vitalchart = (0, mongoose_1.model)('Vitalchart', vitalchartsSchema);
 exports.default = vitalchart;
 /*
@@ -73,4 +85,4 @@ exports.default = vitalchart;
     order_price DECIMAL(10, 2),
     FOREIGN KEY (order_id) REFERENCES PurchaseOrders(order_id),
     FOREIGN KEY (drug_id) REFERENCES Drugs(drug_id)
-*/ 
+*/

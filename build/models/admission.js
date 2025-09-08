@@ -70,6 +70,21 @@ const admissionSchema = new mongoose_1.Schema({
         required: true
     }
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+admissionSchema.index({ patient: 1 });
+admissionSchema.index({ appointment: 1 });
+admissionSchema.index({ bed: 1 });
+admissionSchema.index({ admissionid: 1 });
+admissionSchema.index({ status: 1 });
+admissionSchema.index({ referedward: 1 });
+admissionSchema.index({ createdAt: -1 });
+admissionSchema.index({ referddate: 1 });
+// Compound indexes for common query patterns
+admissionSchema.index({ patient: 1, status: 1 });
+admissionSchema.index({ bed: 1, status: 1 });
+admissionSchema.index({ status: 1, createdAt: -1 });
+admissionSchema.index({ admissionid: 1, status: 1 });
 const admission = (0, mongoose_1.model)('Admission', admissionSchema);
 exports.default = admission;
 /*
@@ -80,4 +95,4 @@ exports.default = admission;
     order_price DECIMAL(10, 2),
     FOREIGN KEY (order_id) REFERENCES PurchaseOrders(order_id),
     FOREIGN KEY (drug_id) REFERENCES Drugs(drug_id)
-*/ 
+*/

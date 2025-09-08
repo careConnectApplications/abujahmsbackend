@@ -23,5 +23,11 @@ const ancfollowup3Schema = new mongoose_1.Schema({
     remark: String,
     staffname: String
 }, { timestamps: true });
+// Single field indexes
+ancfollowup3Schema.index({ anc: 1 }); // For looking up follow-ups for a specific ANC3 record
+ancfollowup3Schema.index({ createdAt: -1 }); // For sorting by date
+ancfollowup3Schema.index({ staffname: 1 }); // For staff-based queries
+// Compound indexes for common query patterns
+ancfollowup3Schema.index({ anc: 1, createdAt: -1 }); // For finding recent follow-ups for a specific ANC3
 const ancfollowup3 = (0, mongoose_1.model)('Ancfollowup3', ancfollowup3Schema);
 exports.default = ancfollowup3;

@@ -12,6 +12,12 @@ const paymentSchema = new mongoose_1.Schema({
     MRN: String,
     HMOId: String,
     phoneNumber: String,
+    department: String,
+    billingtype: {
+        type: String,
+        enum: ["non-custom-billing", "custom-billing"], // add all valid options
+        default: "non-custom-billing"
+    },
     paymentype: {
         required: true,
         type: String,

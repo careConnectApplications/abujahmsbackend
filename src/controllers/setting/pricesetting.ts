@@ -214,4 +214,39 @@ export const getpriceofservice = catchAsync(async (req: Request | any, res: Resp
 
       
   })
-  
+
+// Get all service types for a received service category
+export async function getServiceTypesByCategory(req: any, res: any) {
+  try {
+    const { servicecategory } = req.params;
+    
+    // Validate that service category is provided
+    if (!servicecategory) {
+      throw new Error("Service category is required");
+    }
+    
+    // Query to get all service types for the given service category
+    const queryresult = await readallprices(
+      { 
+        servicecategory: servicecategory,
+        status: configuration.status[1] // Only get active prices
+      },
+      { 
+        servicetype: 1, 
+        _id: 0 
+      }
+    );
+    
+    // Extract unique service types
+    const uniqueServiceTypes = [...new Set(queryresult.pricedetails.map((item: any) => item.servicetype))];
+    
+    res.status(200).json({
+      queryresult: uniqueServiceTypes,
+      status: true
+    });
+    
+  } catch (e: any) {
+    console.log(e);
+    res.status(403).json({ status: false, msg: e.message });
+  }
+}

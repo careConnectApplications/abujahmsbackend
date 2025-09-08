@@ -251,7 +251,7 @@ function updateauthorizationcode(req, res) {
 var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const appointmentid = String(Date.now());
-        const { unit, clinic, dateOfBirth, phoneNumber, isHMOCover, alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature, appointmentdate, appointmentcategory, appointmenttype } = req.body;
+        const { unit, clinic, dateOfBirth, phoneNumber, isHMOCover, alternatePhoneNumber, bloodGroup, genotype, bp, heartRate, temperature, appointmentdate, appointmentcategory, appointmenttype, HMOName, HMOId, HMOPlan } = req.body;
         const clinicalInformation = {
             bloodGroup, genotype, bp, heartRate, temperature
         };
@@ -260,6 +260,8 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // chaorten the MRN to alphanumeric 
         req.body.MRN = uniqunumber;
         req.body.password = config_1.default.defaultPassword;
+        if (HMOName || HMOId || HMOPlan)
+            req.body.isHMOCover = config_1.default.ishmo[1];
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
@@ -274,10 +276,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         //if not dateObirth but age calculate date of birth
         if (!dateOfBirth && req.body.age)
             req.body.dateOfBirth = (0, moment_1.default)().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
-        if (!(isHMOCover == config_1.default.ishmo[1] || isHMOCover == true)) {
-            delete req.body.authorizationcode;
-            delete req.body.facilitypateintreferedfrom;
-        }
         var selectquery = {
             "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
             "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1

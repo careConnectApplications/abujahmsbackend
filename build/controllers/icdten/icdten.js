@@ -33,10 +33,16 @@ exports.readicdten = readicdten;
 const readicdeleven = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { diagnosis } = req.body;
-        let result = yield axios_1.default.get(`https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${diagnosis}`);
-        let queryresult = result.data;
+        const [icd11Res, icd10Res] = yield Promise.all([
+            axios_1.default.get(`https://clinicaltables.nlm.nih.gov/api/icd11_codes/v3/search?terms=${encodeURIComponent(diagnosis)}`),
+            axios_1.default.get(`https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code,name&terms=${encodeURIComponent(diagnosis)}`)
+        ]);
+        const icd11List = icd11Res.data[3] || [];
+        const icd10List = icd10Res.data[3] || [];
+        // Merge both into one array
+        const mergedResults = [...icd11List, ...icd10List];
         res.status(200).json({
-            queryresult: queryresult[3],
+            queryresult: mergedResults,
             status: true
         });
     }

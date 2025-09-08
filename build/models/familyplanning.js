@@ -51,5 +51,11 @@ const familyplanningSchema = new mongoose_1.Schema({
     referredmedicalreferred: String,
     staffname: String
 }, { timestamps: true });
+// Single field indexes
+familyplanningSchema.index({ patient: 1 }); // For looking up family planning records by patient
+familyplanningSchema.index({ createdAt: -1 }); // For sorting by date
+familyplanningSchema.index({ staffname: 1 }); // For staff-based queries
+// Compound indexes for common query patterns
+familyplanningSchema.index({ patient: 1, createdAt: -1 }); // For finding recent family planning records for a specific patient
 const familyplanning = (0, mongoose_1.model)('Familyplanning', familyplanningSchema);
 exports.default = familyplanning;

@@ -42,7 +42,7 @@ function handlePayment(patient, paymentData, updateFn, updateFilter, amountstatu
     });
 }
 // 🔹 Generate insurance claim
-function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action }) {
+function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action, actualcost }) {
     return {
         patient: patient._id,
         serviceCategory,
@@ -53,7 +53,8 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
         amountApproved: amount,
         insurer: patient.HMOName,
         createdBy,
-        action
+        action,
+        actualcost
     };
 }
 // 🔹 Common payment reference resolver
@@ -93,7 +94,8 @@ function processLab(id, ctx) {
             approvalCode,
             amount: approvedamount,
             createdBy,
-            action
+            action,
+            actualcost
         });
     });
 }
@@ -129,7 +131,8 @@ function processRadiology(id, ctx) {
             approvalCode,
             amount: approvedamount,
             createdBy,
-            action
+            action,
+            actualcost
         });
     });
 }
@@ -164,7 +167,8 @@ function processProcedure(id, ctx) {
             approvalCode,
             amount: approvedamount,
             createdBy,
-            action
+            action,
+            actualcost
         });
     });
 }
@@ -199,7 +203,8 @@ function processPharmacy(id, ctx) {
             approvalCode,
             amount: approvedamount,
             createdBy,
-            action
+            action,
+            actualcost
         });
     });
 }
@@ -231,7 +236,8 @@ function processHistopathology(id, ctx) {
             approvalCode,
             amount: approvedamount,
             createdBy,
-            action
+            action,
+            actualcost
         });
     });
 }

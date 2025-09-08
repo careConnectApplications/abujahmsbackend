@@ -52,7 +52,27 @@ const InsuranceClaimSchema = new mongoose_1.Schema({
     },
     amountClaimed: { type: Number, required: true },
     amountApproved: { type: Number },
+    actualcost: { type: Number },
     insurer: { type: String },
     createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "Users" },
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+InsuranceClaimSchema.index({ patient: 1 });
+InsuranceClaimSchema.index({ status: 1 });
+InsuranceClaimSchema.index({ serviceCategory: 1 });
+InsuranceClaimSchema.index({ insurer: 1 });
+InsuranceClaimSchema.index({ createdAt: -1 });
+InsuranceClaimSchema.index({ authorizationCode: 1 });
+InsuranceClaimSchema.index({ approvalCode: 1 });
+InsuranceClaimSchema.index({ lab: 1 });
+InsuranceClaimSchema.index({ radiology: 1 });
+InsuranceClaimSchema.index({ procedure: 1 });
+InsuranceClaimSchema.index({ pharmacy: 1 });
+InsuranceClaimSchema.index({ histopathology: 1 });
+// Compound indexes for common query patterns
+InsuranceClaimSchema.index({ patient: 1, status: 1 });
+InsuranceClaimSchema.index({ status: 1, createdAt: -1 });
+InsuranceClaimSchema.index({ serviceCategory: 1, status: 1 });
+InsuranceClaimSchema.index({ insurer: 1, status: 1 });
 exports.default = mongoose_1.default.model("InsuranceClaim", InsuranceClaimSchema);

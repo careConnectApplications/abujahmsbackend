@@ -137,6 +137,22 @@ userSchema.pre("save", function (next) {
         }
     });
 });
+// Add indexes for performance optimization
+// Single field indexes for primary lookups
+userSchema.index({ staffId: 1 });
+userSchema.index({ roleId: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ status: 1 });
+userSchema.index({ clinic: 1 });
+userSchema.index({ createdAt: -1 });
+userSchema.index({ profession: 1 });
+userSchema.index({ employmentStatus: 1 });
+// Compound indexes for common query patterns
+userSchema.index({ email: 1, status: 1 }); // Login and status check
+userSchema.index({ role: 1, status: 1 }); // Active users by role
+userSchema.index({ clinic: 1, status: 1 }); // Active users by clinic
+userSchema.index({ clinic: 1, role: 1, status: 1 }); // Clinic staff by role
+userSchema.index({ staffId: 1, status: 1 }); // Staff lookup with status
 //create a model
 const users = (0, mongoose_1.model)("Users", userSchema);
 //export the model

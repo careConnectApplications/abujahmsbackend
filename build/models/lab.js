@@ -118,5 +118,17 @@ const labSchema = new mongoose_1.Schema({
         trim: true,
     },
 }, { timestamps: true });
+// Indexes to optimize common queries
+labSchema.index({ patient: 1 }); // Lookup by patient
+labSchema.index({ appointment: 1 }); // Lookup by appointment
+labSchema.index({ appointmentid: 1 }); // Lookup by appointment ID
+labSchema.index({ status: 1 }); // Filter by status
+labSchema.index({ testid: 1 }); // Lookup by test ID
+labSchema.index({ sortbydate: 1 }); // Sort by date
+labSchema.index({ createdAt: -1 }); // Sort by creation time (descending)
+// Compound indexes for common query combinations
+labSchema.index({ patient: 1, status: 1 }); // Patient's tests by status
+labSchema.index({ appointmentid: 1, status: 1 }); // Appointment tests by status
+labSchema.index({ status: 1, createdAt: -1 }); // Recent tests by status
 const lab = (0, mongoose_1.model)('Lab', labSchema);
 exports.default = lab;
