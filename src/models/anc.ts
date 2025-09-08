@@ -144,5 +144,15 @@ const ancSchema = new Schema({
 
 })
 
+// Add indexes for performance optimization
+ancSchema.index({ patient: 1 }); // Lookup by patient
+ancSchema.index({ createdAt: -1 }); // Sort by creation date
+ancSchema.index({ 'pregnancysummary.edd': 1 }); // Sort/filter by expected delivery date
+ancSchema.index({ 'pregnancysummary.lmp': 1 }); // Sort/filter by last menstrual period
+
+// Compound indexes for common query patterns
+ancSchema.index({ patient: 1, createdAt: -1 }); // Patient records by date
+ancSchema.index({ patient: 1, 'pregnancysummary.edd': 1 }); // Patient records by EDD
+
 const anc = model('Anc', ancSchema);
 export default anc;

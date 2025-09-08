@@ -53,6 +53,10 @@ export const scheduleappointment = catchAsync(async (req: any, res: Response, ne
     );
     const hmopercentagecover = insurance?.hmopercentagecover ?? 0;
     const amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
+    
+    // Extract createdBy from req.user (if available)
+    const createdBy = req.user?.user?._id || req.user?._id;laborder
+    
     // choose strategy
     const strategy = amount === 0 ? FreeAppointmentStrategy : PaidAppointmentStrategy;
     const context = AppointmentContext(strategy);
@@ -64,6 +68,9 @@ export const scheduleappointment = catchAsync(async (req: any, res: Response, ne
       amount,
       configuration,
       services: { createpayment, createvitalcharts, createappointment, updatepatient },
+      hmopercentagecover,
+      appointmentPrice,
+      createdBy
     });
     res.status(200).json({ queryresult, status: true });
  

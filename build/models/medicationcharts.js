@@ -29,6 +29,19 @@ const medicalchartsSchema = new mongoose_1.Schema({
     route: String,
     staffname: String,
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+medicalchartsSchema.index({ patient: 1 });
+medicalchartsSchema.index({ admission: 1 });
+medicalchartsSchema.index({ prescription: 1 });
+medicalchartsSchema.index({ referedward: 1 });
+medicalchartsSchema.index({ drug: 1 });
+medicalchartsSchema.index({ createdAt: -1 });
+// Compound indexes for common query patterns
+medicalchartsSchema.index({ patient: 1, createdAt: -1 });
+medicalchartsSchema.index({ admission: 1, createdAt: -1 });
+medicalchartsSchema.index({ patient: 1, admission: 1 });
+medicalchartsSchema.index({ referedward: 1, createdAt: -1 });
 const medicationchart = (0, mongoose_1.model)('Medicationchart', medicalchartsSchema);
 exports.default = medicationchart;
 /*
@@ -49,4 +62,4 @@ note
 dose
 frequency
 route
-*/ 
+*/

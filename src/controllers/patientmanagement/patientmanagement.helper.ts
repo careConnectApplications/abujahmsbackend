@@ -6,7 +6,7 @@ import { createappointment } from "../../dao/appointment";
 import { createpatient,  updatepatient } from "../../dao/patientmanagement";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import {readonehmomanagement} from "../../dao/hmomanagement";
-
+import { createInsuranceClaim } from "../../dao/insuranceclaim";
 
 interface PatientRegistrationStrategy {
   execute(args: {
@@ -228,6 +228,43 @@ const HMOPatientStrategy: PatientRegistrationStrategy = {
 
     payments.filter(Boolean).forEach((p: any) => payment.push(p._id));
 
+    // Create insurance claims for HMO covered services
+    const insuranceClaims = [];
+    
+    // Insurance claim for annual subscription if HMO covers it
+    if (annualsubscriptionhmopercentagecover > 0 && payments[0]) {
+      insuranceClaims.push({
+        patient: createpatientqueryresult._id,
+        serviceCategory: configuration.category[8],
+        payment: payments[0]._id,
+        //authorizationCode: reqBody.authorizationcode || "",
+        approvalCode: reqBody.approvalCode || "",
+        amountClaimed: annualsubscriptionamount,
+        amountApproved: annualsubscriptionamount,
+        insurer: HMOName,
+        createdBy: reqBody.createdBy,
+        action: "approve",
+        actualcost: Number(annualsubscriptionnewRegistrationPrice.amount)
+      });
+    }
+    
+    // Insurance claim for card fee if HMO covers it
+    if (cardfeehmopercentagecover > 0 && payments[1]) {
+      insuranceClaims.push({
+        patient: createpatientqueryresult._id,
+        serviceCategory: configuration.category[9],
+        payment: payments[1]._id,
+        //authorizationCode: reqBody.authorizationcode || "",
+        approvalCode: reqBody.approvalCode || "",
+        amountClaimed: cardfeeamountamount,
+        amountApproved: cardfeeamountamount,
+        insurer: HMOName,
+        createdBy: reqBody.createdBy,
+        action: "approve",
+        actualcost: Number(cardfeenewRegistrationPrice.amount)
+      });
+    }
+
     if (reqBody.appointmentdate) {
       // Find appointment payment for linking
       const appointmentPayment = appointmentAmount > 0 ? payments[2] : null;
@@ -242,12 +279,35 @@ const HMOPatientStrategy: PatientRegistrationStrategy = {
         amount: appointmentAmount,
       });
 
+      // Insurance claim for appointment if HMO covers it
+      if (appointmenthmopercentagecover > 0 && appointmentPrice && payments[2]) {
+        insuranceClaims.push({
+          patient: createpatientqueryresult._id,
+          serviceCategory: configuration.category[0],
+          appointment: queryappointmentresult._id,
+          payment: payments[2]._id,
+          //authorizationCode: reqBody.authorizationcode || "",
+          approvalCode: reqBody.approvalCode || "",
+          amountClaimed: appointmentAmount,
+          amountApproved: appointmentAmount,
+          insurer: HMOName,
+          createdBy: reqBody.createdBy,
+          action: "approve",
+          actualcost: Number(appointmentPrice.amount)
+        });
+      }
+
       queryresult = await updatepatient(createpatientqueryresult._id, {
         ...(payment.length > 0 ? { payment } : {}),
         $push: { appointment: queryappointmentresult._id },
       });
     } else if (payment.length > 0) {
       queryresult = await updatepatient(createpatientqueryresult._id, { payment });
+    }
+    
+    // Create all insurance claims
+    if (insuranceClaims.length > 0) {
+      await createInsuranceClaim(insuranceClaims);
     }
 
     return queryresult ?? createpatientqueryresult;

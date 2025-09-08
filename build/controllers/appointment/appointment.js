@@ -38,7 +38,7 @@ const appointment_helper_1 = require("./appointment.helper");
 //add vitals for 
 // Create a new schedule
 exports.scheduleappointment = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d, _e;
     const appointmentid = String(Date.now());
     //clean the req body
     req.body = (0, otherservices_1.removeEmpty)(req.body);
@@ -63,6 +63,9 @@ exports.scheduleappointment = (0, catchAsync_1.default)((req, res, next) => __aw
     const insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[0] }, { hmopercentagecover: 1 });
     const hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
     const amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(appointmentPrice.amount));
+    // Extract createdBy from req.user (if available)
+    const createdBy = ((_d = (_c = req.user) === null || _c === void 0 ? void 0 : _c.user) === null || _d === void 0 ? void 0 : _d._id) || ((_e = req.user) === null || _e === void 0 ? void 0 : _e._id);
+    exports.laborder;
     // choose strategy
     const strategy = amount === 0 ? appointment_helper_1.FreeAppointmentStrategy : appointment_helper_1.PaidAppointmentStrategy;
     const context = (0, appointment_helper_1.AppointmentContext)(strategy);
@@ -73,6 +76,9 @@ exports.scheduleappointment = (0, catchAsync_1.default)((req, res, next) => __aw
         amount,
         configuration: config_1.default,
         services: { createpayment: payment_1.createpayment, createvitalcharts: vitalcharts_1.createvitalcharts, createappointment: appointment_1.createappointment, updatepatient: patientmanagement_1.updatepatient },
+        hmopercentagecover,
+        appointmentPrice,
+        createdBy
     });
     res.status(200).json({ queryresult, status: true });
 }));

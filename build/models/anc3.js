@@ -80,5 +80,16 @@ const anc3Schema = new mongoose_1.Schema({
         },
     ],
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+anc3Schema.index({ patient: 1 });
+anc3Schema.index({ 'bookingInformation.lmp': 1 });
+anc3Schema.index({ 'bookingInformation.edd': 1 });
+anc3Schema.index({ 'bookingInformation.bookingDate': 1 });
+anc3Schema.index({ staffInfo: 1 });
+anc3Schema.index({ createdAt: -1 });
+// Compound indexes for common query patterns
+anc3Schema.index({ patient: 1, createdAt: -1 });
+anc3Schema.index({ patient: 1, 'bookingInformation.edd': 1 });
 const anc3 = (0, mongoose_1.model)('Anc3', anc3Schema);
 exports.default = anc3;

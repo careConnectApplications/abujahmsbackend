@@ -148,6 +148,16 @@ const dentalEncounterSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
+// Add indexes for performance optimization
+// Single field indexes
+dentalEncounterSchema.index({ patientId: 1 });
+dentalEncounterSchema.index({ appointmentId: 1 });
+dentalEncounterSchema.index({ admissionId: 1 });
+dentalEncounterSchema.index({ createdAt: -1 });
+dentalEncounterSchema.index({ 'procedurePerformed.procedureDate': 1 });
+// Compound indexes for common query patterns
+dentalEncounterSchema.index({ patientId: 1, createdAt: -1 });
+dentalEncounterSchema.index({ appointmentId: 1, patientId: 1 });
 const DentalRecord = (0, mongoose_1.model)("DentalEncounter", dentalEncounterSchema);
 exports.default = DentalRecord;
 /*

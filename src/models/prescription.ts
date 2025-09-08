@@ -104,6 +104,25 @@ const prescriptionSchema = new Schema({
 { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+prescriptionSchema.index({ patient: 1 });
+prescriptionSchema.index({ appointment: 1 });
+prescriptionSchema.index({ appointmentid: 1 });
+prescriptionSchema.index({ orderid: 1 });
+prescriptionSchema.index({ dispensestatus: 1 });
+prescriptionSchema.index({ pharmacy: 1 });
+prescriptionSchema.index({ createdAt: -1 });
+prescriptionSchema.index({ payment: 1 });
+prescriptionSchema.index({ MRN: 1 });
+
+// Compound indexes for common query patterns
+prescriptionSchema.index({ patient: 1, dispensestatus: 1 });
+prescriptionSchema.index({ appointmentid: 1, dispensestatus: 1 });
+prescriptionSchema.index({ pharmacy: 1, dispensestatus: 1 });
+prescriptionSchema.index({ dispensestatus: 1, createdAt: -1 });
+prescriptionSchema.index({ orderid: 1, dispensestatus: 1 });
+
 const prescription= model('Prescription', prescriptionSchema);
 export default prescription;
 
