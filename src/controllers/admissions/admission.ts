@@ -169,7 +169,7 @@ export async function updateadmissionstatus(req: any, res: any) {
 
     await strategy(admission, { ...req.body, id });
 
-    res.status(200).json({ status: true, message: "Successfully updated admission status" });
+    res.status(200).json({ status: true, msg: "Successfully updated admission status" });
   } catch (e: any) {
     console.error(e);
     res.status(403).json({ status: false, msg: e.message });
