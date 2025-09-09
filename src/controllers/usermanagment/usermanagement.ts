@@ -223,7 +223,7 @@ export const updateUserSpecialPermission = catchAsync(async (req: Request, res: 
 
   res.status(200).json({
     status: true,
-    msg: "special permissions updated successfully",
+    message: "special permissions updated successfully",
     body: updateUser
   })
 });
@@ -258,7 +258,7 @@ export const getUserCombinedPermissions = catchAsync(async (req: Request, res: R
 
   res.status(200).json({
     status: true,
-    msg: "user permissions fetched successfully",
+    message: "user permissions fetched successfully",
     data: userResponse
   });
 })
@@ -286,7 +286,7 @@ export const getUserPermissions = catchAsync(async (req: Request, res: Response,
 
   res.status(200).json({
     status: true,
-    msg: "user permissions fetched successfully",
+    message: "user permissions fetched successfully",
     data: {
       permissions, user
     }
@@ -333,7 +333,7 @@ export const updateUserPermissions = catchAsync(async (req: Request, res: Respon
 
   res.status(200).json({
     status: true,
-    msg: "user permissions updated successfully",
+    message: "user permissions updated successfully",
     data: {
       user: updatedUser,
       permissions: fullPermissions

@@ -655,7 +655,7 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
 
   res.status(201).json({
     status: true,
-    msg: "custom billing info created for user!",
+    message: "custom billing info created for user!",
     data: paymentInfo
   });
 });

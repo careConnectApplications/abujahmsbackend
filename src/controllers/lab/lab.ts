@@ -619,7 +619,7 @@ export const validatelabresult = catchAsync(async (req: any, res: Response, next
   res.status(200).json({
     queryresult,
     status: true,
-    msg: "Lab result validated successfully"
+    message: "Lab result validated successfully"
   });
 });
 

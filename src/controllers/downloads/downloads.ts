@@ -15,7 +15,7 @@ export async function downloadtemplates(req:any, res:any){
               if (err) {
                 console.log(err);
                 
-                return res.status(500).send(configuration.error.errordownload);
+                return res.status(500).json({ status: false, msg: err.message || configuration.error.errordownload });
               }
             });
            

@@ -486,7 +486,7 @@ export const authorizeTransactiongroup = catchAsync(
     if (!records || records.length === 0) {
       return res.status(404).json({
         status: false,
-        msg: "No records found for the given testId",
+        message: "No records found for the given testId",
       });
     }
 
