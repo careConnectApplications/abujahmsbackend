@@ -113,7 +113,7 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
 
   res.status(201).json({
     status: true,
-    message: "anc created successfully",
+    msg: "anc created successfully",
     data: queryresult
   })
 });

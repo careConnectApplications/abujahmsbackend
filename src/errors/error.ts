@@ -61,12 +61,8 @@ export const errorHandler = (
     res.locals.errorMessage = err.message;
 
     const response = {
-        code: statusCode,
-        message,
-        ...((process.env.NODE_ENV as string) === "development" &&
-            _req.get("host")?.startsWith("localhost") && {
-            stack: err.stack,
-        }),
+        status: false,
+        msg: message
     };
 
     if ((process.env.NODE_ENV as string) === "development") {

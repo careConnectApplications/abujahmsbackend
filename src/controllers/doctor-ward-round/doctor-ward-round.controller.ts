@@ -29,7 +29,7 @@ export const createDoctorWardNote = catchAsync(
 
         res.status(201).json({
             status: true,
-            message: 'Admission note for doctor ward round created successfully',
+            msg: 'Admission note for doctor ward round created successfully',
             data: note
         });
     }
@@ -106,7 +106,7 @@ export const updateDoctorWardAdmissionNote = catchAsync(
 
         res.status(200).json({
             status: 'success',
-            message: 'Admission note updated successfully',
+            msg: 'Admission note updated successfully',
             data: note
         });
     }

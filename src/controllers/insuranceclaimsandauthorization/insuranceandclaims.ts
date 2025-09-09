@@ -486,7 +486,7 @@ export const authorizeTransactiongroup = catchAsync(
     if (!records || records.length === 0) {
       return res.status(404).json({
         status: false,
-        message: "No records found for the given testId",
+        msg: "No records found for the given testId",
       });
     }
 
@@ -574,4 +574,4 @@ export const updateInsuranceClaimStatus = catchAsync(async (req: Request | any, 
       queryresult
     });
 
-  }) 
+  })
