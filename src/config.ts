@@ -1,10 +1,17 @@
 import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
+import * as maternityModules from "./config/maternity-modules";
 const configuration: any = {
   //clinic name
   //wardnames
   accidentType:  ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"],
   proceduretype:["Major Operation","Intermediate Operation","Minor Operation","Circumcision"],
+  // Maternity module options
+  phase: maternityModules.phase,
+  selectDrug: maternityModules.selectDrug,
+  obstetricComplication: maternityModules.obstetricComplication,
+  noOfVE: maternityModules.noOfVE,
+  cervicalDilation: maternityModules.cervicalDilation,
   encounterplanoutcome:["Death","Referred Out","Treated","Others"],
   arrivalMode:["Walk-in", "Ambulance", "Referral","Death"],
   unitcategory:[
@@ -129,6 +136,12 @@ const configuration: any = {
         accidentType: configuration.accidentType,
         proceduretype:configuration.proceduretype,
         encounterplanoutcome:configuration.encounterplanoutcome,
+        // Maternity module options
+        phase: configuration.phase,
+        selectDrug: configuration.selectDrug,
+        obstetricComplication: configuration.obstetricComplication,
+        noOfVE: configuration.noOfVE,
+        cervicalDilation: configuration.cervicalDilation,
         unitcategory:configuration.unitcategory,
         arrivalMode: configuration.arrivalMode,
         cliniccategory:configuration.cliniccategory,
