@@ -156,7 +156,7 @@ interface IMortalityRegister extends Document {
   name: string;
   sex: "Male" | "Female";
   dateOfBirth: Date;
-  age: number;
+  age: string;
   patientCardNumber: string;
   healthFacility: string;
   ward: string;
@@ -169,6 +169,7 @@ interface IMortalityRegister extends Document {
   neonatalOther: string;
   Deathunderfive:string;
   DeathunderfiveOther:string;
+    patient?: any;
 }
 
 // Common enums that are reused across schemas
@@ -732,7 +733,7 @@ const mortalityRegisterSchema = new Schema<IMortalityRegister>({
     type: Date
   },
   age: {
-    type: Number
+    type: String
   },
   patientCardNumber: {
     type: String
@@ -792,7 +793,12 @@ const mortalityRegisterSchema = new Schema<IMortalityRegister>({
   DeathunderfiveOther: {
     type: String,
     maxlength: 1000
-  }
+  },
+    patient: {
+    type: Schema.Types.ObjectId,
+    ref: "Patientsmanagement",
+    default: null
+  },
 }, {
   timestamps: true
 });

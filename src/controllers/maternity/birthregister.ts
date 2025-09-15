@@ -25,8 +25,8 @@ const createBirthRegister = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -50,8 +50,8 @@ const getBirthRegister = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -64,13 +64,12 @@ const getBirthRegisterById = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
       queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -83,13 +82,12 @@ const getBirthRegisterByPatientId = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
       queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      status: true,
-      msg: error.message ,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -113,8 +111,8 @@ const updateBirthRegister = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };

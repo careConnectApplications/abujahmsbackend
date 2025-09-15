@@ -46,25 +46,6 @@ router.get(
   postnatalCareController.getPostnatalCarePaginated
 );
 
-// Aggregate postnatal care data
-router.get(
-  "/aggregate",
-  protect,
-  postnatalCareController.aggregatePostnatalCare
-);
 
-// Get postnatal care count
-router.get(
-  "/count",
-  protect,
-  postnatalCareController.countPostnatalCare
-);
-
-// Get postnatal care statistics
-router.get(
-  "/statistics",
-  protect,
-  postnatalCareController.getPostnatalCareStatistics
-);
 
 export default router;

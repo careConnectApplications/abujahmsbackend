@@ -48,25 +48,5 @@ router.get(
   mortalityRegisterController.getMortalityRegisterPaginated
 );
 
-// Aggregate mortality register data
-router.get(
-  "/aggregate",
-  protect,
-  mortalityRegisterController.aggregateMortalityRegister
-);
-
-// Get mortality register count
-router.get(
-  "/count",
-  protect,
-  mortalityRegisterController.countMortalityRegister
-);
-
-// Get mortality statistics
-router.get(
-  "/statistics",
-  protect,
-  mortalityRegisterController.getMortalityStatistics
-);
 
 export default router;

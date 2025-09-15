@@ -42,11 +42,7 @@ const readAllThirdStageLabour = async (limit?: number, skip?: number, searchText
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -62,11 +58,7 @@ const createThirdStageLabour = async (thirdStageLabourData: any) => {
       status: 201,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -81,11 +73,7 @@ const updateThirdStageLabour = async (thirdStageLabourId: string, updateData: an
       .populate("doctor");
 
     if (!updatedThirdStageLabour) {
-      return {
-        error: true,
-        message: "Third stage labour not found",
-        status: 404,
-      };
+      throw new Error("Third stage labour not found");
     }
 
     return {
@@ -95,11 +83,7 @@ const updateThirdStageLabour = async (thirdStageLabourId: string, updateData: an
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || config.messages.general.serverError,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -112,11 +96,7 @@ const deleteThirdStageLabour = async (thirdStageLabourId: string) => {
     );
 
     if (!deletedThirdStageLabour) {
-      return {
-        error: true,
-        message: "Third stage labour not found",
-        status: 404,
-      };
+      throw new Error("Third stage labour not found");
     }
 
     return {
@@ -125,11 +105,7 @@ const deleteThirdStageLabour = async (thirdStageLabourId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -143,11 +119,7 @@ const getThirdStageLabourById = async (thirdStageLabourId: string) => {
       .populate("doctor");
 
     if (!thirdStageLabour) {
-      return {
-        error: true,
-        message: "Third stage labour not found",
-        status: 404,
-      };
+      throw new Error("Third stage labour not found");
     }
 
     return {
@@ -156,11 +128,7 @@ const getThirdStageLabourById = async (thirdStageLabourId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -181,11 +149,7 @@ const getThirdStageLabourByPatientId = async (patientId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -247,11 +211,7 @@ const aggregateThirdStageLabour = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -312,11 +272,7 @@ const getThirdStageLabourPaginated = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 

@@ -25,8 +25,8 @@ const createThirdStageLabour = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -48,8 +48,8 @@ const getThirdStageLabour = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -62,13 +62,12 @@ const getThirdStageLabourById = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
-      data: result.data,
+      queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -81,7 +80,6 @@ const getThirdStageLabourByPatientId = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
       queryresult: result.data,
     });
   } catch (error: any) {

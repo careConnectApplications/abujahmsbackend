@@ -43,11 +43,7 @@ const readAllFirstStageLabour = async (limit?: number, skip?: number, searchText
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -63,11 +59,7 @@ const createFirstStageLabour = async (firstStageLabourData: any) => {
       status: 201,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -82,11 +74,7 @@ const updateFirstStageLabour = async (firstStageLabourId: string, updateData: an
       .populate("doctor");
 
     if (!updatedFirstStageLabour) {
-      return {
-        error: true,
-        message:  "First stage labour not found",
-        status: 404,
-      };
+      throw new Error("First stage labour not found");
     }
 
     return {
@@ -96,11 +84,7 @@ const updateFirstStageLabour = async (firstStageLabourId: string, updateData: an
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || config.messages.general.serverError,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -113,11 +97,7 @@ const deleteFirstStageLabour = async (firstStageLabourId: string) => {
     );
 
     if (!deletedFirstStageLabour) {
-      return {
-        error: true,
-        message:  "First stage labour not found",
-        status: 404,
-      };
+      throw new Error("First stage labour not found");
     }
 
     return {
@@ -126,11 +106,7 @@ const deleteFirstStageLabour = async (firstStageLabourId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message ,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -144,11 +120,7 @@ const getFirstStageLabourById = async (firstStageLabourId: string) => {
       .populate("doctor");
 
     if (!firstStageLabour) {
-      return {
-        error: true,
-        message: "First stage labour not found",
-        status: 404,
-      };
+      throw new Error("First stage labour not found");
     }
 
     return {
@@ -157,11 +129,7 @@ const getFirstStageLabourById = async (firstStageLabourId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -182,11 +150,7 @@ const getFirstStageLabourByPatientId = async (patientId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message ,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -238,11 +202,7 @@ const aggregateFirstStageLabour = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -302,11 +262,7 @@ const getFirstStageLabourPaginated = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 

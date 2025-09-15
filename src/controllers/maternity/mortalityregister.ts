@@ -25,8 +25,8 @@ const createMortalityRegister = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -42,16 +42,16 @@ const getMortalityRegister = async (req: Request, res: Response) => {
     );
     
     res.status(result.status).json({
-      queryresult: {
-        data: result.data,
+      
+        queryresult: result.data,
         totalCount: result.totalCount || 0,
         status: true
-      }
+      
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -65,12 +65,12 @@ const getMortalityRegisterById = async (req: Request, res: Response) => {
     res.status(result.status).json({
       status: true,
       msg: result.message,
-      data: result.data,
+      queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -84,12 +84,12 @@ const getMortalityRegisterByPatientId = async (req: Request, res: Response) => {
     res.status(result.status).json({
       status: true,
       msg: result.message,
-      data: result.data,
+      queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -113,8 +113,8 @@ const updateMortalityRegister = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -150,81 +150,20 @@ const getMortalityRegisterPaginated = async (req: Request, res: Response) => {
     );
     
     res.status(result.status).json({
-      queryresult: {
-        data: result.data,
+      
+        queryresult: result.data,
         //totalCount: result.data?.totalCount || 0,
         status: true
-      }
+      
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
 
-const aggregateMortalityRegister = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate, groupBy } = req.query;
-    
-    const result = await mortalityRegisterDao.aggregateMortalityRegister(
-      startDate ? new Date(startDate as string) : undefined,
-      endDate ? new Date(endDate as string) : undefined,
-      (groupBy as "day" | "month" | "year") || "month"
-    );
-    
-    res.status(result.status).json({
-      status: true,
-      msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
-
-const countMortalityRegister = async (req: Request, res: Response) => {
-  try {
-    const result = await mortalityRegisterDao.countMortalityRegister();
-    
-    res.status(result.status).json({
-      status: true,
-      msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
-
-const getMortalityStatistics = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate } = req.query;
-    
-    const result = await mortalityRegisterDao.getMortalityStatistics(
-      startDate ? new Date(startDate as string) : undefined,
-      endDate ? new Date(endDate as string) : undefined
-    );
-    
-    res.status(result.status).json({
-      status: true,
-      msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
 
 export default {
   createMortalityRegister,
@@ -234,7 +173,5 @@ export default {
   updateMortalityRegister,
   // deleteMortalityRegister,
   getMortalityRegisterPaginated,
-  aggregateMortalityRegister,
-  countMortalityRegister,
-  getMortalityStatistics,
+ 
 };

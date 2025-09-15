@@ -44,11 +44,7 @@ const readAllBirthRegister = async (limit?: number, skip?: number, searchText?: 
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -63,11 +59,7 @@ const createBirthRegister = async (birthRegisterData: any) => {
       status: 201,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -81,11 +73,7 @@ const updateBirthRegister = async (birthRegisterId: string, updateData: any) => 
       .populate("patient");
 
     if (!updatedBirthRegister) {
-      return {
-        error: true,
-        message: "Birth register not found",
-        status: 404,
-      };
+      throw new Error("Birth register not found");
     }
 
     return {
@@ -95,11 +83,7 @@ const updateBirthRegister = async (birthRegisterId: string, updateData: any) => 
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || config.messages.general.serverError,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -112,11 +96,7 @@ const deleteBirthRegister = async (birthRegisterId: string) => {
     );
 
     if (!deletedBirthRegister) {
-      return {
-        error: true,
-        message: "Birth register not found",
-        status: 404,
-      };
+      throw new Error("Birth register not found");
     }
 
     return {
@@ -125,11 +105,7 @@ const deleteBirthRegister = async (birthRegisterId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -142,11 +118,7 @@ const getBirthRegisterById = async (birthRegisterId: string) => {
       .populate("patient");
 
     if (!birthRegister) {
-      return {
-        error: true,
-        message: "Birth register not found",
-        status: 404,
-      };
+      throw new Error("Birth register not found");
     }
 
     return {
@@ -155,11 +127,7 @@ const getBirthRegisterById = async (birthRegisterId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -179,11 +147,7 @@ const getBirthRegisterByPatientId = async (patientId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -233,11 +197,7 @@ const aggregateBirthRegister = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -297,11 +257,7 @@ const getBirthRegisterPaginated = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message,
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 

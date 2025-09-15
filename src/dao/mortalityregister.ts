@@ -44,11 +44,7 @@ const readAllMortalityRegister = async (limit?: number, skip?: number, searchTex
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -64,11 +60,7 @@ const createMortalityRegister = async (mortalityRegisterData: any) => {
       status: 201,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -81,11 +73,7 @@ const updateMortalityRegister = async (mortalityRegisterId: string, updateData: 
     );
 
     if (!updatedMortalityRegister) {
-      return {
-        error: true,
-        message: "Mortality register not found",
-        status: 404,
-      };
+      throw new Error("Mortality register not found");
     }
 
     return {
@@ -95,11 +83,7 @@ const updateMortalityRegister = async (mortalityRegisterId: string, updateData: 
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -112,11 +96,7 @@ const deleteMortalityRegister = async (mortalityRegisterId: string) => {
     );
 
     if (!deletedMortalityRegister) {
-      return {
-        error: true,
-        message: "Mortality register not found",
-        status: 404,
-      };
+      throw new Error("Mortality register not found");
     }
 
     return {
@@ -125,11 +105,7 @@ const deleteMortalityRegister = async (mortalityRegisterId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -141,11 +117,7 @@ const getMortalityRegisterById = async (mortalityRegisterId: string) => {
     });
 
     if (!mortalityRegister) {
-      return {
-        error: true,
-        message: "Mortality register not found",
-        status: 404,
-      };
+      throw new Error("Mortality register not found");
     }
 
     return {
@@ -155,11 +127,7 @@ const getMortalityRegisterById = async (mortalityRegisterId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -178,11 +146,7 @@ const getMortalityRegisterByPatientId = async (patientId: string) => {
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -237,11 +201,7 @@ const aggregateMortalityRegister = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -304,11 +264,7 @@ const getMortalityRegisterPaginated = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 
@@ -406,11 +362,7 @@ const getMortalityStatistics = async (
       status: 200,
     };
   } catch (error: any) {
-    return {
-      error: true,
-      message: error.message || "Server error occurred",
-      status: 500,
-    };
+    throw new Error(`${error.message}`);
   }
 };
 

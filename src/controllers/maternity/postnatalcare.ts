@@ -25,8 +25,8 @@ const createPostnatalCare = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -42,16 +42,16 @@ const getPostnatalCare = async (req: Request, res: Response) => {
     );
     
     res.status(result.status).json({
-      queryresult: {
-        data: result.data,
+     
+        queryresult: result.data,
         totalCount: result.totalCount || 0,
         status: true
-      }
+      
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -64,13 +64,12 @@ const getPostnatalCareById = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
-      data: result.data,
+      queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -83,13 +82,12 @@ const getPostnatalCareByPatientId = async (req: Request, res: Response) => {
     
     res.status(result.status).json({
       status: true,
-      msg: result.message,
-      data: result.data,
+      queryresult: result.data,
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -113,8 +111,8 @@ const updatePostnatalCare = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
@@ -150,80 +148,20 @@ const getPostnatalCarePaginated = async (req: Request, res: Response) => {
     );
     
     res.status(result.status).json({
-      queryresult: {
-        data: result.data,
+    
+        queryresult: result.data,
         //totalCount: result.data?.totalCount || 0,
         status: true
-      }
+    
     });
   } catch (error: any) {
     res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
+      status: false,
+      msg: error.message,
     });
   }
 };
 
-const aggregatePostnatalCare = async (req: Request, res: Response) => {
-  try {
-    const { startDate, endDate, groupBy } = req.query;
-    
-    const result = await postnatalCareDao.aggregatePostnatalCare(
-      startDate ? new Date(startDate as string) : undefined,
-      endDate ? new Date(endDate as string) : undefined,
-      (groupBy as "day" | "month" | "year") || "month"
-    );
-    
-    res.status(result.status).json({
-      status: true,
-      msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
-
-const countPostnatalCare = async (req: Request, res: Response) => {
-  try {
-    const result = await postnatalCareDao.countPostnatalCare();
-    
-    res.status(result.status).json({
-      status: true,
-      //msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
-
-const getPostnatalCareStatistics = async (req: Request, res: Response) => {
-  try {
-    const { patientId } = req.query;
-    
-    const result = await postnatalCareDao.getPostnatalCareStatistics(
-      patientId as string | undefined
-    );
-    
-    res.status(result.status).json({
-      status: true,
-      msg: result.message,
-      data: result.data,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: true,
-      message: error.message || config.messages.general.serverError,
-    });
-  }
-};
 
 export default {
   createPostnatalCare,
@@ -233,7 +171,5 @@ export default {
   updatePostnatalCare,
   // deletePostnatalCare,
   getPostnatalCarePaginated,
-  aggregatePostnatalCare,
-  countPostnatalCare,
-  getPostnatalCareStatistics,
+
 };
