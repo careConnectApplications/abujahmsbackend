@@ -38,6 +38,7 @@ import physiotherapyRoute from "../routes/phisiotherapy";
 import EyeModuleRoute from "../routes/eye-module.route";
 import DoctorWardRoute from "../routes/doctor-ward-round.route";
 import Insuranceclaimsandauthorization from '../routes/insuranceauthorizationandclaims';
+import maternity from '../routes/maternity';
 
 
 
@@ -107,6 +108,7 @@ function createServer() {
   app.use("/api/v1/eye-module", protect, EyeModuleRoute);
   app.use("/api/v1/doctor-ward-round", protect, DoctorWardRoute);
   app.use("/api/v1/insuranceauthorizationandclaims", protect, Insuranceclaimsandauthorization);
+  app.use("/api/v1/maternity", protect, maternity);
 
   // Handle POST requests to /webhook
   /*
