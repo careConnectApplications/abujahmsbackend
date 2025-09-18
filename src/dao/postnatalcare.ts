@@ -125,8 +125,7 @@ const getPostnatalCareById = async (postnatalCareId: string) => {
 const getPostnatalCareByPatientId = async (patientId: string) => {
   try {
     const postnatalCareRecords = await PostnatalCare.find({
-      patientsId: patientId,
-      deletedAt: { $exists: false },
+      patient: patientId
     })
       .populate("patient")
       .populate("doctor")

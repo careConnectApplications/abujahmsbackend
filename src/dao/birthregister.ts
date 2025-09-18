@@ -134,8 +134,7 @@ const getBirthRegisterById = async (birthRegisterId: string) => {
 const getBirthRegisterByPatientId = async (patientId: string) => {
   try {
     const birthRegisters = await BirthRegister.find({
-      patientsId: patientId,
-      deletedAt: { $exists: false },
+      patient: patientId
     })
       .populate("patient")
       .sort({ createdAt: -1 });

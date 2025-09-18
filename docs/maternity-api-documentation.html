@@ -441,9 +441,8 @@
         <div class="code-block">
 {
     "status": true,
-    "message": "Success message",
-    "data": { ... },
-    "error": false,
+    "msg": "Success message",
+    "queryresult": { ... },  // or "data" depending on endpoint
     "totalCount": 100  // For paginated responses
 }
         </div>
@@ -554,18 +553,6 @@
             <p><strong>URL Parameters:</strong></p>
             <ul>
                 <li><code>id</code> - The record ID to update</li>
-            </ul>
-        </div>
-
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method delete">DELETE</span>
-                <span class="endpoint-path">/first-stage-labour/delete/:id</span>
-            </div>
-            <p><strong>Description:</strong> Delete a first stage labour record</p>
-            <p><strong>URL Parameters:</strong></p>
-            <ul>
-                <li><code>id</code> - The record ID to delete</li>
             </ul>
         </div>
 
@@ -1517,9 +1504,7 @@
         <div class="code-block">
 {
     "status": false,
-    "error": true,
-    "message": "Error description",
-    "data": null
+    "msg": "Error description"
 }
         </div>
 
