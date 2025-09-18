@@ -135,8 +135,7 @@ const getThirdStageLabourById = async (thirdStageLabourId: string) => {
 const getThirdStageLabourByPatientId = async (patientId: string) => {
   try {
     const thirdStageLabourRecords = await ThirdStageLabour.find({
-      patientsId: patientId,
-      deletedAt: { $exists: false },
+      patient: patientId
     })
       .populate("patient")
       .populate("doctor")
