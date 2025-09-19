@@ -7,6 +7,9 @@ const configuration: any = {
   accidentType:  ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"],
   proceduretype:["Major Operation","Intermediate Operation","Minor Operation","Circumcision"],
   // Maternity module options
+  route:maternityModules.route,
+  obstetricCare:maternityModules.obstetricCare,
+  modeOfDelivery:maternityModules.modeOfDelivery,
   phase: maternityModules.phase,
   selectDrug: maternityModules.selectDrug,
   obstetricComplication: maternityModules.obstetricComplication,
@@ -137,6 +140,9 @@ const configuration: any = {
         proceduretype:configuration.proceduretype,
         encounterplanoutcome:configuration.encounterplanoutcome,
         // Maternity module options
+        route:configuration.route,
+        obstetricCare:configuration.obstetricCare,
+        modeOfDelivery:configuration.modeOfDelivery,
         phase: configuration.phase,
         selectDrug: configuration.selectDrug,
         obstetricComplication: configuration.obstetricComplication,
