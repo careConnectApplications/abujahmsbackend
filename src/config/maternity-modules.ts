@@ -92,6 +92,7 @@ export const motherStatusAfterDelivery = [
     "Dead"
 ];
 
+
 export const perinealTear = [
     "First degree",
     "Second degree",
@@ -193,6 +194,10 @@ export const kangarooMotherCare = [
 export const typeOfVisit = [
     "New",
     "Revisit"
+];
+export const sexOfChild = [
+    "Male",
+    "Female"
 ];
 
 export const visit = [
