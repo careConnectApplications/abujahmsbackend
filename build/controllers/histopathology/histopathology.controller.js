@@ -70,7 +70,7 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     });
     res.status(201).json({
         status: true,
-        message: "Histopathology created successfully",
+        msg: "Histopathology created successfully",
         data: savedHistopathology
     });
 }));
@@ -220,7 +220,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
     res.status(201).json({
         status: true,
-        message: "Histopathology  created successfully",
+        msg: "Histopathology  created successfully",
         data: savedHistopathology
     });
 });

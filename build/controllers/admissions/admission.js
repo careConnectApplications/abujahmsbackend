@@ -157,7 +157,7 @@ function updateadmissionstatus(req, res) {
             if (!strategy)
                 throw new Error(`No strategy found for status: ${status}`);
             yield strategy(admission, Object.assign(Object.assign({}, req.body), { id }));
-            res.status(200).json({ status: true, message: "Successfully updated admission status" });
+            res.status(200).json({ status: true, msg: "Successfully updated admission status" });
         }
         catch (e) {
             console.error(e);

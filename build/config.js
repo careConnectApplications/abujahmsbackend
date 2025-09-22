@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,11 +44,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const clinics_1 = require("./dao/clinics");
 const servicetype_1 = require("./dao/servicetype");
+const maternityModules = __importStar(require("./config/maternity-modules"));
 const configuration = {
     //clinic name
     //wardnames
     accidentType: ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"],
     proceduretype: ["Major Operation", "Intermediate Operation", "Minor Operation", "Circumcision"],
+    // Maternity module options
+    route: maternityModules.route,
+    obstetricCare: maternityModules.obstetricCare,
+    modeOfDelivery: maternityModules.modeOfDelivery,
+    phase: maternityModules.phase,
+    selectDrug: maternityModules.selectDrug,
+    obstetricComplication: maternityModules.obstetricComplication,
+    noOfVE: maternityModules.noOfVE,
+    cervicalDilation: maternityModules.cervicalDilation,
+    newBornStatus: maternityModules.newBornStatus,
+    motherStatusAfterDelivery: maternityModules.motherStatusAfterDelivery,
+    perinealTear: maternityModules.perinealTear,
+    episiotomy: maternityModules.episiotomy,
+    placenta: maternityModules.placenta,
+    membranes: maternityModules.membranes,
+    cord: maternityModules.cord,
+    perinealStatus: maternityModules.perinealStatus,
+    typeOfDelivery: maternityModules.typeOfDelivery,
+    multipleGestation: maternityModules.multipleGestation,
+    mva: maternityModules.mva,
+    obstetricsFistulaServices: maternityModules.obstetricsFistulaServices,
+    maternalDeath: maternityModules.maternalDeath,
+    neonatalDeath: maternityModules.neonatalDeath,
+    deathUnderFive: maternityModules.deathUnderFive,
+    sex: maternityModules.sex,
+    kangarooMotherCare: maternityModules.kangarooMotherCare,
+    typeOfVisit: maternityModules.typeOfVisit,
+    sexOfChild: maternityModules.sexOfChild,
+    visit: maternityModules.visit,
+    outcomeOfVisit: maternityModules.outcomeOfVisit,
+    services: maternityModules.services,
+    neonatalComplications: maternityModules.neonatalComplications,
+    counselling: maternityModules.counselling,
     encounterplanoutcome: ["Death", "Referred Out", "Treated", "Others"],
     arrivalMode: ["Walk-in", "Ambulance", "Referral", "Death"],
     unitcategory: [
@@ -135,6 +202,39 @@ const configuration = {
                 accidentType: configuration.accidentType,
                 proceduretype: configuration.proceduretype,
                 encounterplanoutcome: configuration.encounterplanoutcome,
+                // Maternity module options
+                route: configuration.route,
+                obstetricCare: configuration.obstetricCare,
+                modeOfDelivery: configuration.modeOfDelivery,
+                phase: configuration.phase,
+                selectDrug: configuration.selectDrug,
+                obstetricComplication: configuration.obstetricComplication,
+                noOfVE: configuration.noOfVE,
+                cervicalDilation: configuration.cervicalDilation,
+                newBornStatus: configuration.newBornStatus,
+                motherStatusAfterDelivery: configuration.motherStatusAfterDelivery,
+                perinealTear: configuration.perinealTear,
+                episiotomy: configuration.episiotomy,
+                placenta: configuration.placenta,
+                membranes: configuration.membranes,
+                cord: configuration.cord,
+                perinealStatus: configuration.perinealStatus,
+                typeOfDelivery: configuration.typeOfDelivery,
+                multipleGestation: configuration.multipleGestation,
+                mva: configuration.mva,
+                obstetricsFistulaServices: configuration.obstetricsFistulaServices,
+                maternalDeath: configuration.maternalDeath,
+                neonatalDeath: configuration.neonatalDeath,
+                deathUnderFive: configuration.deathUnderFive,
+                sex: configuration.sex,
+                kangarooMotherCare: configuration.kangarooMotherCare,
+                typeOfVisit: configuration.typeOfVisit,
+                sexOfChild: configuration.sexOfChild,
+                visit: configuration.visit,
+                outcomeOfVisit: configuration.outcomeOfVisit,
+                services: configuration.services,
+                neonatalComplications: configuration.neonatalComplications,
+                counselling: configuration.counselling,
                 unitcategory: configuration.unitcategory,
                 arrivalMode: configuration.arrivalMode,
                 cliniccategory: configuration.cliniccategory,
@@ -1112,7 +1212,7 @@ const configuration = {
         errornotfoundgeneric: "Record not found."
     },
     validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
-    //environment: "test",
+    // environment: "test",
     environment: "prod",
 };
 exports.default = configuration;

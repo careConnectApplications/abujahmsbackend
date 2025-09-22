@@ -105,8 +105,8 @@ function searchpartient(req, res) {
                 ]
             }, selectquery, '', '');
             res.status(200).json({
-                queryresult,
-                status: true
+                status: true,
+                message: "patient hmo info updated successfully"
             });
         }
         catch (e) {
@@ -497,7 +497,7 @@ exports.updatePatientToHmo = (0, catchAsync_1.default)((req, res, next) => __awa
     yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
-        message: "patient hmo info updated successfully",
+        msg: "patient hmo info updated successfully",
         data: updatedPatient
     });
 }));

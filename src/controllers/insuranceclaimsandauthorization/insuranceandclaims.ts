@@ -574,4 +574,4 @@ export const updateInsuranceClaimStatus = catchAsync(async (req: Request | any, 
       queryresult
     });
 
-  }) 
+  })

@@ -1,5 +1,5 @@
 import express from 'express';
-import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice} from '../controllers/setting/pricesetting';
+import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice,getServiceTypesByCategory} from '../controllers/setting/pricesetting';
 import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
 import {createunits,getallunits,updateunits,getunitsbyclinic,getunitsbyclinicname} from '../controllers/setting/units';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
@@ -25,6 +25,7 @@ router.get('/getallprices',getallprices);
 router.get('/searchtest/:searchparams',searchtest);
 router.get('/searchprocedure/:searchparams',searchprocedure);
 router.get('/searchradiology/:searchparams',searchradiology);
+router.get('/getservicetypesbycategory/:servicecategory',getServiceTypesByCategory);
 
 
 

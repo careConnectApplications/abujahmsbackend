@@ -64,8 +64,8 @@ export async function searchpartient(req: any, res: any) {
     }, selectquery, '', '');
 
     res.status(200).json({
-      queryresult,
-      status: true
+      status: true,
+      message: "patient hmo info updated successfully"
     });
 
 
@@ -528,7 +528,7 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
 
   res.status(200).json({
     status: true,
-    message: "patient hmo info updated successfully",
+    msg: "patient hmo info updated successfully",
     data: updatedPatient
   })
 });
