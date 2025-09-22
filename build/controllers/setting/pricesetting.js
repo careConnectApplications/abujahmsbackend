@@ -19,6 +19,7 @@ exports.updatepricestatus = updatepricestatus;
 exports.searchtest = searchtest;
 exports.searchprocedure = searchprocedure;
 exports.searchradiology = searchradiology;
+exports.getServiceTypesByCategory = getServiceTypesByCategory;
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
@@ -195,3 +196,33 @@ exports.getpriceofservice = (0, catchAsync_1.default)((req, res, next) => __awai
     // Respond with calculated amount
     res.status(200).json({ price: amount, status: true });
 }));
+// Get all service types for a received service category
+function getServiceTypesByCategory(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { servicecategory } = req.params;
+            // Validate that service category is provided
+            if (!servicecategory) {
+                throw new Error("Service category is required");
+            }
+            // Query to get all service types for the given service category
+            const queryresult = yield (0, price_1.readallprices)({
+                servicecategory: servicecategory,
+                status: config_1.default.status[1] // Only get active prices
+            }, {
+                servicetype: 1,
+                _id: 0
+            });
+            // Extract unique service types
+            const uniqueServiceTypes = [...new Set(queryresult.pricedetails.map((item) => item.servicetype))];
+            res.status(200).json({
+                queryresult: uniqueServiceTypes,
+                status: true
+            });
+        }
+        catch (e) {
+            console.log(e);
+            res.status(403).json({ status: false, msg: e.message });
+        }
+    });
+}

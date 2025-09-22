@@ -87,7 +87,7 @@ exports.createAbujaAnc = (0, catchAsync_1.default)((req, res, next) => __awaiter
     const queryresult = yield (0, anc3_1.createanc)(newAnc3);
     res.status(201).json({
         status: true,
-        message: "anc created successfully",
+        msg: "anc created successfully",
         data: queryresult
     });
 }));

@@ -24,6 +24,7 @@ router.get('/getallprices', pricesetting_1.getallprices);
 router.get('/searchtest/:searchparams', pricesetting_1.searchtest);
 router.get('/searchprocedure/:searchparams', pricesetting_1.searchprocedure);
 router.get('/searchradiology/:searchparams', pricesetting_1.searchradiology);
+router.get('/getservicetypesbycategory/:servicecategory', pricesetting_1.getServiceTypesByCategory);
 router.post('/createclinics', clinics_1.createclinics);
 router.get('/getallclinic', clinics_1.getallclinic);
 router.get('/getonlyclinic', clinics_1.getonlyclinic);

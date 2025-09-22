@@ -41,17 +41,16 @@ const errorConverter = (err, _req, _res, next) => {
 };
 exports.errorConverter = errorConverter;
 const errorHandler = (err, _req, res, _next) => {
-    var _a;
     let { statusCode, message } = err;
     if (process.env.NODE_ENV === "production" && !err.isOperational) {
         statusCode = http_status_1.default.INTERNAL_SERVER_ERROR;
         message = "Internal Server Error";
     }
     res.locals.errorMessage = err.message;
-    const response = Object.assign({ code: statusCode, message }, (process.env.NODE_ENV === "development" &&
-        ((_a = _req.get("host")) === null || _a === void 0 ? void 0 : _a.startsWith("localhost")) && {
-        stack: err.stack,
-    }));
+    const response = {
+        status: false,
+        msg: message
+    };
     if (process.env.NODE_ENV === "development") {
         logger_1.logger.error(err);
     }
