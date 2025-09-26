@@ -315,7 +315,7 @@ exports.createExamination = (0, catchAsync_1.default)((req, res, next) => __awai
     }
     res.status(201).json({
         status: "success",
-        message: "Ophthalmology examination saved successfully",
+        msg: "Ophthalmology examination saved successfully",
         eyeDoc
     });
 }));
@@ -465,7 +465,7 @@ exports.createPreliminaryTest = (0, catchAsync_1.default)((req, res, next) => __
     }
     res.status(201).json({
         status: "success",
-        message: "Preliminary test recorded successfully",
+        msg: "Preliminary test recorded successfully",
         data: eyeDoc
     });
 }));
@@ -570,7 +570,7 @@ exports.createOperationalNotes = (0, catchAsync_1.default)((req, res, next) => _
     }
     res.status(201).json({
         status: "success",
-        message: "Operational notes and files uploaded successfully",
+        msg: "Operational notes and files uploaded successfully",
         data: updatedDoc
     });
 }));
@@ -603,7 +603,7 @@ exports.getEyeRecordByAppointmentIdAndPatientId = (0, catchAsync_1.default)((req
         return next(new errors_1.ApiError(404, `no record was found with patient id ${patientId} and appointmentId`));
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 }));
@@ -624,7 +624,7 @@ exports.getEyeRecordById = (0, catchAsync_1.default)((req, res, next) => __await
         return next(new errors_1.ApiError(404, `no eye record was found with id ${Id}`));
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 }));
@@ -634,14 +634,14 @@ exports.getAllEyeRecords = (0, catchAsync_1.default)((req, res, next) => __await
     const doc = yield (0, eye_module_dao_1.getAllEyeRecordpaginated)([], page, limit);
     res.status(200).json({
         status: "success",
-        message: "all Eye record fetched successfully",
+        msg: "all Eye record fetched successfully",
         data: doc
     });
 }));
 exports.getAllEyeUtilData = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(200).json({
         status: "success",
-        message: "eye module config",
+        msg: "eye module config",
         data: {
             OperationalNotesFileName: eye_modules_1.OperationalNotesFileName, LensTint: eye_modules_1.LensTint, lensType: eye_modules_1.lensType, slitLamp: eye_modules_1.slitLamp, opthalmoscopy: eye_modules_1.opthalmoscopy, refraction: eye_modules_1.refraction
         }
@@ -700,7 +700,7 @@ exports.updateLensPrescription = (0, catchAsync_1.default)((req, res, next) => _
     }
     res.status(200).json({
         status: "success",
-        message: "Lens prescription updated successfully",
+        msg: "Lens prescription updated successfully",
         data: updatedDoc
     });
 }));
@@ -808,7 +808,7 @@ exports.updatePreliminaryTest = (0, catchAsync_1.default)((req, res, next) => __
     }
     res.status(200).json({
         status: "success",
-        message: "Preliminary test updated successfully",
+        msg: "Preliminary test updated successfully",
         data: updatedDoc
     });
 }));
@@ -907,7 +907,7 @@ exports.updateExamination = (0, catchAsync_1.default)((req, res, next) => __awai
     }
     res.status(200).json({
         status: "success",
-        message: "Examination updated successfully",
+        msg: "Examination updated successfully",
         data: updatedDoc
     });
 }));
@@ -952,7 +952,7 @@ exports.updateOperationalTest = (0, catchAsync_1.default)((req, res, next) => __
     }
     res.status(200).json({
         status: "success",
-        message: "Operational tests updated successfully",
+        msg: "Operational tests updated successfully",
         data: updatedDoc
     });
 }));
@@ -978,7 +978,7 @@ exports.getEyeRecordByPatientId = (0, catchAsync_1.default)((req, res, next) => 
         return next(new errors_1.ApiError(404, `no record was found with patient id ${patientId} and appointmentId`));
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 }));
@@ -1050,7 +1050,7 @@ exports.createEyeConsultation = (0, catchAsync_1.default)((req, res, next) => __
     }
     res.status(201).json({
         status: "success",
-        message: "Eye Consultation recorded successfully",
+        msg: "Eye Consultation recorded successfully",
         data: eyeDoc
     });
 }));
@@ -1099,7 +1099,7 @@ exports.updateEyeConsultation = (0, catchAsync_1.default)((req, res, next) => __
     }
     res.status(200).json({
         status: "success",
-        message: "Eye Consultation updated successfully",
+        msg: "Eye Consultation updated successfully",
         data: updatedDoc
     });
 }));

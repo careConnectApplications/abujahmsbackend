@@ -56,7 +56,7 @@ exports.CreateReportTest = (0, catchAsync_1.default)((req, res, next) => __await
     yield (0, histopathology_dao_2.updateHistopathologyRecord)({ _id, "testRequired.name": testTypeId }, { $set: { "testRequired.$.paymentStatus": config_1.default.status[7] } });
     res.status(201).json({
         status: true,
-        message: `Test type '${testTypeId}' created successfully`,
+        msg: `Test type '${testTypeId}' created successfully`,
         data: newReportTest
     });
 }));

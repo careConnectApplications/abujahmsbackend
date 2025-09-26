@@ -37,7 +37,7 @@ exports.createDoctorWardNote = (0, catchAsync_1.default)((req, res, next) => __a
     }, next);
     res.status(201).json({
         status: true,
-        message: 'Admission note for doctor ward round created successfully',
+        msg: 'Admission note for doctor ward round created successfully',
         data: note
     });
 }));
@@ -88,7 +88,7 @@ exports.updateDoctorWardAdmissionNote = (0, catchAsync_1.default)((req, res, nex
     }
     res.status(200).json({
         status: 'success',
-        message: 'Admission note updated successfully',
+        msg: 'Admission note updated successfully',
         data: note
     });
 }));

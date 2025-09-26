@@ -27,7 +27,7 @@ function downloadtemplates(req, res) {
         res.download(filePath, fileName, (err) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send(config_1.default.error.errordownload);
+                return res.status(500).json({ status: false, msg: err.message || config_1.default.error.errordownload });
             }
         });
     });
