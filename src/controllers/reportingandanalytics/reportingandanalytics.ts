@@ -1,7 +1,7 @@
 
 import configuration from "../../config";
 import { NextFunction, Request, Response } from "express";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate,readthirdstageLabouraggregate,readsecondstageLabouraggregate,readfirststageLabouraggregate,readmortalityregisteraggregate,readbirthregisteraggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 import { financialreports } from "../../utils/reporting/financial";
@@ -19,6 +19,7 @@ import {labinvestigationreports} from "../../utils/reporting/labinvestigation";
 import {radiodiagnosisreports} from "../../utils/reporting/radiodiagnosis";
 import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
+import {maternityreports} from "../../utils/reporting/maternity";
 import {removeEmptyStrings,mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
@@ -194,6 +195,55 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     const {radioDiagnosisPipeline} = radiodiagnosisreports(startdate, enddate);
     const {operationPipeline} = operationreports(startdate, enddate);
     const {specialConsultativePipeline} = specialconsultativereports(startdate, enddate);
+    const {
+      liveBirthPipeline,
+      freshStillBirthPipeline,
+      maceratedStillBirthPipeline,
+      asphyxiaPipeline,
+      lowBirthWeightPipeline,
+      macrosomicBabiesPipeline,
+      earlyNeoNatalDeathPipeline,
+      bornBeforeArrivalPipeline,
+      preMaturityPipeline,
+      neoNatalDeathPipeline,
+      bookedCasesPipeline,
+      unbookedCasesPipeline,
+      svdPipeline,
+      vacuumDeliveryPipeline,
+      forcepsDeliveryPipeline,
+      electiveCaesareanPipeline,
+      emergencyCaesareanPipeline,
+      svdFromSecondStagePipeline,
+      csFromSecondStagePipeline,
+      twinDeliveryPipeline,
+      tripletDeliveryPipeline,
+      quadrupletDeliveryPipeline,
+      breechPresentationPipeline,
+      inductionOfLabourPipeline,
+      pretermLabourPipeline,
+      manualRemovalOfPlacentaPipeline,
+      postPartumHemorrhagePipeline,
+      prematureRuptureOfMembranePipeline,
+      antePartumHemorrhagePipeline,
+      placentaPreviaPipeline,
+      abruptioPlacentaPipeline,
+      preEclampsiaPipeline,
+      eclampsiaPipeline,
+      maternalDeathPipeline,
+      maternalDeathFromMortalityPipeline,
+      pregnancyInducedHypertensionPipeline,
+      mvaPipeline,
+      missedAbortionPipeline,
+      inducedAbortionPipeline,
+      criminalAbortionPipeline,
+      newFistulaCasesPipeline,
+      admittedFistulaCasesPipeline,
+      firstRepairPipeline,
+      secondRepairPipeline,
+      surgeryForFistulaRepairPipeline,
+      dischargesAfterFistulaSurgeryPipeline,
+      closedAndDryFistulaAtDischargePipeline
+    } = maternityreports(startdate, enddate);
     
   
     let queryresult:any; 
@@ -421,6 +471,225 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       Object.keys(groupedByVaccination).forEach(vaccination => {
         queryresult[vaccination] = formatRow(groupedByVaccination[vaccination]);
       });
+    }
+    else if(querytype == summary[22]){
+      // MATERNITY RETURN Report
+      const [
+        // Babies Data
+        liveBirth,
+        freshStillBirth,
+        maceratedStillBirth,
+        asphyxia,
+        lowBirthWeight,
+        macrosomicBabies,
+        earlyNeoNatalDeath,
+        bornBeforeArrival,
+        preMaturity,
+        neoNatalDeath,
+        // Mothers Data - Booking Status  
+        bookedCases,
+        unbookedCases,
+        // Type of Delivery
+        svd,
+        vacuumDelivery,
+        forcepsDelivery,
+        electiveCaesarean,
+        emergencyCaesarean,
+        // Also check SecondStageLabour
+        svdFromSecondStage,
+        csFromSecondStage,
+        // Multiple Gestation
+        twinDelivery,
+        tripletDelivery,
+        quadrupletDelivery,
+        // Obstetric Complications
+        breechPresentation,
+        inductionOfLabour,
+        inductionFromFirstStage,
+        pretermLabour,
+        manualRemovalOfPlacenta,
+        postPartumHemorrhage,
+        prematureRuptureOfMembrane,
+        antePartumHemorrhage,
+        placentaPrevia,
+        abruptioPlacenta,
+        preEclampsia,
+        eclampsia,
+        maternalDeath,
+        maternalDeathFromMortality,
+        pregnancyInducedHypertension,
+        mva,
+        missedAbortion,
+        inducedAbortion,
+        criminalAbortion,
+        // Obstetric Fistula Services
+        newFistulaCases,
+        admittedFistulaCases,
+        firstRepair,
+        secondRepair,
+        surgeryForFistulaRepair,
+        dischargesAfterFistulaSurgery,
+        closedAndDryFistulaAtDischarge
+      ] = await Promise.all([
+        // Babies Data
+        readthirdstageLabouraggregate(liveBirthPipeline),
+        readthirdstageLabouraggregate(freshStillBirthPipeline),
+        readthirdstageLabouraggregate(maceratedStillBirthPipeline),
+        readthirdstageLabouraggregate(asphyxiaPipeline),
+        readthirdstageLabouraggregate(lowBirthWeightPipeline),
+        readthirdstageLabouraggregate(macrosomicBabiesPipeline),
+        readthirdstageLabouraggregate(earlyNeoNatalDeathPipeline),
+        readthirdstageLabouraggregate(bornBeforeArrivalPipeline),
+        readthirdstageLabouraggregate(preMaturityPipeline),
+        readmortalityregisteraggregate(neoNatalDeathPipeline),
+        // Mothers Data
+        readthirdstageLabouraggregate(bookedCasesPipeline),
+        readthirdstageLabouraggregate(unbookedCasesPipeline),
+        // Type of Delivery
+        readthirdstageLabouraggregate(svdPipeline),
+        readthirdstageLabouraggregate(vacuumDeliveryPipeline),
+        readthirdstageLabouraggregate(forcepsDeliveryPipeline),
+        readthirdstageLabouraggregate(electiveCaesareanPipeline),
+        readthirdstageLabouraggregate(emergencyCaesareanPipeline),
+        // Check SecondStageLabour as well
+        readsecondstageLabouraggregate(svdFromSecondStagePipeline),
+        readsecondstageLabouraggregate(csFromSecondStagePipeline),
+        // Multiple Gestation
+        readthirdstageLabouraggregate(twinDeliveryPipeline),
+        readthirdstageLabouraggregate(tripletDeliveryPipeline),
+        readthirdstageLabouraggregate(quadrupletDeliveryPipeline),
+        // Obstetric Complications
+        readthirdstageLabouraggregate(breechPresentationPipeline),
+        readthirdstageLabouraggregate(inductionOfLabourPipeline),
+        readfirststageLabouraggregate(inductionOfLabourPipeline), // Also check FirstStageLabour
+        readthirdstageLabouraggregate(pretermLabourPipeline),
+        readthirdstageLabouraggregate(manualRemovalOfPlacentaPipeline),
+        readthirdstageLabouraggregate(postPartumHemorrhagePipeline),
+        readthirdstageLabouraggregate(prematureRuptureOfMembranePipeline),
+        readthirdstageLabouraggregate(antePartumHemorrhagePipeline),
+        readthirdstageLabouraggregate(placentaPreviaPipeline),
+        readthirdstageLabouraggregate(abruptioPlacentaPipeline),
+        readthirdstageLabouraggregate(preEclampsiaPipeline),
+        readthirdstageLabouraggregate(eclampsiaPipeline),
+        readthirdstageLabouraggregate(maternalDeathPipeline),
+        readmortalityregisteraggregate(maternalDeathFromMortalityPipeline),
+        readthirdstageLabouraggregate(pregnancyInducedHypertensionPipeline),
+        readthirdstageLabouraggregate(mvaPipeline),
+        readthirdstageLabouraggregate(missedAbortionPipeline),
+        readthirdstageLabouraggregate(inducedAbortionPipeline),
+        readthirdstageLabouraggregate(criminalAbortionPipeline),
+        // Obstetric Fistula Services
+        readthirdstageLabouraggregate(newFistulaCasesPipeline),
+        readthirdstageLabouraggregate(admittedFistulaCasesPipeline),
+        readthirdstageLabouraggregate(firstRepairPipeline),
+        readthirdstageLabouraggregate(secondRepairPipeline),
+        readthirdstageLabouraggregate(surgeryForFistulaRepairPipeline),
+        readthirdstageLabouraggregate(dischargesAfterFistulaSurgeryPipeline),
+        readthirdstageLabouraggregate(closedAndDryFistulaAtDischargePipeline)
+      ]);
+      console.log("liveBirt",liveBirth);
+      // Helper function to format female-only data
+      const formatFemaleOnly = (data: any[]) => {
+        const count = data[0]?.count || 0;
+        return { female: count, total: count };
+      };
+
+      // Combine SVD from both sources
+      const totalSVD = (svd[0]?.count || 0) + (svdFromSecondStage[0]?.count || 0);
+      const totalCS = (electiveCaesarean[0]?.count || 0) + (emergencyCaesarean[0]?.count || 0) + (csFromSecondStage[0]?.count || 0);
+      
+      // Combine induction of labour from both sources
+      const totalInductionOfLabour = (inductionOfLabour[0]?.count || 0) + (inductionFromFirstStage[0]?.count || 0);
+      
+      // Combine maternal death from both sources
+      const totalMaternalDeath = (maternalDeath[0]?.count || 0) + (maternalDeathFromMortality[0]?.count || 0);
+      
+      // Calculate composite metrics
+      const iufdCount = (freshStillBirth[0]?.count || 0) + (maceratedStillBirth[0]?.count || 0);
+      const perinatalDeathCount = iufdCount + (earlyNeoNatalDeath[0]?.count || 0);
+      const totalVaginalDeliveries = totalSVD + (vacuumDelivery[0]?.count || 0) + (forcepsDelivery[0]?.count || 0);
+      const totalCaesareanSections = totalCS;
+      const totalBirths = liveBirth.reduce((sum: number, item: any) => sum + (item.count || 0), 0) + iufdCount;
+      const totalDeliveries = totalVaginalDeliveries + totalCaesareanSections;
+
+      queryresult = {
+        // BABIES DATA
+        "Live Birth": formatRow(liveBirth),
+        "Fresh Still Birth": formatRow(freshStillBirth),
+        "Macerated Still Birth": formatRow(maceratedStillBirth),
+        "Asphyxia": formatRow(asphyxia),
+        "Low Birth Weight (<2.5kg)": formatRow(lowBirthWeight),
+        "Macrosomic Babies (≥4.5kg)": formatRow(macrosomicBabies),
+        "Early Neo Natal Death (death within 7 days of Age)": formatRow(earlyNeoNatalDeath),
+        "Born Before Arrival": formatRow(bornBeforeArrival),
+        "Pre-Maturity (<34 Weeks)": formatRow(preMaturity),
+        "IUFD (Intra Uterine Fetal Death)": { 
+          male: (freshStillBirth.find((r: any) => r._id?.toLowerCase() === "male")?.count || 0) + 
+                (maceratedStillBirth.find((r: any) => r._id?.toLowerCase() === "male")?.count || 0),
+          female: (freshStillBirth.find((r: any) => r._id?.toLowerCase() === "female")?.count || 0) + 
+                  (maceratedStillBirth.find((r: any) => r._id?.toLowerCase() === "female")?.count || 0),
+          total: iufdCount 
+        },
+        "Perinatal Death (IUFD + Baby Deaths within 7 Days)": { 
+          male: (freshStillBirth.find((r: any) => r._id?.toLowerCase() === "male")?.count || 0) + 
+                (maceratedStillBirth.find((r: any) => r._id?.toLowerCase() === "male")?.count || 0) +
+                (earlyNeoNatalDeath.find((r: any) => r._id?.toLowerCase() === "male")?.count || 0),
+          female: (freshStillBirth.find((r: any) => r._id?.toLowerCase() === "female")?.count || 0) + 
+                  (maceratedStillBirth.find((r: any) => r._id?.toLowerCase() === "female")?.count || 0) +
+                  (earlyNeoNatalDeath.find((r: any) => r._id?.toLowerCase() === "female")?.count || 0),
+          total: perinatalDeathCount
+        },
+        "Neo-natal death (Death within 28 days of Age)": formatRow(neoNatalDeath),
+        
+        // MOTHERS DATA - BOOKING STATUS
+        "Booked Cases": formatFemaleOnly(bookedCases),
+        "Unbooked Cases": formatFemaleOnly(unbookedCases),
+        
+        // TYPE OF DELIVERY
+        "SVD": formatFemaleOnly([{ count: totalSVD }]),
+        "Vacuum Delivery": formatFemaleOnly(vacuumDelivery),
+        "Forceps Delivery": formatFemaleOnly(forcepsDelivery),
+        "Total No of Vaginal Deliveries (VD)": { female: totalVaginalDeliveries, total: totalVaginalDeliveries },
+        "Elective Caesarean Section": formatFemaleOnly(electiveCaesarean),
+        "Emergency Caesarean Section": formatFemaleOnly([{ count: (emergencyCaesarean[0]?.count || 0) + (csFromSecondStage[0]?.count || 0) }]),
+        "Total No of Caesarean Section Deliveries": { female: totalCaesareanSections, total: totalCaesareanSections },
+        
+        // MULTIPLE GESTATION
+        "Multiple Gestation": formatFemaleOnly([{ count: (twinDelivery[0]?.count || 0) + (tripletDelivery[0]?.count || 0) + (quadrupletDelivery[0]?.count || 0) }]),
+        "Twin Delivery": formatFemaleOnly(twinDelivery),
+        "Triplet Delivery": formatFemaleOnly(tripletDelivery),
+        "Quadruplet Delivery": formatFemaleOnly(quadrupletDelivery),
+        "Total Births (Live Births + IUFD)": { male: 0, female: 0, total: totalBirths },
+        "Total Deliveries (Vaginal + C/S)": { female: totalDeliveries, total: totalDeliveries },
+        
+        // OBSTETRIC COMPLICATIONS
+        "Breech Presentation": formatFemaleOnly(breechPresentation),
+        "Induction of Labour": formatFemaleOnly([{ count: totalInductionOfLabour }]),
+        "Preterm Labour": formatFemaleOnly(pretermLabour),
+        "Manual Removal of Placenta": formatFemaleOnly(manualRemovalOfPlacenta),
+        "Post-Partum Hemorrhage (PPH)": formatFemaleOnly(postPartumHemorrhage),
+        "Premature Rupture of Membrane (PROM)": formatFemaleOnly(prematureRuptureOfMembrane),
+        "Ante Partum Hemorrhage (APH)": formatFemaleOnly(antePartumHemorrhage),
+        "Placenta Previa": formatFemaleOnly(placentaPrevia),
+        "Abruptio Placenta": formatFemaleOnly(abruptioPlacenta),
+        "Pre-Eclampsia": formatFemaleOnly(preEclampsia),
+        "Eclampsia": formatFemaleOnly(eclampsia),
+        "Maternal Death": formatFemaleOnly([{ count: totalMaternalDeath }]),
+        "Pregnancy Induced Hypertension (PIH)": formatFemaleOnly(pregnancyInducedHypertension),
+        "MVA (Abortion)": formatFemaleOnly(mva),
+        "Missed": formatFemaleOnly(missedAbortion),
+        "Induced": formatFemaleOnly(inducedAbortion),
+        "Criminal": formatFemaleOnly(criminalAbortion),
+        
+        // OBSTETRIC FISTULA SERVICES
+        "New cases (Women presenting with Fistula)": formatFemaleOnly(newFistulaCases),
+        "Admitted Fistula cases": formatFemaleOnly(admittedFistulaCases),
+        "First Repair": formatFemaleOnly(firstRepair),
+        "Second Repair": formatFemaleOnly(secondRepair),
+        "Surgery for Fistula repair": formatFemaleOnly(surgeryForFistulaRepair),
+        "Discharges after Fistula surgery": formatFemaleOnly(dischargesAfterFistulaSurgery),
+        "Closed and dry Fistula at discharge": formatFemaleOnly(closedAndDryFistulaAtDischarge)
+      };
     }
     else{
       return next(new ApiError(400,`Query type ${configuration.error.errorisrequired}`))

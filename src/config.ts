@@ -1249,9 +1249,9 @@ const configuration: any = {
     errornotfoundgeneric: "Record not found."
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
- // environment: "test",
+  environment: "test",
 
-  environment: "prod",
+ // environment: "prod",
 
 }
 export default configuration;
