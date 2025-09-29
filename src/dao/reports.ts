@@ -13,6 +13,7 @@ import Nutrition from "../models/nutrition";
 import configuration from "../config";
 import Immunization from "../models/immunization";
 import Familyplanning from "../models/familyplanning";
+import { ThirdStageLabour, SecondStageLabour, FirstStageLabour, MortalityRegister, BirthRegister } from "../models/maternity";
 export async function readpatientsmanagementaggregate(input:any) {
   try{
   return await Patientsmanagement.aggregate(input);
@@ -158,4 +159,55 @@ export async function readpaymentaggregate(input:any) {
                       console.log(e);
                       throw new Error("Failed to update report");
                   }
+              }
+
+              // Maternity aggregates
+              export async function readthirdstageLabouraggregate(input:any) {
+                try{
+                  return await ThirdStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readsecondstageLabouraggregate(input:any) {
+                try{
+                  return await SecondStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readfirststageLabouraggregate(input:any) {
+                try{
+                  return await FirstStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readmortalityregisteraggregate(input:any) {
+                try{
+                  return await MortalityRegister.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readbirthregisteraggregate(input:any) {
+                try{
+                  return await BirthRegister.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
               }

@@ -65,7 +65,7 @@ export async function searchpartient(req: any, res: any) {
 
     res.status(200).json({
       status: true,
-      message: "patient hmo info updated successfully"
+      queryresult
     });
 
 

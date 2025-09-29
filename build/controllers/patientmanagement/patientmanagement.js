@@ -106,7 +106,7 @@ function searchpartient(req, res) {
             }, selectquery, '', '');
             res.status(200).json({
                 status: true,
-                message: "patient hmo info updated successfully"
+                queryresult
             });
         }
         catch (e) {
