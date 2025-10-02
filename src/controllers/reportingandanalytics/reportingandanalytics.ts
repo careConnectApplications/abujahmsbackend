@@ -1,7 +1,7 @@
 
 import configuration from "../../config";
 import { NextFunction, Request, Response } from "express";
-import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate,readthirdstageLabouraggregate,readsecondstageLabouraggregate,readfirststageLabouraggregate,readmortalityregisteraggregate,readbirthregisteraggregate} from "../../dao/reports";
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate,readthirdstageLabouraggregate,readsecondstageLabouraggregate,readfirststageLabouraggregate,readmortalityregisteraggregate,readbirthregisteraggregate,readeyeconditionaggregate} from "../../dao/reports";
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 import { financialreports } from "../../utils/reporting/financial";
@@ -20,7 +20,8 @@ import {radiodiagnosisreports} from "../../utils/reporting/radiodiagnosis";
 import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
 import {maternityreports} from "../../utils/reporting/maternity";
-import {removeEmptyStrings,mergeCounts,formatRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
+import {eyeConditionReports} from "../../utils/reporting/eyecondition";
+import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 
@@ -689,6 +690,23 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
         "Surgery for Fistula repair": formatFemaleOnly(surgeryForFistulaRepair),
         "Discharges after Fistula surgery": formatFemaleOnly(dischargesAfterFistulaSurgery),
         "Closed and dry Fistula at discharge": formatFemaleOnly(closedAndDryFistulaAtDischarge)
+      };
+    }
+    else if(querytype == summary[23]){
+      // Eye Condition Report
+      const { eyeConditionPipeline } = eyeConditionReports(startdate, enddate);
+      const eyeConditionRawData = await readeyeconditionaggregate(eyeConditionPipeline);
+      
+      // Format the raw data into the required structure
+      const eyeConditionFormatted = formatEyeConditionReport(eyeConditionRawData);
+      
+      // Create the final report structure
+      queryresult = {
+        reportType: "Eye Condition Report",
+        facilityName: "",
+        month: new Date(enddate).toLocaleString('default', { month: 'long', year: 'numeric' }),
+        conditions: eyeConditionFormatted,
+        rawData: eyeConditionRawData // Include raw data for debugging if needed
       };
     }
     else{

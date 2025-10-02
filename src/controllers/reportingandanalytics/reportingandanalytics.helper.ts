@@ -1039,3 +1039,84 @@ export const reportdeath = (filters: any) => {
     }
   ];
 };
+
+// Helper function to format eye condition report data
+export const formatEyeConditionReport = (eyeData: any[]) => {
+  const conditions = [
+    "Presbyopia",
+    "Myopia", 
+    "Hypermetropia",
+    "Astigmatism",
+    "Cataract",
+    "Cataract Surgery",
+    "Glaucoma",
+    "Glaucoma Surgery",
+    "Trachoma",
+    "Trachoma Surgery",
+    "Pterygium",
+    "Pterygium Surgery",
+    "Other(Specify)"
+  ];
+
+  const ageGroups = ["0-14", "15-29", "30-44", "45+"];
+  
+  // Initialize result structure
+  const result: any = {};
+  
+  conditions.forEach(condition => {
+    result[condition] = {
+      male: {
+        "0-14": 0,
+        "15-29": 0,
+        "30-44": 0,
+        "45+": 0,
+        total: 0
+      },
+      female: {
+        "0-14": 0,
+        "15-29": 0,
+        "30-44": 0,
+        "45+": 0,
+        total: 0
+      },
+      grandTotal: 0
+    };
+  });
+
+  // Fill in the data from aggregation
+  eyeData.forEach(item => {
+    const condition = item.condition || "Other(Specify)";
+    const gender = item.gender === "male" ? "male" : "female";
+    const ageGroup = item.ageGroup;
+    const count = item.count || 0;
+
+    if (result[condition] && result[condition][gender] && ageGroups.includes(ageGroup)) {
+      result[condition][gender][ageGroup] = count;
+      result[condition][gender].total += count;
+      result[condition].grandTotal += count;
+    }
+  });
+
+  return result;
+};
+
+// Format eye condition row for display
+export const formatEyeConditionRow = (conditionData: any) => {
+  return {
+    male: {
+      "0-14": conditionData.male["0-14"] || 0,
+      "15-29": conditionData.male["15-29"] || 0,
+      "30-44": conditionData.male["30-44"] || 0,
+      "45+": conditionData.male["45+"] || 0,
+      total: conditionData.male.total || 0
+    },
+    female: {
+      "0-14": conditionData.female["0-14"] || 0,
+      "15-29": conditionData.female["15-29"] || 0,
+      "30-44": conditionData.female["30-44"] || 0,
+      "45+": conditionData.female["45+"] || 0,
+      total: conditionData.female.total || 0
+    },
+    grandTotal: conditionData.grandTotal || 0
+  };
+};
