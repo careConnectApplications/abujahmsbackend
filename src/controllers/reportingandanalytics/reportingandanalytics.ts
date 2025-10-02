@@ -708,9 +708,6 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       
       // Create the final report structure
       queryresult = {
-        reportType: "Eye Condition Report",
-        facilityName: "",
-        month: new Date(enddate).toLocaleString('default', { month: 'long', year: 'numeric' }),
         conditions: conditionsArray,
         conditionsObject: eyeConditionFormatted, // Keep original object format as well
         summary: {
