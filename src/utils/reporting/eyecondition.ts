@@ -1,10 +1,14 @@
 export const eyeConditionReports = (startdate: Date, enddate: Date) => {
-  // Eye Condition Report Pipeline
+  // Eye Condition Report Pipeline - Simplified version that groups by actual diagnosis
   const eyeConditionPipeline = [
     {
       $match: {
         createdAt: { $gte: startdate, $lte: enddate },
-        "eyeConsultation": { $ne: null }
+        "eyeConsultation": { $ne: null },
+        "eyeConsultation.diagnosis": { 
+          $exists: true, 
+          $nin: [null, "", undefined]
+        }
       }
     },
     {
@@ -21,7 +25,9 @@ export const eyeConditionReports = (startdate: Date, enddate: Date) => {
     {
       $addFields: {
         diagnosis: {
-          $ifNull: ["$eyeConsultation.diagnosis", ""]
+          $trim: {
+            input: { $ifNull: ["$eyeConsultation.diagnosis", "Unknown"] }
+          }
         },
         patientAge: {
           $divide: [
@@ -55,163 +61,9 @@ export const eyeConditionReports = (startdate: Date, enddate: Date) => {
       }
     },
     {
-      $addFields: {
-        conditions: {
-          $cond: {
-            if: { $eq: ["$diagnosis", ""] },
-            then: [],
-            else: {
-              $map: {
-                input: {
-                  $filter: {
-                    input: [
-                      {
-                        $cond: [
-                          { $regexMatch: { input: "$diagnosis", regex: /presbyopia/i } },
-                          "Presbyopia",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $regexMatch: { input: "$diagnosis", regex: /myopia/i } },
-                          "Myopia",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $regexMatch: { input: "$diagnosis", regex: /hypermetropia/i } },
-                          "Hypermetropia",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $regexMatch: { input: "$diagnosis", regex: /astigmatism/i } },
-                          "Astigmatism",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /cataract/i } },
-                            { $not: { $regexMatch: { input: "$diagnosis", regex: /surgery/i } } }
-                          ] },
-                          "Cataract",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /cataract/i } },
-                            { $regexMatch: { input: "$diagnosis", regex: /surgery/i } }
-                          ] },
-                          "Cataract Surgery",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /glaucoma/i } },
-                            { $not: { $regexMatch: { input: "$diagnosis", regex: /surgery/i } } }
-                          ] },
-                          "Glaucoma",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /glaucoma/i } },
-                            { $regexMatch: { input: "$diagnosis", regex: /surgery/i } }
-                          ] },
-                          "Glaucoma Surgery",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /trachoma/i } },
-                            { $not: { $regexMatch: { input: "$diagnosis", regex: /surgery/i } } }
-                          ] },
-                          "Trachoma",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /trachoma/i } },
-                            { $regexMatch: { input: "$diagnosis", regex: /surgery/i } }
-                          ] },
-                          "Trachoma Surgery",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /pterygium/i } },
-                            { $not: { $regexMatch: { input: "$diagnosis", regex: /surgery/i } } }
-                          ] },
-                          "Pterygium",
-                          null
-                        ]
-                      },
-                      {
-                        $cond: [
-                          { $and: [
-                            { $regexMatch: { input: "$diagnosis", regex: /pterygium/i } },
-                            { $regexMatch: { input: "$diagnosis", regex: /surgery/i } }
-                          ] },
-                          "Pterygium Surgery",
-                          null
-                        ]
-                      }
-                    ],
-                    cond: { $ne: ["$$this", null] }
-                  }
-                },
-                as: "condition",
-                in: "$$condition"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      $addFields: {
-        conditions: {
-          $cond: {
-            if: { $eq: [{ $size: "$conditions" }, 0] },
-            then: {
-              $cond: {
-                if: { $ne: ["$diagnosis", ""] },
-                then: ["Other"],
-                else: []
-              }
-            },
-            else: "$conditions"
-          }
-        }
-      }
-    },
-    {
-      $unwind: {
-        path: "$conditions",
-        preserveNullAndEmptyArrays: false
-      }
-    },
-    {
       $group: {
         _id: {
-          condition: "$conditions",
+          diagnosis: "$diagnosis",
           gender: "$patientGender",
           ageGroup: "$ageGroup"
         },
@@ -220,11 +72,18 @@ export const eyeConditionReports = (startdate: Date, enddate: Date) => {
     },
     {
       $project: {
-        condition: "$_id.condition",
+        condition: "$_id.diagnosis",
         gender: "$_id.gender",
         ageGroup: "$_id.ageGroup",
         count: 1,
         _id: 0
+      }
+    },
+    {
+      $sort: {
+        condition: 1,
+        gender: 1,
+        ageGroup: 1
       }
     }
   ];
