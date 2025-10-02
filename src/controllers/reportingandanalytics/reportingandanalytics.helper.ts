@@ -1085,15 +1085,37 @@ export const formatEyeConditionReport = (eyeData: any[]) => {
 
   // Fill in the data from aggregation
   eyeData.forEach(item => {
-    const condition = item.condition || "Other(Specify)";
+    const diagnosis = item.diagnosis || "Other(Specify)";
     const gender = item.gender === "male" ? "male" : "female";
     const ageGroup = item.ageGroup;
     const count = item.count || 0;
 
-    if (result[condition] && result[condition][gender] && ageGroups.includes(ageGroup)) {
-      result[condition][gender][ageGroup] = count;
-      result[condition][gender].total += count;
-      result[condition].grandTotal += count;
+    // Since we're now using actual diagnoses, we need to handle dynamic conditions
+    if (!result[diagnosis]) {
+      // Create new entry for this diagnosis if it doesn't exist
+      result[diagnosis] = {
+        male: {
+          "0-14": 0,
+          "15-29": 0,
+          "30-44": 0,
+          "45+": 0,
+          total: 0
+        },
+        female: {
+          "0-14": 0,
+          "15-29": 0,
+          "30-44": 0,
+          "45+": 0,
+          total: 0
+        },
+        grandTotal: 0
+      };
+    }
+
+    if (result[diagnosis][gender] && ageGroups.includes(ageGroup)) {
+      result[diagnosis][gender][ageGroup] = count;
+      result[diagnosis][gender].total += count;
+      result[diagnosis].grandTotal += count;
     }
   });
 

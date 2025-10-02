@@ -72,7 +72,7 @@ export const eyeConditionReports = (startdate: Date, enddate: Date) => {
     },
     {
       $project: {
-        condition: "$_id.diagnosis",
+        diagnosis: "$_id.diagnosis",
         gender: "$_id.gender",
         ageGroup: "$_id.ageGroup",
         count: 1,
@@ -81,7 +81,7 @@ export const eyeConditionReports = (startdate: Date, enddate: Date) => {
     },
     {
       $sort: {
-        condition: 1,
+        diagnosis: 1,
         gender: 1,
         ageGroup: 1
       }
