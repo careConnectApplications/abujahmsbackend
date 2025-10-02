@@ -21,7 +21,7 @@ import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
 import {maternityreports} from "../../utils/reporting/maternity";
 import {eyeConditionReports} from "../../utils/reporting/eyecondition";
-import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
+import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,formatEyeConditionRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 
@@ -700,13 +700,20 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       // Format the raw data into the required structure
       const eyeConditionFormatted = formatEyeConditionReport(eyeConditionRawData);
       
+      // Convert the conditions object to an array and apply row formatting
+      const conditionsArray = Object.keys(eyeConditionFormatted).sort().map(diagnosis => ({
+        diagnosis: diagnosis,
+        data: formatEyeConditionRow(eyeConditionFormatted[diagnosis])
+      }));
+      
       // Create the final report structure
       queryresult = {
-        reportType: "Eye Condition Report",
-        facilityName: "",
-        month: new Date(enddate).toLocaleString('default', { month: 'long', year: 'numeric' }),
-        conditions: eyeConditionFormatted,
-        rawData: eyeConditionRawData // Include raw data for debugging if needed
+        conditions: conditionsArray,
+        conditionsObject: eyeConditionFormatted, // Keep original object format as well
+        summary: {
+          totalDiagnoses: conditionsArray.length,
+          totalPatients: eyeConditionRawData.reduce((sum: number, item: any) => sum + (item.count || 0), 0)
+        }
       };
     }
     else{
