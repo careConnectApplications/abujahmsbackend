@@ -36,7 +36,7 @@ const settings = function () {
                 { querytype: "deathreport" },
                 // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
             ];
-            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning", "inpatients records", "outpatients records", "accident and emergency records", "national health insurance services", "lab investigation report", "radiology diagnosis", "operation", "special consultative", "immunization"];
+            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning", "inpatients records", "outpatients records", "accident and emergency records", "national health insurance services", "lab investigation report", "radiology diagnosis", "operation", "special consultative", "immunization", "maternity"];
             return { reports, summary };
         }
         catch (error) {
