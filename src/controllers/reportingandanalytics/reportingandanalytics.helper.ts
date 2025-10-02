@@ -1042,57 +1042,20 @@ export const reportdeath = (filters: any) => {
 
 // Helper function to format eye condition report data
 export const formatEyeConditionReport = (eyeData: any[]) => {
-  const conditions = [
-    "Presbyopia",
-    "Myopia", 
-    "Hypermetropia",
-    "Astigmatism",
-    "Cataract",
-    "Cataract Surgery",
-    "Glaucoma",
-    "Glaucoma Surgery",
-    "Trachoma",
-    "Trachoma Surgery",
-    "Pterygium",
-    "Pterygium Surgery",
-    "Other(Specify)"
-  ];
-
   const ageGroups = ["0-14", "15-29", "30-44", "45+"];
   
-  // Initialize result structure
+  // Initialize empty result structure
   const result: any = {};
-  
-  conditions.forEach(condition => {
-    result[condition] = {
-      male: {
-        "0-14": 0,
-        "15-29": 0,
-        "30-44": 0,
-        "45+": 0,
-        total: 0
-      },
-      female: {
-        "0-14": 0,
-        "15-29": 0,
-        "30-44": 0,
-        "45+": 0,
-        total: 0
-      },
-      grandTotal: 0
-    };
-  });
 
-  // Fill in the data from aggregation
+  // Build result dynamically from the aggregation data
   eyeData.forEach(item => {
     const diagnosis = item.diagnosis || "Other(Specify)";
     const gender = item.gender === "male" ? "male" : "female";
     const ageGroup = item.ageGroup;
     const count = item.count || 0;
 
-    // Since we're now using actual diagnoses, we need to handle dynamic conditions
+    // Create new entry for this diagnosis if it doesn't exist
     if (!result[diagnosis]) {
-      // Create new entry for this diagnosis if it doesn't exist
       result[diagnosis] = {
         male: {
           "0-14": 0,
@@ -1112,6 +1075,7 @@ export const formatEyeConditionReport = (eyeData: any[]) => {
       };
     }
 
+    // Add the count if the age group is valid
     if (result[diagnosis][gender] && ageGroups.includes(ageGroup)) {
       result[diagnosis][gender][ageGroup] = count;
       result[diagnosis][gender].total += count;
@@ -1120,25 +1084,4 @@ export const formatEyeConditionReport = (eyeData: any[]) => {
   });
 
   return result;
-};
-
-// Format eye condition row for display
-export const formatEyeConditionRow = (conditionData: any) => {
-  return {
-    male: {
-      "0-14": conditionData.male["0-14"] || 0,
-      "15-29": conditionData.male["15-29"] || 0,
-      "30-44": conditionData.male["30-44"] || 0,
-      "45+": conditionData.male["45+"] || 0,
-      total: conditionData.male.total || 0
-    },
-    female: {
-      "0-14": conditionData.female["0-14"] || 0,
-      "15-29": conditionData.female["15-29"] || 0,
-      "30-44": conditionData.female["30-44"] || 0,
-      "45+": conditionData.female["45+"] || 0,
-      total: conditionData.female.total || 0
-    },
-    grandTotal: conditionData.grandTotal || 0
-  };
 };
