@@ -21,7 +21,7 @@ import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
 import {maternityreports} from "../../utils/reporting/maternity";
 import {eyeConditionReports} from "../../utils/reporting/eyecondition";
-import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,formatEyeConditionRow,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
+import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 
@@ -700,16 +700,15 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       // Format the raw data into the required structure
       const eyeConditionFormatted = formatEyeConditionReport(eyeConditionRawData);
       
-      // Convert the conditions object to an array and apply row formatting
+      // Convert the conditions object to an array (data is already properly formatted)
       const conditionsArray = Object.keys(eyeConditionFormatted).sort().map(diagnosis => ({
         diagnosis: diagnosis,
-        data: formatEyeConditionRow(eyeConditionFormatted[diagnosis])
+        data: eyeConditionFormatted[diagnosis]
       }));
       
       // Create the final report structure
       queryresult = {
-        conditions: conditionsArray,
-        conditionsObject: eyeConditionFormatted, // Keep original object format as well
+        diagnosis: conditionsArray,
         summary: {
           totalDiagnoses: conditionsArray.length,
           totalPatients: eyeConditionRawData.reduce((sum: number, item: any) => sum + (item.count || 0), 0)
