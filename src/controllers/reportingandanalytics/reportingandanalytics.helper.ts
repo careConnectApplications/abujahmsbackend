@@ -1085,3 +1085,98 @@ export const formatEyeConditionReport = (eyeData: any[]) => {
 
   return result;
 };
+
+// Helper function to format disease cases report
+export const formatDiseaseCasesReport = (rawData: any[], predefinedDiseases: string[]) => {
+  const result: any = {};
+  
+  // If predefined diseases list is provided, initialize with zero values
+  if (predefinedDiseases && predefinedDiseases.length > 0) {
+    predefinedDiseases.forEach((disease, index) => {
+      result[disease] = {
+        sn: index + 1,
+        case: disease,
+        newCases: {
+          male: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 },
+          female: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 }
+        },
+        followUp: {
+          male: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 },
+          female: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 }
+        },
+        total: 0,
+        mortality: 0
+      };
+    });
+  }
+
+  // Process raw data and populate counts
+  rawData.forEach(item => {
+    const diagnosis = item.diagnosis;
+    if (!diagnosis) return;
+
+    let targetDisease = diagnosis;
+
+    // If predefined diseases exist, try to match
+    if (predefinedDiseases && predefinedDiseases.length > 0) {
+      // Try exact match first (case insensitive)
+      let matchedDisease = predefinedDiseases.find(disease => 
+        disease.toLowerCase() === diagnosis.toLowerCase()
+      );
+
+      // If no exact match, try partial match
+      if (!matchedDisease) {
+        matchedDisease = predefinedDiseases.find(disease =>
+          diagnosis.toLowerCase().includes(disease.toLowerCase()) ||
+          disease.toLowerCase().includes(diagnosis.toLowerCase())
+        );
+      }
+
+      // Only process if we found a match
+      if (!matchedDisease) return;
+      targetDisease = matchedDisease;
+    }
+
+    // Initialize disease entry if it doesn't exist (for dynamic mode)
+    if (!result[targetDisease]) {
+      result[targetDisease] = {
+        sn: Object.keys(result).length + 1,
+        case: targetDisease,
+        newCases: {
+          male: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 },
+          female: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 }
+        },
+        followUp: {
+          male: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 },
+          female: { "<5": 0, "<15": 0, "15-19": 0, "20+": 0 }
+        },
+        total: 0,
+        mortality: 0
+      };
+    }
+
+    // Update counts
+    const gender = item.gender === "male" ? "male" : "female";
+    const ageGroup = item.ageGroup;
+    const appointmentCategory = item.appointmentCategory === "new" ? "newCases" : "followUp";
+    const count = item.count || 0;
+    const mortality = item.mortality || 0;
+
+    // Update counts if age group exists
+    if (result[targetDisease][appointmentCategory][gender][ageGroup] !== undefined) {
+      result[targetDisease][appointmentCategory][gender][ageGroup] += count;
+      result[targetDisease].total += count;
+      result[targetDisease].mortality += mortality;
+    }
+  });
+
+  // Convert to array format and re-number if dynamic
+  const diseaseArray = Object.values(result);
+  
+  // Re-assign serial numbers in case of dynamic mode
+  diseaseArray.forEach((disease: any, index) => {
+    disease.sn = index + 1;
+  });
+
+  return diseaseArray;
+};
