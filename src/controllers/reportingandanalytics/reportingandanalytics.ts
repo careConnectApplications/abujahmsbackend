@@ -21,7 +21,8 @@ import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
 import {maternityreports} from "../../utils/reporting/maternity";
 import {eyeConditionReports} from "../../utils/reporting/eyecondition";
-import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
+import {diseaseCasesReports} from "../../utils/reporting/diseasecases";
+import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,formatDiseaseCasesReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 
@@ -712,6 +713,24 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
         summary: {
           totalDiagnoses: conditionsArray.length,
           totalPatients: eyeConditionRawData.reduce((sum: number, item: any) => sum + (item.count || 0), 0)
+        }
+      };
+    }
+    else if(querytype == summary[24]){
+      // Disease Cases Report
+      const { diseaseCasesPipeline } = diseaseCasesReports(startdate, enddate);
+      const diseaseCasesRawData = await readappointmentaggregate(diseaseCasesPipeline);
+      
+      // Format the raw data - only showing diseases with actual data
+      const diseaseCasesFormatted = formatDiseaseCasesReport(diseaseCasesRawData, []);
+      
+      // Create the final report structure
+      queryresult = {
+        diseases: diseaseCasesFormatted,
+        summary: {
+          totalDiseases: diseaseCasesFormatted.length,
+          totalCases: diseaseCasesFormatted.reduce((sum: number, item: any) => sum + (item.total || 0), 0),
+          totalMortality: diseaseCasesFormatted.reduce((sum: number, item: any) => sum + (item.mortality || 0), 0)
         }
       };
     }
