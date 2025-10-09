@@ -20,6 +20,7 @@ import {radiodiagnosisreports} from "../../utils/reporting/radiodiagnosis";
 import {operationreports} from "../../utils/reporting/operation";
 import {specialconsultativereports} from "../../utils/reporting/specialconsultative";
 import {maternityreports} from "../../utils/reporting/maternity";
+import {mortalityreports} from "../../utils/reporting/mortality";
 import {eyeConditionReports} from "../../utils/reporting/eyecondition";
 import {diseaseCasesReports} from "../../utils/reporting/diseasecases";
 import {removeEmptyStrings,mergeCounts,formatRow,formatEyeConditionReport,formatDiseaseCasesReport,reportbyappointmentreport,reportbyadmissionreport,reportbyfinancialreport,reportlab,reportprocedure,reportpharmacy,reportradiology,reportimmunization,reportdeath} from "./reportingandanalytics.helper";
@@ -181,7 +182,6 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     }
      
     let {summary}:any = await settings();
-    
     const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
     const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
     const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate,outpatientdepartmentpipeline, accidentEmergencyRecordsPipeline} = appointmentaggregatereports(startdate,enddate)
@@ -244,11 +244,37 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
       secondRepairPipeline,
       surgeryForFistulaRepairPipeline,
       dischargesAfterFistulaSurgeryPipeline,
-      closedAndDryFistulaAtDischargePipeline
+      closedAndDryFistulaAtDischargePipeline,
+      liveBirthsLowWeightPipeline,
+      liveBirthsNormalWeightPipeline,
+      freshStillBirthsCountPipeline,
+      maceratedStillBirthsCountPipeline,
+      childrenUnder1YearRegisteredPipeline,
+      birthCertificatesIssuedPipeline,
+      birthCertificatesCollectedPipeline
     } = maternityreports(startdate, enddate);
     
+    const {
+      mortality0to28DaysPipeline,
+      mortality29Daysto11MonthsPipeline,
+      mortality12to59MonthsPipeline,
+      mortality5to9YearsPipeline,
+      mortality10to19YearsPipeline,
+      mortality20PlusYearsPipeline,
+      maternalMortalityUnder20Pipeline,
+      maternalMortality20to34Pipeline,
+      maternalMortality35PlusPipeline,
+      neonatalDeathPrematurityPipeline,
+      neonatalDeathTetanusPipeline,
+      neonatalDeathMalformationPipeline,
+      neonatalDeathOtherPipeline,
+      underFiveDeathMalariaPipeline,
+      underFiveDeathPneumoniaPipeline,
+      underFiveDeathMalnutritionPipeline,
+      underFiveDeathOtherPipeline
+    } = mortalityreports(startdate, enddate);
   
-    let queryresult:any; 
+    let queryresult:any;
    
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -732,6 +758,137 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
           totalCases: diseaseCasesFormatted.reduce((sum: number, item: any) => sum + (item.total || 0), 0),
           totalMortality: diseaseCasesFormatted.reduce((sum: number, item: any) => sum + (item.mortality || 0), 0)
         }
+      };
+    }
+    else if(querytype == summary[25]){
+      // Mortality Report by Age Groups
+      const [
+        mortality0to28Days,
+        mortality29Daysto11Months,
+        mortality12to59Months,
+        mortality5to9Years,
+        mortality10to19Years,
+        mortality20PlusYears
+      ] = await Promise.all([
+        readmortalityregisteraggregate(mortality0to28DaysPipeline),
+        readmortalityregisteraggregate(mortality29Daysto11MonthsPipeline),
+        readmortalityregisteraggregate(mortality12to59MonthsPipeline),
+        readmortalityregisteraggregate(mortality5to9YearsPipeline),
+        readmortalityregisteraggregate(mortality10to19YearsPipeline),
+        readmortalityregisteraggregate(mortality20PlusYearsPipeline)
+      ]);
+
+      queryresult = {
+        "0-28 days": formatRow(mortality0to28Days),
+        "29d-11mths": formatRow(mortality29Daysto11Months),
+        "12-59mths": formatRow(mortality12to59Months),
+        "5-9yrs": formatRow(mortality5to9Years),
+        "10-19yrs": formatRow(mortality10to19Years),
+        "20+yrs": formatRow(mortality20PlusYears)
+      };
+    }
+    else if(querytype == summary[26]){
+      // Maternal Mortality Report by Age Groups
+      const [
+        maternalMortalityUnder20,
+        maternalMortality20to34,
+        maternalMortality35Plus
+      ] = await Promise.all([
+        readmortalityregisteraggregate(maternalMortalityUnder20Pipeline),
+        readmortalityregisteraggregate(maternalMortality20to34Pipeline),
+        readmortalityregisteraggregate(maternalMortality35PlusPipeline)
+      ]);
+
+      // Helper function to format female-only maternal mortality data
+      const formatMaternalRow = (data: any[]) => {
+        const count = data[0]?.count || 0;
+        return { female: count, total: count };
+      };
+
+      queryresult = {
+        "under20yrs": formatMaternalRow(maternalMortalityUnder20),
+        "20-34yrs": formatMaternalRow(maternalMortality20to34),
+        "35+yrs": formatMaternalRow(maternalMortality35Plus)
+      };
+    }
+    else if(querytype == summary[27]){
+      // Causes of Deaths Report
+      const [
+        neonatalDeathPrematurity,
+        neonatalDeathTetanus,
+        neonatalDeathMalformation,
+        neonatalDeathOther,
+        underFiveDeathMalaria,
+        underFiveDeathPneumonia,
+        underFiveDeathMalnutrition,
+        underFiveDeathOther
+      ] = await Promise.all([
+        readmortalityregisteraggregate(neonatalDeathPrematurityPipeline),
+        readmortalityregisteraggregate(neonatalDeathTetanusPipeline),
+        readmortalityregisteraggregate(neonatalDeathMalformationPipeline),
+        readmortalityregisteraggregate(neonatalDeathOtherPipeline),
+        readmortalityregisteraggregate(underFiveDeathMalariaPipeline),
+        readmortalityregisteraggregate(underFiveDeathPneumoniaPipeline),
+        readmortalityregisteraggregate(underFiveDeathMalnutritionPipeline),
+        readmortalityregisteraggregate(underFiveDeathOtherPipeline)
+      ]);
+
+      queryresult = {
+        neonatalDeaths: {
+          "Prematurity": neonatalDeathPrematurity[0]?.count || 0,
+          "Neonatal Tetanus": neonatalDeathTetanus[0]?.count || 0,
+          "Congenital Malformation": neonatalDeathMalformation[0]?.count || 0,
+          "Others": neonatalDeathOther[0]?.count || 0
+        },
+        underFiveDeaths: {
+          "Malaria": underFiveDeathMalaria[0]?.count || 0,
+          "Pneumonia": underFiveDeathPneumonia[0]?.count || 0,
+          "Malnutrition": underFiveDeathMalnutrition[0]?.count || 0,
+          "Others": underFiveDeathOther[0]?.count || 0
+        }
+      };
+    }
+    else if(querytype == summary[28]){
+      // Newborn Health (Outcome of Pregnancy) Report
+      const [
+        liveBirthsLowWeight,
+        liveBirthsNormalWeight,
+        freshStillBirthsCount,
+        maceratedStillBirthsCount
+      ] = await Promise.all([
+        readthirdstageLabouraggregate(liveBirthsLowWeightPipeline),
+        readthirdstageLabouraggregate(liveBirthsNormalWeightPipeline),
+        readthirdstageLabouraggregate(freshStillBirthsCountPipeline),
+        readthirdstageLabouraggregate(maceratedStillBirthsCountPipeline)
+      ]);
+
+      queryresult = {
+        liveBirths: {
+          "under2.5kg": formatRow(liveBirthsLowWeight),
+          "≥2.5kg": formatRow(liveBirthsNormalWeight)
+        },
+        stillBirths: {
+          "Fresh Still Births (FSB)": freshStillBirthsCount[0]?.count || 0,
+          "Macerated Still Births (MSB)": maceratedStillBirthsCount[0]?.count || 0
+        }
+      };
+    }
+    else if(querytype == summary[29]){
+      // Birth Registration Report
+      const [
+        childrenUnder1YearRegistered,
+        birthCertificatesIssued,
+        birthCertificatesCollected
+      ] = await Promise.all([
+        readbirthregisteraggregate(childrenUnder1YearRegisteredPipeline),
+        readbirthregisteraggregate(birthCertificatesIssuedPipeline),
+        readbirthregisteraggregate(birthCertificatesCollectedPipeline)
+      ]);
+
+      queryresult = {
+        "Children Under 1 Year Registered": formatRow(childrenUnder1YearRegistered),
+        "Birth Certificates Issued": formatRow(birthCertificatesIssued),
+        "Birth Certificates Collected": formatRow(birthCertificatesCollected)
       };
     }
     else{
