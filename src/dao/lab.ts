@@ -1,126 +1,136 @@
 import Lab from "../models/lab";
-import {labinterface} from '../models/lab'
+import { labinterface } from '../models/lab'
 import configuration from "../config";
+import { NextFunction } from "express";
+import { ApiError } from "../errors";
 
-  //read all lab history
-  //sort({createdAt: -1}).limit(5)
-  export async function countlab(query:any) {
-    try {
-      
-      return await Lab.countDocuments(query);
-     
-    } catch (err) {
-      console.log(err);
-      throw new Error("Failed to retrieve lab test data");
-    }
-  };
-  
-  export async function readalllablimitfive(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
-    try {
-      return await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({createdAt: 1}).limit(5);
-      
-    } catch (err) {
-      console.log(err);
-      throw new Error("Failed to retrieve lab test data");
-    }
-  };
-  export async function readalllab(query:any,selectquery:any,populatequery:any,populatesecondquery:any,populatethirdquery:any) {
-    try {
-      const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 });
-      const totallabdetails = await Lab.find(query).countDocuments();
-      return { labdetails, totallabdetails };
-    } catch (err) {
-      console.log(err);
-      throw new Error("Failed to retrieve lab test data");
-    }
-  };
-  export async function optimizedreadalllab(aggregatequery:any,page:any,size:any){
-    
-      try{
-        const skip = (page - 1) * size;
-       var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });;
-      const totallabdetails = (await Lab.aggregate(aggregatequery)).length;
-      const totalPages = Math.ceil(totallabdetails / size);
-      return { labdetails, totalPages,totallabdetails, size, page};
-      
-      }
-      catch(err:any){
-        console.log(err);
-            throw new Error("Failed to retrieve lab test data");
-      
-      }
-      
-      
-      }
-  export async function createlab(input:any){
-    try{
-       const lab = new Lab(input);
-        return await lab.save();
-    }
-    catch(err){
-      console.log(err);
-      throw new Error("Failed to create lab test");
+//read all lab history
+//sort({createdAt: -1}).limit(5)
+export async function countlab(query: any) {
+  try {
 
-    }
+    return await Lab.countDocuments(query);
+
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to retrieve lab test data");
   }
-  //find one
-  export async function readonelab(query:any,selectquery:any,populatequery:any){
-    try{
+};
+
+export async function readalllablimitfive(query: any, selectquery: any, populatequery: any, populatesecondquery: any, populatethirdquery: any) {
+  try {
+    return await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 }).limit(5);
+
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to retrieve lab test data");
+  }
+};
+export async function readalllab(query: any, selectquery: any, populatequery: any, populatesecondquery: any, populatethirdquery: any) {
+  try {
+    const labdetails = await Lab.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 });
+    const totallabdetails = await Lab.find(query).countDocuments();
+    return { labdetails, totallabdetails };
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to retrieve lab test data");
+  }
+};
+export async function optimizedreadalllab(aggregatequery: any, page: any, size: any) {
+
+  try {
+    const skip = (page - 1) * size;
+    var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });;
+    const totallabdetails = (await Lab.aggregate(aggregatequery)).length;
+    const totalPages = Math.ceil(totallabdetails / size);
+    return { labdetails, totalPages, totallabdetails, size, page };
+
+  }
+  catch (err: any) {
+    console.log(err);
+    throw new Error("Failed to retrieve lab test data");
+
+  }
+
+
+}
+export async function createlab(input: any) {
+  try {
+    const lab = new Lab(input);
+    return await lab.save();
+  }
+  catch (err) {
+    console.log(err);
+    throw new Error("Failed to create lab test");
+
+  }
+}
+//find one
+export async function readonelab(query: any, selectquery: any, populatequery: any) {
+  try {
     return await Lab.findOne(query).select(selectquery).populate(populatequery);
-    }
-    catch(err){
-      console.log(err);
-      throw new Error("Failed to retrieve lab test data");
-
-    }
   }
-  
- 
-  
-  //update  lab by id
-  export async function updatelab(id:any, reqbody:any){
-    try{
-    const lab = await Lab.findOneAndUpdate({ _id: id }, reqbody,{
+  catch (err) {
+    console.log(err);
+    throw new Error("Failed to retrieve lab test data");
+
+  }
+}
+
+
+
+//update  lab by id
+export async function updatelab(id: any, reqbody: any) {
+  try {
+    const lab = await Lab.findOneAndUpdate({ _id: id }, reqbody, {
       new: true
     });
-      if (!lab) {
-        //return json  false response
-        throw new Error(configuration.error.errorinvalidcredentials);
-      }
-      return lab;
-    }catch(err){
-      console.log(err);
-      throw new Error("Failed to update lab test");
-
+    if (!lab) {
+      //return json  false response
+      throw new Error(configuration.error.errorinvalidcredentials);
     }
+    return lab;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to update lab test");
 
   }
-  //update  appointment by query
-  export async function updatelabbyquery(query:any, reqbody:any){
-    try{
-    const lab = await Lab.findOneAndUpdate(query, reqbody,{
+
+}
+//update  appointment by query
+export async function updatelabbyquery(query: any, reqbody: any) {
+  try {
+    const lab = await Lab.findOneAndUpdate(query, reqbody, {
       new: true
     });
-      if (!lab) {
-        //return json  false response
-        throw new Error(configuration.error.errorinvalidcredentials);
-      }
-      return lab;
-    }catch(err){
-      console.log(err);
-      throw new Error("Failed to update lab test");
-
+    if (!lab) {
+      //return json  false response
+      throw new Error(configuration.error.errorinvalidcredentials);
     }
+    return lab;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to update lab test");
 
   }
-  
 
-  export async function readlabaggregate(input:any) {
-    try{
+}
+
+
+export async function readlabaggregate(input: any) {
+  try {
     return await Lab.aggregate(input);
-    }
-    catch(e:any){
-      console.log(e);
-      throw new Error("Failed to update lab test");
-    }
-    }
+  }
+  catch (e: any) {
+    console.log(e);
+    throw new Error("Failed to update lab test");
+  }
+}
+
+export async function readLabFullDetails(Id: any, next: NextFunction) {
+  try {
+    return await Lab.findById(Id).populate("patient appointment staffname");
+  } catch (err: any) {
+    return next(new ApiError(404, `something went wrong: ${err}`))
+  }
+}
