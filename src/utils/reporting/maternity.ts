@@ -902,7 +902,7 @@ export const maternityreports = (startdate: any, enddate: any) => {
   // Newborn Health (Outcome of Pregnancy) Pipelines
   
   // Live births <2.5kg by gender
-  const liveBirthsLowWeightPipeline = [
+  const liveBirthsLowWeightPipeline:any = [
     {
       $match: {
         createdAt: { $gte: startdate, $lte: enddate },
