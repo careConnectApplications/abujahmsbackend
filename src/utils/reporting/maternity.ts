@@ -899,6 +899,196 @@ export const maternityreports = (startdate: any, enddate: any) => {
     }
   ];
 
+  // Newborn Health (Outcome of Pregnancy) Pipelines
+  
+  // Live births <2.5kg by gender
+  const liveBirthsLowWeightPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        "newBorn.newBornStatus": "Live Birth"
+      }
+    },
+    {
+      $addFields: {
+        weightInKg: {
+          $cond: {
+            if: { $ne: ["$newBorn.weightKg", null] },
+            then: { 
+              $convert: { 
+                input: "$newBorn.weightKg", 
+                to: "double",
+                onError: 0,
+                onNull: 0
+              }
+            },
+            else: 0
+          }
+        }
+      }
+    },
+    {
+      $match: {
+        weightInKg: { $lt: 2.5 }
+      }
+    },
+    {
+      $lookup: {
+        from: "birthregisters",
+        localField: "patient",
+        foreignField: "patient",
+        as: "birthRegister"
+      }
+    },
+    {
+      $unwind: {
+        path: "$birthRegister",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $group: {
+        _id: "$birthRegister.sex",
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Live births ≥2.5kg by gender
+  const liveBirthsNormalWeightPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        "newBorn.newBornStatus": "Live Birth"
+      }
+    },
+    {
+      $addFields: {
+        weightInKg: {
+          $cond: {
+            if: { $ne: ["$newBorn.weightKg", null] },
+            then: { 
+              $convert: { 
+                input: "$newBorn.weightKg", 
+                to: "double",
+                onError: 0,
+                onNull: 0
+              }
+            },
+            else: 0
+          }
+        }
+      }
+    },
+    {
+      $match: {
+        weightInKg: { $gte: 2.5 }
+      }
+    },
+    {
+      $lookup: {
+        from: "birthregisters",
+        localField: "patient",
+        foreignField: "patient",
+        as: "birthRegister"
+      }
+    },
+    {
+      $unwind: {
+        path: "$birthRegister",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $group: {
+        _id: "$birthRegister.sex",
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Fresh Still Births (FSB) - total count
+  const freshStillBirthsCountPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        "newBorn.newBornStatus": "Fresh Still Birth"
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Macerated Still Births (MSB) - total count
+  const maceratedStillBirthsCountPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        "newBorn.newBornStatus": "Macerated Still Birth"
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Birth Registration Pipelines - Using BirthRegister collection
+  
+  // Children under 1 year registered - by gender
+  const childrenUnder1YearRegisteredPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        under1YearRegistration: true
+      }
+    },
+    {
+      $group: {
+        _id: "$sex",
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Birth certificates issued - by gender
+  const birthCertificatesIssuedPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        birthCertificateIssue: { $exists: true, $ne: null }
+      }
+    },
+    {
+      $group: {
+        _id: "$sex",
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
+  // Birth certificates collected - by gender
+  const birthCertificatesCollectedPipeline = [
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lte: enddate },
+        birthCertificateCollected: { $exists: true, $ne: null }
+      }
+    },
+    {
+      $group: {
+        _id: "$sex",
+        count: { $sum: 1 }
+      }
+    }
+  ];
+
   return {
     // Babies Data
     liveBirthPipeline,
@@ -957,6 +1147,17 @@ export const maternityreports = (startdate: any, enddate: any) => {
     secondRepairPipeline,
     surgeryForFistulaRepairPipeline,
     dischargesAfterFistulaSurgeryPipeline,
-    closedAndDryFistulaAtDischargePipeline
+    closedAndDryFistulaAtDischargePipeline,
+
+    // Newborn Health (Outcome of Pregnancy)
+    liveBirthsLowWeightPipeline,
+    liveBirthsNormalWeightPipeline,
+    freshStillBirthsCountPipeline,
+    maceratedStillBirthsCountPipeline,
+
+    // Birth Registration
+    childrenUnder1YearRegisteredPipeline,
+    birthCertificatesIssuedPipeline,
+    birthCertificatesCollectedPipeline
   };
 };
