@@ -625,13 +625,15 @@ export const validatelabresult = catchAsync(async (req: any, res: Response, next
 });
 
 /// fetch lab bottle label
-export const printLabBottleLabels = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const printLabBottleLabels = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { id } = req.params;
+
+  const user = (req.user).user;
 
   if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
   if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
 
-  const data = await readLabFullDetails(id, next);
+  const data: any = await readLabFullDetails(id, next);
 
   if (data && data.status != configuration.status[5]) {
     return next(new ApiError(401, "lab result must be scheduled"))
@@ -640,7 +642,8 @@ export const printLabBottleLabels = catchAsync(async (req: Request, res: Respons
   return res.status(200).json({
     status: true,
     message: "success",
-    data
+    data,
+    user
   });
 });
 
