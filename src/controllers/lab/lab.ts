@@ -635,7 +635,7 @@ export const printLabBottleLabels = catchAsync(async (req: Request | any, res: R
 
   const data: any = await readLabFullDetails(id, next);
 
-  if (data && data.status != configuration.status[5]) {
+   if (data && data.status != configuration.status[5]) {
     return next(new ApiError(401, "lab result must be scheduled"))
   }
 
