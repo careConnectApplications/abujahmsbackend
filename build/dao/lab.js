@@ -67,11 +67,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const skip = (page - 1) * size;
-<<<<<<< HEAD
             var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });
-=======
-            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             ;
             const totallabdetails = (yield lab_1.default.aggregate(aggregatequery)).length;
             const totalPages = Math.ceil(totallabdetails / size);
@@ -79,11 +75,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to retrieve lab test data");
-=======
-            throw new Error(config_1.default.error.erroruserread);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }

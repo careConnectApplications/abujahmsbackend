@@ -8,20 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-<<<<<<< HEAD
-=======
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createpricingmodel = void 0;
 exports.getpricingmodel = getpricingmodel;
 exports.updatepricingmodel = updatepricingmodel;
-<<<<<<< HEAD
-=======
-const config_1 = __importDefault(require("../../config"));
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const pricingmodel_1 = require("../../dao/pricingmodel");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
@@ -35,11 +25,7 @@ var createpricingmodel = (req, res) => __awaiter(void 0, void 0, void 0, functio
         (0, otherservices_1.validateinputfaulsyvalue)({ pricingtype, exactnameofancclinic, exactnameofservicetypeforadult, exactnameofservicetypeforchild });
         const foundPricingmodel = yield (0, pricingmodel_1.readonepricemodel)({});
         if (foundPricingmodel) {
-<<<<<<< HEAD
             throw new Error(`Pricing Model already exists`);
-=======
-            throw new Error(`Pricing Model ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         const queryresult = yield (0, pricingmodel_1.createpricemodel)({ pricingtype, exactnameofancclinic, exactnameofservicetypeforadult, exactnameofservicetypeforchild });
         //create audit log

@@ -148,8 +148,6 @@ const dentalEncounterSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
-// Add indexes for performance optimization
-// Single field indexes
 dentalEncounterSchema.index({ patientId: 1 });
 dentalEncounterSchema.index({ appointmentId: 1 });
 dentalEncounterSchema.index({ admissionId: 1 });

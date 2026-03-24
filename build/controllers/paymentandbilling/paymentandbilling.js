@@ -108,8 +108,6 @@ exports.payAnnualSubscription = (0, catchAsync_1.default)((req, res) => __awaite
         status: true
     });
 }));
-///deactivate a user
-//show total for each login cashier
 exports.getCashierTotal = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { email } = (req.user).user;
@@ -344,107 +342,6 @@ function groupreadallpaymentoptimized(req, res) {
                     MRN: 1,
                 },
             });
-<<<<<<< HEAD
-=======
-            // Lookup patient
-            /*
-             statusfilter.status==configuration.status[2] && pipeline.push({
-              $lookup: {
-                from: 'patientsmanagements',
-                localField: 'patient',
-                foreignField: '_id',
-                as: 'patient',
-              },
-            });
-            */
-            //statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
-            // Build patient match condition dynamically
-            /*
-            const patientMatch:any = {};
-            
-            if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
-            if (lastName && statusfilter.status==configuration.status[2]) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
-            if (MRN && statusfilter.status==configuration.status[2]) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
-            if (HMOId && statusfilter.status==configuration.status[2]) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
-            if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
-            
-            if (Object.keys(patientMatch).length > 0) {
-              pipeline.push({ $match: patientMatch });
-            }
-              */
-            // Grouping
-            /*
-            statusfilter.status==configuration.status[2]?pipeline.push({
-              $group: {
-                _id: "$paymentreference",
-                paymentreference: { $first: "$paymentreference" },
-                createdAt: { $first: "$createdAt" },
-                updatedAt: { $first: "$updatedAt" },
-                amount: { $sum: "$amount" },
-                firstName: { $first: "$patient.firstName" },
-                phoneNumber: { $first: "$patient.phoneNumber" },
-                lastName: { $first: "$patient.lastName" },
-                MRN: { $first: "$patient.MRN" },
-                isHMOCover: { $first: "$patient.isHMOCover" },
-                HMOName: { $first: "$patient.HMOName" },
-                HMOId: { $first: "$patient.HMOId" },
-                HMOPlan: { $first: "$patient.HMOPlan" },
-              },
-            }):pipeline.push({
-              $group: {
-                _id: "$paymentreference",
-                paymentreference: { $first: "$paymentreference" },
-                createdAt: { $first: "$createdAt" },
-                updatedAt: { $first: "$updatedAt" },
-                amount: { $sum: "$amount" },
-               // firstName: { $first: "$patient.firstName" },
-                //phoneNumber: { $first: "$patient.phoneNumber" },
-                //lastName: { $first: "$patient.lastName" },
-                //MRN: { $first: "$patient.MRN" },
-                //isHMOCover: { $first: "$patient.isHMOCover" },
-                //HMOName: { $first: "$patient.HMOName" },
-                //HMOId: { $first: "$patient.HMOId" },
-                //HMOPlan: { $first: "$patient.HMOPlan" },
-              },
-            });
-            
-            
-            // Projection
-            statusfilter.status==configuration.status[2]?pipeline.push({
-              $project: {
-                _id: 0,
-                paymentreference: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                amount: 1,
-                firstName: 1,
-                phoneNumber: 1,
-                lastName: 1,
-                MRN: 1,
-                isHMOCover: 1,
-                HMOName: 1,
-                HMOId: 1,
-                HMOPlan: 1,
-              },
-            }):pipeline.push({
-              $project: {
-                _id: 0,
-                paymentreference: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                amount: 1,
-              //  firstName: 1,
-               // phoneNumber: 1,
-               // lastName: 1,
-                //MRN: 1,
-                //isHMOCover: 1,
-                //HMOName: 1,
-                //HMOId: 1,
-                //HMOPlan: 1,
-              },
-            });
-            */
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             // Sorting
             pipeline.push({ $sort: { createdAt: -1 } });
             const queryresult = yield (0, payment_1.readpaymentaggregateoptimized)(pipeline, page, size);
@@ -520,17 +417,20 @@ function confirmpayment(req, res) {
             const queryresult = yield (0, payment_1.updatepayment)(id, { status, cashieremail: email, cashierid: staffId });
             //const queryresult:any =await updatepayment(id,{status});
             //confirm payment of the service paid for 
-            //for patient registration
             if (paymentcategory == config_1.default.category[9]) {
-                //update patient registration status
                 yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1] });
             } /*
+        =======
+            }
+            /*
+        >>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             
             //for appointment
             else if(paymentcategory == configuration.category[0]){
               //schedule the patient
               //payment
               await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
+        <<<<<<< HEAD
         
             }
               */

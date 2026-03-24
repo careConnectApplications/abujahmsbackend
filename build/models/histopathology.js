@@ -165,8 +165,6 @@ histopathologySchema.pre(/^find/, function (next) {
     next();
 });
 histopathologySchema.plugin(paginate_1.paginate);
-// Add indexes for performance optimization
-// Single field indexes
 histopathologySchema.index({ patient: 1 });
 histopathologySchema.index({ status: 1 });
 histopathologySchema.index({ payment: 1 });

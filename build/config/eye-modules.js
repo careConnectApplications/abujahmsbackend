@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refraction = exports.opthalmoscopy = exports.slitLamp = exports.lensType = exports.LensTint = exports.OperationalNotesFileName = void 0;
+exports.refraction = exports.opthalmoscopy = exports.slitLamp = exports.lensType = exports.LensTint = exports.eyeConditions = exports.OperationalNotesFileName = void 0;
 exports.OperationalNotesFileName = [
     {
         name: "CVF",
@@ -9,6 +9,21 @@ exports.OperationalNotesFileName = [
     { name: "OCT", label: "OCT" },
     { name: "FundusPhotograph", label: "Fundus Photograph" },
     { name: "FFA", label: "FFA" }
+];
+exports.eyeConditions = [
+    "Presbyopia",
+    "Myopia",
+    "Hypermetropia",
+    "Astigmatism",
+    "Cataract",
+    "Cataract Surgery",
+    "Glaucoma",
+    "Glaucoma Surgery",
+    "Trachoma",
+    "Trachoma Surgery",
+    "Pterygium",
+    "Pterygium Surgery",
+    "Other(Specify)"
 ];
 exports.LensTint = [
     "Amber",

@@ -86,7 +86,6 @@ exports.createfluidbalancev1 = (0, catchAsync_1.default)((req, res, next) => __a
     const { firstName, lastName, _id: userId } = (req.user).user;
     req.body.staffname = `${firstName} ${lastName}`;
     var { outputamount, inputamount, patientId, referedward, intakeroute, intaketype, outputtype, outputroute } = req.body;
-    // var { oralfluids,tubefeedingvolume,IVfluidtype,IVfluidvolume,IVfluidrate,medication,urineoutput,stoolfrequency,consistency,stoolamount,vomitamount,drainage,totalintake,totaloutput,netfliudbalancefor24hours,staffname} = req.body;
     (0, otherservices_1.validateinputfaulsyvalue)({ inputamount, outputamount });
     //frequency must inlcude
     //route must contain allowed options

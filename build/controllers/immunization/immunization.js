@@ -57,11 +57,7 @@ const createimmunizations = (req, res) => __awaiter(void 0, void 0, void 0, func
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
         var { vaccinationlocation, outreachMedications, adverseEffectVaccine, isFullyImmunized, isZeroDoseChild, vaccination, medicationgiventomanageadverseeffect, adverseeffectseverity, anynotedadverseeffect, schedule, vaccinecode, vaccinename, vaccinetype, manufacturer, batchno, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname } = req.body;
-<<<<<<< HEAD
         //validateinputfaulsyvalue({vaccinationlocation,outreachMedications,vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
-=======
-        (0, otherservices_1.validateinputfaulsyvalue)({ vaccinationlocation, outreachMedications, adverseEffectVaccine, vaccination, schedule, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         //frequency must inlcude
         //route must contain allowed options
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
@@ -86,11 +82,7 @@ function updateimmunizations(req, res) {
             const { firstName, lastName } = (req.user).user;
             req.body.staffname = `${firstName} ${lastName}`;
             var { vaccinationlocation, outreachMedications, adverseEffectVaccine, isFullyImmunized, isZeroDoseChild, vaccination, medicationgiventomanageadverseeffect, adverseeffectseverity, anynotedadverseeffect, schedule, vaccinecode, vaccinename, vaccinetype, manufacturer, batchno, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname } = req.body;
-<<<<<<< HEAD
             //validateinputfaulsyvalue({vaccinationlocation,outreachMedications,vaccination,schedule,expirydate,dose,doseamount,administrationsite,administrationroute,consent,immunizationstatus,comment,onsetdateofreaction,reactcode,reporter,reportingsource,staffname});
-=======
-            (0, otherservices_1.validateinputfaulsyvalue)({ vaccinationlocation, outreachMedications, adverseEffectVaccine, vaccination, schedule, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             var queryresult = yield (0, immunization_1.updateimmunization)(id, { vaccinationlocation, outreachMedications, adverseEffectVaccine, isFullyImmunized, isZeroDoseChild, vaccination, medicationgiventomanageadverseeffect, adverseeffectseverity, anynotedadverseeffect, schedule, vaccinecode, vaccinename, vaccinetype, manufacturer, batchno, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname });
             res.status(200).json({
                 queryresult,

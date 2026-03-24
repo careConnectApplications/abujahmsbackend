@@ -73,9 +73,6 @@ const anathesiaSchema = new mongoose_1.Schema({
         default: null,
     },
 }, { timestamps: true });
-<<<<<<< HEAD
-// Add indexes for performance optimization
-// Single field indexes
 anathesiaSchema.index({ theatreadmission: 1 });
 anathesiaSchema.index({ createdAt: -1 });
 anathesiaSchema.index({ filledby: 1 });
@@ -83,7 +80,5 @@ anathesiaSchema.index({ asa: 1 });
 // Compound indexes for common query patterns
 anathesiaSchema.index({ theatreadmission: 1, createdAt: -1 });
 anathesiaSchema.index({ filledby: 1, createdAt: -1 });
-=======
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const anathesia = (0, mongoose_1.model)('Anathesia', anathesiaSchema);
 exports.default = anathesia;

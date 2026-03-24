@@ -9,19 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-<<<<<<< HEAD
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createvitalsignscores = exports.readallvitalsignscoreByTheatreAdmission = exports.updatepostanaetheticrecoverychartform = exports.readonepostanaetheticrecoverychartformbytheatreadmission = exports.fillpostanaetheticrecoverychartform = void 0;
 exports.updatevitalsignscores = updatevitalsignscores;
-=======
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createvitalsignscores = exports.readallvitalsignscoreByTheatreAdmission = exports.updatepostanaetheticrecoverychartform = exports.readonepostanaetheticrecoverychartformbytheatreadmission = exports.fillpostanaetheticrecoverychartform = void 0;
-exports.updatevitalsignscores = updatevitalsignscores;
-const config_1 = __importDefault(require("../../config"));
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const otherservices_1 = require("../../utils/otherservices");
 const theatreadmission_1 = require("../../dao/theatreadmission");
 const postanaetheticrecoverychart_1 = require("../../dao/postanaetheticrecoverychart");
@@ -36,11 +26,7 @@ const fillpostanaetheticrecoverychartform = (req, res) => __awaiter(void 0, void
         //validate theatre admission
         var findAdmission = yield (0, theatreadmission_1.readonethearteadmission)({ _id: theatreadmission }, {}, '');
         if (!findAdmission) {
-<<<<<<< HEAD
             throw new Error(`Theatre Admission already exists`);
-=======
-            throw new Error(`Theatre Admission ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         //const queryresult:any =await updatethearteadmission(id,{status});
         //create conscent
@@ -82,11 +68,7 @@ const updatepostanaetheticrecoverychartform = (req, res) => __awaiter(void 0, vo
         //validate theatre admission
         var findAdmission = yield (0, postanaetheticrecoverychart_1.readonepostanaetheticrecoverychart)({ _id: id }, {}, '', '');
         if (!findAdmission) {
-<<<<<<< HEAD
             throw new Error(`Postanaetheticrecoverychart Form already exists`);
-=======
-            throw new Error(`Postanaetheticrecoverychart Form ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         //const queryresult:any =await updatethearteaadmission(id,{status});
         //create conscent
@@ -129,11 +111,7 @@ const createvitalsignscores = (req, res) => __awaiter(void 0, void 0, void 0, fu
         //route must contain allowed options
         var findpostanaetheticrecoverychart = yield (0, postanaetheticrecoverychart_1.readonepostanaetheticrecoverychart)({ _id: postanaetheticrecoverychart }, {}, '', '');
         if (!findpostanaetheticrecoverychart) {
-<<<<<<< HEAD
             throw new Error(`Postanaetheticrecoverychart form already exists`);
-=======
-            throw new Error(`Postanaetheticrecoverychart form ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         const queryresult = yield (0, vitalsignscore_1.createvitalsignscore)({ staffname, postanatheticrecoverychart: findpostanaetheticrecoverychart._id, consciousness, ventilation, movement, total, bp, pulserate, respiration, color, temperature, time, });
         res.status(200).json({ queryresult, status: true });

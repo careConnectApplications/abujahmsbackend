@@ -40,8 +40,6 @@ const fluidbalanceSchema = new mongoose_1.Schema({
     dateTo: { type: Date, },
     dateFrom: { type: Date }
 }, { timestamps: true });
-// Add indexes for performance optimization
-// Single field indexes for primary lookups
 fluidbalanceSchema.index({ patient: 1 });
 fluidbalanceSchema.index({ admission: 1 });
 fluidbalanceSchema.index({ referedward: 1 });

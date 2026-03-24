@@ -112,7 +112,6 @@ const immunizationaggregatereports = (startdate, enddate) => {
             }
         }
     ];
-    // New pipeline for immunization grouped by gender and vaccination
     const immunizationByGenderAndVaccination = [
         {
             $match: { createdAt: { $gt: startdate, $lt: enddate } }

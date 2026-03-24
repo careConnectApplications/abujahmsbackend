@@ -25,7 +25,6 @@ const settings = function () {
             const query = { type: config_1.default.clinictype[2] };
             //console.log(check2);
             const reports = [
-<<<<<<< HEAD
                 { querytype: "financialreport" },
                 { querytype: "outpatient" },
                 { querytype: "inpatient" },
@@ -37,21 +36,7 @@ const settings = function () {
                 { querytype: "deathreport" },
                 // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
             ];
-            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning", "inpatients records", "outpatients records", "accident and emergency records", "national health insurance services", "lab investigation report", "radiology diagnosis", "operation", "special consultative", "immunization", "maternity"];
-=======
-                { querytype: "financialreport", querygroup: ["Appointment", "Lab", "Patient Registration", "Radiology", "Procedure", ...pharmacyNames] },
-                { querytype: "appointmentreport", querygroup: clinicNames },
-                { querytype: "admissionreport", querygroup: wardNames },
-                { querytype: "hmolabreport", querygroup: hmoNames },
-                { querytype: "hmoreportforprocedure", querygroup: hmoNames },
-                { querytype: "hmoreportforpharmacy", querygroup: hmoNames },
-                { querytype: "hmoappointmentreport", querygroup: hmoNames },
-                { querytype: "hmoradiologyreport", querygroup: hmoNames },
-                { querytype: "secondaryservicereport", querygroup: ["Appointment", "Lab", "Radiology", "Procedure", "All", ...pharmacyNames] },
-                // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
-            ];
-            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate"];
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
+            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning", "inpatients records", "outpatients records", "accident and emergency records", "national health insurance services", "lab investigation report", "radiology diagnosis", "operation", "special consultative", "immunization", "maternity", "eyecondition", "disease cases", "mortality", "maternal mortality", "causes of deaths", "Newborn Health(Outcome of pregnancy(Outcome of pregnancy)", "birth registration"];
             return { reports, summary };
         }
         catch (error) {

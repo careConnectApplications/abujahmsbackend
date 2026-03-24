@@ -148,11 +148,7 @@ const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, func
         //search for price if available
         var patients = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
         if (!patients) {
-<<<<<<< HEAD
             throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
-=======
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
         if (!appointmentPrice) {

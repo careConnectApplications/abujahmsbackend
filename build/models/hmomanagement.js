@@ -13,7 +13,6 @@ const hmomanagementSchema = new mongoose_1.Schema({
         type: String, trim: true
     }
 }, { timestamps: true });
-// Add indexes for performance optimization
 hmomanagementSchema.index({ id: 1 }, { unique: true }); // Unique HMO ID
 hmomanagementSchema.index({ hmoname: 1 }); // Search by HMO name
 hmomanagementSchema.index({ insuranceId: 1 }); // Search by insurance ID

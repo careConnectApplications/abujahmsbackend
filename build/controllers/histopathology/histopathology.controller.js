@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getHistopathologyRecordByPatientId = exports.getAllHistopathologyDashboard = exports.CreateMultipleTestReport = exports.getAllHistopathologyPaginatedHandler = exports.getAllHistopathology = exports.getHistopathologyRecordById = exports.CreateHistopatholgyService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
-//import { readoneappointment } from "../../dao/appointment";
 const histopathology_dao_1 = require("../../dao/histopathology.dao");
 const histopathology_tests_dao_1 = require("../../dao/histopathology-tests.dao");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -75,6 +74,19 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     });
 }));
 /*
+=======
+
+const generateRefNumber = () => {
+    const uniqueHistopathologyId = uuidv4();
+    return `histo-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
+}
+
+const generateLabNumber = () => {
+    const uniqueHistopathologyId = uuidv4();
+    return `Lab-${new Date().getFullYear()}-${uniqueHistopathologyId}`;
+}
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export const CreateHistopatholgyService = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     //const validBiopsyType = ["Excision", "Incision", "Endoscopy", "Trucut"];
 
@@ -86,12 +98,16 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
         biopsyType,
         wholeOrgan,
         previousBiopsy,
+<<<<<<< HEAD
         diagnosis,
         imageBase64,
         nameofexplainer,
         nameofrepresentive,
         addressofrepresentaive,
         fullnameofwitness
+=======
+        diagnosis
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     } = req.body;
 
     // if (!appointmentId) return next(new ApiError(400, "Appointment Id is not provided!"));
@@ -110,12 +126,20 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     //const _appointmentId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(appointmentId);
     const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(patientId);
 
+<<<<<<< HEAD
+=======
+    // let appointment = await readoneappointment({ _id: _appointmentId }, {}, '');
+    // if (!appointment) {
+    //     return next(new ApiError(404, `Appointment donot ${configuration.error.erroralreadyexit}`))
+    // }
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     // check if patient still has a pending record
     let pendingHistopathologyRecord = await queryHistopathologyRecord({ patient: _patientId, status: configuration.status[2] }, null, null);
     if (pendingHistopathologyRecord) return next(new ApiError(400, "this patient still has a pending histopathology record"))
 
     const { firstName, lastName, _id: userId } = (req.user).user;
+<<<<<<< HEAD
 
     ///Step 2: Read the Appointment and populate the patient field.
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
@@ -137,6 +161,23 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 //    const createdPayments = [];
      const refNumber = generateRefNumber();
 
+=======
+    const raiseby = `${firstName} ${lastName}`;
+
+    ///Step 2: Read the Appointment and populate the patient field.
+    const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+
+    if (!foundPatient) {
+        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    }
+
+    //const { servicetypedetails } = await readallservicetype({ category: configuration.category[6] }, { type: 1, category: 1, department: 1, _id: 0 });
+
+    let totalAmount = 0;
+    const testRequiredRecords: any[] = [];
+    const createdPayments = [];
+     const refNumber = generateRefNumber();
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     for (let i = 0; i < examTypes.length; i++) {
         const service = examTypes[i];
 
@@ -145,6 +186,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
         if (!testPrice) {
             return next(new Error(`${configuration.error.errornopriceset}  ${service}`));
         }
+<<<<<<< HEAD
         const serviceAmount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
         //const serviceAmount = testPrice.amount;
         totalAmount += serviceAmount;
@@ -153,11 +195,20 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
         /*
 
+=======
+
+        const serviceAmount = testPrice.amount;
+        totalAmount += serviceAmount;
+
+        //const refNumber = generateRefNumber();
+        
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         const paymentData = {
             paymentreference: refNumber,
             paymentype: service,
             paymentcategory: configuration.category[6], // Histopathology category
             patient: _patientId,
+<<<<<<< HEAD
             firstName: foundPatient?.firstName,
             lastName: foundPatient?.lastName,
             MRN: foundPatient?.MRN,
@@ -168,31 +219,57 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 /*
         testRequiredRecords.push({
             amount: serviceAmount,
+=======
+            firstName:foundPatient?.firstName,
+            lastName:foundPatient?.lastName,
+            MRN:foundPatient?.MRN,
+            phoneNumber:foundPatient?.phoneNumber,
+            amount: Number(serviceAmount)
+        }
+
+        testRequiredRecords.push({
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             name: service,
             PaymentRef: null,
             paymentStatus: configuration.status[5] // Scheduled
         });
 
+<<<<<<< HEAD
        // createdPayments.push(paymentData);
     }
 /*
     for (let i = 0; i < createdPayments.length; i++) {
 
+=======
+        createdPayments.push(paymentData);
+    }
+
+    for (let i = 0; i < createdPayments.length; i++) {
+      
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         const paymentRecord = await createpayment(createdPayments[i]);
 
         testRequiredRecords[i].PaymentRef = paymentRecord._id;
     }
+<<<<<<< HEAD
         */
 /*
+=======
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     const labNo = generateLabNumber();
 
     const newHistopathology = {
         patient: _patientId,
         staffInfo: userId,
         amount: totalAmount,
+<<<<<<< HEAD
         refNumber,
         //status: configuration.status[5],
         status: configuration.otherstatus[0],
+=======
+        status: configuration.status[5],
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         paymentStatus: configuration.status[2],
         testRequired: testRequiredRecords,
         diagnosisForm: {
@@ -205,6 +282,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
             requestingDoctor: _doctorId,
             phoneNumber: foundPatient.phoneNumber || null
         },
+<<<<<<< HEAD
         consentForm: {
             nameofexplainer,
             nameofrepresentive,
@@ -213,6 +291,8 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
             fullnameofwitness,
             createdBy: userId
         }
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     };
 
@@ -220,6 +300,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
     res.status(201).json({
         status: true,
+<<<<<<< HEAD
         msg: "Histopathology  created successfully",
         data: savedHistopathology
     });

@@ -41,7 +41,6 @@ var signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!user) {
             throw new Error(config_1.default.error.errorinvaliduser);
         }
-        //chek if user is active
         if (user.status === config_1.default.status[0]) {
             throw new Error(config_1.default.error.errordeactivate);
         }

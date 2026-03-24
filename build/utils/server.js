@@ -89,7 +89,6 @@ const insuranceauthorizationandclaims_1 = __importDefault(require("../routes/ins
 const maternity_1 = __importDefault(require("../routes/maternity"));
 function createServer() {
     const app = (0, express_1.default)();
-    // ✅ Collect default Node.js metrics (CPU, memory, event loop, GC, etc.)
     prom_client_1.default.collectDefaultMetrics({ prefix: "node_" });
     // 1. Total number of requests (Counter)
     const totalRequests = new prom_client_1.default.Counter({
@@ -113,6 +112,16 @@ function createServer() {
         name: "process_resident_memory_bytes",
         help: "Resident memory size in bytes",
     });
+    if (process.env.NODE_ENV !== "test") {
+        app.use(logger_1.morgan.successHandler);
+        app.use(logger_1.morgan.errorHandler);
+    }
+    //cross origin sharing
+    app.use((0, cors_1.default)({
+        origin: "*",
+    }));
+    app.use(express_1.default.static(__dirname + '/downloads'));
+    app.use(express_1.default.static(path.join(__dirname, 'uploads')));
     setInterval(() => {
         const usage = process.cpuUsage();
         const memory = process.memoryUsage();
@@ -141,7 +150,6 @@ function createServer() {
     });
     app.use(express_1.default.static(__dirname + '/downloads'));
     app.use(express_1.default.static(path.join(__dirname, 'uploads')));
-    //middleware to process json
     app.use(express_1.default.json({ limit: '50mb' }));
     app.use(express_1.default.urlencoded({ extended: true }));
     /*
@@ -151,10 +159,6 @@ function createServer() {
         createParentPath: true,
     }));
     */
-    /****
-     * Cron Jobs
-     */
-    //import("../jobs/checkExpiredSubscriptionDate.job");
     app.use((0, express_fileupload_1.default)());
     // Expose /metrics endpoint
     app.get("/api/v1/metrics", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -196,25 +200,6 @@ function createServer() {
     app.use("/api/v1/doctor-ward-round", middleware_1.protect, doctor_ward_round_route_1.default);
     app.use("/api/v1/insuranceauthorizationandclaims", middleware_1.protect, insuranceauthorizationandclaims_1.default);
     app.use("/api/v1/maternity", middleware_1.protect, maternity_1.default);
-    // Handle POST requests to /webhook
-    /*
-  app.post('/api/v1/webhook', (req, res) => {
-    // Log the incoming Event Grid event data
-    console.log('Event received:', JSON.stringify(req.body, null, 2));
-  
-    // You can handle the event logic here
-    // Example: if you're dealing with Azure Storage events, check for a specific event type
-    const event = req.body[0];  // Event Grid sends an array of events
-    if (event.eventType === 'Microsoft.Storage.BlobCreated') {
-        console.log('A blob was created in your storage account.');
-        // Handle blob creation event
-    }
-  
-    // Send a 200 OK response back to acknowledge receipt of the event
-    res.status(200).send('Event received');
-  });
-  */
-    // Send back a 404 error for any unknown API request
     app.use((_req, _res, next) => {
         next(new errors_1.ApiError(http_status_1.default.NOT_FOUND, "Request Endpoint Not found"));
     });

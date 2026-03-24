@@ -128,8 +128,6 @@ const physiotherapyAssessmentSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
-// Add indexes for performance optimization
-// Single field indexes for primary lookups
 physiotherapyAssessmentSchema.index({ patientId: 1 });
 physiotherapyAssessmentSchema.index({ appointmentId: 1 });
 physiotherapyAssessmentSchema.index({ admissionId: 1 });

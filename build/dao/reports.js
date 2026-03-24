@@ -24,7 +24,6 @@ exports.readlabaggregate = readlabaggregate;
 exports.readradiologyaggregate = readradiologyaggregate;
 exports.readprescriptionaggregate = readprescriptionaggregate;
 exports.readnutritionaggregate = readnutritionaggregate;
-<<<<<<< HEAD
 exports.readimmunizationaggregate = readimmunizationaggregate;
 exports.readfamilyaggregate = readfamilyaggregate;
 exports.readthirdstageLabouraggregate = readthirdstageLabouraggregate;
@@ -32,8 +31,7 @@ exports.readsecondstageLabouraggregate = readsecondstageLabouraggregate;
 exports.readfirststageLabouraggregate = readfirststageLabouraggregate;
 exports.readmortalityregisteraggregate = readmortalityregisteraggregate;
 exports.readbirthregisteraggregate = readbirthregisteraggregate;
-=======
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
+exports.readeyeconditionaggregate = readeyeconditionaggregate;
 const payment_1 = __importDefault(require("../models/payment"));
 const admission_1 = __importDefault(require("../models/admission"));
 const appointment_1 = __importDefault(require("../models/appointment"));
@@ -46,13 +44,10 @@ const radiology_1 = __importDefault(require("../models/radiology"));
 const prescription_1 = __importDefault(require("../models/prescription"));
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const nutrition_1 = __importDefault(require("../models/nutrition"));
-<<<<<<< HEAD
 const immunization_1 = __importDefault(require("../models/immunization"));
 const familyplanning_1 = __importDefault(require("../models/familyplanning"));
 const maternity_1 = require("../models/maternity");
-=======
-const config_1 = __importDefault(require("../config"));
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
+const eye_module_model_1 = __importDefault(require("../models/eye-module/eye-module.model"));
 function readpatientsmanagementaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -269,15 +264,14 @@ function readbirthregisteraggregate(input) {
         }
     });
 }
-//nutrition
-function readnutritionaggregate(input) {
+function readeyeconditionaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield nutrition_1.default.aggregate(input);
+            return yield eye_module_model_1.default.aggregate(input);
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }

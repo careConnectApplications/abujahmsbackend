@@ -60,11 +60,6 @@ const uuid_1 = require("uuid");
 const config_1 = __importDefault(require("../../config"));
 const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
-<<<<<<< HEAD
-=======
-const appointment_1 = require("../../dao/appointment");
-const pricingmodel_1 = require("../../dao/pricingmodel");
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const audit_1 = require("../../dao/audit");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const errors_1 = require("../../errors");
@@ -75,7 +70,6 @@ const patientCache_1 = require("../../utils/cache/patientCache");
 const redisClient_1 = require("../../utils/redisClient");
 // Initialize Redis on module load
 (0, redisClient_1.initializeRedis)().catch(console.error);
-//search patients 
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -155,9 +149,6 @@ function bulkuploadhmopatients(req, res) {
             if (!gethmo) {
                 throw new Error("HMONAME does not exist");
             }
-            //await createpatientachieve(patientdetails);
-            //delete patient management
-            //await deletePatietsByCondition({HMOName});
             var columnmapping = {
                 A: "title",
                 B: "firstName",
@@ -187,7 +178,6 @@ function bulkuploadhmopatients(req, res) {
             yield (0, otherservices_1.uploaddocument)(file, filename, allowedextension, uploadpath);
             //convert uploaded excel to json
             var convert_to_json = (0, otherservices_1.convertexceltojson)(`${uploadpath}/${filename}${path.extname(file.name)}`, config_1.default.hmotemplate, columnmapping);
-            //save to database
             var { hmo } = convert_to_json;
             if (hmo.length > 0) {
                 for (var i = 0; i < hmo.length; i++) {
@@ -240,7 +230,6 @@ function updateauthorizationcode(req, res) {
             const { id } = req.params;
             const { authorizationcode } = req.body;
             var queryresult = yield (0, patientmanagement_1.updatepatient)(id, { authorizationcode });
-            // Invalidate cache after update
             yield (0, patientCache_1.invalidateAllPatientCache)();
             res.status(200).json({
                 queryresult,
@@ -270,38 +259,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!(req.body.isHMOCover)) {
             req.body.isHMOCover = config_1.default.ishmo[0];
         }
-<<<<<<< HEAD
-=======
-        if (!(req.body.isHMOCover == config_1.default.ishmo[1] || req.body.isHMOCover == true)) {
-            delete req.body.authorizationcode;
-            delete req.body.facilitypateintreferedfrom;
-        }
-        req.body.appointmentcategory = config_1.default.category[3];
-        req.body.appointmenttype = config_1.default.category[3];
-        var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover } = req.body;
-        //validation
-        (0, otherservices_1.validateinputfaulsyvalue)({ phoneNumber, firstName, lastName, gender, clinic, appointmentdate, appointmentcategory, appointmenttype, isHMOCover });
-        //define the service type
-        /*
-        if(isHMOCover==configuration.ishmo[1] || isHMOCover == true){
-          console.log("here");
-          //throw new Error(configuration.error.errorauthorizehmo);
-          req.body.patienttype = configuration.patienttype[1];
-          req.body.status = configuration.status[1];
-          validateinputfaulsyvalue({authorizationcode});
-
-        }
-          */
-        if (authorizationcode) {
-            req.body.patienttype = config_1.default.patienttype[1];
-        }
-        //define the service type
-        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            req.body.status = config_1.default.status[1];
-        }
-        //get token from header and extract clinic
-        //check for 11 digit
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         if (phoneNumber.length !== 11) {
             throw new Error(config_1.default.error.errorelevendigit);
         }
@@ -322,7 +279,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (foundUser && phoneNumber !== config_1.default.defaultphonenumber) {
             throw new Error(`Patient already exists`);
         }
-<<<<<<< HEAD
         // fetch prices for optional services only
         const [annualsubscriptionnewRegistrationPrice, cardfeenewRegistrationPrice,] = yield Promise.all([
             (0, price_1.readoneprice)({
@@ -365,80 +321,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         // Invalidate cache after patient creation
         yield (0, patientCache_1.invalidateAllPatientCache)();
         res.status(200).json({ queryresult: result, status: true });
-=======
-        //var settings =await configuration.settings();
-        //validate if price is set for patient registration
-        //var newRegistrationPrice = await readoneprice({servicecategory:settings.servicecategory[0].category});
-        // var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});
-        //console.log('appointmentprice', appointmentPrice);
-        var { isHMOCover } = req.body;
-        var newRegistrationPrice;
-        const foundPricingmodel = yield (0, pricingmodel_1.readonepricemodel)({ pricingtype: config_1.default.pricingtype[1] });
-        if (foundPricingmodel) {
-            const age = Number(req.body.age);
-            const isAdult = age >= 18;
-            const isChild = age < 18;
-            //check for error
-            console.log("Clinic from pricing model:", foundPricingmodel.exactnameofancclinic);
-            console.log("Clinic from request:", clinic);
-            console.log("Is adult:", isAdult);
-            console.log("Age:", age);
-            //confirm the type of pricing model
-            if (foundPricingmodel.exactnameofancclinic == clinic) {
-                console.log("clinic");
-                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: clinic });
-            }
-            else if (isAdult) {
-                console.log("greater than 18");
-                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforadult, $options: 'i' } });
-            }
-            else if (isChild) {
-                console.log("less than 18");
-                newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: { $regex: foundPricingmodel.exactnameofservicetypeforchild, $options: 'i' } });
-            }
-            else {
-                console.log("errror /////");
-                //return error
-                throw new Error(`${config_1.default.error.errornopriceset} ${foundPricingmodel.exactnameofservicetypeforchild} ${foundPricingmodel.exactnameofservicetypeforadult} or ${clinic}`);
-            }
-            //find pricing model
-        }
-        else {
-            newRegistrationPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[3], isHMOCover, servicetype: config_1.default.category[3] });
-        }
-        //use age to calculate price
-        console.log("newRegistrationPrice", newRegistrationPrice);
-        if (!(isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) && !newRegistrationPrice) {
-            console.log("second errror /////");
-            throw new Error(config_1.default.error.errornopriceset);
-        }
-        var uniqunumber = yield (0, otherservices_1.storeUniqueNumber)(4);
-        // chaorten the MRN to alphanumeric 
-        req.body.MRN = uniqunumber;
-        req.body.password = config_1.default.defaultPassword;
-        //other validations
-        var payment = [];
-        const createpatientqueryresult = yield (0, patientmanagement_1.createpatient)(req.body);
-        //create payment
-        //create payment for only none hmo patient
-        let queryappointmentresult;
-        let queryresult;
-        let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8] });
-        if (isHMOCover == config_1.default.ishmo[1] || isHMOCover == true) {
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
-        }
-        else {
-            const createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName, lastName, MRN: req.body.MRN, phoneNumber, paymentreference: req.body.MRN, paymentype: newRegistrationPrice.servicetype, paymentcategory: newRegistrationPrice.servicecategory, patient: createpatientqueryresult._id, amount: Number(newRegistrationPrice.amount) });
-            // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
-            payment.push(createpaymentqueryresult._id);
-            //payment.push(createappointmentpaymentqueryresult._id);
-            //update createpatientquery
-            queryappointmentresult = yield (0, appointment_1.createappointment)({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: config_1.default.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.MRN, HMOId: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOId, HMOName: createpatientqueryresult === null || createpatientqueryresult === void 0 ? void 0 : createpatientqueryresult.HMOName });
-            queryresult = yield (0, patientmanagement_1.updatepatient)(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
-        }
-        res.status(200).json({ queryresult, status: true });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     catch (error) {
         res.status(403).json({ status: false, msg: error.message });
@@ -446,7 +328,6 @@ var createpatients = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.createpatients = createpatients;
 //add patiient
-//read all patients
 function getallpatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -490,7 +371,6 @@ function getallpatients(req, res) {
                 },
             };
             var populateappointmentquery = "appointment";
-            // Implement cache-aside pattern
             const queryresult = yield (0, patientCache_1.cachePatientList)(page, size, filter, () => __awaiter(this, void 0, void 0, function* () {
                 // This function is called only if data is not in cache
                 return yield (0, patientmanagement_1.readallpatientpaginated)(filter, selectquery, populatequery, populateappointmentquery, page, size);
@@ -549,7 +429,6 @@ exports.updatepatients = (0, catchAsync_1.default)((req, res, next) => __awaiter
     var queryresult = yield (0, patientmanagement_1.updatepatient)(id, req.body);
     if (!queryresult)
         return next(new errors_1.ApiError(401, "update failed"));
-    // Invalidate cache after patient update
     yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         queryresult,
@@ -572,7 +451,6 @@ var uploadpix = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { id } = req.params;
         //update pix name in patient
         const queryresult = yield (0, patientmanagement_1.updatepatient)(id, { passport: renamedurl });
-        // Invalidate cache after patient update
         yield (0, patientCache_1.invalidateAllPatientCache)();
         res.json({
             queryresult,
@@ -605,7 +483,6 @@ exports.updatePatientToHmo = (0, catchAsync_1.default)((req, res, next) => __awa
     /// then convert to true
     const updatedPatient = yield (0, patientmanagement_1.updatepatient)(id, { isHMOCover: config_1.default.ishmo[1], previouslyNotHmo: true });
     /// save db
-    // Invalidate cache after HMO update
     yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
@@ -632,7 +509,6 @@ exports.updatePatientClinicalInformation = (0, catchAsync_1.default)((req, res, 
         specialNeeds,
         updatedBy: userId
     });
-    // Invalidate cache after clinical information update
     yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,
@@ -663,7 +539,6 @@ exports.updatePatientFluidBalancing = (0, catchAsync_1.default)((req, res, next)
             fluidBalance: newFluidRecord
         }
     });
-    // Invalidate cache after fluid balance update
     yield (0, patientCache_1.invalidateAllPatientCache)();
     res.status(200).json({
         status: true,

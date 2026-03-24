@@ -61,7 +61,6 @@ const { ObjectId } = mongoose_1.default.Types;
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const procedure_helper_1 = require("./procedure.helper");
 const config_1 = __importDefault(require("../../config"));
-<<<<<<< HEAD
 exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
@@ -74,87 +73,6 @@ exports.scheduleprocedureorder = (0, catchAsync_1.default)((req, res, next) => _
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, "", "");
     if (!foundPatient) {
         throw new Error(`Patient already exists`);
-=======
-//lab order
-var scheduleprocedureorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        //accept _id from request
-        const { id } = req.params;
-        console.log("///////id", id);
-        var { procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid } = req.body;
-        const { firstName, lastName } = (req.user).user;
-        const raiseby = `${firstName} ${lastName}`;
-        var procedureid = String(Date.now());
-        var proceduresid = [];
-        var paymentids = [];
-        (0, otherservices_1.validateinputfaulsyvalue)({ id, procedure });
-        //find the record in appointment and validate
-        const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
-        //category
-        if (!foundPatient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
-        }
-        var appointment;
-        if (appointmentid) {
-            appointmentid = new ObjectId(appointmentid);
-            appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
-            if (!appointment) {
-                //create an appointment
-                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
-            }
-        }
-        //const {servicetypedetails} = await readallservicetype({category: configuration.category[5]},{type:1,category:1,department:1,_id:0});
-        //loop through all test and create record in lab order
-        for (var i = 0; i < procedure.length; i++) {
-            //search for price of test name
-            var testPrice = yield (0, price_1.readoneprice)({ servicetype: procedure[i], isHMOCover: config_1.default.ishmo[0] });
-            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0] && !testPrice) {
-                throw new Error(`${config_1.default.error.errornopriceset}  ${procedure[i]}`);
-            }
-            //search testname in setting
-            //var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure[i]));
-            /*      f(!testsetting || testsetting.length < 1){
-              throw new Error(`${procedure[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
-          }
-              */
-            let paymentreference;
-            //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
-            var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
-            if (findAdmission) {
-                paymentreference = findAdmission.admissionid;
-            }
-            else {
-                paymentreference = procedureid;
-            }
-            //create payment
-            if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-                var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.firstName, lastName: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.lastName, MRN: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.MRN, phoneNumber: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.phoneNumber, paymentreference, paymentype: procedure[i], paymentcategory: config_1.default.category[5], patient: id, amount: Number(testPrice.amount) });
-                //create testrecordn 
-                var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, payment: createpaymentqueryresult._id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
-                proceduresid.push(procedurerecord._id);
-                paymentids.push(createpaymentqueryresult._id);
-            }
-            else {
-                // var createpaymentqueryresult =await createpayment({paymentreference,paymentype:procedure[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
-                //create testrecordn 
-                var procedurerecord = yield (0, procedure_1.createprocedure)({ procedure: procedure[i], patient: id, procedureid, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, raiseby });
-                proceduresid.push(procedurerecord._id);
-                //paymentids.push(createpaymentqueryresult._id);
-            }
-        }
-        let queryresult;
-        if ((foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.isHMOCover) == config_1.default.ishmo[0]) {
-            queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid, payment: paymentids } });
-        }
-        else {
-            queryresult = yield (0, patientmanagement_1.updatepatient)(id, { $push: { prcedure: proceduresid } });
-        }
-        if (appointmentid) {
-            yield (0, appointment_1.updateappointment)(appointment._id, { $push: { procedure: proceduresid } });
-            //procedure
-        }
-        res.status(200).json({ queryresult, status: true });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     console.log("foundPatient", foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance);
     // HMO coverage %
@@ -300,7 +218,6 @@ res.status(403).json({ status: false, msg: error.message });
 
 }
 */
-//get lab order by patient
 const readAllprocedureByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -346,7 +263,11 @@ function updateprocedures(req, res) {
             //  var testsetting = servicetypedetails.filter(item => (item.type).includes(procedure));
             /*
             if(!testsetting || testsetting.length < 1){
+        <<<<<<< HEAD
               throw new Error(`${procedure} does not ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
+        =======
+              throw new Error(`${procedure} donot ${configuration.error.erroralreadyexit} in ${configuration.category[5]} as a service type  `);
+        >>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
           }
               */
             //check that the status is not complete

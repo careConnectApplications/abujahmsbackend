@@ -10,11 +10,7 @@ const middleware_1 = require("../utils/middleware");
 const appointment_1 = require("../controllers/appointment/appointment");
 const router = express_1.default.Router();
 router.get('/getallmedicalhistoryoptimized/:clinic', appointment_1.getAllPaidSchedulesoptimized);
-<<<<<<< HEAD
 router.post('/scheduleappointment', middleware_1.checkSubscription, appointment_1.scheduleappointment);
-=======
-router.post('/scheduleappointment', appointment_1.scheduleappointment);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 router.get('/getallschedules', appointment_1.getAllSchedules);
 router.get('/getallschedulesoptimized', appointment_1.getAllSchedulesoptimized);
 //getAllSchedulesoptimized

@@ -33,6 +33,9 @@ const radiodiagnosis_1 = require("../../utils/reporting/radiodiagnosis");
 const operation_1 = require("../../utils/reporting/operation");
 const specialconsultative_1 = require("../../utils/reporting/specialconsultative");
 const maternity_1 = require("../../utils/reporting/maternity");
+const mortality_1 = require("../../utils/reporting/mortality");
+const eyecondition_1 = require("../../utils/reporting/eyecondition");
+const diseasecases_1 = require("../../utils/reporting/diseasecases");
 const reportingandanalytics_helper_1 = require("./reportingandanalytics.helper");
 const errors_1 = require("../../errors");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
@@ -45,248 +48,7 @@ const reports = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("filter", filters);
         //paymentcategory
         //cashieremail
-<<<<<<< HEAD
         var { querytype } = req.params;
-=======
-        var { querygroup, querytype, startdate, enddate } = req.params;
-        if (!querygroup) {
-            throw new Error(`querygroup ${config_1.default.error.errorisrequired}`);
-        }
-        if (!startdate || !enddate) {
-            var todaydate = new Date();
-            enddate = todaydate;
-            startdate = new Date(todaydate.getFullYear(), todaydate.getMonth() - 6, todaydate.getDate());
-        }
-        else {
-            startdate = new Date(startdate);
-            enddate = new Date(enddate);
-        }
-        const reportbyfinancialreport = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $match: { $and: [{ paymentcategory: querygroup }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            }
-        ];
-        //admission
-        //referedward
-        //status
-        //appointment
-        //clinic
-        /*
-        patient: {
-              type: Schema.Types.ObjectId,
-              ref: "Patientsmanagement",
-              default: null,
-            },
-        
-            referedward:
-          {
-            type: Schema.Types.ObjectId,
-            ref: "Wardmanagement",
-            default: null,
-          },
-        */
-        const reportbyadmissionreport = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $lookup: {
-                    from: "wardmanagements",
-                    localField: "referedward",
-                    foreignField: "_id",
-                    as: "referedward",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$referedward",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ "referedward.wardname": querygroup }, { referddate: { $gt: startdate, $lt: enddate } }] }
-            },
-        ];
-        const reportbyappointmentreport = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $match: { $and: [{ clinic: querygroup }, {
-                            appointmentdate: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-        ];
-        const reportbyhmoreport = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ "patient.HMOName": querygroup }, {
-                            createdAt: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-        ];
-        const appointmentreportbyhmoreport = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ "patient.HMOName": querygroup }, {
-                            appointmentdate: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-        ];
-        const secondaryservice = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $addFields: {
-                    servicetype: {
-                        $ifNull: ["$testname", "$appointmenttype"]
-                    }
-                }
-            },
-            {
-                $project: {
-                    servicetype: 1,
-                    patient: 1
-                }
-            }
-        ];
-        const proceduresecondaryservice = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $addFields: {
-                    servicetype: {
-                        $reduce: {
-                            input: { $ifNull: ["$procedure", []] },
-                            initialValue: "",
-                            in: {
-                                $cond: {
-                                    if: { $eq: ["$$value", ""] },
-                                    then: "$$this",
-                                    else: { $concat: ["$$value", ",", "$$this"] }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    servicetype: 1,
-                    patient: 1
-                }
-            }
-        ];
-        const patientsecondaryservice = [
-            {
-                $match: { $and: [{ patienttype: config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            }
-        ];
-        const pharmacysecondaryservice = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ pharmacy: querygroup }, { "patient.patienttype": config_1.default.patienttype[1] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $addFields: {
-                    servicetype: "$prescription"
-                }
-            },
-            {
-                $project: {
-                    servicetype: 1,
-                    patient: 1
-                }
-            }
-        ];
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         var queryresult;
         //var c = await configuration.settings2();
         let { reports } = yield (0, settings_1.settings)();
@@ -392,7 +154,7 @@ const cashierreport = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.cashierreport = cashierreport;
 //report summary
 exports.reportsummary = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33;
     var { querytype, startdate, enddate } = req.params;
     if (!startdate || !enddate) {
         var todaydate = new Date();
@@ -419,7 +181,8 @@ exports.reportsummary = (0, catchAsync_1.default)((req, res, next) => __awaiter(
     const { radioDiagnosisPipeline } = (0, radiodiagnosis_1.radiodiagnosisreports)(startdate, enddate);
     const { operationPipeline } = (0, operation_1.operationreports)(startdate, enddate);
     const { specialConsultativePipeline } = (0, specialconsultative_1.specialconsultativereports)(startdate, enddate);
-    const { liveBirthPipeline, freshStillBirthPipeline, maceratedStillBirthPipeline, asphyxiaPipeline, lowBirthWeightPipeline, macrosomicBabiesPipeline, earlyNeoNatalDeathPipeline, bornBeforeArrivalPipeline, preMaturityPipeline, neoNatalDeathPipeline, bookedCasesPipeline, unbookedCasesPipeline, svdPipeline, vacuumDeliveryPipeline, forcepsDeliveryPipeline, electiveCaesareanPipeline, emergencyCaesareanPipeline, svdFromSecondStagePipeline, csFromSecondStagePipeline, twinDeliveryPipeline, tripletDeliveryPipeline, quadrupletDeliveryPipeline, breechPresentationPipeline, inductionOfLabourPipeline, pretermLabourPipeline, manualRemovalOfPlacentaPipeline, postPartumHemorrhagePipeline, prematureRuptureOfMembranePipeline, antePartumHemorrhagePipeline, placentaPreviaPipeline, abruptioPlacentaPipeline, preEclampsiaPipeline, eclampsiaPipeline, maternalDeathPipeline, maternalDeathFromMortalityPipeline, pregnancyInducedHypertensionPipeline, mvaPipeline, missedAbortionPipeline, inducedAbortionPipeline, criminalAbortionPipeline, newFistulaCasesPipeline, admittedFistulaCasesPipeline, firstRepairPipeline, secondRepairPipeline, surgeryForFistulaRepairPipeline, dischargesAfterFistulaSurgeryPipeline, closedAndDryFistulaAtDischargePipeline } = (0, maternity_1.maternityreports)(startdate, enddate);
+    const { liveBirthPipeline, freshStillBirthPipeline, maceratedStillBirthPipeline, asphyxiaPipeline, lowBirthWeightPipeline, macrosomicBabiesPipeline, earlyNeoNatalDeathPipeline, bornBeforeArrivalPipeline, preMaturityPipeline, neoNatalDeathPipeline, bookedCasesPipeline, unbookedCasesPipeline, svdPipeline, vacuumDeliveryPipeline, forcepsDeliveryPipeline, electiveCaesareanPipeline, emergencyCaesareanPipeline, svdFromSecondStagePipeline, csFromSecondStagePipeline, twinDeliveryPipeline, tripletDeliveryPipeline, quadrupletDeliveryPipeline, breechPresentationPipeline, inductionOfLabourPipeline, pretermLabourPipeline, manualRemovalOfPlacentaPipeline, postPartumHemorrhagePipeline, prematureRuptureOfMembranePipeline, antePartumHemorrhagePipeline, placentaPreviaPipeline, abruptioPlacentaPipeline, preEclampsiaPipeline, eclampsiaPipeline, maternalDeathPipeline, maternalDeathFromMortalityPipeline, pregnancyInducedHypertensionPipeline, mvaPipeline, missedAbortionPipeline, inducedAbortionPipeline, criminalAbortionPipeline, newFistulaCasesPipeline, admittedFistulaCasesPipeline, firstRepairPipeline, secondRepairPipeline, surgeryForFistulaRepairPipeline, dischargesAfterFistulaSurgeryPipeline, closedAndDryFistulaAtDischargePipeline, liveBirthsLowWeightPipeline, liveBirthsNormalWeightPipeline, freshStillBirthsCountPipeline, maceratedStillBirthsCountPipeline, childrenUnder1YearRegisteredPipeline, birthCertificatesIssuedPipeline, birthCertificatesCollectedPipeline } = (0, maternity_1.maternityreports)(startdate, enddate);
+    const { mortality0to28DaysPipeline, mortality29Daysto11MonthsPipeline, mortality12to59MonthsPipeline, mortality5to9YearsPipeline, mortality10to19YearsPipeline, mortality20PlusYearsPipeline, maternalMortalityUnder20Pipeline, maternalMortality20to34Pipeline, maternalMortality35PlusPipeline, neonatalDeathPrematurityPipeline, neonatalDeathTetanusPipeline, neonatalDeathMalformationPipeline, neonatalDeathOtherPipeline, underFiveDeathMalariaPipeline, underFiveDeathPneumoniaPipeline, underFiveDeathMalnutritionPipeline, underFiveDeathOtherPipeline } = (0, mortality_1.mortalityreports)(startdate, enddate);
     let queryresult;
     if (querytype == summary[0]) {
         //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -584,7 +347,6 @@ exports.reportsummary = (0, catchAsync_1.default)((req, res, next) => __awaiter(
                         count: item.count
                     });
                 }
-<<<<<<< HEAD
             });
         }
         // Format each clinic's results
@@ -599,673 +361,6 @@ exports.reportsummary = (0, catchAsync_1.default)((req, res, next) => __awaiter(
         queryresult["Dental Clinic"] = (0, reportingandanalytics_helper_1.formatRow)(((_s = specialReport[0]) === null || _s === void 0 ? void 0 : _s.dentalClinic) || []);
         queryresult["Family Planning Attendance (New)"] = (0, reportingandanalytics_helper_1.formatRow)(((_t = specialReport[0]) === null || _t === void 0 ? void 0 : _t.familyPlanningNew) || []);
         queryresult["Family Planning Attendance (Follow-up)"] = (0, reportingandanalytics_helper_1.formatRow)(((_u = specialReport[0]) === null || _u === void 0 ? void 0 : _u.familyPlanningFollowUp) || []);
-=======
-              },
-              {
-                $addFields: {
-                  firstNonNullEmail: { $arrayElemAt: ["$emails", 0] }
-                }
-              },
-              {
-                $project: { emails: 0 }
-              }
-            */
-            {
-                $group: {
-                    _id: "$cashieremail", // Group by product
-                    totalAmount: { $sum: "$amount" },
-                    cashierid: { $first: "$cashierid" },
-                    tempcashiername: {
-                        $push: {
-                            $cond: [{ $ne: ["$cashiername", null] }, "$cashiername", "$$REMOVE"]
-                        }
-                    },
-                    //cashiername:{$first:"$cashiername"}
-                }
-            },
-            {
-                $addFields: {
-                    cashiername: { $arrayElemAt: ["$tempcashiername", 0] }
-                }
-            },
-            {
-                $project: {
-                    cashieremail: "$_id",
-                    cashiername: 1,
-                    totalAmount: 1,
-                    cashierid: 1,
-                    status: config_1.default.status[3],
-                    _id: 0
-                }
-            }
-        ];
-        const cashieraggregatepaidgrandtotal = [
-            {
-                $match: { $and: [{ status: config_1.default.status[3] }, { createdAt: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $group: {
-                    _id: null, // Group by product
-                    grandtotalAmount: { $sum: "$amount" }
-                }
-            },
-            {
-                $project: {
-                    grandtotalAmount: 1,
-                    _id: 0
-                }
-            }
-        ];
-        //5 , 6 ,9
-        const appointmentaggregatescheduled = [
-            {
-                $match: { $and: [{ status: config_1.default.status[5] }, {
-                            appointmentdate: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-            {
-                $group: {
-                    _id: "$clinic", // Group by product
-                    Numberofappointment: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",
-                    Numberofappointment: 1,
-                    status: config_1.default.status[5],
-                    _id: 0
-                }
-            }
-        ];
-        const appointmentaggregatecomplete = [
-            {
-                $match: { $and: [{ status: config_1.default.status[6] }, {
-                            appointmentdate: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-            {
-                $group: {
-                    _id: "$clinic", // Group by product
-                    Numberofappointment: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",
-                    Numberofappointment: 1,
-                    status: config_1.default.status[6],
-                    _id: 0
-                }
-            }
-        ];
-        const appointmentaggregateinprogress = [
-            {
-                $match: { $and: [{ status: config_1.default.status[9] }, {
-                            appointmentdate: { $gt: startdate, $lt: enddate }
-                        }] }
-            },
-            {
-                $group: {
-                    _id: "$clinic", // Group by product
-                    Numberofappointment: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",
-                    Numberofappointment: 1,
-                    status: config_1.default.status[9],
-                    _id: 0
-                }
-            }
-        ];
-        const appointmentaggregatetotalnumberofappointments = [
-            {
-                $match: { $or: [{ status: config_1.default.status[5] }, { status: config_1.default.status[6] }, { status: config_1.default.status[9] }], appointmentdate: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $group: {
-                    _id: null, // Group by product
-                    GrandTotalNumberofappointment: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    GrandTotalNumberofappointment: 1,
-                    _id: 0
-                }
-            }
-        ];
-        //3,5,
-        const admissionaggregateadmited = [
-            {
-                $lookup: {
-                    from: "wardmanagements",
-                    localField: "referedward",
-                    foreignField: "_id",
-                    as: "referedward",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$referedward",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ status: config_1.default.admissionstatus[1] }, { referddate: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $group: {
-                    _id: "$referedward.wardname", // Group by product
-                    Numberofadmission: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    wardname: "$_id",
-                    Numberofadmission: 1,
-                    status: config_1.default.admissionstatus[1],
-                    _id: 0
-                }
-            }
-        ];
-        const admissionaggregatetransfered = [
-            {
-                $lookup: {
-                    from: "wardmanagements",
-                    localField: "referedward",
-                    foreignField: "_id",
-                    as: "referedward",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$referedward",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ status: config_1.default.admissionstatus[3] }, { referddate: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $group: {
-                    _id: "$referedward.wardname", // Group by product
-                    Numberofadmission: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    wardname: "$_id",
-                    Numberofadmission: 1,
-                    status: config_1.default.admissionstatus[3],
-                    _id: 0
-                }
-            }
-        ];
-        const admissionaggregatedischarged = [
-            {
-                $lookup: {
-                    from: "wardmanagements",
-                    localField: "referedward",
-                    foreignField: "_id",
-                    as: "referedward",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$referedward",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [{ status: config_1.default.admissionstatus[5] }, { referddate: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $group: {
-                    _id: "$referedward.wardname", // Group by product
-                    Numberofadmission: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    wardname: "$_id",
-                    Numberofadmission: 1,
-                    status: config_1.default.admissionstatus[5],
-                    _id: 0
-                }
-            }
-        ];
-        const admissionaggregatetotalnumberofadmissions = [
-            {
-                $match: { $or: [{ status: config_1.default.admissionstatus[1] }, { status: config_1.default.admissionstatus[3] }, { status: config_1.default.admissionstatus[5] }], referddate: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $group: {
-                    _id: null, // Group by product
-                    TotalNumberofadmission: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    TotalNumberofadmission: 1,
-                    _id: 0
-                }
-            }
-        ];
-        //procedure aggregate
-        //9, 7
-        const procedureaggregatepaid = [
-            {
-                $lookup: {
-                    from: "payments",
-                    localField: "payment",
-                    foreignField: "_id",
-                    as: "payment",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$payment",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { "payment.status": config_1.default.status[3], createdAt: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $group: {
-                    _id: "$clinic", // Group by product
-                    Numberofprocedures: { $sum: 1 },
-                    totalAmount: { $sum: "$payment.amount" }
-                }
-            },
-            {
-                $project: {
-                    clinic: "$_id",
-                    Numberofprocedures: 1,
-                    totalAmount: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const totalprocedureaggregate = [
-            {
-                $lookup: {
-                    from: "payments",
-                    localField: "payment",
-                    foreignField: "_id",
-                    as: "payment",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$payment",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { "payment.status": config_1.default.status[3], createdAt: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $group: {
-                    _id: null, // Group by product
-                    TotalNumberofprocedures: { $sum: 1 },
-                    GrandtotalAmount: { $sum: "$payment.amount" }
-                }
-            },
-            {
-                $project: {
-                    TotalNumberofprocedures: 1,
-                    GrandtotalAmount: 1,
-                    _id: 0
-                }
-            }
-        ];
-        //clinical aggregate
-        const clinicalaggregate = [
-            {
-                $match: { appointmentdate: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $group: {
-                    _id: {
-                        $ifNull: ["$clinicalencounter.diagnosisicd10", "No Diagnosis"] // Group by product
-                    },
-                    Numberofappointment: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    diagnosis: "$_id",
-                    Numberofappointment: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const aggregatebyhmo = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [
-                        {
-                            "patient.isHMOCover": config_1.default.ishmo[1]
-                        },
-                        { createdAt: { $gt: startdate, $lt: enddate } }
-                    ]
-                }
-            },
-            {
-                $group: {
-                    _id: { $ifNull: ["$patient.HMOName", "HMO Not Found"] },
-                    //"$patient.HMOName",                // Group by product
-                    TotalNumber: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    HMOName: "$_id",
-                    TotalNumber: 1,
-                    _id: 0
-                }
-            }
-        ];
-        ///////procedure ////////
-        const appointmentaggregatebyhmo = [
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $match: { $and: [
-                        {
-                            "patient.isHMOCover": config_1.default.ishmo[1]
-                        },
-                        { appointmentdate: { $gt: startdate, $lt: enddate } }
-                    ]
-                }
-            },
-            {
-                $group: {
-                    _id: { $ifNull: ["$patient.HMOName", "HMO Not Found"] },
-                    //"$patient.HMOName",                // Group by product
-                    TotalNumber: { $sum: 1 },
-                }
-            },
-            {
-                $project: {
-                    HMOName: "$_id",
-                    TotalNumber: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const nutritionaggregatechildren0to59thatreceivednutirtion = [
-            {
-                $match: { createdAt: { $gt: startdate, $lt: enddate } }
-            },
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        ageinmonths: "$ageinmonths",
-                        typeofvisit: "$typeofvisit",
-                        gender: "$patient.gender"
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 } // Optional: sort descending by count
-            },
-            {
-                $project: {
-                    parameters: "$_id",
-                    count: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const nutritionaggregatechildren0to59growingwell = [
-            {
-                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { growthaccordingtothechildhealthcard: config_1.default.growthaccordingtothechildhealthcard[0] }] }
-                //growthaccordingtothechildhealthcard
-            },
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        gender: "$patient.gender"
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 } // Optional: sort descending by count
-            },
-            {
-                $project: {
-                    parameters: "$_id",
-                    count: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const nutritionaggregatechildren0to5exclusivebreadstfeeding = [
-            {
-                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { infactandyoungchildfeeding: config_1.default.infactandyoungchildfeeding[0] }, { ageinmonths: config_1.default.ageinmonths[0] }] }
-            },
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        gender: "$patient.gender"
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 } // Optional: sort descending by count
-            },
-            {
-                $project: {
-                    parameters: "$_id",
-                    count: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const nutritionaggregatechildren0to59givenvitaminasupplement = [
-            {
-                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }] }
-            },
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        gender: "$patient.gender",
-                        vitaminasupplement: "$vitaminasupplement"
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 } // Optional: sort descending by count
-            },
-            {
-                $project: {
-                    parameters: "$_id",
-                    count: 1,
-                    _id: 0
-                }
-            }
-        ];
-        const nutritionaggregatechildren12to59receiveddeworming = [
-            {
-                $match: { $and: [{ createdAt: { $gt: startdate, $lt: enddate } }, { deworming: { $ne: null } }] }
-            },
-            {
-                $lookup: {
-                    from: "patientsmanagements",
-                    localField: "patient",
-                    foreignField: "_id",
-                    as: "patient",
-                },
-            },
-            {
-                $unwind: {
-                    path: "$patient",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $group: {
-                    _id: {
-                        gender: "$patient.gender"
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { count: -1 } // Optional: sort descending by count
-            },
-            {
-                $project: {
-                    parameters: "$_id",
-                    count: 1,
-                    _id: 0
-                }
-            }
-        ];
-        //children12to59receiveddeworming
-        //console.log("//////////", querytype);
-        let queryresult;
-        if (querytype == summary[0]) {
-            //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
-            queryresult = { paid: yield (0, reports_1.readpaymentaggregate)(financialaggregatepaid), grandtotal: yield (0, reports_1.readpaymentaggregate)(financialaggregategrandtotalpaid) };
-        }
-        else if (querytype == summary[1]) {
-            //cashier summary
-            queryresult = { paid: yield (0, reports_1.readpaymentaggregate)(cashieraggregatepaid), grandtotal: yield (0, reports_1.readpaymentaggregate)(cashieraggregatepaidgrandtotal) };
-        }
-        else if (querytype == summary[2]) {
-            queryresult = { scheduled: yield (0, reports_1.readappointmentaggregate)(appointmentaggregatescheduled), complete: yield (0, reports_1.readappointmentaggregate)(appointmentaggregatecomplete), inprogress: yield (0, reports_1.readappointmentaggregate)(appointmentaggregateinprogress), totalnumberofappointments: yield (0, reports_1.readappointmentaggregate)(appointmentaggregatetotalnumberofappointments) };
-            //appointmentaggregatetotalnumberofappointments
-            //appointment summary
-        }
-        else if (querytype == summary[3]) {
-            //wardadmission summary
-            queryresult = { admited: yield (0, reports_1.readadmissionaggregate)(admissionaggregateadmited), transfered: yield (0, reports_1.readadmissionaggregate)(admissionaggregatetransfered), discharged: yield (0, reports_1.readadmissionaggregate)(admissionaggregatedischarged), totalnumberofadmissions: yield (0, reports_1.readadmissionaggregate)(admissionaggregatetotalnumberofadmissions) };
-        }
-        else if (querytype == summary[4]) {
-            console.log("procedure");
-            queryresult = { paid: yield (0, reports_1.readprocedureaggregate)(procedureaggregatepaid), grandtotal: yield (0, reports_1.readprocedureaggregate)(totalprocedureaggregate) };
-        }
-        else if (querytype == summary[5]) {
-            //clinicalaggregate
-            queryresult = { clinicalreport: yield (0, reports_1.readappointmentaggregate)(clinicalaggregate) };
-        }
-        else if (querytype == summary[6]) {
-            //clinicalaggregate
-            //"hmoappointmentaggregate","hmoradiologyreport"];
-            queryresult = {
-                hmolabsummary: yield (0, reports_1.readlabaggregate)(aggregatebyhmo),
-                hmoproceduresummary: yield (0, reports_1.readprocedureaggregate)(aggregatebyhmo),
-                hmopharmacysummary: yield (0, reports_1.readprescriptionaggregate)(aggregatebyhmo),
-                hmoradiologysummary: yield (0, reports_1.readradiologyaggregate)(aggregatebyhmo),
-                hmsappointmentsummary: yield (0, reports_1.readappointmentaggregate)(appointmentaggregatebyhmo)
-            };
-        }
-        else if (querytype == summary[7]) {
-            const [children0to59thatreceivednutirtion, children0to59growingwell, children0to5exclusivebreadstfeeding, children0to59givenvitaminasupplement, children12to59receiveddeworming] = yield Promise.all([
-                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59thatreceivednutirtion),
-                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59growingwell),
-                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to5exclusivebreadstfeeding),
-                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren0to59givenvitaminasupplement),
-                (0, reports_1.readnutritionaggregate)(nutritionaggregatechildren12to59receiveddeworming)
-            ]);
-            queryresult = { children0to59thatreceivednutirtion, children0to59growingwell, children0to5exclusivebreadstfeeding, children0to59givenvitaminasupplement, children12to59receiveddeworming };
-        }
-        else {
-            throw new Error(`querytype ${config_1.default.error.errorisrequired}`);
-        }
-        res.json({ queryresult, status: true });
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     else if (querytype == summary[21]) {
         // Immunization Report - Grouped by Gender and Vaccination
@@ -1453,6 +548,139 @@ exports.reportsummary = (0, catchAsync_1.default)((req, res, next) => __awaiter(
             "Surgery for Fistula repair": formatFemaleOnly(surgeryForFistulaRepair),
             "Discharges after Fistula surgery": formatFemaleOnly(dischargesAfterFistulaSurgery),
             "Closed and dry Fistula at discharge": formatFemaleOnly(closedAndDryFistulaAtDischarge)
+        };
+    }
+    else if (querytype == summary[23]) {
+        // Eye Condition Report
+        const { eyeConditionPipeline } = (0, eyecondition_1.eyeConditionReports)(startdate, enddate);
+        const eyeConditionRawData = yield (0, reports_1.readeyeconditionaggregate)(eyeConditionPipeline);
+        // Format the raw data into the required structure
+        const eyeConditionFormatted = (0, reportingandanalytics_helper_1.formatEyeConditionReport)(eyeConditionRawData);
+        // Convert the conditions object to an array (data is already properly formatted)
+        const conditionsArray = Object.keys(eyeConditionFormatted).sort().map(diagnosis => ({
+            diagnosis: diagnosis,
+            data: eyeConditionFormatted[diagnosis]
+        }));
+        // Create the final report structure
+        queryresult = {
+            diagnosis: conditionsArray,
+            summary: {
+                totalDiagnoses: conditionsArray.length,
+                totalPatients: eyeConditionRawData.reduce((sum, item) => sum + (item.count || 0), 0)
+            }
+        };
+    }
+    else if (querytype == summary[24]) {
+        // Disease Cases Report
+        const { diseaseCasesPipeline } = (0, diseasecases_1.diseaseCasesReports)(startdate, enddate);
+        const diseaseCasesRawData = yield (0, reports_1.readappointmentaggregate)(diseaseCasesPipeline);
+        // Format the raw data - only showing diseases with actual data
+        const diseaseCasesFormatted = (0, reportingandanalytics_helper_1.formatDiseaseCasesReport)(diseaseCasesRawData, []);
+        // Create the final report structure
+        queryresult = {
+            diseases: diseaseCasesFormatted,
+            summary: {
+                totalDiseases: diseaseCasesFormatted.length,
+                totalCases: diseaseCasesFormatted.reduce((sum, item) => sum + (item.total || 0), 0),
+                totalMortality: diseaseCasesFormatted.reduce((sum, item) => sum + (item.mortality || 0), 0)
+            }
+        };
+    }
+    else if (querytype == summary[25]) {
+        // Mortality Report by Age Groups
+        const [mortality0to28Days, mortality29Daysto11Months, mortality12to59Months, mortality5to9Years, mortality10to19Years, mortality20PlusYears] = yield Promise.all([
+            (0, reports_1.readmortalityregisteraggregate)(mortality0to28DaysPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(mortality29Daysto11MonthsPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(mortality12to59MonthsPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(mortality5to9YearsPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(mortality10to19YearsPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(mortality20PlusYearsPipeline)
+        ]);
+        queryresult = {
+            "0-28 days": (0, reportingandanalytics_helper_1.formatRow)(mortality0to28Days),
+            "29d-11mths": (0, reportingandanalytics_helper_1.formatRow)(mortality29Daysto11Months),
+            "12-59mths": (0, reportingandanalytics_helper_1.formatRow)(mortality12to59Months),
+            "5-9yrs": (0, reportingandanalytics_helper_1.formatRow)(mortality5to9Years),
+            "10-19yrs": (0, reportingandanalytics_helper_1.formatRow)(mortality10to19Years),
+            "20+yrs": (0, reportingandanalytics_helper_1.formatRow)(mortality20PlusYears)
+        };
+    }
+    else if (querytype == summary[26]) {
+        // Maternal Mortality Report by Age Groups
+        const [maternalMortalityUnder20, maternalMortality20to34, maternalMortality35Plus] = yield Promise.all([
+            (0, reports_1.readmortalityregisteraggregate)(maternalMortalityUnder20Pipeline),
+            (0, reports_1.readmortalityregisteraggregate)(maternalMortality20to34Pipeline),
+            (0, reports_1.readmortalityregisteraggregate)(maternalMortality35PlusPipeline)
+        ]);
+        // Helper function to format female-only maternal mortality data
+        const formatMaternalRow = (data) => {
+            var _a;
+            const count = ((_a = data[0]) === null || _a === void 0 ? void 0 : _a.count) || 0;
+            return { female: count, total: count };
+        };
+        queryresult = {
+            "under20yrs": formatMaternalRow(maternalMortalityUnder20),
+            "20-34yrs": formatMaternalRow(maternalMortality20to34),
+            "35+yrs": formatMaternalRow(maternalMortality35Plus)
+        };
+    }
+    else if (querytype == summary[27]) {
+        // Causes of Deaths Report
+        const [neonatalDeathPrematurity, neonatalDeathTetanus, neonatalDeathMalformation, neonatalDeathOther, underFiveDeathMalaria, underFiveDeathPneumonia, underFiveDeathMalnutrition, underFiveDeathOther] = yield Promise.all([
+            (0, reports_1.readmortalityregisteraggregate)(neonatalDeathPrematurityPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(neonatalDeathTetanusPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(neonatalDeathMalformationPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(neonatalDeathOtherPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(underFiveDeathMalariaPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(underFiveDeathPneumoniaPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(underFiveDeathMalnutritionPipeline),
+            (0, reports_1.readmortalityregisteraggregate)(underFiveDeathOtherPipeline)
+        ]);
+        queryresult = {
+            neonatalDeaths: {
+                "Prematurity": ((_24 = neonatalDeathPrematurity[0]) === null || _24 === void 0 ? void 0 : _24.count) || 0,
+                "Neonatal Tetanus": ((_25 = neonatalDeathTetanus[0]) === null || _25 === void 0 ? void 0 : _25.count) || 0,
+                "Congenital Malformation": ((_26 = neonatalDeathMalformation[0]) === null || _26 === void 0 ? void 0 : _26.count) || 0,
+                "Others": ((_27 = neonatalDeathOther[0]) === null || _27 === void 0 ? void 0 : _27.count) || 0
+            },
+            underFiveDeaths: {
+                "Malaria": ((_28 = underFiveDeathMalaria[0]) === null || _28 === void 0 ? void 0 : _28.count) || 0,
+                "Pneumonia": ((_29 = underFiveDeathPneumonia[0]) === null || _29 === void 0 ? void 0 : _29.count) || 0,
+                "Malnutrition": ((_30 = underFiveDeathMalnutrition[0]) === null || _30 === void 0 ? void 0 : _30.count) || 0,
+                "Others": ((_31 = underFiveDeathOther[0]) === null || _31 === void 0 ? void 0 : _31.count) || 0
+            }
+        };
+    }
+    else if (querytype == summary[28]) {
+        // Newborn Health (Outcome of Pregnancy) Report
+        const [liveBirthsLowWeight, liveBirthsNormalWeight, freshStillBirthsCount, maceratedStillBirthsCount] = yield Promise.all([
+            (0, reports_1.readthirdstageLabouraggregate)(liveBirthsLowWeightPipeline),
+            (0, reports_1.readthirdstageLabouraggregate)(liveBirthsNormalWeightPipeline),
+            (0, reports_1.readthirdstageLabouraggregate)(freshStillBirthsCountPipeline),
+            (0, reports_1.readthirdstageLabouraggregate)(maceratedStillBirthsCountPipeline)
+        ]);
+        queryresult = {
+            liveBirths: {
+                "under2.5kg": (0, reportingandanalytics_helper_1.formatRow)(liveBirthsLowWeight),
+                "≥2.5kg": (0, reportingandanalytics_helper_1.formatRow)(liveBirthsNormalWeight)
+            },
+            stillBirths: {
+                "Fresh Still Births (FSB)": ((_32 = freshStillBirthsCount[0]) === null || _32 === void 0 ? void 0 : _32.count) || 0,
+                "Macerated Still Births (MSB)": ((_33 = maceratedStillBirthsCount[0]) === null || _33 === void 0 ? void 0 : _33.count) || 0
+            }
+        };
+    }
+    else if (querytype == summary[29]) {
+        // Birth Registration Report
+        const [childrenUnder1YearRegistered, birthCertificatesIssued, birthCertificatesCollected] = yield Promise.all([
+            (0, reports_1.readbirthregisteraggregate)(childrenUnder1YearRegisteredPipeline),
+            (0, reports_1.readbirthregisteraggregate)(birthCertificatesIssuedPipeline),
+            (0, reports_1.readbirthregisteraggregate)(birthCertificatesCollectedPipeline)
+        ]);
+        queryresult = {
+            "Children Under 1 Year Registered": (0, reportingandanalytics_helper_1.formatRow)(childrenUnder1YearRegistered),
+            "Birth Certificates Issued": (0, reportingandanalytics_helper_1.formatRow)(birthCertificatesIssued),
+            "Birth Certificates Collected": (0, reportingandanalytics_helper_1.formatRow)(birthCertificatesCollected)
         };
     }
     else {

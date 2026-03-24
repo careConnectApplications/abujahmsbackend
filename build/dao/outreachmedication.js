@@ -29,11 +29,7 @@ function readalloutreachmedication(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to retrieve outreach medication data");
-=======
-            throw new Error(config_1.default.error.erroruserread);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -46,11 +42,7 @@ function createoutreachmedication(input) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to create outreach medication");
-=======
-            throw new Error(config_1.default.error.errorusercreate);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -62,11 +54,7 @@ function readoneoutreachmedication(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to retrieve outreach medication data");
-=======
-            throw new Error(config_1.default.error.erroruserread);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -85,11 +73,7 @@ function updateoutreachmedication(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to update outreach medication");
-=======
-            throw new Error(config_1.default.error.erroruserupdate);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -108,11 +92,7 @@ function updateoutreachmedicationbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-<<<<<<< HEAD
             throw new Error("Failed to update outreach medication");
-=======
-            throw new Error(config_1.default.error.erroruserupdate);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }

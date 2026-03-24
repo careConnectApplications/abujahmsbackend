@@ -129,7 +129,6 @@ function updatepayment(id, reqbody) {
         }
     });
 }
-//update  appointment by query
 function updatepaymentbyquery(query, reqbody) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

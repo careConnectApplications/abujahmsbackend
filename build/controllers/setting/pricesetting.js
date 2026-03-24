@@ -25,13 +25,9 @@ const price_1 = require("../../dao/price");
 const otherservices_1 = require("../../utils/otherservices");
 const audit_1 = require("../../dao/audit");
 const pricingmodel_1 = require("../../dao/pricingmodel");
-<<<<<<< HEAD
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const hmocategorycover_1 = require("../../dao/hmocategorycover");
-=======
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
-//add patiient
 var createprices = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         var { servicecategory, amount, servicetype, isHMOCover, category } = req.body;

@@ -85,7 +85,6 @@ var referadmission = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         //create admission
         var admissionrecord = yield (0, admissions_1.createadmission)({ alldiagnosis, referedward, admittospecialization, referddate, doctorname: firstName + " " + lastName, appointment: id, patient: patient._id, admissionid, bed, referredIn, referredFrom });
-        // Update ward and bed status simultaneously using Promise.all
         yield Promise.all([
             (0, wardmanagement_1.updatewardmanagement)(referedwardid, { $inc: { occupiedbed: 1, vacantbed: -1 } }),
             (0, bed_1.updatebed)(bed, { status: config_1.default.bedstatus[1] }),

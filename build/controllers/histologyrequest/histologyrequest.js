@@ -10,10 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatehistologyrequestform = exports.readhistologyrequestformytheatreadmission = exports.fillhistologyrequestform = void 0;
-<<<<<<< HEAD
-=======
-const config_1 = __importDefault(require("../../config"));
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const otherservices_1 = require("../../utils/otherservices");
 const theatreadmission_1 = require("../../dao/theatreadmission");
 const histology_1 = require("../../dao/histology");
@@ -28,11 +24,7 @@ const fillhistologyrequestform = (req, res) => __awaiter(void 0, void 0, void 0,
         //validate theatre admission
         var findAdmission = yield (0, theatreadmission_1.readonethearteadmission)({ _id: theatreadmission }, {}, '');
         if (!findAdmission) {
-<<<<<<< HEAD
             throw new Error(`Theatre Admission does not exist`);
-=======
-            throw new Error(`Theatre Admission donot ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         const queryresult = yield (0, histology_1.createhistologyrequest)({ theatreadmission, africannonafrican, historyofpresentillness, presentingcomplaint, findingonphysicalexamination, otherfindings, anatomicalsiteofbiopsy, grossappearanceoflesion, previousreportwithnumberanddate, nameofconsultant, filledby });
         res.status(200).json({
@@ -72,11 +64,7 @@ const updatehistologyrequestform = (req, res) => __awaiter(void 0, void 0, void 
         //validate theatre admission
         var findhistologyrequestform = yield (0, histology_1.readonehistology)({ _id: id }, {}, '');
         if (!findhistologyrequestform) {
-<<<<<<< HEAD
             throw new Error(`Histology Request Form already exists`);
-=======
-            throw new Error(`Histology Request Form ${config_1.default.error.erroralreadyexit}`);
->>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         //const queryresult:any =await updatethearteadmission(id,{status});
         //create conscent

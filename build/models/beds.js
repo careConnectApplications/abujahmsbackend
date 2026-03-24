@@ -10,8 +10,6 @@ const bedSchema = new mongoose_1.Schema({
     assignedPatient: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Patient', default: null },
     assignedDate: { type: Date }
 }, { timestamps: true });
-// Add indexes for performance optimization
-// Single field indexes for primary lookups
 bedSchema.index({ bednumber: 1 });
 bedSchema.index({ ward: 1 });
 bedSchema.index({ status: 1 });

@@ -42,7 +42,6 @@ exports.createPhysiotherapyAssessments = (0, catchAsync_1.default)((req, res, ne
     if (appointment) {
         appointmentId = checkappointmentId;
     }
-    //if (!appointment) return next(new Error(`Appointment does not exist already exists`));
     const input = {
         patientId: patient._id,
         appointmentId,
