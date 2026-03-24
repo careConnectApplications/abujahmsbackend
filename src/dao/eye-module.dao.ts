@@ -11,7 +11,11 @@ export async function getallEyeModules(query: any, selectquery: any, populateque
         return { eyedetails, totaleyedetails };
     } catch (err) {
         console.log(err);
+<<<<<<< HEAD
         return next(new ApiError(401, "Failed to retrieve eye module data"));
+=======
+        return next(new ApiError(401, configuration.error.erroruserread));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 };
 
@@ -39,7 +43,11 @@ export async function updateEyeModule(id: any, reqbody: any, next: NextFunction)
 
         return doc;
     } catch (err) {
+<<<<<<< HEAD
         return next(new ApiError(401, "Failed to update eye module"))
+=======
+        return next(new ApiError(401, configuration.error.erroruserupdate))
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
 }
@@ -57,7 +65,11 @@ export async function updateappointmentbyquery(query: any, reqbody: any, next: N
         return doc;
     } catch (err) {
         console.log(err);
+<<<<<<< HEAD
         return next(new ApiError(409, "Failed to update eye module"));
+=======
+        return next(new ApiError(409, configuration.error.erroruserupdate));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 }
 

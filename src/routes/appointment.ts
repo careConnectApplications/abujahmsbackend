@@ -6,7 +6,11 @@ import {scheduleappointment,getAllSchedules,updateappointments,getAllSchedulesBy
 const router = express.Router();
 
 router.get('/getallmedicalhistoryoptimized/:clinic', getAllPaidSchedulesoptimized);
+<<<<<<< HEAD
 router.post('/scheduleappointment', checkSubscription, scheduleappointment);
+=======
+router.post('/scheduleappointment', scheduleappointment);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 router.get('/getallschedules', getAllSchedules);
 router.get('/getallschedulesoptimized', getAllSchedulesoptimized);
 //getAllSchedulesoptimized

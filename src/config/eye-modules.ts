@@ -8,6 +8,7 @@ export const OperationalNotesFileName = [
     { name: "FFA", label: "FFA" }
 ];
 
+<<<<<<< HEAD
 export const eyeConditions = [
     "Presbyopia",
     "Myopia",
@@ -24,6 +25,8 @@ export const eyeConditions = [
     "Other(Specify)"
 ];
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export const LensTint = [
     "Amber",
     "Amethyst",
@@ -135,4 +138,8 @@ export const refraction = [
     "vBase",
     "vc",
     "bcva"
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

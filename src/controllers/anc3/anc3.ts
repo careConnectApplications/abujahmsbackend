@@ -61,7 +61,11 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
   if (!id) return next(new ApiError(400, "Patient Id is not provided!"));
   const _patientId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(id);
   const patientrecord: any = await readonepatient({ _id: _patientId }, {}, '', '');
+<<<<<<< HEAD
   if (!patientrecord) return next(new ApiError(404, `Patient do not already exists`));
+=======
+  if (!patientrecord) return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 
   const newAnc3 = {
@@ -113,11 +117,16 @@ export const createAbujaAnc = catchAsync(async (req: Request | any, res: Respons
 
   res.status(201).json({
     status: true,
+<<<<<<< HEAD
     msg: "anc created successfully",
+=======
+    message: "anc created successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     data: queryresult
   })
 });
 
+<<<<<<< HEAD
 export const updateAbujaAnc = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
   const { id } = req.params; // anc id
 
@@ -211,6 +220,8 @@ export const updateAbujaAnc = catchAsync(async (req: Request | any, res: Respons
     status: true
   });
 });
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 //get lab order by patient
 ///////////////////////////anc followup/////////////////////////
 export const readAllancfollowupByAncv3 = async (req: any, res: any) => {
@@ -240,7 +251,11 @@ export const createancfollowupsv3 = async (req: any, res: any) => {
     const ancrecord: any = await readoneanc({ _id: anc }, {}, '');
     //console.log(admissionrecord);   
     if (!ancrecord) {
+<<<<<<< HEAD
       throw new Error(`ANC does not exist`);
+=======
+      throw new Error(`ANC donot ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
     const queryresult = await createancfollowup({ anc: ancrecord._id, heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
@@ -329,7 +344,11 @@ export const createancsv3 = async (req: any, res: any) => {
     const patientrecord: any = await readonepatient({ _id: id }, {}, '', '');
     //console.log(admissionrecord);   
     if (!patientrecord) {
+<<<<<<< HEAD
       throw new Error(`Patient does not exist`);
+=======
+      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
     const queryresult = await createanc({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });

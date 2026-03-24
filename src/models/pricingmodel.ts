@@ -9,6 +9,7 @@ const pricingmodelSchema = new Schema({
 { timestamps: true }
 );
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 pricingmodelSchema.index({ pricingtype: 1 }); // Search by pricing type
 pricingmodelSchema.index({ exactnameofancclinic: 1 }); // Search by ANC clinic name
@@ -20,3 +21,10 @@ pricingmodelSchema.index({ pricingtype: 1, exactnameofancclinic: 1 }); // Price 
 
 const pricingmodel= model('Pricingmodel', pricingmodelSchema);
 export default pricingmodel;
+=======
+const pricingmodel= model('Pricingmodel', pricingmodelSchema);
+export default pricingmodel;
+
+
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

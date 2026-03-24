@@ -502,10 +502,13 @@ const vitalsSchema = new Schema({
   },
   */
   staffname: String,
+<<<<<<< HEAD
 doctorassigment: {
 type: String,
 default: configuration.doctorassigment[0]
   },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   status: {
 
     type: String,
@@ -533,6 +536,7 @@ const appointmentSchema = new Schema({
     required: true
   },
   additionalnote: String,
+<<<<<<< HEAD
   inprogressStartDate: {
     type: Date,
     default: null
@@ -541,14 +545,19 @@ const appointmentSchema = new Schema({
     type: Date,
     default: null
   },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
     default: null,
   },
+<<<<<<< HEAD
   category: String,
   unit: {type: String, required: true},
   arrivalMode: { type: String, enum: ["Walk-in", "Ambulance", "Referral","Death"], default: "Walk-in" },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   admission:
   {
     type: Schema.Types.ObjectId,
@@ -562,7 +571,10 @@ const appointmentSchema = new Schema({
   },
   firstName: String,
   lastName: String,
+<<<<<<< HEAD
   amount: Number,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   MRN: String,
   HMOId: String,
   HMOName: String,
@@ -643,22 +655,33 @@ const appointmentSchema = new Schema({
     required: true
   },
   policecase: Boolean,
+<<<<<<< HEAD
   accidentType: {
     type: String,
     enum: ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"]
   },
   dateOfAccident: { type: Date },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   physicalassault: Boolean,
   sexualassault: Boolean,
   policaename: String,
   servicenumber: String,
+<<<<<<< HEAD
   policephonenumber: String,  division: String,
+=======
+  policephonenumber: String,
+  division: String,
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   fromclinicalencounter: {
     type: Boolean,
     default: false,
 
   },
+<<<<<<< HEAD
   
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   status: {
     required: true,
     type: String,
@@ -679,6 +702,7 @@ appointmentSchema.index({ appointmentcategory: 1 });             // Filter by ca
 appointmentSchema.index({ appointmenttype: 1 });                 // Filter by type
 appointmentSchema.index({ status: 1 });                           // Filter by status
 appointmentSchema.index({ createdAt: -1 }); // Sort by creation time
+<<<<<<< HEAD
 
 appointmentSchema.index({ clinic: 1, status: 1 });
 
@@ -776,6 +800,9 @@ appointmentSchema.pre('updateOne', async function(next) {
   
   next();
 });
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
+appointmentSchema.index({ clinic: 1, status: 1 });
 const appointment = model('Appointment', appointmentSchema);
 export default appointment;

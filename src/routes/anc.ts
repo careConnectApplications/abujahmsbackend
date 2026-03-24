@@ -2,13 +2,22 @@ import express from 'express';
 import {
     createAbujaAnc,
     createancfollowupsv3,
+<<<<<<< HEAD
     readAllancByPatientv3, readAllancfollowupByAncv3, updateAbujaAnc, updateancfollowupsv3
+=======
+    createancsv3, 
+    readAllancByPatientv3, readAllancfollowupByAncv3, updateancfollowupsv3, updateancsv3
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 } from '../controllers/anc3/anc3';
 const router = express.Router();
 
 router.post('/createancv3/:id', createAbujaAnc);
 router.post("/:id", createAbujaAnc);
+<<<<<<< HEAD
 router.put('/updateancsv3/:id', updateAbujaAnc);
+=======
+router.put('/updateancsv3/:id', updateancsv3);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 router.get('/readallancbypatientv3/:patient', readAllancByPatientv3);
 //////////////////////anc followup ////////////////////////////////
 router.post('/createancfollowupsv3/:anc', createancfollowupsv3);

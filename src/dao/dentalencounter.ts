@@ -24,7 +24,11 @@ export async function readAllDentalEncounters(
     return { encounters, total };
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve dental encounter data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -35,7 +39,11 @@ export async function createDentalEncounter(input: any) {
     return await newEncounter.save();
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to create dental encounter");
+=======
+    throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -45,7 +53,11 @@ export async function readOneDentalEncounter(query: any, selectquery: any) {
     return await DentalEncounter.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve dental encounter data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -65,7 +77,11 @@ export async function updateDentalEncounterById(id: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update dental encounter");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -83,6 +99,10 @@ export async function updateDentalEncounterByQuery(query: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update dental encounter");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }

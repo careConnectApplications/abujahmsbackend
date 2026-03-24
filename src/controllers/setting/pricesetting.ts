@@ -4,10 +4,13 @@ import  {readallprices,createprice,updateprice,readoneprice}  from "../../dao/pr
 import { validateinputfaulsyvalue,calculateAmountPaidByHMO} from "../../utils/otherservices";
 import {createaudit} from "../../dao/audit";
 import {readonepricemodel} from "../../dao/pricingmodel";
+<<<<<<< HEAD
 import {readonepatient} from "../../dao/patientmanagement";
 import catchAsync from "../../utils/catchAsync";
 import {readonehmocategorycover} from "../../dao/hmocategorycover";
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 //add patiient
 export var createprices = async (req:any,res:any) =>{
    

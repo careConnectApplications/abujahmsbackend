@@ -37,6 +37,13 @@ export var signin = async (req: any, res: any) => {
             throw new Error(configuration.error.errorinvaliduser);
         }
 
+<<<<<<< HEAD
+=======
+
+        //chek if user is active
+        if (user.status === configuration.status[0]) {
+            throw new Error(configuration.error.errordeactivate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
         //chek if user is active
         if (user.status === configuration.status[0]) {
@@ -72,11 +79,19 @@ export var signup = catchAsync(async (req: Request | any, res: Response, next: N
     const foundUser = await readone({ $or: [{ email }, { phoneNumber }] });
 
     if (foundUser) {
+<<<<<<< HEAD
        throw new Error(`User with this email or phonenumber  already exists`);
     }
 
     if (!isValidPhoneNumber(phoneNumber)) {
         throw new Error(configuration.error.errorNotValidPhoneNumber)
+=======
+        return next(new ApiError(401, `User with this email or phonenumber  ${configuration.error.erroralreadyexit}`));
+    }
+
+    if (!isValidPhoneNumber(phoneNumber)) {
+        return next(new ApiError(409, configuration.error.errorNotValidPhoneNumber))
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     req.body.password = configuration.defaultPassword;
@@ -89,7 +104,11 @@ export var signup = catchAsync(async (req: Request | any, res: Response, next: N
     const queryresult = await createuser(req.body);
 
     if (!queryresult) {
+<<<<<<< HEAD
         throw new Error('operation failed!');
+=======
+        return next(new ApiError(403, 'operation failed!'));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     //const message = `Your account creation on Gotruck APP is successful. \n Login Email: ${email} \n Portal Link: https://google.com/ \n Default-Password: truck \n Please Login and change your Password`;

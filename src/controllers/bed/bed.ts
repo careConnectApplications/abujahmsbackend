@@ -20,9 +20,16 @@ export const createbeds = catchAsync(async (req: Request | any, res: Response, n
     const actor = `${firstName} ${lastName}`;
     const id = new ObjectId(wardid);
     validateinputfaulsyvalue({ wardid });
+<<<<<<< HEAD
     const foundWard =  await readonewardmanagement({_id:id},'');
     if(!foundWard){
       throw new Error(`Ward does not exist`);
+=======
+    
+    const foundWard =  await readonewardmanagement({_id:id},'');
+    if(!foundWard){
+      throw new Error(`Ward doesnt ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
       
@@ -30,7 +37,11 @@ export const createbeds = catchAsync(async (req: Request | any, res: Response, n
     // Check for existing bed with same number in the same ward
     const existing = await readonebed({ bednumber, ward:id }, '');
     if (existing) {
+<<<<<<< HEAD
       throw new Error(`Bed already exists`);
+=======
+      throw new Error(`Bed ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     const queryresult = await createbed({
@@ -115,7 +126,11 @@ export const updatebeds = catchAsync(async (req: Request | any, res: Response, n
     validateinputfaulsyvalue({ bednumber});
     const existing = await readonebed({ bednumber}, '');
     if (existing) {
+<<<<<<< HEAD
       throw new Error(`Bed already exists`);
+=======
+      throw new Error(`Bed ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     const queryresult = await updatebed(id, {
       bednumber

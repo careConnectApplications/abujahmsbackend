@@ -6,6 +6,7 @@ import configuration from "../config";
 
 export async function readpaymentaggregate(input: any) {
   try {
+<<<<<<< HEAD
     return await Payment.aggregate(input);
   }
   catch (e: any) {
@@ -45,6 +46,47 @@ export async function readallpaymentaggregate(input: any) {
   }
   catch (e: any) {
     throw new Error("Failed to retrieve payment data");
+=======
+    return await Payment.aggregate(input);
+  }
+  catch (e: any) {
+    console.log(e);
+    throw new Error(configuration.error.erroruserupdate);
+  }
+}
+export async function readpaymentaggregateoptimized(input: any, page: any, size: any) {
+  try {
+    const skip = (page - 1) * size;
+    const paymentdetails = await Payment.aggregate(input).skip(skip).limit(size).sort({ createdAt: -1 });
+    const totalpaymentdetails = (await Payment.aggregate(input)).length;
+    const totalPages = Math.ceil(totalpaymentdetails / size);
+    return { paymentdetails, totalPages, totalpaymentdetails, size, page };
+  }
+  catch (e: any) {
+    console.log(e);
+    throw new Error(configuration.error.erroruserupdate);
+  }
+}
+
+//read all payment history
+export async function readallpayment(query: any, populatequery: any) {
+  try {
+
+    const paymentdetails = await Payment.find(query).populate(populatequery).sort({ createdAt: -1 });;
+    const totalpaymentdetails = await Payment.find(query).countDocuments();
+    return { paymentdetails, totalpaymentdetails };
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserread);
+  }
+};
+export async function readallpaymentaggregate(input: any) {
+  try {
+    return await Payment.aggregate(input);
+  }
+  catch (e: any) {
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
   }
 }
@@ -55,7 +97,11 @@ export async function createpayment(input: any) {
   }
   catch (err) {
     console.log(err);
+<<<<<<< HEAD
     throw new Error("Failed to create payment");
+=======
+    throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
   }
 }
@@ -66,7 +112,11 @@ export async function createpaymentSession(input: any, session: any) {
   }
   catch (err) {
     console.log(err);
+<<<<<<< HEAD
     throw new Error("Failed to create payment");
+=======
+    throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
   }
 }
@@ -77,6 +127,7 @@ export async function readonepayment(query: any) {
   }
   catch (err) {
     console.log(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve payment data");
 
   }
@@ -99,10 +150,52 @@ export async function updatepayment(id: any, reqbody: any) {
   } catch (err) {
     console.log(err);
     throw new Error("Failed to update payment");
+=======
+    throw new Error(configuration.error.erroruserread);
+
+  }
+}
+
+
+
+//update  users
+export async function updatepayment(id: any, reqbody: any) {
+  try {
+    const transaction = await Payment.findOneAndUpdate({ _id: id }, reqbody, {
+      new: true
+    });
+    if (!transaction) {
+      //return json  false response
+      throw new Error(configuration.error.errorinvalidcredentials);
+    }
+    return transaction;
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserupdate);
 
   }
 
 }
+//update  appointment by query
+export async function updatepaymentbyquery(query: any, reqbody: any) {
+  try {
+    const payment = await Payment.updateMany(query, reqbody, {
+      new: true
+    });
+    if (!payment) {
+      //return json  false response
+      throw new Error(configuration.error.errorinvalidcredentials);
+    }
+    return payment;
+  } catch (err) {
+    console.log(err);
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
+
+  }
+
+}
+<<<<<<< HEAD
 //update  appointment by query
 export async function updatepaymentbyquery(query: any, reqbody: any) {
   try {
@@ -124,3 +217,5 @@ export async function updatepaymentbyquery(query: any, reqbody: any) {
   }
 
 }
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

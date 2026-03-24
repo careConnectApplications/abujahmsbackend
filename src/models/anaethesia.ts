@@ -77,6 +77,7 @@ filledby: {
 },
 { timestamps: true }
 );
+<<<<<<< HEAD
 
 // Add indexes for performance optimization
 // Single field indexes
@@ -91,3 +92,7 @@ anathesiaSchema.index({ filledby: 1, createdAt: -1 });
 
 const anathesia = model('Anathesia', anathesiaSchema);
 export default anathesia;
+=======
+const anathesia = model('Anathesia', anathesiaSchema);
+export default anathesia;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

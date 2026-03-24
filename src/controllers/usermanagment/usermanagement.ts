@@ -165,7 +165,11 @@ export async function bulkuploadusers(req: any, res: any) {
         validateinputfaulsyvalue({ email, firstName, title, staffId, lastName, country, state, city, address, age, dateOfBirth, gender, licence, phoneNumber, role, degree, profession, employmentStatus, nativeSpokenLanguage, otherLanguage, readWriteLanguage, clinic, zip, specializationDetails });
         const foundUser = await readone({ email });
         if (foundUser) {
+<<<<<<< HEAD
           throw new Error(`${email} already exists`);
+=======
+          throw new Error(`${email} ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
         }
         var roleId = (configuration.roles).filter((e: any) => e.role == role)[0].roleId;
@@ -358,4 +362,8 @@ export const setUserDefaultPermission = catchAsync(async (req: Request, res: Res
     status: true,
     data: queryresult
   });
+<<<<<<< HEAD
 })
+=======
+})
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

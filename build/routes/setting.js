@@ -14,7 +14,10 @@ const testscomponent_1 = require("../controllers/setting/testscomponent");
 const hmomanagement_1 = require("../controllers/setting/hmomanagement");
 const pricemodel_1 = require("../controllers/setting/pricemodel");
 const outreachmedication_1 = require("../controllers/setting/outreachmedication");
+<<<<<<< HEAD
 const bed_1 = require("../controllers/bed/bed");
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const audit_1 = require("../controllers/audit/audit");
 const hmscategorycover_1 = require("../controllers/setting/hmscategorycover");
 //import {readicdten} from "../controllers/icdten/icdten";
@@ -70,6 +73,7 @@ router.get('/readallaudit', audit_1.readAllaudit);
 router.post('/createoutreachmedication', outreachmedication_1.createoutreachmedications);
 router.get('/getalloutreachmedication', outreachmedication_1.getalloutreachmedications);
 router.put('/updateoutreachmedication/:id', outreachmedication_1.updateoutreachmedications);
+<<<<<<< HEAD
 //bed management
 router.post('/createbed', bed_1.createbeds);
 router.get('/getavailablebedsbyward/:wardid', bed_1.getAvailableBedsByWard);
@@ -82,4 +86,6 @@ router.post('/getpriceofservice/:id', pricesetting_1.getpriceofservice);
 router.post("/createhmocategorycover", hmscategorycover_1.createhmocategorycovercontroller);
 router.get("/getallhmocategorycover", hmscategorycover_1.getallhmocategorycovercontroller);
 router.put("/updatehmocategorycover/:_id", hmscategorycover_1.updatehmocategorycovercontroller);
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 exports.default = router;

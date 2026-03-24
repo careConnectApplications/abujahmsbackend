@@ -7,6 +7,7 @@ const pricingmodelSchema = new mongoose_1.Schema({
     exactnameofservicetypeforadult: String,
     exactnameofservicetypeforchild: String,
 }, { timestamps: true });
+<<<<<<< HEAD
 // Add indexes for performance optimization
 pricingmodelSchema.index({ pricingtype: 1 }); // Search by pricing type
 pricingmodelSchema.index({ exactnameofancclinic: 1 }); // Search by ANC clinic name
@@ -14,5 +15,7 @@ pricingmodelSchema.index({ exactnameofservicetypeforadult: 1 }); // Search by ad
 pricingmodelSchema.index({ exactnameofservicetypeforchild: 1 }); // Search by child service type
 // Compound indexes for common query patterns
 pricingmodelSchema.index({ pricingtype: 1, exactnameofancclinic: 1 }); // Price by type and clinic
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const pricingmodel = (0, mongoose_1.model)('Pricingmodel', pricingmodelSchema);
 exports.default = pricingmodel;

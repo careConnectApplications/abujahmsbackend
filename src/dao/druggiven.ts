@@ -10,7 +10,11 @@ import configuration from "../config";
       return { druggivendetails, totaldruggivendetails };
     } catch (err) {
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve drug administration data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
   };
   export async function createdruggiven(input:any){
@@ -21,7 +25,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to create drug administration");
+=======
+      throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -32,7 +40,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve drug administration data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -53,7 +65,11 @@ import configuration from "../config";
       return druggiven;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update drug administration");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 
@@ -71,7 +87,11 @@ import configuration from "../config";
       return druggiven;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update drug administration");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 

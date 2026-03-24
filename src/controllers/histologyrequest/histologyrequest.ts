@@ -18,7 +18,11 @@ validateinputfaulsyvalue({theatreadmission, africannonafrican,historyofpresentil
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
+<<<<<<< HEAD
     throw new Error(`Theatre Admission does not exist`);
+=======
+    throw new Error(`Theatre Admission donot ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 }
 
@@ -70,7 +74,11 @@ catch(e:any){
     //validate theatre admission
       var  findhistologyrequestform = await readonehistology({_id:id},{},'');
       if(!findhistologyrequestform){
+<<<<<<< HEAD
         throw new Error(`Histology Request Form already exists`);
+=======
+        throw new Error(`Histology Request Form ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
     //const queryresult:any =await updatethearteadmission(id,{status});

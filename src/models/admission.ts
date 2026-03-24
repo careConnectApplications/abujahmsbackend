@@ -61,7 +61,10 @@ const admissionSchema = new Schema({
        required: true
 
   },
+<<<<<<< HEAD
   bedfee:Number,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   doctorname:
   {
     type: String, 

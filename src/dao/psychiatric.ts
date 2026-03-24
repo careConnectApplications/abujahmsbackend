@@ -18,7 +18,11 @@ export async function readAllPsychiatricEvaluations(query: any, selectquery: any
     return { evaluations, total };
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve psychiatric data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -29,7 +33,11 @@ export async function createPsychiatricEvaluation(input: any) {
     return await newEvaluation.save();
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to create psychiatric");
+=======
+    throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -39,7 +47,11 @@ export async function readOnePsychiatricEvaluation(query: any, selectquery: any)
     return await PsychiatricEvaluation.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve psychiatric data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -55,7 +67,11 @@ export async function updatePsychiatricEvaluationById(id: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update psychiatric");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -71,6 +87,10 @@ export async function updatePsychiatricEvaluationByQuery(query: any, reqbody: an
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update psychiatric");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }

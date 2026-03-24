@@ -61,7 +61,11 @@ function optimizedreadallradiology(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to retrieve radiology test data");
+=======
+            throw new Error(config_1.default.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }

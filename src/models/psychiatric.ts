@@ -34,6 +34,7 @@ const psychiatricEvaluationSchema = new mongoose.Schema({
 { timestamps: true }
 );
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 // Single field indexes
 psychiatricEvaluationSchema.index({ patientId: 1 });
@@ -45,5 +46,7 @@ psychiatricEvaluationSchema.index({ createdAt: -1 });
 psychiatricEvaluationSchema.index({ patientId: 1, createdAt: -1 });
 psychiatricEvaluationSchema.index({ appointmentId: 1, patientId: 1 });
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const psychiatric = mongoose.model('PsychiatricEvaluation', psychiatricEvaluationSchema);
 export default psychiatric;

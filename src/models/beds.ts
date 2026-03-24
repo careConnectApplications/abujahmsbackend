@@ -9,6 +9,7 @@ const bedSchema = new Schema({
   assignedDate: { type: Date }
 }, { timestamps: true });
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 // Single field indexes for primary lookups
 bedSchema.index({ bednumber: 1 });
@@ -24,5 +25,7 @@ bedSchema.index({ status: 1, isDeleted: 1 }); // Available beds (vacant and not 
 bedSchema.index({ ward: 1, isDeleted: 1 }); // Active beds in a ward
 bedSchema.index({ assignedPatient: 1, status: 1 }); // Patient bed assignment
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const bed = model('Bed', bedSchema);
 export default bed;

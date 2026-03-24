@@ -1,7 +1,11 @@
 
 import configuration from "../../config";
 import { NextFunction, Request, Response } from "express";
+<<<<<<< HEAD
 import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate,readthirdstageLabouraggregate,readsecondstageLabouraggregate,readfirststageLabouraggregate,readmortalityregisteraggregate,readbirthregisteraggregate,readeyeconditionaggregate} from "../../dao/reports";
+=======
+import {readpaymentaggregate,readappointmentaggregate,readadmissionaggregate,readprocedureaggregate,readradiologyaggregate,readlabaggregate,readprescriptionaggregate,readpatientsmanagementaggregate,readnutritionaggregate,readimmunizationaggregate,readfamilyaggregate} from "../../dao/reports";
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 import {readallpayment}  from "../../dao/payment";
 import {settings} from "../settings/settings";
 import { financialreports } from "../../utils/reporting/financial";
@@ -15,6 +19,7 @@ import {heathfacilityattendancereports} from "../../utils/reporting/healthfacili
 import {inpatientattendancereports} from "../../utils/reporting/inpatientcare";
 import {immunizationaggregatereports} from "../../utils/reporting/immunization";
 import {familyplanningreports} from "../../utils/reporting/familyplanning";
+<<<<<<< HEAD
 import {labinvestigationreports} from "../../utils/reporting/labinvestigation";
 import {radiodiagnosisreports} from "../../utils/reporting/radiodiagnosis";
 import {operationreports} from "../../utils/reporting/operation";
@@ -30,6 +35,10 @@ import catchAsync from "../../utils/catchAsync";
 // Utility function to remove empty string values from an object
 
 
+=======
+import { ApiError } from "../../errors";
+import catchAsync from "../../utils/catchAsync";
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export const reports = async (req:any, res:any) => {
 try{
   let {filters} = req.body;
@@ -39,7 +48,256 @@ try{
   
   //paymentcategory
   //cashieremail
+<<<<<<< HEAD
 var { querytype}: any = req.params;
+=======
+var { querygroup, querytype, startdate, enddate }: any = req.params;
+if (!querygroup) {
+  throw new Error(`querygroup ${configuration.error.errorisrequired}`);
+}
+
+if (!startdate || !enddate) {
+  var todaydate = new Date();
+  enddate = todaydate;
+  startdate = new Date(
+    todaydate.getFullYear(),
+    todaydate.getMonth() - 6,
+    todaydate.getDate()
+  );
+} else {
+  startdate = new Date(startdate);
+  enddate = new Date(enddate);
+}
+
+const reportbyfinancialreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+    {   
+            $match:{$and:[{paymentcategory: querygroup}, {updatedAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
+
+
+
+const reportbyadmissionreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $lookup: {
+      from: "wardmanagements",
+      localField: "referedward",
+      foreignField: "_id",
+      as: "referedward",
+    },
+  },
+  {
+    $unwind: {
+      path: "$referedward",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+  {
+    $match:{$and:[{"referedward.wardname": querygroup}, {referddate:{ $gt: startdate, $lt: enddate }}]} 
+  },
+];
+
+const reportbyappointmentreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $match:{$and:[{clinic: querygroup}, {
+      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
+  },
+];
+
+const reportbyhmoreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+  {
+    $match:{$and:[{"patient.HMOName": querygroup}, {
+      createdAt:{ $gt: startdate, $lt: enddate }}]} 
+  },
+];
+const appointmentreportbyhmoreport = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+  {
+    $match:{$and:[{"patient.HMOName": querygroup}, {
+      appointmentdate:{ $gt: startdate, $lt: enddate }}]} 
+  },
+];
+const secondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    },
+    {
+      $addFields: {
+        servicetype: {
+          $ifNull: ["$testname", "$appointmenttype"]
+        }
+      }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
+    }
+    
+];
+const proceduresecondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    ,
+    {
+      $addFields: {
+        servicetype: {
+          $reduce: {
+            input: { $ifNull: ["$procedure", []] },
+            initialValue: "",
+            in: {
+              $cond: {
+                if: { $eq: ["$$value", ""] },
+                then: "$$this",
+                else: { $concat: ["$$value", ",", "$$this"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
+    }
+      
+    
+];
+
+const patientsecondaryservice = [
+ 
+    {   
+            $match:{$and:[{patienttype: configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    }
+    
+];
+const pharmacysecondaryservice = [
+  {
+    $lookup: {
+      from: "patientsmanagements",
+      localField: "patient",
+      foreignField: "_id",
+      as: "patient",
+    },
+  },
+  {
+    $unwind: {
+      path: "$patient",
+      preserveNullAndEmptyArrays: true
+    }
+    
+  },
+    {   
+            $match:{$and:[{pharmacy: querygroup},{"patient.patienttype": configuration.patienttype[1]}, {createdAt:{ $gt: startdate, $lt: enddate }}]}   
+    },
+    {
+      $addFields: {
+        servicetype:"$prescription"
+      }
+    },
+    {
+      $project:{
+        servicetype:1,
+        patient:1
+
+      }
+    }
+    
+];
+
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 var queryresult: any;
 
 //var c = await configuration.settings2();
@@ -80,6 +338,21 @@ else if(querytype == reports[7].querytype){
   queryresult= await readimmunizationaggregate(reportimmunization(filters));
 
 }
+else if(querytype == reports[8].querytype && querygroup ==reports[8].querygroup[4]){
+
+  const [result1, result2, result3] = await Promise.all([
+    readprocedureaggregate(proceduresecondaryservice),
+    readradiologyaggregate(secondaryservice),
+    readlabaggregate(secondaryservice),
+    readappointmentaggregate(secondaryservice)
+  ]);
+
+  queryresult = [...result1, ...result2, ...result3];
+
+  //queryresult= await readprocedureaggregate(proceduresecondaryservice);
+
+}
+
 else if(querytype == reports[8].querytype){
   queryresult= await readappointmentaggregate(reportdeath(filters));
 
@@ -182,6 +455,7 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     }
      
     let {summary}:any = await settings();
+<<<<<<< HEAD
     const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
     const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
     const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate,outpatientdepartmentpipeline, accidentEmergencyRecordsPipeline} = appointmentaggregatereports(startdate,enddate)
@@ -275,6 +549,22 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
     } = mortalityreports(startdate, enddate);
   
     let queryresult:any;
+=======
+    
+    const {financialaggregatepaid,financialaggregategrandtotalpaid} = financialreports(startdate,enddate);
+    const {cashieraggregatepaid,cashieraggregatepaidgrandtotal} = cashieraggregatereports(startdate,enddate);
+    const {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate} = appointmentaggregatereports(startdate,enddate)
+    const {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions} = admissionaggregatereports(startdate,enddate);
+    const {procedureaggregatepaid,totalprocedureaggregate} = procedureaggregatereports(startdate, enddate);
+    const {nutritionaggregatechildren12to59receiveddeworming,nutritionaggregatechildren0to59givenvitaminasupplement,nutritionaggregatechildren0to5exclusivebreadstfeeding,nutritionaggregatechildren0to59growingwell,nutritionaggregatechildren0to59thatreceivednutirtion} =nutritionaggregatereports(startdate, enddate);
+    const {appointmentaggregatebyhmo,aggregatebyhmo} =hmoaggregatereports(startdate, enddate);
+    const {heathfacilityoutpatientattendance,heathfacilitygeneralattendance} = heathfacilityattendancereports(startdate, enddate);
+    const {inpatientdischarges} = inpatientattendancereports(startdate, enddate);
+    const {immunizationpipeline,AEFIcasesreported} = immunizationaggregatereports(startdate, enddate);
+    const {newfamilyplanningacceptorsByGender,counselCountByGender,moderncontraceptionbyagegroup,clientsgivenoralpills,totaloralpillcyclesdispensed,emergencyContraceptiveDispensed,injectablesByName,implantsInsertedByType,iudInserted,sterilizationByGender,maleCondomsDistributed,femaleCondomsDistributed,postpartumCounsellingCount,postPartumImplanonInsertions,postPartumJadelleInsertions,postPartumIUDInsertions}=familyplanningreports(startdate, enddate);
+  
+    let queryresult:any; 
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
    
     if(querytype == summary[0]){
      //queryresult = {paid: await readpaymentaggregate(financialaggregatepaid), pendingpayment:await readpaymentaggregate(financialaggregatependingpaid)};
@@ -324,6 +614,33 @@ export const reportsummary = catchAsync(async (req:Request,res:Response,next: Ne
    
   ]);
   queryresult = {children0to59thatreceivednutirtion,children0to59growingwell,children0to5exclusivebreadstfeeding,children0to59givenvitaminasupplement,children12to59receiveddeworming};
+<<<<<<< HEAD
+=======
+    }
+      else if(querytype == summary[8]){
+        const [outpatientattendance,generalattendance] = await Promise.all([readappointmentaggregate(heathfacilityoutpatientattendance),readappointmentaggregate(heathfacilitygeneralattendance)]);
+        queryresult={outpatientattendance,generalattendance};
+
+      }
+      else if(querytype == summary[9]){
+          queryresult = await readadmissionaggregate(inpatientdischarges);
+      }
+      else if(querytype == summary[10]){
+        queryresult = await readimmunizationaggregate(immunizationpipeline);
+      }
+      else if(querytype == summary[11]){
+        const [aeficasesreport]=await Promise.all([readimmunizationaggregate(AEFIcasesreported)]);
+        queryresult = {aeficasesreport};
+      }
+      else if(querytype == summary[12]){
+        
+        const [newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted]=await Promise.all([readfamilyaggregate(newfamilyplanningacceptorsByGender),readfamilyaggregate(counselCountByGender),readfamilyaggregate(moderncontraceptionbyagegroup),readfamilyaggregate(clientsgivenoralpills),readfamilyaggregate(totaloralpillcyclesdispensed),readfamilyaggregate(emergencyContraceptiveDispensed),readfamilyaggregate(injectablesByName),readfamilyaggregate(implantsInsertedByType),readfamilyaggregate(iudInserted),readfamilyaggregate(sterilizationByGender),readfamilyaggregate(maleCondomsDistributed),readfamilyaggregate(femaleCondomsDistributed),readfamilyaggregate(postpartumCounsellingCount),readfamilyaggregate(postPartumImplanonInsertions),readfamilyaggregate(postPartumJadelleInsertions),readfamilyaggregate(postPartumIUDInsertions)]);
+       queryresult={newfamilyplanningacceptors,familyplanningclientscounselled,femalesusingmoderncontraception,clientsgivenoralpill,oralpillcyclesdispensed,emergencycontraceptivedispense,injectablesgiven,Implantsinserted,iudInserteds,sterilization,malecondomdistributed,femalecondomdistributed,womencounselledonpostpartumfamilyplanning,postpartumimplanoninserted,postpartumjadelleinserted,postpartumIUDinserted};
+      
+       }
+    else{
+      return next(new ApiError(400,`querytype ${configuration.error.errorisrequired}`))
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
       else if(querytype == summary[8]){
         const [outpatientattendance,generalattendance] = await Promise.all([readappointmentaggregate(heathfacilityoutpatientattendance),readappointmentaggregate(heathfacilitygeneralattendance)]);

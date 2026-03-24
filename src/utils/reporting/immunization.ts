@@ -116,6 +116,7 @@ const AEFIcasesreported = [
   }
 ];
 
+<<<<<<< HEAD
 // New pipeline for immunization grouped by gender and vaccination
 const immunizationByGenderAndVaccination = [
   {   
@@ -166,3 +167,7 @@ const immunizationByGenderAndVaccination = [
 
    return {immunizationpipeline,AEFIcasesreported,immunizationByGenderAndVaccination}
 }
+=======
+   return {immunizationpipeline,AEFIcasesreported}
+}
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

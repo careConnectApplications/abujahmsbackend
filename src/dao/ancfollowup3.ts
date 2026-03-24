@@ -9,7 +9,11 @@ import configuration from "../config";
       return { ancfollowupdetails, totalancfollowupdetails };
     } catch (err) {
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve ANC follow-up data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
   };
   export async function createancfollowup(input:any){
@@ -20,7 +24,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to create ANC follow-up");
+=======
+      throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -31,7 +39,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve ANC follow-up data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -49,7 +61,11 @@ import configuration from "../config";
       return ancfollowup;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update ANC follow-up");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 
@@ -67,7 +83,11 @@ import configuration from "../config";
       return ancfollowup;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update ANC follow-up");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 

@@ -105,6 +105,7 @@ const physiotherapyAssessmentSchema = new Schema({
   timestamps: true
 });
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 // Single field indexes for primary lookups
 physiotherapyAssessmentSchema.index({ patientId: 1 });
@@ -117,9 +118,15 @@ physiotherapyAssessmentSchema.index({ patientId: 1, createdAt: -1 }); // Patient
 physiotherapyAssessmentSchema.index({ appointmentId: 1, patientId: 1 }); // Assessment for specific appointment
 physiotherapyAssessmentSchema.index({ admissionId: 1, createdAt: -1 }); // Admission assessments timeline
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const PhysiotherapyAssessment = mongoose.model(
   "PhysiotherapyAssessment",
   physiotherapyAssessmentSchema
 );
 
 export default PhysiotherapyAssessment;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

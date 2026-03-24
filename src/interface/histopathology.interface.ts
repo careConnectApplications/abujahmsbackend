@@ -36,6 +36,7 @@ export interface ILabUse {
   DateReported?: Date;
 }
 
+<<<<<<< HEAD
 export interface IConsentForm {
   nameofexplainer: string;
   filename?: string;
@@ -49,6 +50,8 @@ export interface IConsentForm {
 }
 
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export interface IHistopathology {
   patient: Types.ObjectId;
   appointment?: Types.ObjectId | null;
@@ -56,14 +59,20 @@ export interface IHistopathology {
   staffInfo?: Types.ObjectId | null;
   payment?: Types.ObjectId | null;
   amount?: number;
+<<<<<<< HEAD
   hmopercentagecover?:number;
   actualcost?:number;
   refNumber:string,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   paymentStatus?: string;
   status: string;
   testRequired?: IHistopathologyTestRequired[];
   diagnosisForm: IDiagnosisForm;
+<<<<<<< HEAD
   consentForm?: IConsentForm | null;
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   LabUse?: ILabUse;
   createdAt?: Date;
   updatedAt?: Date;

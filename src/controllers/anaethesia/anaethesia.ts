@@ -19,7 +19,11 @@ validateinputfaulsyvalue({theatreadmission,preopeassessment,allergies,weight,asa
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
+<<<<<<< HEAD
     throw new Error(`Theatre Admission already exists`);
+=======
+    throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 }
 //const queryresult:any =await updatethearteadmission(id,{status});
@@ -67,7 +71,11 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readoneanaethesia({_id:id},{},'','');
       if(!findAdmission){
+<<<<<<< HEAD
         throw new Error(`Anaethesia Form already exists`);
+=======
+        throw new Error(`Anaethesia Form ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
     //const queryresult:any =await updatethearteaadmission(id,{status});
@@ -117,7 +125,11 @@ catch(e:any){
           
   var  findanathesia = await readoneanaethesia({_id:anathesia},{},'','');
   if(!findanathesia){
+<<<<<<< HEAD
     throw new Error(`Anathesia record already exists`);
+=======
+    throw new Error(`Anathesia record ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 }
         const queryresult=await createdruggiven({druggiven,timegiven,bp,pulse,temp,staffname,anathesia:findanathesia._id});
@@ -188,7 +200,11 @@ catch(e:any){
           
           var  findanathesia = await readoneanaethesia({_id:anathesia},{},'','');
           if(!findanathesia){
+<<<<<<< HEAD
             throw new Error(`Anathesia record already exists`);
+=======
+            throw new Error(`Anathesia record ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
         }
         const queryresult=await createfoodgiven({ foodgiven,timegiven,bp,pulse,temp,staffname,anathesia:findanathesia._id});

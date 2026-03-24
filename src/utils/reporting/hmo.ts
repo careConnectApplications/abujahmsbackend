@@ -1,5 +1,8 @@
 import configuration from "../../config";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export const hmoaggregatereports=(startdate:any,enddate:any)=>{
 
 const aggregatebyhmo = [
@@ -95,6 +98,7 @@ const aggregatebyhmo = [
 
       }
     ];
+<<<<<<< HEAD
     const insurancePatientsByGenderAndName = [
       {
         $match: {
@@ -193,3 +197,7 @@ export const insuranceservices = (startdate: any, enddate: any) => {
     insurancePatientsByGenderAndName
   };
 };
+=======
+    return {appointmentaggregatebyhmo,aggregatebyhmo}
+}
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

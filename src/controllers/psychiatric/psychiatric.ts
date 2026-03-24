@@ -60,7 +60,11 @@ export const createPsychiatricEvaluationController = catchAsync(async (req: Requ
     validateinputfaulsyvalue({ id, appointmentoradmissionunderscoreid});
     const patient:any = await readonepatient({ _id: id }, {}, '', '');
     if (!patient) {
+<<<<<<< HEAD
       next(new Error(`Patient does not exist already exists`));
+=======
+      next(new Error(`Patient does not exist ${configuration.error.erroralreadyexit}`));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     var checkappointmentId=new ObjectId(appointmentoradmissionunderscoreid);
     //validate appointment id

@@ -1,7 +1,11 @@
 import { Schema, model } from "mongoose";
 import configuration from "../config";
 import bcrypt from "bcryptjs";
+<<<<<<< HEAD
 
+=======
+import { required } from "joi";
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export interface patientinterface {
   title: String;
   firstName: String;
@@ -189,6 +193,7 @@ const patientSchema = new Schema(
         default: [],
       },
     ],
+<<<<<<< HEAD
     subscriptionPaidUntil: {
       type: Date,
       default: null
@@ -197,6 +202,8 @@ const patientSchema = new Schema(
       type: Boolean,
       default: true
     },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     status: {
       required: true,
       type: String,

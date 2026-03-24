@@ -38,7 +38,11 @@ import configuration from "../config";
     
       try{
         const skip = (page - 1) * size;
+<<<<<<< HEAD
        var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });;
+=======
+       var labdetails = await Lab.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
       const totallabdetails = (await Lab.aggregate(aggregatequery)).length;
       const totalPages = Math.ceil(totallabdetails / size);
       return { labdetails, totalPages,totallabdetails, size, page};
@@ -46,7 +50,11 @@ import configuration from "../config";
       }
       catch(err:any){
         console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to retrieve lab test data");
+=======
+            throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
       
       }
       

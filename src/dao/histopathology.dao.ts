@@ -2,6 +2,7 @@ import { NextFunction } from "express";
 import mongoose from "mongoose";
 import Histopathology from "../models/histopathology";
 import { IOptions, QueryResult } from "../paginate/paginate";
+<<<<<<< HEAD
 export const findTestRequiredById = async (subdocId: string) => {
   const result = await Histopathology.findOne(
     { "testRequired._id": new mongoose.Types.ObjectId(subdocId) },
@@ -10,6 +11,9 @@ export const findTestRequiredById = async (subdocId: string) => {
 
   return result;
 };
+=======
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
     try {
         const histopathology = new Histopathology(body);
@@ -19,9 +23,12 @@ export async function CreateHistopatholgyDao(body: any, next: NextFunction) {
         return next(err);
     }
 }
+<<<<<<< HEAD
 export const getHistopathologyByIdPopulate = async (
     id: mongoose.Types.ObjectId
 ): Promise<any | null> => Histopathology.findById(id).populate('patient');
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 export const getHistopathologyById = async (
     id: mongoose.Types.ObjectId
@@ -56,6 +63,7 @@ export const updateHistopathologyRecord = async (query: any, reqbody: any) => {
     });
 
     return doc;
+<<<<<<< HEAD
 }
 export const getAllPaginatedHistopathologyRecords = async (
   query: any,
@@ -118,3 +126,6 @@ export const getHistopatholofySubdocument = async (id: string) => {
      
     
   }
+=======
+}
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

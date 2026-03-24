@@ -12,13 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 exports.createancsv3 = exports.readAllancByPatientv3 = exports.createancfollowupsv3 = exports.readAllancfollowupByAncv3 = exports.updateAbujaAnc = exports.createAbujaAnc = void 0;
+=======
+exports.createancsv3 = exports.readAllancByPatientv3 = exports.createancfollowupsv3 = exports.readAllancfollowupByAncv3 = void 0;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 exports.updateancfollowupsv3 = updateancfollowupsv3;
 exports.updateancsv3 = updateancsv3;
 const anc3_1 = require("../../dao/anc3");
 const ancfollowup3_1 = require("../../dao/ancfollowup3");
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
+<<<<<<< HEAD
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const errors_1 = require("../../errors");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -146,6 +151,9 @@ exports.updateAbujaAnc = (0, catchAsync_1.default)((req, res, next) => __awaiter
         status: true
     });
 }));
+=======
+const config_1 = __importDefault(require("../../config"));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 //get lab order by patient
 ///////////////////////////anc followup/////////////////////////
 const readAllancfollowupByAncv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,6 +173,10 @@ exports.readAllancfollowupByAncv3 = readAllancfollowupByAncv3;
 const createancfollowupsv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { anc } = req.params;
+<<<<<<< HEAD
+=======
+        console.log('anc', anc);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         const { firstName, lastName } = (req.user).user;
         req.body.staffname = `${firstName} ${lastName}`;
         var { heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname } = req.body;
@@ -174,7 +186,11 @@ const createancfollowupsv3 = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const ancrecord = yield (0, anc3_1.readoneanc)({ _id: anc }, {}, '');
         //console.log(admissionrecord);   
         if (!ancrecord) {
+<<<<<<< HEAD
             throw new Error(`ANC does not exist`);
+=======
+            throw new Error(`ANC donot ${config_1.default.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
         const queryresult = yield (0, ancfollowup3_1.createancfollowup)({ anc: ancrecord._id, heightoffundus, presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname });
         res.status(200).json({ queryresult, status: true });
@@ -229,6 +245,7 @@ const createancsv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { lmp, edd, gravidity, breasts, height, cvs, rs, pelvis, abdomen } = req.body;
         const pregnancysummary = { lmp, edd, gravidity };
         const generalexamination = { breasts, height, cvs, rs, pelvis, abdomen };
+<<<<<<< HEAD
         /////////// validation for anc followup /////////////////////////
         var { 
         //heightoffundus, 
@@ -237,11 +254,14 @@ const createancsv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             // heightoffundus, 
             presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname
         });
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         //frequency must inlcude
         //route must contain allowed options
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
+<<<<<<< HEAD
             throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, anc3_1.createanc)({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });
@@ -253,6 +273,11 @@ const createancsv3 = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             presentationandposition, presentingpart, foetalheight, bp, hb, protein, glucose, weight, oedema, tetanustoxoid, sulfadoxinepyrimethamine, albendazole, remark, staffname
         });
         ///////////////////end first  follow up/////////////////////////////////
+=======
+            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+        }
+        const queryresult = yield (0, anc3_1.createanc)({ patient: patientrecord._id, pregnancysummary, generalexamination, postmedicalorsurgicalhistory, previouspregnancy, historyofpresentpregnancy, staffname });
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         res.status(200).json({ queryresult, status: true });
     }
     catch (e) {

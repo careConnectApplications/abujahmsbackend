@@ -35,7 +35,11 @@ export async function countradiology(query:any) {
     }
     catch(err:any){
       console.log(err);
+<<<<<<< HEAD
           throw new Error("Failed to retrieve radiology test data");
+=======
+          throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
     

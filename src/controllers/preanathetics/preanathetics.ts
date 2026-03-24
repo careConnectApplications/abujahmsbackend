@@ -132,7 +132,11 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readonepreanathetics({_id:id},{},'');
       if(!findAdmission){
+<<<<<<< HEAD
         throw new Error(`Preanathetics Form does not  already exists`);
+=======
+        throw new Error(`Preanathetics Form donot  ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
     //const queryresult:any =await updatethearteadmission(id,{status});

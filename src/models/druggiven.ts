@@ -39,6 +39,7 @@ const druggivenSchema = new Schema({
 },
 { timestamps: true }
 );
+<<<<<<< HEAD
 
 // Single field indexes
 druggivenSchema.index({ anathesia: 1 }); // For looking up drugs given for a specific anesthesia
@@ -51,3 +52,7 @@ druggivenSchema.index({ anathesia: 1, timegiven: -1 }); // For finding recent dr
 
 const druggiven = model('Druggiven', druggivenSchema);
 export default druggiven;
+=======
+const druggiven = model('Druggiven', druggivenSchema);
+export default druggiven;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

@@ -531,7 +531,10 @@ const appointmentSchema = new mongoose_1.Schema({
     },
     firstName: String,
     lastName: String,
+<<<<<<< HEAD
     amount: Number,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     MRN: String,
     HMOId: String,
     HMOName: String,
@@ -639,6 +642,7 @@ appointmentSchema.index({ appointmenttype: 1 }); // Filter by type
 appointmentSchema.index({ status: 1 }); // Filter by status
 appointmentSchema.index({ createdAt: -1 }); // Sort by creation time
 appointmentSchema.index({ clinic: 1, status: 1 });
+<<<<<<< HEAD
 // Middleware to track status changes and set corresponding dates
 // Pre-save middleware (for new documents and .save() operations)
 appointmentSchema.pre('save', function (next) {
@@ -722,5 +726,7 @@ appointmentSchema.pre('updateOne', function (next) {
         next();
     });
 });
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const appointment = (0, mongoose_1.model)('Appointment', appointmentSchema);
 exports.default = appointment;

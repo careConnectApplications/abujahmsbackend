@@ -56,6 +56,33 @@ export var pharmacyorder= async (req:any, res:any) =>{
       //loop through all test and create record in lab order
       for(var i =0; i < products.length; i++){
         let {dosageform,strength,dosage,frequency,route,drug,pharmacy,prescriptionnote,duration} = products[i];
+<<<<<<< HEAD
+=======
+    //    console.log(testname[i]);
+        //var orderPrice:any = await readoneprice({servicetype:products[i], servicecategory: configuration.category[1],pharmacy});
+        /*
+        var orderPrice:any = await readoneprice({servicetype:drug, servicecategory: configuration.category[1],pharmacy});
+        
+        if(!orderPrice){
+          throw new Error(`${configuration.error.errornopriceset} ${products[i]}`);
+      }
+      if(orderPrice.qty <=0){
+        throw new Error(`${products[i]} ${configuration.error.erroravailability}`);
+
+      }
+        */
+      /*
+      var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment:Number(orderPrice.amount);
+      var createpaymentqueryresult =await createpayment({paymentreference:orderid,paymentype:products[i],paymentcategory:configuration.category[1],patient:patient._id,amount});
+      */
+      //create 
+     // console.log("got here");
+      //var prescriptionrecord:any = await createprescription({pharmacy, prescription:products[i],patient:patient._id,payment:createpaymentqueryresult._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid});
+   /*
+   appointmentdate:Date,
+   clinic:String,
+   */
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
       var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
       pharcyorderid.push(prescriptionrecord ._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -214,6 +241,7 @@ export const pharmacyorderwithoutconfirmation = async (req: any, res: any) => {
         amount,
       });
     }
+<<<<<<< HEAD
 
     // update patient prescriptions
     const queryresult = await updatepatient(patient._id, {
@@ -222,6 +250,33 @@ export const pharmacyorderwithoutconfirmation = async (req: any, res: any) => {
 
     res.status(200).json({ queryresult, status: true });
   } catch (error: any) {
+=======
+    var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+    let paymentreference; 
+    //validate the status
+      //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+      var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+      if(findAdmission){
+        paymentreference = findAdmission.admissionid;
+    
+    }
+    else{
+      paymentreference = orderid;
+    }
+   
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:drug,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+    //create 
+   // console.log("got here");
+    var prescriptionrecord:any = await createprescription({isHMOCover:patient?.isHMOCover,HMOPlan:patient?.HMOPlan,HMOName:patient?.HMOName,HMOId:patient?.HMOId,firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,qty,pharmacy,duration,dosageform,strength,dosage,frequency,route, prescription:drug,patient:patient._id,orderid,prescribersname:firstName + " " + lastName,prescriptionnote,appointment:appointment._id,appointmentid:appointment.appointmentid,appointmentdate:appointment?.appointmentdate,clinic:appointment?.clinic});
+    pharcyorderid.push(prescriptionrecord ._id);
+    paymentids.push(createpaymentqueryresult._id);
+    }
+    var queryresult=await updatepatient(patient._id,{$push: {prescription:pharcyorderid,payment:paymentids}});
+    res.status(200).json({queryresult, status: true});
+  }
+  
+  catch(error:any){
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     res.status(403).json({ status: false, msg: error.message });
   }
 };
@@ -535,6 +590,44 @@ export const confirmpharmacygrouporder = async (req: any, res: any) => {
   try {
     const { pharmacyrequest } = req.body;
     let queryresult;
+<<<<<<< HEAD
+=======
+    for(let i=0; pharmacyrequest.length > i; i++){
+      let {option,remark,qty,id} = pharmacyrequest[i];
+      if(option == true){
+        validateinputfaulsyvalue({qty});
+        }
+        var prescriptionresponse:any = await readoneprescription({_id:new ObjectId(id)},{},'patient','','');
+        const {prescription, orderid,patient,pharmacy} = prescriptionresponse;
+        var orderPrice:any = await readoneprice({servicetype:prescription, servicecategory: configuration.category[1],pharmacy});
+        
+        if(!orderPrice){
+          throw new Error(`${configuration.error.errornopriceset} ${prescription}`);
+      }
+      var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+      let paymentreference; 
+      //validate the status
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+        if(findAdmission){
+          paymentreference = findAdmission.admissionid;
+      
+      }
+      else{
+        paymentreference = orderid;
+      }
+      if(option == true){
+        var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+      queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+        await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+        
+      }
+      else{
+        queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
+    
+      }
+      
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     for (let i = 0; pharmacyrequest.length > i; i++) {
       const { option, remark, qty, id } = pharmacyrequest[i];
@@ -598,8 +691,52 @@ export const confirmpharmacygrouporder = async (req: any, res: any) => {
     })
     }
 
+<<<<<<< HEAD
     res.status(200).json({ queryresult, status: true });
   } catch (e: any) {
+=======
+}
+  */
+//validate quantity entered
+
+
+
+
+var amount =patient.isHMOCover == configuration.ishmo[1]?Number(orderPrice.amount) * configuration.hmodrugpayment * qty:Number(orderPrice.amount) * qty;
+let paymentreference; 
+//validate the status
+  //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+  var  findAdmission = await readoneadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
+  if(findAdmission){
+    paymentreference = findAdmission.admissionid;
+
+}
+else{
+  paymentreference = orderid;
+}
+  let queryresult;
+  if(option == true){
+    var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference,paymentype:prescription,paymentcategory:pharmacy,patient:patient._id,amount,qty});
+  queryresult= await updateprescription(id,{dispensestatus:configuration.status[10],payment:createpaymentqueryresult._id,remark,qty});
+    await updatepatient(patient._id,{$push: {payment:createpaymentqueryresult._id}});
+    
+  }
+  else{
+    queryresult= await updateprescription(id,{dispensestatus:configuration.status[13], remark});
+
+  }
+  res.status(200).json({queryresult, status: true});
+    //if accept
+//accept or reject lab order
+//var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+//paymentids.push(createpaymentqueryresult._id);
+//var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+//var testrecord = await createlab({payment:createpaymentqueryresult._id});
+//change status to 2 or  13 for reject
+
+  }
+  catch(e:any){
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     console.log("error", e);
     res.status(403).json({ status: false, msg: e.message });
   }

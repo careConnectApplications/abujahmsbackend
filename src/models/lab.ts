@@ -12,7 +12,11 @@ const testresultSchema = new Schema({
   nranges: String,
   unit: String
 });
+<<<<<<< HEAD
 const chemicalpathologyreportSchema = new Schema({
+=======
+const chemicalpathologyreportSchema=new Schema({
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   comment: String,
   reportedby: { type: String },
   status: String
@@ -66,10 +70,17 @@ const labSchema = new Schema({
     type: String,
     required: true
   },
+<<<<<<< HEAD
   testresult: [testresultSchema],
   chemicalpathologyreport: chemicalpathologyreportSchema,
   peripheralbloodfilmreport: peripheralbloodfilmreportSchema,
   ADHbonemarrowaspirationreport: ADHbonemarrowaspirationreportSchema,
+=======
+  testresult:[testresultSchema ],
+  chemicalpathologyreport:chemicalpathologyreportSchema,
+  peripheralbloodfilmreport:peripheralbloodfilmreportSchema,
+  ADHbonemarrowaspirationreport:ADHbonemarrowaspirationreportSchema,
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patientsmanagement",
@@ -98,15 +109,25 @@ const labSchema = new Schema({
   },
   raiseby: String,
   payment: {
+<<<<<<< HEAD
     type: Schema.Types.ObjectId,
     ref: "Payment",
     default: null,
   },
   labcategory: {
+=======
+      type: Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null,
+    },
+  labcategory:{
+    required: true,
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     type: String,
     default: "lab",
 
   },
+<<<<<<< HEAD
   sortby: String,
   note: String,
   priority: { type: String, enum: ["urgent", "routine"] },
@@ -119,6 +140,14 @@ const labSchema = new Schema({
   actualcost:Number,
   chemicalpathologyhemathologyreviewtstatus:{
 
+=======
+  sortby:String,
+  note: String,
+  priority:{type:String, enum: ["urgent", "routine"]},
+  sortbydate:Date,
+  amount: Number,
+  status:{
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     required: true,
     type: String,
     default: configuration.status[14],

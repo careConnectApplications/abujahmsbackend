@@ -1,7 +1,12 @@
 import * as path from 'path';
+<<<<<<< HEAD
 import client from 'prom-client';
 import cors from 'cors';
 import express, { Application,Request, Response, NextFunction } from 'express';
+=======
+import cors from 'cors';
+import express, { Application } from 'express';
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 import fileUpload from "express-fileupload";
 import httpStatus from "http-status";
 import { readicdeleven } from '../controllers/icdten/icdten';
@@ -37,14 +42,18 @@ import { protect } from "../utils/middleware";
 import histopathologyText from "../routes/histopathology-tests.route";
 import physiotherapyRoute from "../routes/phisiotherapy";
 import EyeModuleRoute from "../routes/eye-module.route";
+<<<<<<< HEAD
 import DoctorWardRoute from "../routes/doctor-ward-round.route";
 import Insuranceclaimsandauthorization from '../routes/insuranceauthorizationandclaims';
 import maternity from '../routes/maternity';
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 
 
 function createServer() {
   const app: Application = express();
+<<<<<<< HEAD
   // ✅ Collect default Node.js metrics (CPU, memory, event loop, GC, etc.)
 client.collectDefaultMetrics({ prefix: "node_" });
 
@@ -73,8 +82,21 @@ const memoryUsage = new client.Gauge({
   name: "process_resident_memory_bytes",
   help: "Resident memory size in bytes",
 });
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
+  if (process.env.NODE_ENV !== "test") {
+    app.use(morgan.successHandler);
+    app.use(morgan.errorHandler);
+  }
+  //cross origin sharing
+  app.use(cors({
+    origin: "*",
+  }));
+  app.use(express.static(__dirname + '/downloads'));
+  app.use(express.static(path.join(__dirname, 'uploads')));
 
+<<<<<<< HEAD
 setInterval(() => {
   const usage = process.cpuUsage();
   const memory = process.memoryUsage();
@@ -109,6 +131,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   app.use(express.static(__dirname + '/downloads'));
   app.use(express.static(path.join(__dirname, 'uploads')));
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   //middleware to process json
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true }));
@@ -120,6 +144,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       createParentPath: true,
   }));
   */
+<<<<<<< HEAD
 
   /****
    * Cron Jobs
@@ -132,6 +157,9 @@ app.get("/api/v1/metrics", async (req: Request, res: Response) => {
   res.set("Content-Type", client.register.contentType);
   res.end(await client.register.metrics());
 });
+=======
+  app.use(fileUpload());
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
@@ -164,9 +192,12 @@ app.get("/api/v1/metrics", async (req: Request, res: Response) => {
   app.use("/api/v1/dental", protect, dentalRoute)
   app.use("/api/v1/histopathology-test", protect, histopathologyText);
   app.use("/api/v1/eye-module", protect, EyeModuleRoute);
+<<<<<<< HEAD
   app.use("/api/v1/doctor-ward-round", protect, DoctorWardRoute);
   app.use("/api/v1/insuranceauthorizationandclaims", protect, Insuranceclaimsandauthorization);
   app.use("/api/v1/maternity", protect, maternity);
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
   // Handle POST requests to /webhook
   /*

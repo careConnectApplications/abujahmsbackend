@@ -13,8 +13,11 @@ import Nutrition from "../models/nutrition";
 import configuration from "../config";
 import Immunization from "../models/immunization";
 import Familyplanning from "../models/familyplanning";
+<<<<<<< HEAD
 import { ThirdStageLabour, SecondStageLabour, FirstStageLabour, MortalityRegister, BirthRegister } from "../models/maternity";
 import EyeModule from "../models/eye-module/eye-module.model";
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 export async function readpatientsmanagementaggregate(input:any) {
   try{
   return await Patientsmanagement.aggregate(input);
@@ -136,7 +139,11 @@ export async function readpaymentaggregate(input:any) {
                     }
                     catch(e:any){
                       console.log(e);
+<<<<<<< HEAD
                       throw new Error("Failed to update report");
+=======
+                      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
                     }
                     }
                     //immunization
@@ -147,7 +154,11 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
+<<<<<<< HEAD
                       throw new Error("Failed to update report");
+=======
+                      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
                   }
               }
               //family planning
@@ -158,6 +169,7 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
+<<<<<<< HEAD
                       throw new Error("Failed to update report");
                   }
               }
@@ -222,3 +234,8 @@ export async function readpaymentaggregate(input:any) {
                   throw new Error("Failed to update report");
                 }
               }
+=======
+                      throw new Error(configuration.error.erroruserupdate);
+                  }
+              }
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

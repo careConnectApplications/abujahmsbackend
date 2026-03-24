@@ -86,6 +86,7 @@ router.get('/getavailablebedsbyward/:wardid',getAvailableBedsByWard);
 router.get('/getallbeds',getallbeds);
 router.put('/softdeleterestorebed/:id',softDeleteBed);
 router.put('/updatebednumber/:id',updatebeds);
+<<<<<<< HEAD
 //getpriceofservice
 router.post('/getpriceofservice/:id',getpriceofservice);
 //hmo category route
@@ -93,6 +94,8 @@ router.post("/createhmocategorycover", createhmocategorycovercontroller);
 router.get("/getallhmocategorycover", getallhmocategorycovercontroller);
 router.put("/updatehmocategorycover/:_id", updatehmocategorycovercontroller);
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
 
 

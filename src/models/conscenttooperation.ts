@@ -6,6 +6,7 @@ const conscenttooperationSchema = new Schema({
         type: String,
         required: true,
     },
+<<<<<<< HEAD
     filename: String,
     nameofrepresentive:
     {
@@ -27,6 +28,23 @@ const conscenttooperationSchema = new Schema({
         default: null,
     },
 
+=======
+    addressofrepresentaive:{
+        type: String,
+        required: true,
+    },
+    fullnameofwitness:{
+        type: String,
+        required: true,
+    },
+   conscentdate: Date,
+   theatreadmission: {
+       type: Schema.Types.ObjectId,
+       ref: "Theatreadmission",
+       default: null,
+     },
+ 
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 },
     { timestamps: true }
 );

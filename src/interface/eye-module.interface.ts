@@ -140,6 +140,7 @@ export interface OphthalmologyExamination {
 }
 
 export enum OperationalTestType {
+<<<<<<< HEAD
     CVF = 'CVF',
     OCT = 'OCT',
     FundusPhotograph = 'FundusPhotograph',
@@ -201,4 +202,44 @@ export interface IEyeModel extends Model<IEyeModuleDoc> {
         filter: Record<string, any>,
         options: Record<string, any>
     ): Promise<QueryResult>;
+=======
+  CVF = 'CVF',
+  OCT = 'OCT',
+  FundusPhotograph = 'FundusPhotograph',
+  FFA = 'FFA'
+}
+
+export interface OphthalmologyOperationalTest {
+  resultType: OperationalTestType;
+  fileUrl: string;
+  uploadedAt?: Date;
+  uploadedBy: string;
+}
+
+export interface IEyeModule {
+  patient: string | mongoose.Types.ObjectId;
+  ref?: string;
+  appointment?: string | mongoose.Types.ObjectId | null;
+  appointmentid: string;
+  createdBy?: string | mongoose.Types.ObjectId | null;
+  updatedBy?: string | mongoose.Types.ObjectId | null;
+  status: string;
+  optometryLensPrescription?: OptometryLensPrescription | null;
+  preliminaryTest?: PreliminaryTest | null;
+  examination?: OphthalmologyExamination | null;
+  operationalTest?: OphthalmologyOperationalTest[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IEyeModuleDoc extends IEyeModule, Document {
+  _id: string;
+}
+
+export interface IEyeModel extends Model<IEyeModuleDoc> {
+  paginate(
+    filter: Record<string, any>,
+    options: Record<string, any>
+  ): Promise<QueryResult>;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 }

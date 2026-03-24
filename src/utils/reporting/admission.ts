@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 import status from "http-status";
 import configuration from "../../config";
 export const admissionaggregatereports=(startdate:any,enddate:any)=>{
@@ -90,6 +91,10 @@ const inpatientrecordspipeline = [
         },
       },
     ];
+=======
+import configuration from "../../config";
+export const admissionaggregatereports=(startdate:any,enddate:any)=>{
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 const admissionaggregateadmited = [
       {
@@ -220,11 +225,16 @@ const admissionaggregateadmited = [
           TotalNumberofadmission:1,
           _id:0
 
+<<<<<<< HEAD
        }
+=======
+        }
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
       }
         
     ];
+<<<<<<< HEAD
     return {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions,inpatientrecordspipeline}
 }
 
@@ -239,3 +249,7 @@ const admissionaggregateadmited = [
 
 
 
+=======
+    return {admissionaggregateadmited,admissionaggregatetransfered,admissionaggregatedischarged,admissionaggregatetotalnumberofadmissions}
+}
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

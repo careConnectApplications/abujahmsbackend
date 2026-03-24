@@ -29,7 +29,11 @@ function readallanaethesias(query, selectquery) {
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to retrieve anaesthesia data");
+=======
+            throw new Error(config_1.default.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -43,7 +47,11 @@ function createanaethesia(input) {
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to create anaesthesia");
+=======
+            throw new Error(config_1.default.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -55,7 +63,11 @@ function readoneanaethesia(query, selectquery, populatequery, populatequerysecon
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to retrieve anaesthesia data");
+=======
+            throw new Error(config_1.default.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -74,7 +86,11 @@ function updateanaethesia(id, reqbody) {
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to update anaesthesia");
+=======
+            throw new Error(config_1.default.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }
@@ -93,7 +109,11 @@ function updateanaethesiaquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
+<<<<<<< HEAD
             throw new Error("Failed to update anaesthesia");
+=======
+            throw new Error(config_1.default.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }
     });
 }

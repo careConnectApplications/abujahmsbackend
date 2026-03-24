@@ -7,6 +7,7 @@ import nodemailer from "nodemailer";
 import * as path from 'path';
 import configuration from "../config";
 import { readonepatient } from '../dao/patientmanagement';
+<<<<<<< HEAD
 import {readoneadmission} from "../dao/admissions";
 const { v4: uuidv4 } = require('uuid');
 export function removeEmpty(obj:any) {
@@ -17,6 +18,9 @@ export function removeEmpty(obj:any) {
   }
   return obj;
 }
+=======
+const { v4: uuidv4 } = require('uuid');
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 export var encrypt = async function (password: any) {
   try {
@@ -234,13 +238,18 @@ export function parseDate(input: string): Date | null {
 }
 
 export function isValidPhoneNumber(phoneNumber: string): boolean {
+<<<<<<< HEAD
   if (!phoneNumber ) {
+=======
+  if (!phoneNumber || typeof phoneNumber === 'string') {
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     return false;
   }
 
   const phoneNumberRegex = /^(\+?234|0)(70|80|81|90|91)\d{8}$/;
 
   return phoneNumberRegex.test(phoneNumber);
+<<<<<<< HEAD
 }
 
 export function calculateAmountPaidByHMO(hmoCoveragePercentage: number, totalAmount: number): number {
@@ -256,4 +265,6 @@ export async function getPaymentReference(patientId: string, fallbackId: string)
     ""
   );
   return admission ? admission.admissionid : fallbackId;
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 }

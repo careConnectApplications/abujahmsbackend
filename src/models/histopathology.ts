@@ -3,6 +3,7 @@ import configuration from "../config";
 import { IHistopathologyDoc, IHistopathologyModel } from "../interface/histopathology.interface";
 import { paginate } from "../paginate";
 
+<<<<<<< HEAD
 const consentFormSchema = new Schema({
     nameofexplainer: {
         type: String,
@@ -34,6 +35,8 @@ const consentFormSchema = new Schema({
     },
 }, { timestamps: true });
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel>(
     {
         patient: {
@@ -65,8 +68,11 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             type: Number,
             min: [0, "Amount cannot be negative"],
         },
+<<<<<<< HEAD
         hmopercentagecover:Number,
         actualcost:Number,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         paymentStatus: {
             type: String,
             default: configuration.status[2],
@@ -76,7 +82,10 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
             type: String,
             default: configuration.status[5],
         },
+<<<<<<< HEAD
         refNumber:String,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         testRequired: [{
             name: { type: String, required: true, trim: true },
             PaymentRef: {
@@ -84,7 +93,10 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 ref: "Payment",
                 default: null
             },
+<<<<<<< HEAD
             amount: { type: Number, min: [0, "Amount cannot be negative"] },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             paymentStatus: { type: String, default: configuration.status[5] }
         }],
         diagnosisForm: {
@@ -112,10 +124,38 @@ const histopathologySchema = new Schema<IHistopathologyDoc, IHistopathologyModel
                 default: null
             }
         },
+<<<<<<< HEAD
         consentForm: {
             type: consentFormSchema,
             default: true,
         },
+=======
+        // LabUse: {
+        //     DateReceived: {
+        //         type: Date,
+        //         default: Date.now
+        //     },
+        //     DateInspected: {
+        //         type: Date,
+        //     },
+        //     DateGrossed: {
+        //         type: Date,
+        //     },
+        //     DatePassed: {
+        //         type: Date,
+        //     },
+        //     NumberOfBlocks: {
+        //         type: Number
+        //     },
+        //     Action: { type: String, trim: true },
+        //     DateRequested: {
+        //         type: Date,
+        //     },
+        //     DateReported: {
+        //         type: Date,
+        //     },
+        // }
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     },
     {
         timestamps: true,
@@ -138,6 +178,7 @@ histopathologySchema.pre<IHistopathologyDoc>(/^find/, function (next) {
 
 histopathologySchema.plugin(paginate as any);
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 // Single field indexes
 histopathologySchema.index({ patient: 1 });
@@ -155,3 +196,7 @@ histopathologySchema.index({ paymentStatus: 1, status: 1 });
 
 const Histopathology = mongoose.model<IHistopathologyDoc, IHistopathologyModel>("Histopathology", histopathologySchema);
 export default Histopathology;
+=======
+const Histopathology = mongoose.model<IHistopathologyDoc, IHistopathologyModel>("Histopathology", histopathologySchema);
+export default Histopathology;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

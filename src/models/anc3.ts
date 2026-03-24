@@ -67,11 +67,14 @@ const anc3Schema = new Schema({
     ref: "Users",
     default: null,
   },
+<<<<<<< HEAD
   updatedBy: {
     type: Schema.Types.ObjectId,
     ref: "Users",
     default: null,
   },
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   ancfollowup: [
     {
       type: Schema.Types.ObjectId,
@@ -82,6 +85,7 @@ const anc3Schema = new Schema({
 
 }, { timestamps: true })
 
+<<<<<<< HEAD
 // Add indexes for performance optimization
 // Single field indexes
 anc3Schema.index({ patient: 1 });
@@ -95,5 +99,7 @@ anc3Schema.index({ createdAt: -1 });
 anc3Schema.index({ patient: 1, createdAt: -1 });
 anc3Schema.index({ patient: 1, 'bookingInformation.edd': 1 });
 
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const anc3 = model('Anc3', anc3Schema);
 export default anc3;

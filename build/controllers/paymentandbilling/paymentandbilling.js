@@ -344,6 +344,107 @@ function groupreadallpaymentoptimized(req, res) {
                     MRN: 1,
                 },
             });
+<<<<<<< HEAD
+=======
+            // Lookup patient
+            /*
+             statusfilter.status==configuration.status[2] && pipeline.push({
+              $lookup: {
+                from: 'patientsmanagements',
+                localField: 'patient',
+                foreignField: '_id',
+                as: 'patient',
+              },
+            });
+            */
+            //statusfilter.status==configuration.status[2] && pipeline.push({ $unwind: { path: "$patient", preserveNullAndEmptyArrays: true } });
+            // Build patient match condition dynamically
+            /*
+            const patientMatch:any = {};
+            
+            if (firstName && statusfilter.status==configuration.status[2]) patientMatch['patient.firstName'] = new RegExp(`^${firstName}`, 'i');
+            if (lastName && statusfilter.status==configuration.status[2]) patientMatch['patient.lastName'] = new RegExp(`^${lastName}`, 'i');
+            if (MRN && statusfilter.status==configuration.status[2]) patientMatch['patient.MRN'] = new RegExp(`^${MRN}`, 'i');
+            if (HMOId && statusfilter.status==configuration.status[2]) patientMatch['patient.HMOId'] = new RegExp(`^${HMOId}`, 'i');
+            if (phoneNumber && statusfilter.status==configuration.status[2]) patientMatch['patient.phoneNumber'] = new RegExp(`^${phoneNumber}`, 'i');
+            
+            if (Object.keys(patientMatch).length > 0) {
+              pipeline.push({ $match: patientMatch });
+            }
+              */
+            // Grouping
+            /*
+            statusfilter.status==configuration.status[2]?pipeline.push({
+              $group: {
+                _id: "$paymentreference",
+                paymentreference: { $first: "$paymentreference" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                amount: { $sum: "$amount" },
+                firstName: { $first: "$patient.firstName" },
+                phoneNumber: { $first: "$patient.phoneNumber" },
+                lastName: { $first: "$patient.lastName" },
+                MRN: { $first: "$patient.MRN" },
+                isHMOCover: { $first: "$patient.isHMOCover" },
+                HMOName: { $first: "$patient.HMOName" },
+                HMOId: { $first: "$patient.HMOId" },
+                HMOPlan: { $first: "$patient.HMOPlan" },
+              },
+            }):pipeline.push({
+              $group: {
+                _id: "$paymentreference",
+                paymentreference: { $first: "$paymentreference" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                amount: { $sum: "$amount" },
+               // firstName: { $first: "$patient.firstName" },
+                //phoneNumber: { $first: "$patient.phoneNumber" },
+                //lastName: { $first: "$patient.lastName" },
+                //MRN: { $first: "$patient.MRN" },
+                //isHMOCover: { $first: "$patient.isHMOCover" },
+                //HMOName: { $first: "$patient.HMOName" },
+                //HMOId: { $first: "$patient.HMOId" },
+                //HMOPlan: { $first: "$patient.HMOPlan" },
+              },
+            });
+            
+            
+            // Projection
+            statusfilter.status==configuration.status[2]?pipeline.push({
+              $project: {
+                _id: 0,
+                paymentreference: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                amount: 1,
+                firstName: 1,
+                phoneNumber: 1,
+                lastName: 1,
+                MRN: 1,
+                isHMOCover: 1,
+                HMOName: 1,
+                HMOId: 1,
+                HMOPlan: 1,
+              },
+            }):pipeline.push({
+              $project: {
+                _id: 0,
+                paymentreference: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                amount: 1,
+              //  firstName: 1,
+               // phoneNumber: 1,
+               // lastName: 1,
+                //MRN: 1,
+                //isHMOCover: 1,
+                //HMOName: 1,
+                //HMOId: 1,
+                //HMOPlan: 1,
+              },
+            });
+            */
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             // Sorting
             pipeline.push({ $sort: { createdAt: -1 } });
             const queryresult = yield (0, payment_1.readpaymentaggregateoptimized)(pipeline, page, size);

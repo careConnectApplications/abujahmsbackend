@@ -1,7 +1,10 @@
 import express from "express";
 import {
     createExamination,
+<<<<<<< HEAD
     createEyeConsultation,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     createLensPrescription,
     createOperationalNotes,
     createPreliminaryTest,
@@ -11,7 +14,10 @@ import {
     getEyeRecordById,
     getEyeRecordByPatientId,
     updateExamination,
+<<<<<<< HEAD
     updateEyeConsultation,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     updateLensPrescription,
     updateOperationalTest,
     updatePreliminaryTest
@@ -32,7 +38,10 @@ router.patch("/lens-prescription/:eyeModuleId", updateLensPrescription);
 router.patch("/preliminary-test/:eyeModuleId", updatePreliminaryTest);
 router.patch("/examination/:eyeModuleId", updateExamination);
 router.patch("/operational-notes/:eyeModuleId", updateOperationalTest);
+<<<<<<< HEAD
 router.post("/eye-consultation", createEyeConsultation);
 router.put("/eye-consultation/:eyeModuleId", updateEyeConsultation);
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 export default router;

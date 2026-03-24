@@ -21,7 +21,11 @@ validateinputfaulsyvalue({theatreadmission,score,timeofdischarge,treatmentgiveni
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
+<<<<<<< HEAD
     throw new Error(`Theatre Admission already exists`);
+=======
+    throw new Error(`Theatre Admission ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 }
 //const queryresult:any =await updatethearteadmission(id,{status});
@@ -69,7 +73,11 @@ catch(e:any){
     //validate theatre admission
       var  findAdmission = await readonepostanaetheticrecoverychart({_id:id},{},'','');
       if(!findAdmission){
+<<<<<<< HEAD
         throw new Error(`Postanaetheticrecoverychart Form already exists`);
+=======
+        throw new Error(`Postanaetheticrecoverychart Form ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     }
     //const queryresult:any =await updatethearteaadmission(id,{status});
@@ -125,7 +133,11 @@ catch(e:any){
           
           var  findpostanaetheticrecoverychart = await readonepostanaetheticrecoverychart({_id:postanaetheticrecoverychart},{},'','');
           if(!findpostanaetheticrecoverychart){
+<<<<<<< HEAD
             throw new Error(`Postanaetheticrecoverychart form already exists`);
+=======
+            throw new Error(`Postanaetheticrecoverychart form ${configuration.error.erroralreadyexit}`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
         }
         const queryresult=await createvitalsignscore({ staffname,postanatheticrecoverychart:findpostanaetheticrecoverychart._id,consciousness,ventilation,movement,total,bp,pulserate,respiration,color,temperature,time,});

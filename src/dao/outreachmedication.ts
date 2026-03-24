@@ -9,7 +9,11 @@ import configuration from "../config";
       return { outreachmedicationdetails, totaloutreachmedicationdetails };
     } catch (err) {
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve outreach medication data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
   };
   export async function createoutreachmedication(input:any){
@@ -20,7 +24,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to create outreach medication");
+=======
+      throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -31,7 +39,11 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to retrieve outreach medication data");
+=======
+      throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
   }
@@ -51,7 +63,11 @@ import configuration from "../config";
       return outreachmedication;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update outreach medication");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 
@@ -69,7 +85,11 @@ import configuration from "../config";
       return outreachmedication;
     }catch(err){
       console.log(err);
+<<<<<<< HEAD
       throw new Error("Failed to update outreach medication");
+=======
+      throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
 

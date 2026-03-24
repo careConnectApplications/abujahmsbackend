@@ -1,5 +1,6 @@
 import { readallclinics } from "./dao/clinics";
 import { readallservicetype } from "./dao/servicetype";
+<<<<<<< HEAD
 import * as maternityModules from "./config/maternity-modules";
 const configuration: any = {
   //clinic name
@@ -69,6 +70,11 @@ const configuration: any = {
         "Other"
   ],
   referencecategory:['lab','radiology','procedure','pharmacy','histopathology'],
+=======
+const configuration: any = {
+  //clinic name
+  //wardname
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   bedstatus:['vacant', 'occupied'],
   treatmentPlan:['Urgent', 'Routine', 'Elective'],
   intraOral:['Swollen Gum', 'Recession', 'Tenderness', 'Hyperemic Gum', 'Periodontal Pockets'],
@@ -79,7 +85,11 @@ const configuration: any = {
   typeofimplants: ["Implanon(IMP)", "Jadelle(JD)", "Others"],
   typeofbarriermethods: ["Internal Condom", "External Condom", "Spermicide", "Sponge", "Diaphragm", "Cervical Cap"],
   familyplanningyesnooption: ["Yes", "No"],
+<<<<<<< HEAD
   labcategory:["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology", "medical", "non - medical"],
+=======
+  labcategory:["hematology", "chemicalpathology"],
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   labreporttypehematologychemicalpathology:["peripheralbloodfilmreport","ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
   gender:["Male", "Female"],
   pricingtype: ["Standard", "Age and Clinic Aware"],
@@ -134,14 +144,21 @@ const configuration: any = {
     "hand bulb nebulizer", "intra-articular", "intrabursal", "intra-cavernosal", "intradermal", "Infiltration", "irrigation", "inhalation", "Intracardiac", "intrapleural", "IM"],
   defaultphonenumber: "11111111111",
   status: ["inactive", "active", "pending payment", "paid", "pending vitals", "scheduled", "complete", "processed", "pending vital", "inprogress", "pending", "new", "accept", "reject", "awaiting confirmation", "achieved"],
+<<<<<<< HEAD
   otherstatus:["awaiting authorization"],
   doctorassigment:["unassigned", "assigned"],
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   hematologyandchemicalpathologystatus:["hemathologyscheduled","chemicalpathologyscheduled","hemathologyprocessed","chemicalpathologyprocessed"],
   admissionstatus: ["toadmit", "admited", "totransfer", "transfered", "todischarge", "discharged"],
   servedstatus: ["served", "unserved"],
   clinictype: ["department", "clinic", "pharmacy", "radiology", "procedure"],
   defaultPassword: "HMSB",
+<<<<<<< HEAD
   category: ["Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure", "Histopathology","Eye Appointment","Annual-Subscription","Card-Fee","Bed-Fee"],
+=======
+  category: ["Appointment","Eye Appointment", "Pharmacy", "Lab", "Patient Registration", "Radiology", "Procedure", "Histopathology"],
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   ishmo: ["No", "Yes"],
   settings: async function () {
     const { clinicdetails } = await readallclinics({}, { "clinic": 1, "id": 1, "_id": 0 });
@@ -160,6 +177,7 @@ const configuration: any = {
 
     return (
       {
+<<<<<<< HEAD
         accidentType: configuration.accidentType,
         proceduretype:configuration.proceduretype,
         encounterplanoutcome:configuration.encounterplanoutcome,
@@ -200,6 +218,8 @@ const configuration: any = {
         arrivalMode: configuration.arrivalMode,
         cliniccategory:configuration.cliniccategory,
         referencecategory:configuration.referencecategory,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         treatmentPlan:configuration.treatmentPlan,
         intraOral:configuration.intraOral,
         tmjAssessment:configuration.tmjAssessment,
@@ -1200,6 +1220,7 @@ const configuration: any = {
   useruploaddirectory: "uploads",
   userdownloadsdirectory: "downloads",
   error: {
+<<<<<<< HEAD
     errorelevendigit: "Phone number must be exactly 11 digits.",
     erroruserread: "Failed to retrieve user data.",
     errorauthorizehmo: "You cannot create an insurance patient from this service.",
@@ -1247,11 +1268,56 @@ const configuration: any = {
     errorfailedtocreate: "Failed to create",
     errorfailedtoupdate: "Failed to update",
     errornotfoundgeneric: "Record not found."
+=======
+    errorelevendigit: "Phone must be 11 digit",
+    erroruserread: "Error in reading user",
+    errorauthorizehmo: "You cant create Insurance Patient from this service",
+    errorgeneral: "Error in",
+    errorrecordnotfound: "Record not found ",
+    errorusercreate: "Error in creating user",
+    errordownload: "Error downloading the file",
+    errorinvalidcredentials: "Invalid credentials",
+    erroruserupdate: "Error in updating users",
+    errornoemailpassword: "Please Provide Email and Password",
+    errorinvaliduser: "invalid credentials",
+    errordeactivate: "You have been Deactivated",
+    errorpasswordmismatch: "Wrong Password Detected",
+    erroralreadyexit: "already exist",
+    errorvacantspace: "has no vancant bed",
+    errorencryptingpassword: "Error in encrypting Password",
+    errorvalidatingpassword: "Error in Validating Password",
+    errorfilextension: "File extension not allowed",
+    errorfilelarge: "File should not be greater than 500kb",
+    errorfileupload: "Error in uploading file",
+    errorisrequired: "is required",
+    erroroption: "value selected is not part of the available options",
+    errorservicecategory: "service category does not exist in the list of accepted categories",
+    errornopriceset: "No Price has been set for this service",
+    erroravailability: "Is out of stock",
+    protectroutes: "Authorization error: You are not an authorise user in this application",
+    errormustbenumber: "must be a number",
+    errornotfound: "not found",
+    errortasknotpending: "Task not pending on you",
+    errorpayment: "This service has not been paid for",
+    errorreferrer: "You are not the preferred consultant for this referrer",
+    errorgreaterthan: "Cannot be greater",
+    errorbase64: "Missing imageBase64",
+    errorservicetray: "This service donot exist in your service tray",
+    errorInvalidObjectId: "Invalid Object Id",
+    errorMustBeAnArray: "Exam types are required and must be an array!",
+    errorIdIsRequired: "Id not found in params!",
+    errorPatientIdIsRequired: "Patient Id is required!",
+    errorNotValidPhoneNumber: "not a valid phone number!"
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   },
   validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
   environment: "test",
 
+<<<<<<< HEAD
 //  environment: "prod",
+=======
+  //environment: "prod",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 }
 export default configuration;

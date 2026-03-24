@@ -43,7 +43,11 @@ export const createEyeModule = catchAsync(async (req: Request | any, res: Respon
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
+<<<<<<< HEAD
         return next(new ApiError(404, `Patient do not already exists`));
+=======
+        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     const newEyeModule = {
         patient: patientId,
@@ -74,12 +78,20 @@ export const createLensPrescription = catchAsync(async (req: Request | any, res:
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
+<<<<<<< HEAD
         return next(new ApiError(404, `Patient do not already exists`));
+=======
+        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     const foundAppointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
     if (!foundAppointment) {
+<<<<<<< HEAD
         return next(new ApiError(404, `appointment do not already exists`));
+=======
+        return next(new ApiError(404, `appointment do not ${configuration.error.erroralreadyexit}`));
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     /// first check if eye module instance aleady exist if not create one
@@ -349,7 +361,11 @@ export const createExamination = catchAsync(async (req: Request | any, res: Resp
 
     res.status(201).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Ophthalmology examination saved successfully",
+=======
+        message: "Ophthalmology examination saved successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         eyeDoc
     });
 
@@ -533,7 +549,11 @@ export const createPreliminaryTest = catchAsync(async (req: Request | any, res: 
 
     res.status(201).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Preliminary test recorded successfully",
+=======
+        message: "Preliminary test recorded successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: eyeDoc
     });
 });
@@ -543,7 +563,10 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
     const { patientId, appointmentId } = req.params;
 
     const files = req.files as any;
+<<<<<<< HEAD
     const { observationalNotes } = req.body;
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     const { _id: userId } = (req.user).user;
 
@@ -634,8 +657,12 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
             $push: {
                 operationalTest: { $each: uploadedTests }
             },
+<<<<<<< HEAD
             updatedBy: userId,
             observationalNotes: observationalNotes,
+=======
+            updatedBy: userId
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         }, next);
 
     } else {
@@ -647,7 +674,10 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
             appointment: _appointmentId,
             appointmentid: foundAppointment.appointmentid,
             operationalTest: uploadedTests,
+<<<<<<< HEAD
             observationalNotes: observationalNotes,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             createdBy: userId,
             updatedBy: userId
         });
@@ -659,7 +689,11 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
 
     res.status(201).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Operational notes and files uploaded successfully",
+=======
+        message: "Operational notes and files uploaded successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: updatedDoc
     });
 });
@@ -696,7 +730,11 @@ export const getEyeRecordByAppointmentIdAndPatientId = catchAsync(async (req: Re
 
     res.status(200).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Eye record fetched successfully",
+=======
+        message: "Eye record fetched successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: doc
     });
 });
@@ -720,7 +758,11 @@ export const getEyeRecordById = catchAsync(async (req: Request, res: Response, n
 
     res.status(200).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Eye record fetched successfully",
+=======
+        message: "Eye record fetched successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: doc
     });
 });
@@ -733,7 +775,11 @@ export const getAllEyeRecords = catchAsync(async (req: Request | any, res: Respo
 
     res.status(200).json({
         status: "success",
+<<<<<<< HEAD
         msg: "all Eye record fetched successfully",
+=======
+        message: "all Eye record fetched successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: doc
     });
 });
@@ -741,7 +787,11 @@ export const getAllEyeRecords = catchAsync(async (req: Request | any, res: Respo
 export const getAllEyeUtilData = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     res.status(200).json({
         status: "success",
+<<<<<<< HEAD
         msg: "eye module config",
+=======
+        message: "eye module config",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
         data: {
             OperationalNotesFileName, LensTint, lensType, slitLamp, opthalmoscopy, refraction
         }
@@ -820,7 +870,11 @@ export const updateLensPrescription = catchAsync(
 
         res.status(200).json({
             status: "success",
+<<<<<<< HEAD
             msg: "Lens prescription updated successfully",
+=======
+            message: "Lens prescription updated successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             data: updatedDoc
         });
     }
@@ -958,7 +1012,11 @@ export const updatePreliminaryTest = catchAsync(
 
         res.status(200).json({
             status: "success",
+<<<<<<< HEAD
             msg: "Preliminary test updated successfully",
+=======
+            message: "Preliminary test updated successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             data: updatedDoc
         });
     }
@@ -1113,7 +1171,11 @@ export const updateExamination = catchAsync(
 
         res.status(200).json({
             status: "success",
+<<<<<<< HEAD
             msg: "Examination updated successfully",
+=======
+            message: "Examination updated successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             data: updatedDoc
         });
     }
@@ -1124,7 +1186,10 @@ export const updateOperationalTest = catchAsync(
         const { eyeModuleId } = req.params;
         const files = req.files as any;
         const { _id: userId } = (req.user).user;
+<<<<<<< HEAD
         const { observationalNotes } = req.body;
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
         if (!mongoose.Types.ObjectId.isValid(eyeModuleId)) {
             return next(new ApiError(400, "Invalid EyeModule ID"));
@@ -1166,7 +1231,11 @@ export const updateOperationalTest = catchAsync(
 
         const updatedDoc = await updateEyeModule(
             eyeModuleId,
+<<<<<<< HEAD
             { operationalTest: uploadedTests, observationalNotes: observationalNotes, updatedBy: userId },
+=======
+            { operationalTest: uploadedTests, updatedBy: userId },
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             next
         );
 
@@ -1176,7 +1245,11 @@ export const updateOperationalTest = catchAsync(
 
         res.status(200).json({
             status: "success",
+<<<<<<< HEAD
             msg: "Operational tests updated successfully",
+=======
+            message: "Operational tests updated successfully",
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
             data: updatedDoc
         });
     });
@@ -1206,6 +1279,7 @@ export const getEyeRecordByPatientId = catchAsync(async (req: Request, res: Resp
 
     res.status(200).json({
         status: "success",
+<<<<<<< HEAD
         msg: "Eye record fetched successfully",
         data: doc
     });
@@ -1371,3 +1445,9 @@ export const updateEyeConsultation = catchAsync(
         });
     }
 );
+=======
+        message: "Eye record fetched successfully",
+        data: doc
+    });
+});
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

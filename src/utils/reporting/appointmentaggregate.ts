@@ -1,5 +1,6 @@
 import configuration from "../../config";
 export const appointmentaggregatereports=(startdate:any,enddate:any)=>{
+<<<<<<< HEAD
 const outpatientdepartmentpipeline = [
   
     {
@@ -59,6 +60,8 @@ const outpatientdepartmentpipeline = [
   ];
 
   
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 const appointmentaggregatescheduled = [
       {   
       
@@ -67,7 +70,11 @@ const appointmentaggregatescheduled = [
 
 },
       {
+<<<<<<< HEAD
        $group: {
+=======
+        $group: {
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
           _id: "$clinic",                // Group by product
           Numberofappointment: { $sum: 1 },
         }
@@ -182,6 +189,7 @@ const appointmentaggregatescheduled = [
           }
             
         ];
+<<<<<<< HEAD
     const accidentEmergencyRecordsPipeline = [
       {
         $match: {
@@ -266,3 +274,8 @@ const appointmentaggregatescheduled = [
 }
     
 
+=======
+    return {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate}
+}
+    
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

@@ -4,20 +4,28 @@ import { updateappointmentbyquery } from "../../dao/appointment";
 import { updatepatientbyanyquery, readonepatient } from "../../dao/patientmanagement";
 import { updatelabbyquery } from "../../dao/lab";
 import configuration from "../../config";
+<<<<<<< HEAD
 import { validateinputfaulsyvalue, calculateAmountPaidByHMO } from "../../utils/otherservices";
+=======
+import { validateinputfaulsyvalue } from "../../utils/otherservices";
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 import catchAsync from "../../utils/catchAsync";
 import mongoose from "mongoose";
 import { ApiError } from "../../errors";
 import { readoneprice } from "../../dao/price";
 import { v4 as uuidv4 } from 'uuid';
+<<<<<<< HEAD
 import { createInsuranceClaim } from "../../dao/insuranceclaim";
 import { readonehmomanagement } from "../../dao/hmomanagement";
 import { readonehmocategorycover } from "../../dao/hmocategorycover";
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
 const generatePaymentNumber = () => {
   const uniqueId = uuidv4();
   return `Billing-${new Date().getFullYear()}-${uniqueId}`;
 }
+<<<<<<< HEAD
 export const payAnnualSubscription = catchAsync(async (req: Request | any, res: Response) => {
     const { patientId } = req.body;
     const { _id: userId } = (req.user).user;
@@ -108,6 +116,9 @@ export const payAnnualSubscription = catchAsync(async (req: Request | any, res: 
       status: true 
     });
 });
+=======
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 ///deactivate a user
 //show total for each login cashier
 export const getCashierTotal = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
@@ -137,11 +148,17 @@ export const getCashierTotal = catchAsync(async (req: Request | any, res: Respon
 //cashieremail:email,cashierid:staffId
 //confirm payment
 export async function confirmgrouppayment(req: any, res: any) {
+<<<<<<< HEAD
     try {
+=======
+  //console.log(req.user);
+  try {
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     const { paymentreferenceid } = req.params;
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
     const { paymentdetails } = response;
+<<<<<<< HEAD
     if (!paymentdetails || paymentdetails.length === 0) throw new Error("no paymentfound for this service");
     for (var i = 0; i < paymentdetails.length; i++) {
     
@@ -183,6 +200,42 @@ export async function confirmgrouppayment(req: any, res: any) {
         await updatepatientbyanyquery({_id:patient}, { subscriptionPaidUntil: nextYear, subscriptionExpired:false });
       }
 
+=======
+    console.log('before', paymentdetails);
+    console.log('length', paymentdetails.length);
+
+    for (var i = 0; i < paymentdetails.length; i++) {
+      console.log('paymentdetails', paymentdetails[i])
+      let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
+
+      //const {patient} = paymentdetails[i];
+      const patientrecord = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
+      console.log('patient', patientrecord);
+      if (!patientrecord && paymentcategory !== configuration.category[3]) {
+        console.log('true');
+        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+
+      }
+      //var settings =await  configuration.settings();
+      const status = configuration.status[3];
+      const { email, staffId, firstName, lastName } = (req.user).user;
+      var cashiername = `${firstName} ${lastName}`;
+      const queryresult: any = await updatepayment(_id, { status, cashieremail: email, cashiername, cashierid: staffId });
+      //const {paymentype,paymentcategory,paymentreference} = queryresult;
+      //for patient registration
+      if (paymentcategory == configuration.category[3]) {
+        //update patient registration status
+        await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1], paymentstatus: status, paymentreference });
+      }
+
+
+      //for lab test
+      else if (paymentcategory == configuration.category[2]) {
+        //update lab test
+        await updatelabbyquery({ payment: _id }, { status: configuration.status[5] })
+      }
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
 
     res.status(200).json({
@@ -440,6 +493,7 @@ export async function confirmpayment(req: any, res: any) {
     const { id } = req.params;
     //check for null of id
     const response: any = await readonepayment({ _id: id });
+<<<<<<< HEAD
     if (!response) throw new Error("no payment found for this service");
     const { patient,paymentcategory, paymentreference } = response;
     const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
@@ -447,6 +501,13 @@ export async function confirmpayment(req: any, res: any) {
      let subscriptionfeePaid;
     if (!patientrecord && paymentcategory !== configuration.category[9]) {
       throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for card`);
+=======
+    const { patient } = response;
+    const patientrecord = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
+    console.log('patient', patientrecord);
+    if (!patientrecord && response.paymentcategory !== configuration.category[3]) {
+      throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     }
     
@@ -458,21 +519,33 @@ export async function confirmpayment(req: any, res: any) {
     const queryresult: any = await updatepayment(id, { status, cashieremail: email, cashierid: staffId });
     //const queryresult:any =await updatepayment(id,{status});
     //confirm payment of the service paid for 
+<<<<<<< HEAD
 
     //for patient registration
     if (paymentcategory == configuration.category[9]) {
 
+=======
+    const { paymentype, paymentcategory, paymentreference } = queryresult;
+    //for patient registration
+    if (paymentcategory == configuration.category[3]) {
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
       //update patient registration status
       await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1] });
 
 
+<<<<<<< HEAD
     }    /*
+=======
+    }
+    /*
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     
     //for appointment
     else if(paymentcategory == configuration.category[0]){
       //schedule the patient
       //payment
       await updateappointmentbyquery({payment:id},{status:configuration.status[5]});
+<<<<<<< HEAD
 
     }
       */
@@ -492,6 +565,20 @@ export async function confirmpayment(req: any, res: any) {
     //update for pharmacy
 
 
+=======
+
+    }
+      */
+
+    //for lab test
+    else if (paymentcategory == configuration.category[2]) {
+      //update lab test
+      await updatelabbyquery({ payment: id }, { status: configuration.status[5] })
+    }
+    //update for pharmacy
+
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 
     res.status(200).json({
       queryresult,
@@ -554,6 +641,7 @@ export async function printreceipt(req: any, res: any) {
     console.log(e);
     res.status(403).json({ status: false, msg: e.message });
 
+<<<<<<< HEAD
   }
 
 }
@@ -653,9 +741,50 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
     await createInsuranceClaim(insuranceClaim);
   }
 
+=======
+  }
+
+}
+
+export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { patientId } = req.params;
+  const {
+    serviceCategory, amount,
+    serviceType, phoneNumber } = req.body;
+
+  const { _id: userId } = (req.user).user;
+
+  const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+
+  if (!foundPatient) {
+    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+  }
+
+  const { firstName, lastName, } = foundPatient;
+
+  const refNumber = generatePaymentNumber();
+
+  const paymentInfo = await createpayment({
+    firstName,
+    lastName,
+    MRN: req.body.MRN,
+    phoneNumber,
+    paymentreference: refNumber,
+    paymentype: serviceType,
+    paymentcategory: serviceCategory,
+    patient: foundPatient._id,
+    amount: Number(amount),
+    createdById: userId,
+  });
+
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   res.status(201).json({
     status: true,
     message: "custom billing info created for user!",
     data: paymentInfo
   });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109

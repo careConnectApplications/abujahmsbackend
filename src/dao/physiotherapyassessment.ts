@@ -24,7 +24,11 @@ export async function readAllPhysiotherapyAssessments(
     return { assessments, total };
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve physiotherapy assessment data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -35,7 +39,11 @@ export async function createPhysiotherapyAssessment(input:any) {
     return await newAssessment.save();
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to create physiotherapy assessment");
+=======
+    throw new Error(configuration.error.errorusercreate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -45,7 +53,11 @@ export async function readOnePhysiotherapyAssessment(query:any, selectquery = {}
     return await PhysiotherapyAssessment.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to retrieve physiotherapy assessment data");
+=======
+    throw new Error(configuration.error.erroruserread);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -65,7 +77,11 @@ export async function updatePhysiotherapyAssessmentById(id:any, reqbody:any) {
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update physiotherapy assessment");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }
 
@@ -85,6 +101,10 @@ export async function updatePhysiotherapyAssessmentByQuery(query:any, reqbody:an
     return updated;
   } catch (err) {
     console.error(err);
+<<<<<<< HEAD
     throw new Error("Failed to update physiotherapy assessment");
+=======
+    throw new Error(configuration.error.erroruserupdate);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
   }
 }

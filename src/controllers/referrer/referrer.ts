@@ -152,7 +152,11 @@ export const scheduleappointment = async (req:any, res:any) => {
        var patients = await readonepatient({_id:patient,status:configuration.status[1]},{},'','');
             
             if(!patients){
+<<<<<<< HEAD
               throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+=======
+              throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
       
             }
       var appointmentPrice = await readoneprice({servicecategory:appointmentcategory,servicetype:appointmenttype});

@@ -47,6 +47,7 @@ const servicetype_1 = require("./dao/servicetype");
 const maternityModules = __importStar(require("./config/maternity-modules"));
 const configuration = {
     //clinic name
+<<<<<<< HEAD
     //wardnames
     accidentType: ["Vehicle-to-Vehicle", "Vehicle-to-Pedestrian", "Vehicle-to-Object", "Single-Vehicle"],
     proceduretype: ["Major Operation", "Intermediate Operation", "Minor Operation", "Circumcision"],
@@ -126,6 +127,9 @@ const configuration = {
     labcategory: ["hematology", "chemicalpathology", "bloodtransfusion", "blooddonation", "cytology", "medical", "non - medical"],
     labreporttypehematologychemicalpathology: ["peripheralbloodfilmreport", "ADHbonemarrowaspirationreport", "chemicalpathologyreport"],
     gender: ["Male", "Female"],
+=======
+    //wardname  
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     pricingtype: ["Standard", "Age and Clinic Aware"],
     anynotedadverseeffect: ["Yes", "No"],
     patienttype: ["primary", "secondary"],
@@ -199,6 +203,7 @@ const configuration = {
             }
             ;
             return ({
+<<<<<<< HEAD
                 accidentType: configuration.accidentType,
                 proceduretype: configuration.proceduretype,
                 encounterplanoutcome: configuration.encounterplanoutcome,
@@ -247,6 +252,8 @@ const configuration = {
                 labpriority: configuration.labpriority,
                 labcategory: configuration.labcategory,
                 labreporttypehematologychemicalpathology: configuration.labreporttypehematologychemicalpathology,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
                 vaccinationlocation: ['fixed', 'outreach'],
                 pricingtype: ["Standard", "Age and Clinic Aware"],
                 tetanustoxoid: ["TT 1", "TT 2", "TT 3", "TT 4", "TT 5"],
@@ -1211,7 +1218,10 @@ const configuration = {
         errorfailedtoupdate: "Failed to update",
         errornotfoundgeneric: "Record not found."
     },
+<<<<<<< HEAD
     validBiopsyType: ["Excision", "Incision", "Endoscopy", "Trucut"],
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     //environment: "test",
     environment: "prod",
 };

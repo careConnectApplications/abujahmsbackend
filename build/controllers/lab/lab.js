@@ -12,7 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 exports.validatelabresult = exports.labresultprocessinghemathologychemicalpathology = exports.readallscheduledlaboptimizedhemathologyandchemicalpathology = exports.sorthemathologyandchemicalpathology = exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+=======
+exports.confirmlaborder = exports.listlabreportbypatient = exports.printlabreport = exports.listlabreport = exports.readallscheduledlaboptimized = exports.readallscheduledlab = exports.readAllLabByPatient = exports.readalllabb = void 0;
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
 exports.labresultprocessing = labresultprocessing;
 const lab_1 = require("../../dao/lab");
 const otherservices_1 = require("../../utils/otherservices");
@@ -155,7 +159,10 @@ const readallscheduledlaboptimized = (req, res) => __awaiter(void 0, void 0, voi
                 $project: {
                     _id: 1,
                     createdAt: 1,
+<<<<<<< HEAD
                     testresult: 1,
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
                     testname: 1,
                     updatedAt: 1,
                     testid: 1,
@@ -168,7 +175,10 @@ const readallscheduledlaboptimized = (req, res) => __awaiter(void 0, void 0, voi
                     HMOId: "$patient.HMOId",
                     HMOName: "$patient.HMOName",
                     status: 1,
+<<<<<<< HEAD
                     filename: 1
+=======
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
                 }
             },
             {
@@ -326,6 +336,7 @@ const listlabreportbypatient = (req, res) => __awaiter(void 0, void 0, void 0, f
 });
 exports.listlabreportbypatient = listlabreportbypatient;
 //this endpoint is use to accept or reject lab order
+<<<<<<< HEAD
 //isHMOCover: { $eq: configuration.ishmo[0] }
 exports.confirmlaborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { option, remark } = req.body;
@@ -334,6 +345,54 @@ exports.confirmlaborder = (0, catchAsync_1.default)((req, res, next) => __awaite
     const lab = yield (0, lab_1.readonelab)({ _id: id }, {}, "patient");
     if (lab.status !== config_1.default.status[14]) {
         throw new Error(config_1.default.error.errorLabStatus);
+=======
+const confirmlaborder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        //extract option
+        const { option, remark } = req.body;
+        const { id } = req.params;
+        console.log('////confirmbodyrequest body////', req.body);
+        console.log('////confirmbodyrequest params////', id);
+        //search for the lab request
+        var lab = yield (0, lab_1.readonelab)({ _id: id }, {}, 'patient');
+        console.log('lab', lab);
+        const { testname, testid, patient, amount } = lab;
+        //validate the status
+        let queryresult;
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        let paymentreference;
+        //let status;
+        //validate the status
+        //search for patient under admission. if the patient is admitted the patient admission number will be use as payment reference
+        var findAdmission = yield (0, admissions_1.readoneadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
+        if (findAdmission) {
+            paymentreference = findAdmission.admissionid;
+            //status=configuration.status[5];
+        }
+        else {
+            paymentreference = testid;
+            //status=configuration.status[2];
+        }
+        if (option == true && patient.isHMOCover == config_1.default.ishmo[0]) {
+            var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference, paymentype: testname, paymentcategory: config_1.default.category[2], patient: patient._id, amount });
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[2], payment: createpaymentqueryresult._id, remark });
+            yield (0, patientmanagement_1.updatepatient)(patient._id, { $push: { payment: createpaymentqueryresult._id } });
+        }
+        else if (option == true && patient.isHMOCover == config_1.default.ishmo[1]) {
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[5], remark });
+        }
+        else {
+            queryresult = yield (0, lab_1.updatelab)({ _id: id }, { status: config_1.default.status[13], remark });
+        }
+        res.status(200).json({ queryresult, status: true });
+        //if accept
+        //accept or reject lab order
+        //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:appointment.patient,amount:Number(testPrice.amount)})
+        //paymentids.push(createpaymentqueryresult._id);
+        //var queryresult=await updatepatient(appointment.patient,{$push: {payment:paymentids}});
+        //var testrecord = await createlab({payment:createpaymentqueryresult._id});
+        //change status to 2 or  13 for reject
+>>>>>>> 315460a373f2a6c5e9da62546d3254a1cca47109
     }
     const { patient } = lab;
     // choose strategy based on isHMOCover
