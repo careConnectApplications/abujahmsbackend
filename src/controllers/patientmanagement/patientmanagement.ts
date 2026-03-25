@@ -25,49 +25,71 @@ import { createDeflateRaw } from "zlib";
 //search patients 
 export async function searchpartient(req: any, res: any) {
   try {
-    //var settings = await configuration.settings();
-    var selectquery = {
+    const { searchparams } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const size = parseInt(req.query.size as string) || 50;
+
+    const selectquery = {
       "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
       "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
     };
-    const { searchparams } = req.params;
 
-    const queryresult = await readallpatient({
-      $or:
-        [
-          // { lastName: { $regex: searchparams, $options: 'i' } },
-          // { firstName: { $regex: searchparams, $options: 'i' } },
+    // Split search params by space to handle full name searches
+    const terms = searchparams.split(' ').filter((t: string) => t.length > 0);
+    
+    let query: any = {};
+
+    if (terms.length >= 2) {
+      // If we have two or more terms, assume it might be [FirstName LastName] or [LastName FirstName]
+      query = {
+        $or: [
           {
-            "$expr": {
-              "$regexMatch": {
-                "input": {
-                  "$concat": [
-                    { "$ifNull": ["$firstName", ""] },
-                    " ",
-                    { "$ifNull": ["$lastName", ""] }
-                  ]
-                },
-                "regex": searchparams,
-                "options": "i"
-              }
-            }
+            $and: [
+              { firstName: { $regex: terms[0], $options: 'i' } },
+              { lastName: { $regex: terms[1], $options: 'i' } }
+            ]
           },
+          {
+            $and: [
+              { firstName: { $regex: terms[1], $options: 'i' } },
+              { lastName: { $regex: terms[0], $options: 'i' } }
+            ]
+          },
+          // Still match individual fields if they contain the full string
+          { firstName: { $regex: searchparams, $options: 'i' } },
+          { lastName: { $regex: searchparams, $options: 'i' } },
           { HMOId: { $regex: searchparams, $options: 'i' } },
           { MRN: { $regex: searchparams, $options: 'i' } },
-          { phoneNumber: { $regex: searchparams, $options: 'i' } }]
-    }, selectquery, '', '');
+          { phoneNumber: { $regex: searchparams, $options: 'i' } }
+        ]
+      };
+    } else {
+      // Single term or fallback
+      query = {
+        $or: [
+          { firstName: { $regex: searchparams, $options: 'i' } },
+          { lastName: { $regex: searchparams, $options: 'i' } },
+          { HMOId: { $regex: searchparams, $options: 'i' } },
+          { MRN: { $regex: searchparams, $options: 'i' } },
+          { phoneNumber: { $regex: searchparams, $options: 'i' } }
+        ]
+      };
+    }
+
+    const queryresult = await readallpatientpaginated(query, selectquery, '', '', page, size);
 
     res.status(200).json({
       queryresult,
       status: true
     });
-
-
   }
   catch (e: any) {
-
+    res.status(403).json({ status: false, msg: e.message });
   }
 }
+
+export const searchpatient = searchpartient;
+
 export async function getallhmopatients(req: Request, res: any) {
   try {
     //var settings = await configuration.settings();

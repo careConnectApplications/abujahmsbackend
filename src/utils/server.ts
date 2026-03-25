@@ -78,7 +78,7 @@ function createServer() {
   app.use('/api/v1/auth', auth);
   app.use('/api/v1/users', protect, users);
   app.use('/api/v1/billing', protect, billingandpayment);
-  app.use('/api/v1/patientsmanagement', protect, patientsmanagement);
+  app.use('/api/v1/patientsmanagement',  patientsmanagement);
   app.use('/api/v1/appointment', protect, appointment);
   app.use('/api/v1/lab', protect, lab);
   app.use('/api/v1/settings', protect, settings);
