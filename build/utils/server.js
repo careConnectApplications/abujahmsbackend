@@ -108,7 +108,7 @@ function createServer() {
     app.use('/api/v1/auth', auth_1.default);
     app.use('/api/v1/users', middleware_1.protect, usermanagement_1.default);
     app.use('/api/v1/billing', middleware_1.protect, billingandpayment_1.default);
-    app.use('/api/v1/patientsmanagement', middleware_1.protect, patientmanagement_1.default);
+    app.use('/api/v1/patientsmanagement', patientmanagement_1.default);
     app.use('/api/v1/appointment', middleware_1.protect, appointment_1.default);
     app.use('/api/v1/lab', middleware_1.protect, lab_1.default);
     app.use('/api/v1/settings', middleware_1.protect, setting_1.default);

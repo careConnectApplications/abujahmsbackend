@@ -98,6 +98,8 @@ const histopathologySchema = new mongoose_1.Schema({
         type: Number,
         min: [0, "Amount cannot be negative"],
     },
+    hmopercentagecover: Number,
+    actualcost: Number,
     paymentStatus: {
         type: String,
         default: config_1.default.status[2],

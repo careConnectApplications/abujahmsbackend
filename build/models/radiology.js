@@ -38,6 +38,8 @@ const radiologySchema = new mongoose_1.Schema({
         type: String,
     },
     amount: Number,
+    hmopercentagecover: Number,
+    actualcost: Number,
     processby: {
         type: String
     },
@@ -50,7 +52,11 @@ const radiologySchema = new mongoose_1.Schema({
         required: true,
         type: String,
         default: config_1.default.status[14],
-    }
+    },
+    filename: {
+        type: String,
+        trim: true,
+    },
 }, { timestamps: true });
 const radiology = (0, mongoose_1.model)('Radiology', radiologySchema);
 exports.default = radiology;

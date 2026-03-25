@@ -20,8 +20,8 @@ exports.processHistopathology = processHistopathology;
 const radiology_1 = require("../../dao/radiology");
 const procedure_1 = require("../../dao/procedure");
 const prescription_1 = require("../../dao/prescription");
+const otherservices_1 = require("../../utils/otherservices");
 const lab_1 = require("../../dao/lab");
-const admissions_1 = require("../../dao/admissions");
 const payment_1 = require("../../dao/payment");
 const histopathology_dao_1 = require("../../dao/histopathology.dao");
 const patientmanagement_1 = require("../../dao/patientmanagement");
@@ -56,12 +56,6 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
     };
 }
 // 🔹 Common payment reference resolver
-function getPaymentReference(patientId, fallbackId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const admission = yield (0, admissions_1.readoneadmission)({ patient: patientId, status: { $ne: config_1.default.admissionstatus[5] } }, {}, "");
-        return admission ? admission.admissionid : fallbackId;
-    });
-}
 // 🟢 LAB HANDLER
 function processLab(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -71,7 +65,7 @@ function processLab(id, ctx) {
         //get patient details, testname, testid, amount from lab
         const { testname, testid, patient, amount } = lab;
         //check if patient is admitted, if yes use admission number as payment reference
-        const paymentreference = yield getPaymentReference(patient._id, testid);
+        const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, testid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
@@ -107,7 +101,7 @@ function processRadiology(id, ctx) {
         const radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, "patient");
         // get patient details, testname, testid, amount from radiology
         const { testname, testid, patient, amount } = radiology;
-        const paymentreference = yield getPaymentReference(patient._id, testid);
+        const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, testid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
@@ -139,7 +133,7 @@ function processProcedure(id, ctx) {
         //find procedure by id
         const findprocedure = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, "patient");
         const { procedure, procedureid, patient, amount } = findprocedure;
-        const paymentreference = yield getPaymentReference(patient._id, procedureid);
+        const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, procedureid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
@@ -170,7 +164,7 @@ function processPharmacy(id, ctx) {
         const { authorizationCode, approvalCode, createdBy } = ctx;
         const findPharmacy = yield (0, prescription_1.readoneprescription)({ _id: id }, {}, 'patient', '', '');
         const { prescription, orderid, patient, amount, qty, pharmacy } = findPharmacy;
-        const paymentreference = yield getPaymentReference(patient._id, orderid);
+        const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, orderid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
