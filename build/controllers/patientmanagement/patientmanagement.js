@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePatientFluidBalancing = exports.updatePatientClinicalInformation = exports.updatePatientToHmo = exports.uploadpix = exports.updatepatients = exports.createpatients = void 0;
+exports.updatePatientFluidBalancing = exports.updatePatientClinicalInformation = exports.updatePatientToHmo = exports.uploadpix = exports.updatepatients = exports.createpatients = exports.searchpatient = void 0;
 exports.searchpartient = searchpartient;
 exports.getallhmopatients = getallhmopatients;
 exports.bulkuploadhmopatients = bulkuploadhmopatients;
@@ -74,45 +74,65 @@ const redisClient_1 = require("../../utils/redisClient");
 function searchpartient(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            //var settings = await configuration.settings();
-            var selectquery = {
+            const { searchparams } = req.params;
+            const page = parseInt(req.query.page) || 1;
+            const size = parseInt(req.query.size) || 50;
+            const selectquery = {
                 "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
                 "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
             };
-            const { searchparams } = req.params;
-            const queryresult = yield (0, patientmanagement_1.readallpatient)({
-                $or: [
-                    // { lastName: { $regex: searchparams, $options: 'i' } },
-                    // { firstName: { $regex: searchparams, $options: 'i' } },
-                    {
-                        "$expr": {
-                            "$regexMatch": {
-                                "input": {
-                                    "$concat": [
-                                        { "$ifNull": ["$firstName", ""] },
-                                        " ",
-                                        { "$ifNull": ["$lastName", ""] }
-                                    ]
-                                },
-                                "regex": searchparams,
-                                "options": "i"
-                            }
-                        }
-                    },
-                    { HMOId: { $regex: searchparams, $options: 'i' } },
-                    { MRN: { $regex: searchparams, $options: 'i' } },
-                    { phoneNumber: { $regex: searchparams, $options: 'i' } }
-                ]
-            }, selectquery, '', '');
+            // Split search params by space to handle full name searches
+            const terms = searchparams.split(' ').filter((t) => t.length > 0);
+            let query = {};
+            if (terms.length >= 2) {
+                // If we have two or more terms, assume it might be [FirstName LastName] or [LastName FirstName]
+                query = {
+                    $or: [
+                        {
+                            $and: [
+                                { firstName: { $regex: terms[0], $options: 'i' } },
+                                { lastName: { $regex: terms[1], $options: 'i' } }
+                            ]
+                        },
+                        {
+                            $and: [
+                                { firstName: { $regex: terms[1], $options: 'i' } },
+                                { lastName: { $regex: terms[0], $options: 'i' } }
+                            ]
+                        },
+                        // Still match individual fields if they contain the full string
+                        { firstName: { $regex: searchparams, $options: 'i' } },
+                        { lastName: { $regex: searchparams, $options: 'i' } },
+                        { HMOId: { $regex: searchparams, $options: 'i' } },
+                        { MRN: { $regex: searchparams, $options: 'i' } },
+                        { phoneNumber: { $regex: searchparams, $options: 'i' } }
+                    ]
+                };
+            }
+            else {
+                // Single term or fallback
+                query = {
+                    $or: [
+                        { firstName: { $regex: searchparams, $options: 'i' } },
+                        { lastName: { $regex: searchparams, $options: 'i' } },
+                        { HMOId: { $regex: searchparams, $options: 'i' } },
+                        { MRN: { $regex: searchparams, $options: 'i' } },
+                        { phoneNumber: { $regex: searchparams, $options: 'i' } }
+                    ]
+                };
+            }
+            const queryresult = yield (0, patientmanagement_1.readallpatientpaginated)(query, selectquery, '', '', page, size);
             res.status(200).json({
                 status: true,
                 queryresult
             });
         }
         catch (e) {
+            res.status(403).json({ status: false, msg: e.message });
         }
     });
 }
+exports.searchpatient = searchpartient;
 function getallhmopatients(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
