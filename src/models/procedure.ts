@@ -32,6 +32,16 @@ const procedureSchema = new Schema({
   processby: {
     type: String
   },
+  proceduretype: {
+      type: String,
+      enum: [
+        "Major Operation",
+        "Intermediate Operation",
+        "Minor Operation",
+        "Circumcision",
+      ],
+      required: true,
+    },
   amount:Number,
   hmopercentagecover:Number,
   actualcost:Number,
@@ -51,8 +61,21 @@ const procedureSchema = new Schema({
 { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+procedureSchema.index({ patient: 1 });
+procedureSchema.index({ procedureid: 1 });
+procedureSchema.index({ status: 1 });
+procedureSchema.index({ proceduretype: 1 });
+procedureSchema.index({ payment: 1 });
+procedureSchema.index({ createdAt: -1 });
+procedureSchema.index({ clinic: 1 });
+
+// Compound indexes for common query patterns
+procedureSchema.index({ patient: 1, status: 1 });
+procedureSchema.index({ procedureid: 1, status: 1 });
+procedureSchema.index({ proceduretype: 1, status: 1 });
+procedureSchema.index({ status: 1, createdAt: -1 });
+
 const procedure = model('Procedure', procedureSchema);
 export default procedure;
-
-
-

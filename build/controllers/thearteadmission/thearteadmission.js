@@ -43,23 +43,23 @@ var refertheatreadmission = (req, res) => __awaiter(void 0, void 0, void 0, func
         const referedtheatreid = new ObjectId(referedtheatre);
         const foundTheatre = yield (0, theatre_1.readonetheatremanagement)({ _id: referedtheatreid }, '');
         if (!foundTheatre) {
-            throw new Error(`Theatre doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Theatre does not exist`);
         }
         //confrim admittospecialization
         //validate specialization
         const foundSpecilization = yield (0, clinics_1.readoneclinic)({ clinic }, '');
         if (!foundSpecilization) {
-            throw new Error(`Specialization doesnt ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Specialization does not exist`);
         }
         //find the record in patient and validate
         var patient = yield (0, patientmanagement_1.readonepatient)({ _id: id, status: config_1.default.status[1] }, {}, '', '');
         if (!patient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+            throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
         }
         //check that patient have not been admitted
         var findAdmission = yield (0, theatreadmission_1.readonethearteadmission)({ patient: patient._id, status: { $ne: config_1.default.admissionstatus[5] } }, {}, '');
         if (findAdmission) {
-            throw new Error(`Patient Admission to Theatre ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient admission to theatre already exists`);
         }
         // validate and create  procedure 
         var procedureid = String(Date.now());
@@ -77,7 +77,7 @@ var refertheatreadmission = (req, res) => __awaiter(void 0, void 0, void 0, func
             console.log(servicetypedetails);
             var testsetting = servicetypedetails.filter(item => (item.type).includes(procedures[i]));
             if (!testsetting || testsetting.length < 1) {
-                throw new Error(`${procedures[i]} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
+                throw new Error(`${procedures[i]} does not ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
             }
             //create payment
             var createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference: id, paymentype: procedures[i], paymentcategory: testsetting[0].category, patient: id, amount: Number(testPrice.amount) });
@@ -144,22 +144,22 @@ function updatetheatreadmissionstatus(req, res) {
         try {
             //validate that status is included in te status choice
             if (!(config_1.default.admissionstatus).includes(status))
-                throw new Error(`${status} status doesnt ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`${status} status does not exist`);
             //if status = discharge
             const response = yield (0, theatreadmission_1.readonethearteadmission)({ _id: id }, {}, '');
             // check for availability of bed spaces in ward only for admitted
             if (!response) {
-                throw new Error(`Theatre Admission donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Theatre Admission does not exist`);
             }
             var theatre = yield (0, theatre_1.readonetheatremanagement)({ _id: response === null || response === void 0 ? void 0 : response.referedtheatre }, {});
             if (!theatre) {
                 // return error
-                throw new Error(`Theatre donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Theatre does not exist`);
             }
             var transftertotheatre = yield (0, theatre_1.readonetheatremanagement)({ _id: transfterto }, {});
             if (transfterto && status == config_1.default.admissionstatus[2] && !transftertotheatre) {
                 // return error
-                throw new Error(`Theatre to be transfered donot  ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Theatre to be transfered does not  already exists`);
             }
             if (transfterto && status == config_1.default.admissionstatus[2] && transftertotheatre.vacantbed < 1) {
                 throw new Error(`${transftertotheatre.theatrename}  ${config_1.default.error.errorvacantspace}`);

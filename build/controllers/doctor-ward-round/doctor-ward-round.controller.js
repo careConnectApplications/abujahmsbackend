@@ -28,7 +28,7 @@ exports.createDoctorWardNote = (0, catchAsync_1.default)((req, res, next) => __a
     const admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: admissionId }, {}, '');
     //console.log(admissionrecord);   
     if (!admissionrecord) {
-        throw new Error(`Admission do not ${config_1.default.error.erroralreadyexit}`);
+        throw new Error(`Admission do not already exists`);
     }
     const note = yield (0, doctor_ward_round_dao_1.CreateDoctorWardRoundDao)({
         admissionId,
@@ -37,7 +37,7 @@ exports.createDoctorWardNote = (0, catchAsync_1.default)((req, res, next) => __a
     }, next);
     res.status(201).json({
         status: true,
-        message: 'Admission note for doctor ward round created successfully',
+        msg: 'Admission note for doctor ward round created successfully',
         data: note
     });
 }));
@@ -88,7 +88,7 @@ exports.updateDoctorWardAdmissionNote = (0, catchAsync_1.default)((req, res, nex
     }
     res.status(200).json({
         status: 'success',
-        message: 'Admission note updated successfully',
+        msg: 'Admission note updated successfully',
         data: note
     });
 }));

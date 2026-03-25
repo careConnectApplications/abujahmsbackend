@@ -21,87 +21,22 @@ const config_1 = __importDefault(require("../../config"));
 const settings = function () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const clinic = [
-                {
-                    $group: {
-                        _id: "$clinic", // Group by 'userId'
-                    }
-                },
-                {
-                    $project: {
-                        clinic: "$_id", // Rename _id to userId
-                        _id: 0 // Exclude _id
-                    }
-                }
-            ];
-            const ward = [
-                {
-                    $group: {
-                        _id: "$wardname", // Group by 'userId'
-                    }
-                },
-                {
-                    $project: {
-                        wardname: "$_id", // Rename _id to userId
-                        _id: 0 // Exclude _id
-                    }
-                }
-            ];
-            const wards = yield (0, reports_1.readwardaggregate)(ward);
-            const clinics = yield (0, reports_1.readclinicaggregate)(clinic);
-            const wardNames = wards.map(ward => ward.wardname);
-            const clinicNames = clinics.map(clinicname => clinicname.clinic);
             //search pharmacy and spread the array
             const query = { type: config_1.default.clinictype[2] };
-            const pharmacyselection = [
-                {
-                    $match: query
-                },
-                {
-                    $group: {
-                        _id: "$clinic", // Group by 'userId'
-                    }
-                },
-                {
-                    $project: {
-                        clinic: "$_id", // Rename _id to userId
-                        _id: 0 // Exclude _id
-                    }
-                }
-            ];
-            const pharmacy = yield (0, reports_1.readclinicaggregate)(pharmacyselection);
-            const pharmacyNames = pharmacy.map((clinicname) => clinicname.clinic);
-            //get all hmos
-            const hmoselection = [
-                {
-                    $group: {
-                        _id: "$hmoname", // Group by 'userId'
-                    }
-                },
-                {
-                    $project: {
-                        hmoname: "$_id", // Rename _id to userId
-                        _id: 0 // Exclude _id
-                    }
-                }
-            ];
-            const hmo = yield (0, reports_1.readhmoaggregate)(hmoselection);
-            const hmoNames = hmo.map((hmoname) => hmoname.hmoname);
-            console.log(hmoNames);
             //console.log(check2);
             const reports = [
-                { querytype: "financialreport", querygroup: ["Appointment", "Lab", "Patient Registration", "Radiology", "Procedure", ...pharmacyNames] },
-                { querytype: "appointmentreport", querygroup: clinicNames },
-                { querytype: "admissionreport", querygroup: wardNames },
-                { querytype: "hmolabreport", querygroup: hmoNames },
-                { querytype: "hmoreportforprocedure", querygroup: hmoNames },
-                { querytype: "hmoreportforpharmacy", querygroup: hmoNames },
-                { querytype: "hmoappointmentreport", querygroup: hmoNames },
-                { querytype: "hmoradiologyreport", querygroup: hmoNames },
-                { querytype: "secondaryservicereport", querygroup: ["Appointment", "Lab", "Radiology", "Procedure", "All", ...pharmacyNames] },
+                { querytype: "financialreport" },
+                { querytype: "outpatient" },
+                { querytype: "inpatient" },
+                { querytype: "labreport" },
+                { querytype: "procedurereport" },
+                { querytype: "pharmacyreport" },
+                { querytype: "radiologyreport" },
+                { querytype: "immunizationreport" },
+                { querytype: "deathreport" },
                 // {querytype:"Nutrition",querygroup:[ "Number Of patient Deworked", "Number of Patient Growing Well"]},
             ];
-            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning"];
+            const summary = ["financialaggregate", "cashieraggregate", "appointmentaggregate", "admissionaggregate", "procedureaggregate", "clinicalaggregate", "hmoaggregate", "nutritionaggregate", "health facility attendance", "inpatient care", "immunization(Antigen received)", "Immunization (Adverse Events Following Immunization, AEFI)", "Family Planning", "inpatients records", "outpatients records", "accident and emergency records", "national health insurance services", "lab investigation report", "radiology diagnosis", "operation", "special consultative", "immunization", "maternity"];
             return { reports, summary };
         }
         catch (error) {

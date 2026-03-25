@@ -29,7 +29,7 @@ function readallhistologyrequests(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve histology data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createhistologyrequest(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create histology");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonehistology(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve histology data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updatehistology(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update histology");
         }
     });
 }
@@ -93,7 +93,7 @@ function updatehistologyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update histology");
         }
     });
 }

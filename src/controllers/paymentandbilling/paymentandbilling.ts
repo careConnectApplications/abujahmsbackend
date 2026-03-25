@@ -4,12 +4,15 @@ import { updateappointmentbyquery } from "../../dao/appointment";
 import { updatepatientbyanyquery, readonepatient } from "../../dao/patientmanagement";
 import { updatelabbyquery } from "../../dao/lab";
 import configuration from "../../config";
-import { validateinputfaulsyvalue } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, calculateAmountPaidByHMO } from "../../utils/otherservices";
 import catchAsync from "../../utils/catchAsync";
 import mongoose from "mongoose";
 import { ApiError } from "../../errors";
 import { readoneprice } from "../../dao/price";
 import { v4 as uuidv4 } from 'uuid';
+import { createInsuranceClaim } from "../../dao/insuranceclaim";
+import { readonehmomanagement } from "../../dao/hmomanagement";
+import { readonehmocategorycover } from "../../dao/hmocategorycover";
 
 const generatePaymentNumber = () => {
   const uniqueId = uuidv4();
@@ -17,21 +20,93 @@ const generatePaymentNumber = () => {
 }
 export const payAnnualSubscription = catchAsync(async (req: Request | any, res: Response) => {
     const { patientId } = req.body;
+    const { _id: userId } = (req.user).user;
+    
     // Check patient exists
-   const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
+    const patient: any = await readonepatient({ _id: patientId}, {}, '', '');
     if (!patient) {
       throw new Error("Patient not found" );
     }
-    const subscriptionPrice: any = await readoneprice({ servicecategory:configuration.category[8], servicetype: configuration.category[8] });
-         if (!subscriptionPrice) {
-           throw new Error(configuration.error.errornopriceset);
-     
-         }
-    const {amount} = subscriptionPrice;
-    var payment =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:patient._id,paymentype:configuration.category[8],paymentcategory:configuration.category[8],patient:patient._id,amount});
+    
+    const subscriptionPrice: any = await readoneprice({ 
+      servicecategory: configuration.category[8], 
+      servicetype: configuration.category[8] 
+    });
+    if (!subscriptionPrice) {
+      throw new Error(configuration.error.errornopriceset);
+    }
+    
+    let paymentAmount = Number(subscriptionPrice.amount);
+    let hmoCoveragePercentage = 0;
+    let gethmo: any = null;
+    
+    // Check if patient has HMO coverage
+    if (patient.isHMOCover === configuration.ishmo[1] || patient.isHMOCover === true) {
+      // Get HMO details
+      if (patient.HMOName) {
+        gethmo = await readonehmomanagement(
+          { hmoname: patient.HMOName }, 
+          { _id: 1, hmopercentagecover: 1 }
+        );
+        
+        if (gethmo) {
+          // Get HMO coverage percentage for annual subscription
+          const hmoCoverage = await readonehmocategorycover(
+            { hmoId: gethmo._id, category: configuration.category[8] },
+            { hmopercentagecover: 1 }
+          );
+          
+          hmoCoveragePercentage = hmoCoverage?.hmopercentagecover ?? 0;
+          
+          // Calculate patient payment amount after HMO coverage
+          if (hmoCoveragePercentage > 0) {
+            paymentAmount = calculateAmountPaidByHMO(
+              hmoCoveragePercentage,
+              Number(subscriptionPrice.amount)
+            );
+          }
+        }
+      }
+    }
+    
+    // Create payment with adjusted amount
+    const payment = await createpayment({
+      firstName: patient?.firstName,
+      lastName: patient?.lastName,
+      MRN: patient?.MRN,
+      phoneNumber: patient?.phoneNumber,
+      paymentreference: patient._id,
+      paymentype: configuration.category[8],
+      paymentcategory: configuration.category[8],
+      patient: patient._id,
+      amount: paymentAmount
+    });
+    
+    // Create insurance claim for HMO patients
+    if ((patient.isHMOCover === configuration.ishmo[1] || patient.isHMOCover === true) && 
+        hmoCoveragePercentage > 0 && payment) {
+      const insuranceClaim = {
+        patient: patient._id,
+        serviceCategory: configuration.category[8],
+        payment: payment._id,
+        authorizationCode: patient.authorizationCode || req.body.authorizationCode || "",
+        approvalCode: patient.approvalCode || req.body.approvalCode || "",
+        amountClaimed: Number(subscriptionPrice.amount),
+        amountApproved: Number(subscriptionPrice.amount),
+        insurer: patient.HMOName,
+        createdBy: userId,
+        action: "approve"
+      };
+      
+      await createInsuranceClaim(insuranceClaim);
+    }
+    
     // Extend subscription by 1 year
-    res.status(201).json({ queryresult: "Subscription payment recorded", payment,status: true });
- 
+    res.status(201).json({ 
+      queryresult: "Subscription payment recorded", 
+      payment,
+      status: true 
+    });
 });
 ///deactivate a user
 //show total for each login cashier
@@ -62,55 +137,26 @@ export const getCashierTotal = catchAsync(async (req: Request | any, res: Respon
 //cashieremail:email,cashierid:staffId
 //confirm payment
 export async function confirmgrouppayment(req: any, res: any) {
-  //console.log(req.user);
-  try {
+    try {
     const { paymentreferenceid } = req.params;
     //check for null of id
     const response: any = await readallpayment({ paymentreference: paymentreferenceid, status: configuration.status[2] }, '');
     const { paymentdetails } = response;
-   
     if (!paymentdetails || paymentdetails.length === 0) throw new Error("no paymentfound for this service");
     for (var i = 0; i < paymentdetails.length; i++) {
     
       let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i]
       //const {patient} = paymentdetails[i];
       const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
-      let cardFeePaid;
-      let subscriptionfeePaid;
-      console.log('*********', paymentcategory);
-      console.log('*********', configuration.category[3]);
-      console.log('*********', configuration.category[8]);
-      console.log('*********', configuration.category[9]);
-      if (!patientrecord && !(paymentcategory == configuration.category[3] || paymentcategory == configuration.category[8] || paymentcategory == configuration.category[9])) {
+    // if patient not found and patient is not paying for card return error
+      if (!patientrecord && !paymentcategory == configuration.category[9]) {
       
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for card`);
 
       }
       
-      if(paymentcategory == configuration.category[3]){
-
-cardFeePaid = await readonepayment({
-  patient,
-  paymentype: configuration.category[9],
-  paymentreference,
-  paymentcategory: configuration.category[9],
-  status: configuration.status[2] 
-});
-//read payment for subscription fee
-subscriptionfeePaid = await readonepayment({
-  patient,
-  paymentype: configuration.category[8],
-  paymentreference, 
-  paymentcategory: configuration.category[8],
-  status: configuration.status[2] 
-});
-
-
-      }
-      //ensure card fee and annual fee is paid before confirming payment for patient registration
-      if (paymentcategory == configuration.category[3] && (cardFeePaid || subscriptionfeePaid)) {
-        throw new Error(`Patient has not paid for ${configuration.category[9]} or ${configuration.category[8]}`);
-      }
+      //ensure card fee and annual fee is paid before confirming payment for patient registration 
+      
       //var settings =await  configuration.settings();
       const status = configuration.status[3];
       const { email, staffId, firstName, lastName } = (req.user).user;
@@ -118,7 +164,8 @@ subscriptionfeePaid = await readonepayment({
       const queryresult: any = await updatepayment(_id, { status, cashieremail: email, cashiername, cashierid: staffId });
       //const {paymentype,paymentcategory,paymentreference} = queryresult;
       //for patient registration
-      if (paymentcategory == configuration.category[3]) {
+      if (paymentcategory == configuration.category[9]) {
+        console.log('*********', patient);
         //update patient registration status
         await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1], paymentstatus: status, paymentreference });
       }
@@ -130,9 +177,10 @@ subscriptionfeePaid = await readonepayment({
         await updatelabbyquery({ payment: _id }, { status: configuration.status[5] })
       }
       else if(paymentcategory ==configuration.category[8]){
+        console.log('*********', configuration.category[8]);
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
-        await updatepayment(_id, { subscriptionPaidUntil: nextYear });
+        await updatepatientbyanyquery({_id:patient}, { subscriptionPaidUntil: nextYear, subscriptionExpired:false });
       }
 
     }
@@ -397,33 +445,12 @@ export async function confirmpayment(req: any, res: any) {
     const patientrecord:any = await readonepatient({ _id: patient, status: configuration.status[1] }, {}, '', '');
      let cardFeePaid;
      let subscriptionfeePaid;
-    if (!patientrecord && paymentcategory !== configuration.category[3]) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+    if (!patientrecord && paymentcategory !== configuration.category[9]) {
+      throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for card`);
 
     }
-    if(paymentcategory == configuration.category[3]){
-  cardFeePaid = await readonepayment({
-  patient,
-  paymentype: configuration.category[9],
-  paymentreference,
-  paymentcategory: configuration.category[9],
-  status: configuration.status[2] 
-});
-//read payment for subscription fee
-subscriptionfeePaid = await readonepayment({
-  patient,
-  paymentype: configuration.category[8],
-  paymentreference, 
-  paymentcategory: configuration.category[8],
-  status: configuration.status[2] 
-});
-
-
-      }
-      if (paymentcategory == configuration.category[3] && (cardFeePaid || subscriptionfeePaid)) {
-        throw new Error(`Patient has not paid for ${configuration.category[9]} or ${configuration.category[8]}`);
-      }
-
+    
+    
 
     //var settings =await  configuration.settings();
     const status = configuration.status[3];
@@ -433,14 +460,13 @@ subscriptionfeePaid = await readonepayment({
     //confirm payment of the service paid for 
 
     //for patient registration
-    if (paymentcategory == configuration.category[3]) {
+    if (paymentcategory == configuration.category[9]) {
 
       //update patient registration status
       await updatepatientbyanyquery({ _id: patient }, { status: configuration.status[1] });
 
 
-    }
-    /*
+    }    /*
     
     //for appointment
     else if(paymentcategory == configuration.category[0]){
@@ -459,6 +485,7 @@ subscriptionfeePaid = await readonepayment({
     else if(paymentcategory ==configuration.category[8]){
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear() + 1);
+        patientrecord.subscriptionExpired=false;
         patientrecord.subscriptionPaidUntil = nextYear;
         await patientrecord.save();
       }
@@ -535,32 +562,96 @@ export const CreateBilingRecord = catchAsync(async (req: Request | any, res: Res
   const { patientId } = req.params;
   const {
     serviceCategory, amount,
-    serviceType, phoneNumber } = req.body;
+    serviceType, phoneNumber, option, department } = req.body;
 
   const { _id: userId } = (req.user).user;
 
-  const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
+  // Fetch patient with insurance populated (like laborder does)
+  const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   const { firstName, lastName, } = foundPatient;
 
+  // Handle fixed pricing option
+  let finalAmount = Number(amount);
+  let actualAmount = Number(amount); // Store original amount for insurance claims
+  
+  if (option === "fixed") {
+    // Fetch price from database like laborder does
+    const servicePrice: any = await readoneprice({ 
+      servicecategory: serviceCategory,
+      servicetype: serviceType 
+    });
+    
+    if (!servicePrice || servicePrice.amount == null) {
+      throw new Error(`${configuration.error.errornopriceset} for ${serviceCategory}/${serviceType}`);
+    }
+    
+    finalAmount = Number(servicePrice.amount);
+    actualAmount = Number(servicePrice.amount);
+  }
+
+  // Calculate HMO coverage for insurance patients (like laborder)
+  let hmopercentagecover = 0;
+  if (foundPatient.insurance) {
+    const insurance: any = await readonehmocategorycover(
+      { 
+        hmoId: foundPatient.insurance._id, 
+        category: serviceCategory 
+      }, 
+      { hmopercentagecover: 1 }
+    );
+    
+    hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+    
+    // Adjust amount based on HMO coverage
+    if (hmopercentagecover > 0) {
+      finalAmount = calculateAmountPaidByHMO(
+        Number(hmopercentagecover), 
+        actualAmount
+      );
+    }
+  }
+
   const refNumber = generatePaymentNumber();
+  
 
   const paymentInfo = await createpayment({
     firstName,
     lastName,
-    MRN: req.body.MRN,
+    MRN: req.body.MRN || foundPatient.MRN,
     phoneNumber,
+    billingtype:"custom-billing",
+    department, // Add department to payment
     paymentreference: refNumber,
     paymentype: serviceType,
     paymentcategory: serviceCategory,
     patient: foundPatient._id,
-    amount: Number(amount),
+    amount: finalAmount,
     createdById: userId,
   });
+
+  // Create insurance claim for HMO patients with coverage > 0
+  if (hmopercentagecover > 0 && paymentInfo) {
+    const insuranceClaim = {
+      patient: foundPatient._id,
+      serviceCategory: serviceCategory,
+      payment: paymentInfo._id,
+      authorizationCode: foundPatient.authorizationCode || req.body.authorizationCode || "",
+      approvalCode: foundPatient.approvalCode || req.body.approvalCode || "",
+      amountClaimed: finalAmount, // Original amount before HMO adjustment
+      amountApproved: finalAmount,
+      insurer: foundPatient.HMOName,
+      createdBy: userId,
+      action: "approve",
+      actualcost: actualAmount
+    };
+    
+    await createInsuranceClaim(insuranceClaim);
+  }
 
   res.status(201).json({
     status: true,

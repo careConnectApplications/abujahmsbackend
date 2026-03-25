@@ -53,7 +53,7 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     const { _id: userId } = (req.user).user;
     const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, 'insurance', '');
     if (!foundPatient)
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[6] }, { hmopercentagecover: 1 });
     console.log("insurance", insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover);
     var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
@@ -70,7 +70,7 @@ exports.CreateHistopatholgyService = (0, catchAsync_1.default)((req, res, next) 
     });
     res.status(201).json({
         status: true,
-        message: "Histopathology created successfully",
+        msg: "Histopathology created successfully",
         data: savedHistopathology
     });
 }));
@@ -121,7 +121,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
 let insurance: any = await readonehmocategorycover(
   { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
@@ -220,7 +220,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
     res.status(201).json({
         status: true,
-        message: "Histopathology  created successfully",
+        msg: "Histopathology  created successfully",
         data: savedHistopathology
     });
 });

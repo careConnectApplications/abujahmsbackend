@@ -9,7 +9,7 @@ import configuration from "../config";
       return { tubefeedingchartsdetails, totaltubefeedingchartsdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve tube feeding chart data");
     }
   };
   export async function createtubefeedingcharts(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create tube feeding chart");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve tube feeding chart data");
 
     }
   }
@@ -52,7 +52,7 @@ import configuration from "../config";
       return tubefeedingchart;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update tube feeding chart");
 
     }
 
@@ -70,7 +70,7 @@ import configuration from "../config";
       return tubefeedingchart;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update tube feeding chart");
 
     }
 

@@ -9,7 +9,7 @@ import configuration from "../config";
       return { wardmanagementdetails, totalwardmanagementdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ward data");
     }
   };
   export async function createwardmanagement(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create ward");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve ward data");
 
     }
   }
@@ -51,7 +51,7 @@ import configuration from "../config";
       return wardmanagement;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ward");
 
     }
 
@@ -69,7 +69,7 @@ import configuration from "../config";
       return wardmanagement;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update ward");
 
     }
 

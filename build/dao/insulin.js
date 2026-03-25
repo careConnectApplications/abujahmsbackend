@@ -29,7 +29,7 @@ function readallinsulins(query, selectquery, populatequery, populatesecondquery)
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve insulin data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createinsulins(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create insulin");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneinsulins(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve insulin data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updateinsulins(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update insulin");
         }
     });
 }
@@ -93,7 +93,7 @@ function updateinsulinquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update insulin");
         }
     });
 }

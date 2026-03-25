@@ -11,7 +11,7 @@ import configuration from "../config";
       return { thearteadmissiondetails, totalthearteadmissiondetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve theatre admission data");
     }
   };
   export async function createthearteadmission(input:any){
@@ -22,7 +22,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create theatre admission");
 
     }
   }
@@ -33,7 +33,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve theatre admission data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return thearteadmission;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update theatre admission");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return thearteadmission;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update theatre admission");
 
     }
 

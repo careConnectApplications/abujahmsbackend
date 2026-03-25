@@ -17,7 +17,6 @@ const otherservices_1 = require("../../utils/otherservices");
 const mongoose_1 = __importDefault(require("mongoose"));
 const psychiatric_1 = require("../../dao/psychiatric");
 const patientmanagement_1 = require("../../dao/patientmanagement");
-const config_1 = __importDefault(require("../../config"));
 const appointment_1 = require("../../dao/appointment");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const admissions_1 = require("../../dao/admissions");
@@ -44,7 +43,7 @@ exports.createPsychiatricEvaluationController = (0, catchAsync_1.default)((req, 
     (0, otherservices_1.validateinputfaulsyvalue)({ id, appointmentoradmissionunderscoreid });
     const patient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
     if (!patient) {
-        next(new Error(`Patient does not exist ${config_1.default.error.erroralreadyexit}`));
+        next(new Error(`Patient does not exist already exists`));
     }
     var checkappointmentId = new ObjectId(appointmentoradmissionunderscoreid);
     //validate appointment id

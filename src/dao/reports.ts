@@ -13,13 +13,15 @@ import Nutrition from "../models/nutrition";
 import configuration from "../config";
 import Immunization from "../models/immunization";
 import Familyplanning from "../models/familyplanning";
+import { ThirdStageLabour, SecondStageLabour, FirstStageLabour, MortalityRegister, BirthRegister } from "../models/maternity";
+import EyeModule from "../models/eye-module/eye-module.model";
 export async function readpatientsmanagementaggregate(input:any) {
   try{
   return await Patientsmanagement.aggregate(input);
   }
   catch(e:any){
     console.log(e);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update report");
   }
   }
 export async function readpaymentaggregate(input:any) {
@@ -28,7 +30,7 @@ export async function readpaymentaggregate(input:any) {
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update report");
     }
     }
 
@@ -38,7 +40,7 @@ export async function readpaymentaggregate(input:any) {
       }
       catch(e:any){
         console.log(e);
-        throw new Error(configuration.error.erroruserupdate);
+        throw new Error("Failed to update report");
       }
       }
   
@@ -49,7 +51,7 @@ export async function readpaymentaggregate(input:any) {
         }
         catch(e:any){
           console.log(e);
-          throw new Error(configuration.error.erroruserupdate);
+          throw new Error("Failed to update report");
         }
         }
         export async function readadmissionaggregate(input:any) {
@@ -58,7 +60,7 @@ export async function readpaymentaggregate(input:any) {
             }
             catch(e:any){
               console.log(e);
-              throw new Error(configuration.error.erroruserupdate);
+              throw new Error("Failed to update report");
             }
             }
 
@@ -69,7 +71,7 @@ export async function readpaymentaggregate(input:any) {
         }
         catch(e:any){
           console.log(e.message);
-          throw new Error(configuration.error.erroruserupdate);
+          throw new Error("Failed to update report");
         }
         }
 
@@ -80,7 +82,7 @@ export async function readpaymentaggregate(input:any) {
             }
             catch(e:any){
               console.log(e);
-              throw new Error(configuration.error.erroruserupdate);
+              throw new Error("Failed to update report");
             }
             }
             export async function readprocedureaggregate(input:any) {
@@ -89,7 +91,7 @@ export async function readpaymentaggregate(input:any) {
               }
               catch(e:any){
                 console.log(e);
-                throw new Error(configuration.error.erroruserupdate);
+                throw new Error("Failed to update report");
               }
               }
 
@@ -101,7 +103,7 @@ export async function readpaymentaggregate(input:any) {
                 }
                 catch(e:any){
                   console.log(e);
-                  throw new Error(configuration.error.erroruserupdate);
+                  throw new Error("Failed to update report");
                 }
                 }
 
@@ -112,7 +114,7 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                     console.log(e);
-                    throw new Error(configuration.error.erroruserupdate);
+                    throw new Error("Failed to update report");
                   }
                   }
                   
@@ -123,7 +125,7 @@ export async function readpaymentaggregate(input:any) {
                     }
                     catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                     }
                     }
 
@@ -134,7 +136,7 @@ export async function readpaymentaggregate(input:any) {
                     }
                     catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                     }
                     }
                     //immunization
@@ -145,7 +147,7 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                   }
               }
               //family planning
@@ -156,6 +158,67 @@ export async function readpaymentaggregate(input:any) {
                   }
                   catch(e:any){
                       console.log(e);
-                      throw new Error(configuration.error.erroruserupdate);
+                      throw new Error("Failed to update report");
                   }
+              }
+
+              // Maternity aggregates
+              export async function readthirdstageLabouraggregate(input:any) {
+                try{
+                  return await ThirdStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readsecondstageLabouraggregate(input:any) {
+                try{
+                  return await SecondStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readfirststageLabouraggregate(input:any) {
+                try{
+                  return await FirstStageLabour.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readmortalityregisteraggregate(input:any) {
+                try{
+                  return await MortalityRegister.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readbirthregisteraggregate(input:any) {
+                try{
+                  return await BirthRegister.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readeyeconditionaggregate(input:any) {
+                try{
+                  return await EyeModule.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
               }

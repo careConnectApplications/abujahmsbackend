@@ -8,7 +8,7 @@ export async function countprocedure(query:any) {
    
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve procedure data");
   }
 };
 
@@ -20,7 +20,7 @@ export async function countprocedure(query:any) {
       return { proceduredetails, totalproceduredetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve procedure data");
     }
   };
   export async function createprocedure(input:any){
@@ -30,7 +30,7 @@ export async function countprocedure(query:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create procedure");
 
     }
   }
@@ -41,7 +41,7 @@ export async function countprocedure(query:any) {
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve procedure data");
 
     }
   }
@@ -61,7 +61,7 @@ export async function countprocedure(query:any) {
       return procedure;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update procedure");
 
     }
 
@@ -79,7 +79,7 @@ export async function countprocedure(query:any) {
       return procedure;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update procedure");
 
     }
 
@@ -95,7 +95,7 @@ export async function countprocedure(query:any) {
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update procedure");
     }
     }
   export async function readprocedureaggregate(input:any) {
@@ -104,6 +104,6 @@ export async function countprocedure(query:any) {
     }
     catch(e:any){
       console.log(e);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update procedure");
     }
     }

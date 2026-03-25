@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maternity Module API Documentation</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @top-center {
+                content: "Maternity Module API Documentation";
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-center {
+                content: counter(page);
+                font-size: 10pt;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            padding: 20px;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            page-break-after: always;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cover-page h1 {
+            font-size: 3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 20px;
+        }
+
+        .cover-page .subtitle {
+            font-size: 1.5em;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+
+        .cover-page .version-info {
+            font-size: 1.1em;
+            color: #95a5a6;
+        }
+
+        /* Table of Contents */
+        .toc {
+            page-break-after: always;
+            padding: 40px 0;
+        }
+
+        .toc h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .toc-item {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc-item.level-1 {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+
+        .toc-item.level-2 {
+            padding-left: 30px;
+            font-size: 0.95em;
+        }
+
+        /* Headers */
+        h1 {
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            page-break-after: avoid;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            page-break-after: avoid;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            color: #34495e;
+            margin: 15px 0 10px 0;
+            page-break-after: avoid;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .module-section {
+            page-break-before: always;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            page-break-inside: avoid;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Endpoint boxes */
+        .endpoint {
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            page-break-inside: avoid;
+            background: #f8f9fa;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .method {
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+
+        .method.post { background: #27ae60; }
+        .method.get { background: #3498db; }
+        .method.put { background: #f39c12; }
+        .method.delete { background: #e74c3c; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        /* Alert boxes */
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        /* Field tables */
+        .field-table {
+            margin: 20px 0;
+        }
+
+        .field-table th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        /* Print optimization */
+        @media print {
+            body {
+                padding: 0;
+            }
+            
+            .cover-page {
+                height: 100vh;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge.required {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge.optional {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .badge.enum {
+            background: #3498db;
+            color: white;
+        }
+
+        /* Response examples */
+        .response-example {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .response-example h5 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>Maternity Module API Documentation</h1>
+        <div class="subtitle">Healthcare Management System</div>
+        <div class="version-info">
+            <p>Version 1.0.0</p>
+            <p>Generated: January 9, 2025</p>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        
+        <div class="toc-item level-1">
+            <span>1. Introduction</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>2. API Overview</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>2.1 Base URL</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>2.2 Authentication</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>2.3 Response Format</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>3. First Stage Labour</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>3.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>3.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>4. Second Stage Labour</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>4.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>4.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>5. Third Stage Labour</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>5.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>5.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>6. Birth Register</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>6.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>6.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>7. Postnatal Care</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>7.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>7.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>8. Mortality Register</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>8.1 Endpoints</span>
+        </div>
+        <div class="toc-item level-2">
+            <span>8.2 Data Model</span>
+        </div>
+        
+        <div class="toc-item level-1">
+            <span>9. Appendix: Enumerations</span>
+        </div>
+    </div>
+
+    <!-- Introduction -->
+    <div class="section">
+        <h1>1. Introduction</h1>
+        <p>The Maternity Module API provides comprehensive endpoints for managing maternal healthcare data throughout the pregnancy, delivery, and postnatal care continuum. This documentation covers all available endpoints, data models, and configuration options for the maternity module.</p>
+        
+        <div class="alert info">
+            <strong>Note:</strong> All endpoints require authentication and proper authorization to access patient data.
+        </div>
+    </div>
+
+    <!-- API Overview -->
+    <div class="section">
+        <h1>2. API Overview</h1>
+        
+        <h2>2.1 Base URL</h2>
+        <div class="code-block">
+            https://api.yourdomain.com/api/maternity
+        </div>
+        
+        <h2>2.2 Authentication</h2>
+        <p>All endpoints require Bearer token authentication. Include the token in the Authorization header:</p>
+        <div class="code-block">
+            Authorization: Bearer &lt;your-token&gt;
+        </div>
+        
+        <h2>2.3 Response Format</h2>
+        <p>All API responses follow a standard format:</p>
+        <div class="code-block">
+{
+    "status": true,
+    "msg": "Success message",
+    "queryresult": { ... },  // or "data" depending on endpoint
+    "totalCount": 100  // For paginated responses
+}
+        </div>
+    </div>
+
+    <!-- First Stage Labour Module -->
+    <div class="section module-section">
+        <h1>3. First Stage Labour</h1>
+        <p>Management of first stage labour records including patient monitoring, cervical dilation tracking, and obstetric complications.</p>
+        
+        <h2>3.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/first-stage-labour/create</span>
+            </div>
+            <p><strong>Description:</strong> Create a new first stage labour record</p>
+            <p><strong>Authentication:</strong> Required</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "patient": "patientId",
+    "dateExamined": "2025-01-09",
+    "inducedLabour": false,
+    "phase": "Active",
+    "duration": "4 hours",
+    "contraction": "Regular",
+    "selectDrug": "Oxytocin",
+    "palpationExamination": "Normal",
+    "obstetricComplication": "None",
+    "noOfVE": "2",
+    "cervicalDilation": 6,
+    "foetalHeartRate": "140 bpm",
+    "lastMenstrualPeriod": "2024-04-01",
+    "expectedDayOfDelivery": "2025-01-10",
+    "notes": "Patient stable",
+    "comments": "Progressing well"
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/getall</span>
+            </div>
+            <p><strong>Description:</strong> Retrieve all first stage labour records</p>
+            <p><strong>Query Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>limit</td>
+                    <td>number</td>
+                    <td>No</td>
+                    <td>Number of records to return</td>
+                </tr>
+                <tr>
+                    <td>skip</td>
+                    <td>number</td>
+                    <td>No</td>
+                    <td>Number of records to skip</td>
+                </tr>
+                <tr>
+                    <td>searchText</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>Search term for filtering</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/get/:id</span>
+            </div>
+            <p><strong>Description:</strong> Get a specific first stage labour record by ID</p>
+            <p><strong>URL Parameters:</strong></p>
+            <ul>
+                <li><code>id</code> - The record ID</li>
+            </ul>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/patient/:patientId</span>
+            </div>
+            <p><strong>Description:</strong> Get all first stage labour records for a specific patient</p>
+            <p><strong>URL Parameters:</strong></p>
+            <ul>
+                <li><code>patientId</code> - The patient ID</li>
+            </ul>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method put">PUT</span>
+                <span class="endpoint-path">/first-stage-labour/update/:id</span>
+            </div>
+            <p><strong>Description:</strong> Update an existing first stage labour record</p>
+            <p><strong>URL Parameters:</strong></p>
+            <ul>
+                <li><code>id</code> - The record ID to update</li>
+            </ul>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/paginated</span>
+            </div>
+            <p><strong>Description:</strong> Get paginated first stage labour records</p>
+            <p><strong>Query Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>page</td>
+                    <td>number</td>
+                    <td>1</td>
+                    <td>Page number</td>
+                </tr>
+                <tr>
+                    <td>limit</td>
+                    <td>number</td>
+                    <td>10</td>
+                    <td>Records per page</td>
+                </tr>
+                <tr>
+                    <td>searchText</td>
+                    <td>string</td>
+                    <td>-</td>
+                    <td>Search filter</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/aggregate</span>
+            </div>
+            <p><strong>Description:</strong> Get aggregated statistics for first stage labour data</p>
+            <p><strong>Query Parameters:</strong></p>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>startDate</td>
+                    <td>date</td>
+                    <td>Start date for aggregation</td>
+                </tr>
+                <tr>
+                    <td>endDate</td>
+                    <td>date</td>
+                    <td>End date for aggregation</td>
+                </tr>
+                <tr>
+                    <td>groupBy</td>
+                    <td>string</td>
+                    <td>Group by: day, month, or year</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/first-stage-labour/count</span>
+            </div>
+            <p><strong>Description:</strong> Get total count of first stage labour records</p>
+        </div>
+
+        <h2>3.2 Data Model</h2>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>dateExamined</td>
+                <td>Date</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Date of examination</td>
+            </tr>
+            <tr>
+                <td>inducedLabour</td>
+                <td>Boolean</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Whether labour was induced</td>
+            </tr>
+            <tr>
+                <td>phase</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Labour phase: "Active" or "Latent"</td>
+            </tr>
+            <tr>
+                <td>duration</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Duration of labour</td>
+            </tr>
+            <tr>
+                <td>contraction</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Contraction details</td>
+            </tr>
+            <tr>
+                <td>selectDrug</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Selected drug (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>obstetricComplication</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Obstetric complications (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>noOfVE</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Number of vaginal examinations: "1" to "6"</td>
+            </tr>
+            <tr>
+                <td>cervicalDilation</td>
+                <td>Number</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Cervical dilation in cm (4-10)</td>
+            </tr>
+            <tr>
+                <td>foetalHeartRate</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Foetal heart rate</td>
+            </tr>
+            <tr>
+                <td>lastMenstrualPeriod</td>
+                <td>Date</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Date of last menstrual period</td>
+            </tr>
+            <tr>
+                <td>expectedDayOfDelivery</td>
+                <td>Date</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Expected delivery date</td>
+            </tr>
+            <tr>
+                <td>notes</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Clinical notes</td>
+            </tr>
+            <tr>
+                <td>comments</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Additional comments</td>
+            </tr>
+            <tr>
+                <td>patient</td>
+                <td>ObjectId</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Reference to patient record</td>
+            </tr>
+            <tr>
+                <td>doctor</td>
+                <td>ObjectId</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Reference to doctor/user</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Second Stage Labour Module -->
+    <div class="section module-section">
+        <h1>4. Second Stage Labour</h1>
+        <p>Management of second stage labour including delivery mode, monitoring, and complications.</p>
+        
+        <h2>4.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/second-stage-labour/create</span>
+            </div>
+            <p><strong>Description:</strong> Create a new second stage labour record</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "patient": "patientId",
+    "modeOfDelivery": "Spontaneous Vaginal Delivery (SVD)",
+    "contraction": "Strong and regular",
+    "deliveryDate": "2025-01-09",
+    "deliveryTime": "14:30",
+    "duration": "45 minutes",
+    "selectDrug": "Oxytocin",
+    "preferredDrugs": "Oxytocin",
+    "foetalMonitoring": "Continuous",
+    "route": "Intravenous",
+    "obstetricComplication": "None",
+    "obstetricCare": "Standard",
+    "cervicalDilatation": 10,
+    "comments": "Normal delivery"
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/second-stage-labour/statistics</span>
+            </div>
+            <p><strong>Description:</strong> Get delivery statistics for second stage labour</p>
+            <p><strong>Additional Feature:</strong> This endpoint provides comprehensive delivery statistics including success rates, complications, and mode of delivery distribution.</p>
+        </div>
+
+        <p><em>Note: Second Stage Labour includes all standard CRUD endpoints similar to First Stage Labour, plus the statistics endpoint for delivery analytics.</em></p>
+
+        <h2>4.2 Data Model</h2>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>modeOfDelivery</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Mode of delivery (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>deliveryDate</td>
+                <td>Date</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Date of delivery</td>
+            </tr>
+            <tr>
+                <td>deliveryTime</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Time of delivery</td>
+            </tr>
+            <tr>
+                <td>route</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Drug administration route</td>
+            </tr>
+            <tr>
+                <td>obstetricCare</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Type of obstetric care provided</td>
+            </tr>
+            <tr>
+                <td>cervicalDilatation</td>
+                <td>Number</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Cervical dilation (4-10 cm)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Third Stage Labour Module -->
+    <div class="section module-section">
+        <h1>5. Third Stage Labour</h1>
+        <p>Management of third stage labour including mother and newborn data, delivery details, and babies data.</p>
+        
+        <h2>5.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/third-stage-labour/create</span>
+            </div>
+            <p><strong>Description:</strong> Create a new third stage labour record</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "patient": "patientId",
+    "mother": {
+        "bloodPressureSystolic": "120",
+        "bloodPressureDiastolic": "80",
+        "pulse": "72",
+        "temperature": "36.5",
+        "respiration": "18",
+        "statusAfterDelivery": "Alive"
+    },
+    "newBorn": {
+        "newBornStatus": "Live Birth",
+        "apgarScore1Min": 8,
+        "apgarScore5Min": 9,
+        "apgarScore10Min": 10,
+        "weightKg": "3.2"
+    },
+    "delivery": {
+        "placenta": "Complete",
+        "membranes": "Complete",
+        "cord": "Normal",
+        "placentaWeight": "500g",
+        "bloodLoss": "250ml",
+        "perinealStatus": "Intact",
+        "typeofDelivery": "SVD",
+        "deliveredBy": "Dr. Smith"
+    },
+    "babiesData": {
+        "liveBirth": true,
+        "freshStillBirth": false,
+        "maceratedStillBirth": false,
+        "asphyxia": false,
+        "lowBirthWeight": false,
+        "macrosomicBabies": false,
+        "earlyNeoNatalDeath": false,
+        "bornBeforeArrival": false,
+        "preMaturity": false
+    }
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/third-stage-labour/statistics</span>
+            </div>
+            <p><strong>Description:</strong> Get comprehensive statistics for third stage labour</p>
+            <p><strong>Returns:</strong> Mother and newborn outcome statistics, complications, and success rates</p>
+        </div>
+
+        <h2>5.2 Data Model - Complex Nested Structure</h2>
+        
+        <h3>Mother Data</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>bloodPressureSystolic</td>
+                <td>String</td>
+                <td>Systolic blood pressure</td>
+            </tr>
+            <tr>
+                <td>bloodPressureDiastolic</td>
+                <td>String</td>
+                <td>Diastolic blood pressure</td>
+            </tr>
+            <tr>
+                <td>pulse</td>
+                <td>String</td>
+                <td>Pulse rate</td>
+            </tr>
+            <tr>
+                <td>temperature</td>
+                <td>String</td>
+                <td>Body temperature</td>
+            </tr>
+            <tr>
+                <td>respiration</td>
+                <td>String</td>
+                <td>Respiration rate</td>
+            </tr>
+            <tr>
+                <td>statusAfterDelivery</td>
+                <td>String</td>
+                <td>"Alive" or "Dead"</td>
+            </tr>
+        </table>
+
+        <h3>NewBorn Data</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>newBornStatus</td>
+                <td>String</td>
+                <td>Status: Live Birth, Fresh Still Birth, Macerated Still Birth, Birth with Deformities</td>
+            </tr>
+            <tr>
+                <td>apgarScore1Min</td>
+                <td>Number</td>
+                <td>APGAR score at 1 minute (0-10)</td>
+            </tr>
+            <tr>
+                <td>apgarScore5Min</td>
+                <td>Number</td>
+                <td>APGAR score at 5 minutes (0-10)</td>
+            </tr>
+            <tr>
+                <td>apgarScore10Min</td>
+                <td>Number</td>
+                <td>APGAR score at 10 minutes (0-10)</td>
+            </tr>
+            <tr>
+                <td>weightKg</td>
+                <td>String</td>
+                <td>Birth weight in kilograms</td>
+            </tr>
+        </table>
+
+        <h3>Delivery Data</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>placenta</td>
+                <td>String</td>
+                <td>"Complete" or "Retained"</td>
+            </tr>
+            <tr>
+                <td>membranes</td>
+                <td>String</td>
+                <td>"Complete" or "Incomplete"</td>
+            </tr>
+            <tr>
+                <td>cord</td>
+                <td>String</td>
+                <td>"Normal" or "Abnormal"</td>
+            </tr>
+            <tr>
+                <td>placentaWeight</td>
+                <td>String</td>
+                <td>Weight of placenta</td>
+            </tr>
+            <tr>
+                <td>bloodLoss</td>
+                <td>String</td>
+                <td>Estimated blood loss</td>
+            </tr>
+            <tr>
+                <td>perinealTear</td>
+                <td>String</td>
+                <td>Degree of tear: First, Second, Third, or Fourth</td>
+            </tr>
+            <tr>
+                <td>episiotomy</td>
+                <td>String</td>
+                <td>"Lateral", "Medical", or "Others"</td>
+            </tr>
+            <tr>
+                <td>typeofDelivery</td>
+                <td>String</td>
+                <td>Type of delivery (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>multipleGestation</td>
+                <td>String</td>
+                <td>Twin, Triplet, or Quadruplet Delivery</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Birth Register Module -->
+    <div class="section module-section">
+        <h1>6. Birth Register</h1>
+        <p>Official birth registration system for recording newborn details and issuing birth certificates.</p>
+        
+        <h2>6.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/birth-register/create</span>
+            </div>
+            <p><strong>Description:</strong> Register a new birth</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "patient": "patientId",
+    "dateOfChildRegistration": "2025-01-09",
+    "under1YearRegistration": true,
+    "sex": "Male",
+    "placeOfBirth": "Abuja General Hospital",
+    "childName": {
+        "lastName": "Doe",
+        "firstName": "John",
+        "middleName": "James"
+    },
+    "fatherFullName": {
+        "lastName": "Doe",
+        "firstName": "Robert",
+        "middleName": "William"
+    },
+    "motherFullName": {
+        "lastName": "Doe",
+        "firstName": "Jane",
+        "middleName": "Mary"
+    },
+    "motherAge": 28,
+    "fathersStateOfOrigin": "Lagos",
+    "residentialAddress": "123 Main Street, Abuja",
+    "phoneNumber": "+234123456789",
+    "birthCertificateIssue": "2025-01-10",
+    "birthCertificateCollected": "2025-01-11"
+}
+            </div>
+        </div>
+
+        <h2>6.2 Data Model</h2>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>dateOfChildRegistration</td>
+                <td>Date</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Date of registration</td>
+            </tr>
+            <tr>
+                <td>under1YearRegistration</td>
+                <td>Boolean</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Whether registered under 1 year</td>
+            </tr>
+            <tr>
+                <td>sex</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>"Male" or "Female"</td>
+            </tr>
+            <tr>
+                <td>childName</td>
+                <td>Object</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Child's name (lastName, firstName, middleName)</td>
+            </tr>
+            <tr>
+                <td>fatherFullName</td>
+                <td>Object</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Father's name (lastName, firstName, middleName)</td>
+            </tr>
+            <tr>
+                <td>motherFullName</td>
+                <td>Object</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Mother's name (lastName, firstName, middleName)</td>
+            </tr>
+            <tr>
+                <td>motherAge</td>
+                <td>Number</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Mother's age at time of birth</td>
+            </tr>
+            <tr>
+                <td>birthCertificateIssue</td>
+                <td>Date</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Date certificate was issued</td>
+            </tr>
+            <tr>
+                <td>birthCertificateCollected</td>
+                <td>Date</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Date certificate was collected</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Postnatal Care Module -->
+    <div class="section module-section">
+        <h1>7. Postnatal Care</h1>
+        <p>Management of postnatal care visits, monitoring mother and newborn health, and tracking outcomes.</p>
+        
+        <h2>7.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/postnatal-care/create</span>
+            </div>
+            <p><strong>Description:</strong> Create a new postnatal care record</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "patient": "patientId",
+    "typeOfVisit": "New",
+    "parity": "2",
+    "motherWeeks": "2",
+    "motherDays": "3",
+    "newBornWeeks": "2",
+    "newBornDays": "3",
+    "sexOfChild": "Female",
+    "kangarooMotherCare": "Required",
+    "numberOfBabiesDelivered": 1,
+    "outcomeOfVisit": {
+        "visit": "Discharge",
+        "visitFor": "Routine checkup",
+        "outcomeOfVisit": "Treated",
+        "associatedProblems": "None",
+        "services": ["Blood pressure", "Vaginal Examination"],
+        "neonatalComplications": [],
+        "counselling": ["Exclusive Breast Feeding", "Family Planning"]
+    }
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/postnatal-care/statistics</span>
+            </div>
+            <p><strong>Description:</strong> Get postnatal care statistics</p>
+            <p><strong>Returns:</strong> Visit outcomes, complications, and service utilization data</p>
+        </div>
+
+        <h2>7.2 Data Model</h2>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>typeOfVisit</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>"New" or "Revisit"</td>
+            </tr>
+            <tr>
+                <td>sexOfChild</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>"Male" or "Female"</td>
+            </tr>
+            <tr>
+                <td>kangarooMotherCare</td>
+                <td>String</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>"Required" or "Not Required"</td>
+            </tr>
+            <tr>
+                <td>outcomeOfVisit</td>
+                <td>Object</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Visit outcome details (see sub-model)</td>
+            </tr>
+        </table>
+
+        <h3>Outcome of Visit Sub-Model</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>visit</td>
+                <td>String</td>
+                <td>"LAMA", "DOPR", "Discharge", or "Refer"</td>
+            </tr>
+            <tr>
+                <td>outcomeOfVisit</td>
+                <td>String</td>
+                <td>"Not Treated", "Treated", "Admitted", "Referred out", "Transportation"</td>
+            </tr>
+            <tr>
+                <td>services</td>
+                <td>Array</td>
+                <td>Services provided during visit</td>
+            </tr>
+            <tr>
+                <td>neonatalComplications</td>
+                <td>Array</td>
+                <td>List of neonatal complications</td>
+            </tr>
+            <tr>
+                <td>counselling</td>
+                <td>Array</td>
+                <td>Counselling topics covered</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Mortality Register Module -->
+    <div class="section module-section">
+        <h1>8. Mortality Register</h1>
+        <p>Recording and tracking maternal, neonatal, and under-five mortality cases.</p>
+        
+        <h2>8.1 Endpoints</h2>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/mortality-register/create</span>
+            </div>
+            <p><strong>Description:</strong> Register a mortality case</p>
+            <p><strong>Request Body:</strong></p>
+            <div class="code-block">
+{
+    "name": "Patient Name",
+    "sex": "Female",
+    "dateOfBirth": "1995-03-15",
+    "age": 29,
+    "patientCardNumber": "PAT-12345",
+    "ward": "Maternity Ward",
+    "state": "FCT",
+    "lga": "Abuja Municipal",
+    "maternalMortality": true,
+    "maternalDeath": "Post-partum haemorrhage",
+    "other": "",
+    "neonatalDeath": "",
+    "Deathunderfive": "",
+    "DeathunderfiveOther": ""
+}
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/mortality-register/statistics</span>
+            </div>
+            <p><strong>Description:</strong> Get mortality statistics</p>
+            <p><strong>Returns:</strong> Mortality rates by category, causes of death distribution</p>
+        </div>
+
+        <h2>8.2 Data Model</h2>
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>name</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>Name of deceased</td>
+            </tr>
+            <tr>
+                <td>sex</td>
+                <td>String</td>
+                <td><span class="badge required">Required</span></td>
+                <td>"Male" or "Female"</td>
+            </tr>
+            <tr>
+                <td>maternalMortality</td>
+                <td>Boolean</td>
+                <td><span class="badge optional">Optional</span></td>
+                <td>Whether it's a maternal death</td>
+            </tr>
+            <tr>
+                <td>maternalDeath</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Cause of maternal death (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>neonatalDeath</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Cause of neonatal death (see enumerations)</td>
+            </tr>
+            <tr>
+                <td>Deathunderfive</td>
+                <td>String</td>
+                <td><span class="badge enum">Enum</span></td>
+                <td>Cause of under-five death (see enumerations)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Appendix: Enumerations -->
+    <div class="section module-section">
+        <h1>9. Appendix: Enumerations</h1>
+        <p>Complete list of enumeration values used across the maternity modules.</p>
+        
+        <h2>Phase Options</h2>
+        <div class="code-block">
+["Active", "Latent"]
+        </div>
+
+        <h2>Select Drug Options</h2>
+        <div class="code-block">
+["Others", "Dextrose Water", "Misoprostol", "Normal Saline", "Oxytocin"]
+        </div>
+
+        <h2>Obstetric Complications</h2>
+        <div class="code-block">
+[
+    "Breech Presentation",
+    "Induction of Labour",
+    "Preterm Labour",
+    "Manual Removal of Placenta",
+    "Post-Partum Hemorrhage (PPH)",
+    "Premature Rapture of Membrane (PROM)",
+    "Ante Partum Hemorrhage (APH)",
+    "Placenta Previa",
+    "Abruptio Placenta",
+    "Pre - Eclampsia",
+    "Eclampsia",
+    "Maternal Death",
+    "Pregnancy Induced Hypertension (PIH)"
+]
+        </div>
+
+        <h2>Number of Vaginal Examinations (noOfVE)</h2>
+        <div class="code-block">
+["1", "2", "3", "4", "5", "6"]
+        </div>
+
+        <h2>Cervical Dilation Range</h2>
+        <div class="code-block">
+{
+    "min": 4,
+    "max": 10,
+    "options": [4, 5, 6, 7, 8, 9, 10]
+}
+        </div>
+
+        <h2>Mode of Delivery</h2>
+        <div class="code-block">
+[
+    "Spontaneous Vaginal Delivery (SVD)",
+    "C-Section (CS)",
+    "Assisted Vaginal Delivery",
+    "Breech Delivery",
+    "Forceps-Assisted Delivery",
+    "Vacuum-Assisted Delivery",
+    "Emergency C.S"
+]
+        </div>
+
+        <h2>Route of Administration</h2>
+        <div class="code-block">
+[
+    "Oral", "Intraocular", "Intraotic", "Nasal",
+    "Sublingual", "Buccal", "Inhaled", "Enteral",
+    "Rectal", "Vaginal", "Transdermal", "Subcutaneous",
+    "Intramuscular", "Intravenous", "Intra-Arterial"
+]
+        </div>
+
+        <h2>Obstetric Care Options</h2>
+        <div class="code-block">
+[
+    "Manual Placenta removal",
+    "Antibiotics",
+    "Oxytocin",
+    "Anticonvulsant",
+    "Blood transfusion",
+    "Others"
+]
+        </div>
+
+        <h2>Maternal Death Causes</h2>
+        <div class="code-block">
+[
+    "Post-partum haemorrhage",
+    "Sepsis",
+    "Obstructed labour",
+    "Abortion",
+    "Malaria",
+    "Anaemia",
+    "HIV",
+    "Other"
+]
+        </div>
+
+        <h2>Neonatal Death Causes</h2>
+        <div class="code-block">
+[
+    "Prematurity",
+    "Neonatal Tetanus",
+    "Continental Malformation",
+    "Others"
+]
+        </div>
+
+        <h2>Under-Five Death Causes</h2>
+        <div class="code-block">
+[
+    "Malaria",
+    "Pneumonia",
+    "Malnutrition",
+    "Others"
+]
+        </div>
+
+        <h2>Services in Postnatal Care</h2>
+        <div class="code-block">
+[
+    "Blood pressure",
+    "Vaginal Examination",
+    "HB",
+    "PCV",
+    "Urinalysis"
+]
+        </div>
+
+        <h2>Neonatal Complications</h2>
+        <div class="code-block">
+[
+    "Newborn with danger signs",
+    "Newborn with danger Signs given first dose of antibiotics and referred",
+    "Neonatal Tetanus",
+    "Neonatal Jaundice"
+]
+        </div>
+
+        <h2>Counselling Topics</h2>
+        <div class="code-block">
+[
+    "Maternal Nutrition",
+    "Exclusive Breast Feeding",
+    "Complementary Feeding",
+    "Family Planning",
+    "Female Genital Mutilation",
+    "Infection Prevention",
+    "Others"
+]
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="section" style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #ddd;">
+        <h2>Additional Information</h2>
+        
+        <h3>Error Handling</h3>
+        <p>All endpoints return standardized error responses:</p>
+        <div class="code-block">
+{
+    "status": false,
+    "msg": "Error description"
+}
+        </div>
+
+        <h3>HTTP Status Codes</h3>
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>200</td>
+                <td>Success</td>
+            </tr>
+            <tr>
+                <td>201</td>
+                <td>Created</td>
+            </tr>
+            <tr>
+                <td>400</td>
+                <td>Bad Request</td>
+            </tr>
+            <tr>
+                <td>401</td>
+                <td>Unauthorized</td>
+            </tr>
+            <tr>
+                <td>404</td>
+                <td>Not Found</td>
+            </tr>
+            <tr>
+                <td>500</td>
+                <td>Internal Server Error</td>
+            </tr>
+        </table>
+
+        <h3>Pagination</h3>
+        <p>Paginated endpoints support the following query parameters:</p>
+        <ul>
+            <li><code>page</code> - Page number (default: 1)</li>
+            <li><code>limit</code> - Items per page (default: 10)</li>
+            <li><code>searchText</code> - Search filter</li>
+        </ul>
+
+        <h3>Contact Information</h3>
+        <p>For API support and questions, please contact the development team.</p>
+        
+        <div style="text-align: center; margin-top: 40px; color: #666;">
+            <p>© 2025 Healthcare Management System - Maternity Module API Documentation</p>
+        </div>
+    </div>
+</body>
+</html>

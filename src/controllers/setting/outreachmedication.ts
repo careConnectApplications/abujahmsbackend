@@ -13,7 +13,7 @@ export var createoutreachmedications = async (req:any,res:any) =>{
       // validate Outreachmedication
         const foundOutreachmedicationname =  await readoneoutreachmedication({outreachmedicationname},'');
         if(foundOutreachmedicationname){
-            throw new Error(`Outreachmedication ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Outreachmedication already exists`);
 
         }
          const queryresult=await createoutreachmedication({outreachmedicationname,outreachmedicationid});

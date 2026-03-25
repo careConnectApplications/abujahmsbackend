@@ -47,7 +47,7 @@ export const createprogressreport = async (req:any, res:any) => {
       const admissionrecord:any =  await readoneadmission({_id:id},{},'');    
       //console.log(admissionrecord);   
       if(!admissionrecord){
-           throw new Error(`Admission donot ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Admission does not exist`);
   
        }
     const queryresult=await createprogressreports({referedward:admissionrecord.referedward,admission:admissionrecord._id,patient:admissionrecord.patient,report,staffname});

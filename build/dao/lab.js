@@ -32,7 +32,7 @@ function countlab(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -40,11 +40,11 @@ function countlab(query) {
 function readalllablimitfive(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 }).limit(5);
+            return yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 }).limit(5);
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -52,13 +52,13 @@ function readalllablimitfive(query, selectquery, populatequery, populatesecondqu
 function readalllab(query, selectquery, populatequery, populatesecondquery, populatethirdquery) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const labdetails = yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: -1 });
+            const labdetails = yield lab_1.default.find(query).select(selectquery).populate(populatequery).populate(populatesecondquery).populate(populatethirdquery).sort({ createdAt: 1 });
             const totallabdetails = yield lab_1.default.find(query).countDocuments();
             return { labdetails, totallabdetails };
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -67,7 +67,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const skip = (page - 1) * size;
-            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: -1 });
+            var labdetails = yield lab_1.default.aggregate(aggregatequery).skip(skip).limit(size).sort({ createdAt: 1 });
             ;
             const totallabdetails = (yield lab_1.default.aggregate(aggregatequery)).length;
             const totalPages = Math.ceil(totallabdetails / size);
@@ -75,7 +75,7 @@ function optimizedreadalllab(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -87,7 +87,7 @@ function createlab(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create lab test");
         }
     });
 }
@@ -99,7 +99,7 @@ function readonelab(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve lab test data");
         }
     });
 }
@@ -118,7 +118,7 @@ function updatelab(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }
@@ -137,7 +137,7 @@ function updatelabbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }
@@ -148,7 +148,7 @@ function readlabaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update lab test");
         }
     });
 }

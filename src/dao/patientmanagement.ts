@@ -13,7 +13,7 @@ export async function countpatient(query: any) {
 
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve patient data");
   }
 };
 
@@ -23,7 +23,7 @@ export async function deletePatietsByCondition(query: any) {
     const result = await Patient.deleteMany(query);
     return result;
   } catch (err) {
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve patient data");
   }
 }
 
@@ -35,7 +35,7 @@ export async function readallpatient(query: any, selectquery: any, populatequery
     return { patientdetails, totalpatientdetails };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve patient data");
   }
 };
 //read all patient history
@@ -49,7 +49,7 @@ export async function readallpatientpaginated(query: any, selectquery: any, popu
     return { patientdetails, totalPages, totalpatientdetails, size, page };
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve patient data");
   }
 };
 export async function createpatient(input: patientinterface) {
@@ -59,7 +59,7 @@ export async function createpatient(input: patientinterface) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create patient");
 
   }
 }
@@ -70,7 +70,7 @@ export async function readonepatient(query: any, selectquery: any, populatequery
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve patient data");
 
   }
 }
@@ -95,7 +95,7 @@ export async function updatepatient(id: any, reqbody: any) {
     return user;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update patient");
 
 
   }
@@ -116,7 +116,7 @@ export async function updatepatientbyanyquery(query: any, reqbody: any) {
     return patient;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update patient");
 
 
   }
@@ -134,7 +134,7 @@ export async function updatepatientmanybyquery(query: any, reqbody: any) {
     return payment;
   } catch (err) {
     console.log(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update patient");
 
   }
 
@@ -152,7 +152,7 @@ export async function createpatientifnotexit(filterinput: any, input: any) {
   }
   catch (err) {
     console.log(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create patient");
 
   }
 }

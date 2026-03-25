@@ -29,7 +29,7 @@ function readallnursingcareplan(query, selectquery, populatequery, populatesecon
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve nursing care plan data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createnursingcareplan(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create nursing care plan");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonenursingcareplan(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve nursing care plan data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updatenursingcareplan(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update nursing care plan");
         }
     });
 }
@@ -91,7 +91,7 @@ function updatenursingcareplanequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update nursing care plan");
         }
     });
 }

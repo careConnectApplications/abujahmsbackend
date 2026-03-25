@@ -1,6 +1,7 @@
 import * as path from 'path';
+import client from 'prom-client';
 import cors from 'cors';
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import fileUpload from "express-fileupload";
 import httpStatus from "http-status";
 import { readicdeleven } from '../controllers/icdten/icdten';
@@ -38,11 +39,53 @@ import physiotherapyRoute from "../routes/phisiotherapy";
 import EyeModuleRoute from "../routes/eye-module.route";
 import DoctorWardRoute from "../routes/doctor-ward-round.route";
 import Insuranceclaimsandauthorization from '../routes/insuranceauthorizationandclaims';
+import maternity from '../routes/maternity';
 
 
 
 function createServer() {
   const app: Application = express();
+  // ✅ Collect default Node.js metrics (CPU, memory, event loop, GC, etc.)
+  client.collectDefaultMetrics({ prefix: "node_" });
+
+  // 1. Total number of requests (Counter)
+  const totalRequests = new client.Counter({
+    name: "http_requests_total",
+    help: "Total number of HTTP requests",
+    labelNames: ["method", "route", "status"] as const,
+  });
+
+  // 2. Total number of errors (Counter)
+  const totalErrors = new client.Counter({
+    name: "http_request_errors_total",
+    help: "Total number of failed HTTP requests",
+    labelNames: ["method", "route", "status"] as const,
+  });
+
+  // 3. CPU utilization (Gauge)
+  const cpuUsage = new client.Gauge({
+    name: "process_cpu_user_seconds_total",
+    help: "Total user CPU time spent in seconds",
+  });
+
+  // 4. Memory usage (Gauge)
+  const memoryUsage = new client.Gauge({
+    name: "process_resident_memory_bytes",
+    help: "Resident memory size in bytes",
+  });
+
+
+  setInterval(() => {
+    const usage = process.cpuUsage();
+    const memory = process.memoryUsage();
+
+    // CPU user time in seconds
+    cpuUsage.set(usage.user / 1e6); // microseconds → seconds
+
+    // Memory RSS (Resident Set Size)
+    memoryUsage.set(memory.rss);
+  }, 5000);
+
 
   if (process.env.NODE_ENV !== "test") {
     app.use(morgan.successHandler);
@@ -52,6 +95,17 @@ function createServer() {
   app.use(cors({
     origin: "*",
   }));
+  // Middleware to track requests & errors
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.on("finish", () => {
+      totalRequests.labels(req.method, req.path, res.statusCode.toString()).inc();
+
+      if (res.statusCode >= 400) {
+        totalErrors.labels(req.method, req.path, res.statusCode.toString()).inc();
+      }
+    });
+    next();
+  });
   app.use(express.static(__dirname + '/downloads'));
   app.use(express.static(path.join(__dirname, 'uploads')));
 
@@ -71,8 +125,13 @@ function createServer() {
    * Cron Jobs
    */
   //import("../jobs/checkExpiredSubscriptionDate.job");
-  
+
   app.use(fileUpload());
+  // Expose /metrics endpoint
+  app.get("/api/v1/metrics", async (req: Request, res: Response) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
+  });
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
@@ -107,6 +166,7 @@ function createServer() {
   app.use("/api/v1/eye-module", protect, EyeModuleRoute);
   app.use("/api/v1/doctor-ward-round", protect, DoctorWardRoute);
   app.use("/api/v1/insuranceauthorizationandclaims", protect, Insuranceclaimsandauthorization);
+  app.use("/api/v1/maternity", protect, maternity);
 
   // Handle POST requests to /webhook
   /*

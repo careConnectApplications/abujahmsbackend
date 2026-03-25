@@ -29,7 +29,7 @@ function readalloperationnotes(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve operation notes data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createoperationnote(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create operation notes");
         }
     });
 }
@@ -54,7 +54,7 @@ function readoneoperationnote(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve operation notes data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updateoperationnote(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update operation notes");
         }
     });
 }
@@ -92,7 +92,7 @@ function updateoperationnotequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update operation notes");
         }
     });
 }

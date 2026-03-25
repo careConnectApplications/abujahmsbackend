@@ -77,5 +77,17 @@ filledby: {
 },
 { timestamps: true }
 );
+
+// Add indexes for performance optimization
+// Single field indexes
+anathesiaSchema.index({ theatreadmission: 1 });
+anathesiaSchema.index({ createdAt: -1 });
+anathesiaSchema.index({ filledby: 1 });
+anathesiaSchema.index({ asa: 1 });
+
+// Compound indexes for common query patterns
+anathesiaSchema.index({ theatreadmission: 1, createdAt: -1 });
+anathesiaSchema.index({ filledby: 1, createdAt: -1 });
+
 const anathesia = model('Anathesia', anathesiaSchema);
 export default anathesia;

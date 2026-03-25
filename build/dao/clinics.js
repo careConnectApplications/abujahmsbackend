@@ -29,7 +29,7 @@ function readallclinics(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve clinic data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createclinic(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create clinic");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneclinic(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve clinic data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updateclinic(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update clinic");
         }
     });
 }
@@ -93,7 +93,7 @@ function updateclinicyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update clinic");
         }
     });
 }

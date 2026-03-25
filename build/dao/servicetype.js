@@ -30,7 +30,7 @@ function readallservicetype(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve service type data");
         }
     });
 }
@@ -44,7 +44,7 @@ function createservicetype(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create service type");
         }
     });
 }
@@ -56,7 +56,7 @@ function readoneservicetype(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve service type data");
         }
     });
 }
@@ -75,7 +75,7 @@ function updateservicetype(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update service type");
         }
     });
 }
@@ -94,7 +94,7 @@ function updateservicetypeyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update service type");
         }
     });
 }
@@ -106,7 +106,7 @@ function createmanyservicetype(filterinput, input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create service type");
         }
     });
 }

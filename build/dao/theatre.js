@@ -29,7 +29,7 @@ function readalltheatremanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve theatre data");
         }
     });
 }
@@ -42,7 +42,7 @@ function createtheatremanagement(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create theatre");
         }
     });
 }
@@ -54,7 +54,7 @@ function readonetheatremanagement(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve theatre data");
         }
     });
 }
@@ -73,7 +73,7 @@ function updatetheatremanagement(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update theatre");
         }
     });
 }
@@ -92,7 +92,7 @@ function updatetheatremanagementbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update theatre");
         }
     });
 }

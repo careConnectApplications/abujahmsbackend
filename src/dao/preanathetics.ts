@@ -10,7 +10,7 @@ import configuration from "../config";
       return { preanatheticsdetails, totalpreanatheticsdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pre-anaesthetic data");
     }
   };
   export async function createpreanathetics(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create pre-anaesthetic");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve pre-anaesthetic data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return preanathetics;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pre-anaesthetic");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return preanathetics;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update pre-anaesthetic");
 
     }
 

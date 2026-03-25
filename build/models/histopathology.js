@@ -165,5 +165,18 @@ histopathologySchema.pre(/^find/, function (next) {
     next();
 });
 histopathologySchema.plugin(paginate_1.paginate);
+// Add indexes for performance optimization
+// Single field indexes
+histopathologySchema.index({ patient: 1 });
+histopathologySchema.index({ status: 1 });
+histopathologySchema.index({ payment: 1 });
+histopathologySchema.index({ paymentStatus: 1 });
+histopathologySchema.index({ createdAt: -1 });
+histopathologySchema.index({ refNumber: 1 });
+histopathologySchema.index({ staffInfo: 1 });
+// Compound indexes for common query patterns
+histopathologySchema.index({ patient: 1, status: 1 });
+histopathologySchema.index({ status: 1, createdAt: -1 });
+histopathologySchema.index({ paymentStatus: 1, status: 1 });
 const Histopathology = mongoose_1.default.model("Histopathology", histopathologySchema);
 exports.default = Histopathology;

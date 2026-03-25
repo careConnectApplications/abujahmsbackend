@@ -19,7 +19,6 @@ const dentalencounter_1 = require("../../dao/dentalencounter");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const appointment_1 = require("../../dao/appointment");
 const admissions_1 = require("../../dao/admissions");
-const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const { ObjectId } = mongoose_1.default.Types;
 // 🔍 Read all dental encounters by patient
@@ -42,7 +41,7 @@ exports.createDentalEncounterController = (0, catchAsync_1.default)((req, res, n
     (0, otherservices_1.validateinputfaulsyvalue)({ id, appointmentoradmissionunderscoreid });
     const patient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
     if (!patient) {
-        return next(new Error(`Patient does not exist ${config_1.default.error.erroralreadyexit}`));
+        return next(new Error(`Patient does not exist already exists`));
     }
     const checkappointmentId = new ObjectId(appointmentoradmissionunderscoreid);
     const appointment = yield (0, appointment_1.readoneappointment)({ _id: checkappointmentId }, {}, '');

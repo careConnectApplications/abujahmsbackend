@@ -15,7 +15,7 @@ export var createpricingmodel = async (req:any,res:any) =>{
        validateinputfaulsyvalue({pricingtype,exactnameofancclinic,exactnameofservicetypeforadult,exactnameofservicetypeforchild});   
         const foundPricingmodel =  await readonepricemodel({});
         if(foundPricingmodel){
-            throw new Error(`Pricing Model ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Pricing Model already exists`);
 
         }
          const queryresult=await createpricemodel({pricingtype,exactnameofancclinic,exactnameofservicetypeforadult,exactnameofservicetypeforchild});

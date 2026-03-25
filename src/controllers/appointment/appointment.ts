@@ -5,7 +5,7 @@ import { createvitalcharts } from "../../dao/vitalcharts";
 import { readonevitalcharts, updatevitalcharts } from "../../dao/vitalcharts";
 import { readonepatient, updatepatient } from "../../dao/patientmanagement";
 import { readonehmocategorycover } from "../../dao/hmocategorycover";
-import { readallservicetype } from "../../dao/servicetype";
+import {readoneclinic} from "../../dao/clinics";
 import { readone, readall } from "../../dao/users";
 import { readoneprice } from "../../dao/price";
 import catchAsync from "../../utils/catchAsync";
@@ -13,77 +13,68 @@ import { createpayment } from "../../dao/payment";
 import mongoose from 'mongoose';
 //import {createvital} from "../../dao/vitals";
 import { createlab } from "../../dao/lab";
-import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable, calculateAmountPaidByHMO, uploadbase64image } from "../../utils/otherservices";
+import { validateinputfaulsyvalue, generateRandomNumber, validateinputfornumber, isObjectAvailable, calculateAmountPaidByHMO, uploadbase64image,removeEmpty } from "../../utils/otherservices";
 import configuration from "../../config";
 import { ApiError } from "../../errors";
 const { ObjectId } = mongoose.Types;
-
+import { AppointmentContext, FreeAppointmentStrategy,PaidAppointmentStrategy  } from "./appointment.helper"; 
 //add vitals for 
 
 
 // Create a new schedule
-export const scheduleappointment = async (req: any, res: any) => {
-  try {
 
-    //req.body.appointmentdate=new Date(req.body.appointmentdate);
-    var appointmentid: any = String(Date.now());
-    //const {id} = req.params;
+export const scheduleappointment = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+    const appointmentid = String(Date.now());
+    //clean the req body
+    req.body=removeEmpty(req.body);
+    console.log("req.body",req.body);
+    const { clinic,unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
 
-    var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division } = req.body;
-    validateinputfaulsyvalue({ clinic, appointmentdate, appointmentcategory, appointmenttype, patient });
-    //pending
+    // validate input
+    validateinputfaulsyvalue({ clinic,unit, appointmentdate, appointmentcategory, appointmenttype, patient });
 
-    //validatioborder
-    var selectquery = {
-      "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-      "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
-    };
-    //search patient if available and por
-    const patientrecord: any = await readonepatient({ _id: patient, status: configuration.status[1] }, selectquery, 'insurance', '');
+    // check patient
+    const selectquery = { firstName: 1, lastName: 1, MRN: 1, HMOId: 1, HMOName: 1, phoneNumber: 1 };
+    const patientrecord = await readonepatient({ _id: patient, status: configuration.status[1] }, selectquery, "insurance", "");
+    if (!patientrecord) throw new Error("Patient not found");
 
-    // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
-    if (!patientrecord) {
-      throw new Error(`Patient donot ${configuration.error.erroralreadyexit}`);
-    }
+    // check clinic
+    const foundclinic = await readoneclinic({ clinic }, {});
+    if (!foundclinic || !foundclinic.category) throw new Error("Clinic invalid or missing category");
+    req.body.category = foundclinic.category;
 
-    var { firstName, lastName, MRN, HMOId, HMOName } = patientrecord;
+    // price
+    const appointmentPrice = await readoneprice({ servicecategory: appointmentcategory, servicetype: appointmenttype });
+    if (!appointmentPrice) throw new Error("Price not set");
 
-    //search for price if available
-    var appointmentPrice: any = await readoneprice({ servicecategory: appointmentcategory, servicetype: appointmenttype });
-    if (!appointmentPrice) {
-      throw new Error(configuration.error.errornopriceset);
+    const insurance = await readonehmocategorycover(
+      { hmoId: patientrecord?.insurance?._id, category: configuration.category[0] },
+      { hmopercentagecover: 1 }
+    );
+    const hmopercentagecover = insurance?.hmopercentagecover ?? 0;
+    const amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
+    
+    // Extract createdBy from req.user (if available)
+    const createdBy = req.user?.user?._id || req.user?._id;laborder
+    
+    // choose strategy
+    const strategy = amount === 0 ? FreeAppointmentStrategy : PaidAppointmentStrategy;
+    const context = AppointmentContext(strategy);
 
-    }
-    let insurance: any = await readonehmocategorycover({ hmoId: patientrecord?.insurance?._id, category: configuration.category[0] }, { hmopercentagecover: 1 });
-    var hmopercentagecover = insurance?.hmopercentagecover ?? 0;
-    var amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(appointmentPrice.amount));
-
-    //create appointment
-    //create payment
-    let createpaymentqueryresult: any;
-    let queryresult;
-    if (amount == 0) {
-      let vitals = await createvitalcharts({ status: configuration.status[8], patient: patientrecord._id });
-      queryresult = await createappointment({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
-      await updatepatient(patient, { $push: { appointment: queryresult._id } });
-
-    }
-    else if (amount > 0) {
-      createpaymentqueryresult = await createpayment({ firstName: patientrecord?.firstName, lastName: patientrecord?.lastName, MRN: patientrecord?.MRN, phoneNumber: patientrecord?.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount });
-      let vitals = await createvitalcharts({ status: configuration.status[8], patient: patientrecord._id });
-      queryresult = await createappointment({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
-      //create vitals
-      await updatepatient(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
-    }
-
-    //create vitals
-
-    //update patient
+    const queryresult = await context.execute({
+      patientrecord,
+      appointmentid,
+      req,
+      amount,
+      configuration,
+      services: { createpayment, createvitalcharts, createappointment, updatepatient },
+      hmopercentagecover,
+      appointmentPrice,
+      createdBy
+    });
     res.status(200).json({ queryresult, status: true });
-  } catch (error: any) {
-    res.status(403).json({ status: false, msg: error.message });
-  }
-};
+ 
+});
 
 // Get all schedueled records
 export const getAllSchedulesoptimized = async (req: any, res: any) => {
@@ -792,6 +783,7 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
 
     //find patient
     const foundPatient: any = await readonepatient({ _id: id }, {}, 'insurance', '');
+   
     // check is patient is under inssurance
     //var isHMOCover;
     // Create a new ObjectId
@@ -805,11 +797,10 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
     //insurance
     if (foundPatient) {
 
-      if (!foundPatient?.insurance) return next(new ApiError(404, "patient does not have insurance info"))
+      if (!foundPatient) return next(new ApiError(404, "patient do not exist"))
 
        //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
-      let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
-     
+      let insurance: any = await readonehmocategorycover({ hmoId: foundPatient?.insurance?._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
       hmopercentagecover = insurance?.hmopercentagecover ?? 0;
       patientappointment = await readoneappointment({ _id: appointmentunderscoreid }, {}, 'patient');
       appointment = {
@@ -826,7 +817,7 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       appointment = await readoneappointment({ _id: id }, {}, 'patient');
       if (!appointment) {
         //create an appointment
-        throw new Error(`Appointment donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Appointment does not exist`);
 
       }
       //read insurance
@@ -841,13 +832,16 @@ export var laborder = catchAsync(async (req: Request | any, res: Response, next:
       //    console.log(testname[i]);
       //console.log(isHMOCover);
       var testPrice: any = await readoneprice({ servicetype: testname[i] });
+      //search in clinic
+      
 
       if (testPrice?.amount == null) {
         throw new Error(`${configuration.error.errornopriceset}  ${testname[i]}`);
       }
+      let labcategory= testPrice?.category;
       let amount = calculateAmountPaidByHMO(Number(hmopercentagecover), Number(testPrice.amount));
       //create testrecord
-      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName });
+      let testrecord: any = await createlab({hmopercentagecover,actualcost:testPrice.amount,note,priority,testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department,amount,raiseby,filename: fileName, labcategory });
 
       testsid.push(testrecord._id);
       //paymentids.push(createpaymentqueryresult._id);
@@ -1311,8 +1305,3 @@ export const countPatientsPerDoctor = catchAsync(async (req: Request, res: Respo
 
 
 });
-
-
-
-
-

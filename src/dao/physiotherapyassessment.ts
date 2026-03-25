@@ -24,7 +24,7 @@ export async function readAllPhysiotherapyAssessments(
     return { assessments, total };
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve physiotherapy assessment data");
   }
 }
 
@@ -35,7 +35,7 @@ export async function createPhysiotherapyAssessment(input:any) {
     return await newAssessment.save();
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create physiotherapy assessment");
   }
 }
 
@@ -45,7 +45,7 @@ export async function readOnePhysiotherapyAssessment(query:any, selectquery = {}
     return await PhysiotherapyAssessment.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve physiotherapy assessment data");
   }
 }
 
@@ -65,7 +65,7 @@ export async function updatePhysiotherapyAssessmentById(id:any, reqbody:any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update physiotherapy assessment");
   }
 }
 
@@ -85,6 +85,6 @@ export async function updatePhysiotherapyAssessmentByQuery(query:any, reqbody:an
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update physiotherapy assessment");
   }
 }

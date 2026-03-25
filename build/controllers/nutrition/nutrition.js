@@ -19,7 +19,6 @@ const patientmanagement_1 = require("../../dao/patientmanagement");
 const otherservices_1 = require("../../utils/otherservices");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
-const config_1 = __importDefault(require("../../config"));
 const readAllnutritionByPatient = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { patient } = req.params;
@@ -45,7 +44,7 @@ const createnutritions = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, nutrition_1.createnutrition)({ patient: patientrecord._id, date, ageinmonths, typeofvisit, infactandyoungchildfeeding, complementaryfeeding, counsellingprovided, referedtosupportgroup, anthropometryheight, anthropometryweight, anthropometrybilateraloedema, muacred, muacyellow, muacgreen, growthaccordingtothechildhealthcard, vitaminasupplement, deworming, staffname });
         res.status(200).json({ queryresult, status: true });

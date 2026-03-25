@@ -1,6 +1,7 @@
 import express from 'express';
-import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice} from '../controllers/setting/pricesetting';
+import {createprices,getallprices,updateprices,updatepricestatus,searchtest,searchprocedure,searchradiology,getpriceofservice,getServiceTypesByCategory} from '../controllers/setting/pricesetting';
 import {createclinics,getallclinic,updateclinics,getonlyclinic} from '../controllers/setting/clinics';
+import {createunits,getallunits,updateunits,getunitsbyclinic,getunitsbyclinicname} from '../controllers/setting/units';
 import {createservicetypes,getallservicetypes,updateservicetypes,getpharmacyservicetype} from '../controllers/setting/servicetype';
 import {createward,getallward,updateward} from '../controllers/setting/wardmanagement';
 import {createtheatre,getalltheatre,updatetheatre} from '../controllers/setting/theatremanagement';
@@ -24,6 +25,7 @@ router.get('/getallprices',getallprices);
 router.get('/searchtest/:searchparams',searchtest);
 router.get('/searchprocedure/:searchparams',searchprocedure);
 router.get('/searchradiology/:searchparams',searchradiology);
+router.get('/getservicetypesbycategory/:servicecategory',getServiceTypesByCategory);
 
 
 
@@ -32,6 +34,13 @@ router.get('/getallclinic',getallclinic);
 router.get('/getonlyclinic',getonlyclinic);
 //getonlyclinic
 router.put('/updateclinics/:id', updateclinics);
+
+//units management
+router.post('/createunits',createunits);
+router.get('/getallunits',getallunits);
+router.get('/getunitsbyclinic/:clinicId',getunitsbyclinic);
+router.get('/getunitsbyclinicname/:clinic',getunitsbyclinicname);
+router.put('/updateunits/:id', updateunits);
 
 router.put('/updateprices/:id',updateprices);
 router.put('/updatepricestatus/:id', updatepricestatus);

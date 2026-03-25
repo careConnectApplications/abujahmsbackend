@@ -18,7 +18,6 @@ const immunization_1 = require("../../dao/immunization");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const mongoose_1 = __importDefault(require("mongoose"));
 const { ObjectId } = mongoose_1.default.Types;
-const config_1 = __importDefault(require("../../config"));
 /*
 export const readallimmunizationByAdmission = async (req:any, res:any) => {
     try {
@@ -64,7 +63,7 @@ const createimmunizations = (req, res) => __awaiter(void 0, void 0, void 0, func
         const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
         //console.log(admissionrecord);   
         if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
         const queryresult = yield (0, immunization_1.createimmunization)({ patient: patientrecord._id, vaccinationlocation, outreachMedications, adverseEffectVaccine, isFullyImmunized, isZeroDoseChild, vaccination, medicationgiventomanageadverseeffect, adverseeffectseverity, anynotedadverseeffect, schedule, vaccinecode, vaccinename, vaccinetype, manufacturer, batchno, expirydate, dose, doseamount, administrationsite, administrationroute, consent, immunizationstatus, comment, onsetdateofreaction, reactcode, reporter, reportingsource, staffname });
         res.status(200).json({ queryresult, status: true });

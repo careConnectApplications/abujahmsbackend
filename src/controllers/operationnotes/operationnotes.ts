@@ -19,7 +19,7 @@ validateinputfaulsyvalue({theatreadmission, diagnosispreop,diagnosisoperative,op
 //validate theatre admission
   var  findAdmission = await readonethearteadmission({_id:theatreadmission},{},'');
   if(!findAdmission){
-    throw new Error(`Theatre Admission donot ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Theatre Admission does not exist`);
 
 }
 
@@ -69,7 +69,7 @@ validateinputfaulsyvalue({diagnosispreop,diagnosisoperative,operative,surgeon,as
  
       var  findoperationnote = await readoneoperationnote({_id:id},{},'');
       if(!findoperationnote){
-        throw new Error(`Operation Note ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Operation Note already exists`);
     
     }
   

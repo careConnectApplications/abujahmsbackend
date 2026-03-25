@@ -43,7 +43,7 @@ export const createEyeModule = catchAsync(async (req: Request | any, res: Respon
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
     const newEyeModule = {
         patient: patientId,
@@ -74,12 +74,12 @@ export const createLensPrescription = catchAsync(async (req: Request | any, res:
 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
 
     const foundAppointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
     if (!foundAppointment) {
-        return next(new ApiError(404, `appointment do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `appointment do not already exists`));
     }
 
     /// first check if eye module instance aleady exist if not create one
@@ -349,7 +349,7 @@ export const createExamination = catchAsync(async (req: Request | any, res: Resp
 
     res.status(201).json({
         status: "success",
-        message: "Ophthalmology examination saved successfully",
+        msg: "Ophthalmology examination saved successfully",
         eyeDoc
     });
 
@@ -533,7 +533,7 @@ export const createPreliminaryTest = catchAsync(async (req: Request | any, res: 
 
     res.status(201).json({
         status: "success",
-        message: "Preliminary test recorded successfully",
+        msg: "Preliminary test recorded successfully",
         data: eyeDoc
     });
 });
@@ -659,7 +659,7 @@ export const createOperationalNotes = catchAsync(async (req: Request | any, res:
 
     res.status(201).json({
         status: "success",
-        message: "Operational notes and files uploaded successfully",
+        msg: "Operational notes and files uploaded successfully",
         data: updatedDoc
     });
 });
@@ -696,7 +696,7 @@ export const getEyeRecordByAppointmentIdAndPatientId = catchAsync(async (req: Re
 
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 });
@@ -720,7 +720,7 @@ export const getEyeRecordById = catchAsync(async (req: Request, res: Response, n
 
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 });
@@ -733,7 +733,7 @@ export const getAllEyeRecords = catchAsync(async (req: Request | any, res: Respo
 
     res.status(200).json({
         status: "success",
-        message: "all Eye record fetched successfully",
+        msg: "all Eye record fetched successfully",
         data: doc
     });
 });
@@ -741,7 +741,7 @@ export const getAllEyeRecords = catchAsync(async (req: Request | any, res: Respo
 export const getAllEyeUtilData = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
     res.status(200).json({
         status: "success",
-        message: "eye module config",
+        msg: "eye module config",
         data: {
             OperationalNotesFileName, LensTint, lensType, slitLamp, opthalmoscopy, refraction
         }
@@ -820,7 +820,7 @@ export const updateLensPrescription = catchAsync(
 
         res.status(200).json({
             status: "success",
-            message: "Lens prescription updated successfully",
+            msg: "Lens prescription updated successfully",
             data: updatedDoc
         });
     }
@@ -958,7 +958,7 @@ export const updatePreliminaryTest = catchAsync(
 
         res.status(200).json({
             status: "success",
-            message: "Preliminary test updated successfully",
+            msg: "Preliminary test updated successfully",
             data: updatedDoc
         });
     }
@@ -1113,7 +1113,7 @@ export const updateExamination = catchAsync(
 
         res.status(200).json({
             status: "success",
-            message: "Examination updated successfully",
+            msg: "Examination updated successfully",
             data: updatedDoc
         });
     }
@@ -1176,7 +1176,7 @@ export const updateOperationalTest = catchAsync(
 
         res.status(200).json({
             status: "success",
-            message: "Operational tests updated successfully",
+            msg: "Operational tests updated successfully",
             data: updatedDoc
         });
     });
@@ -1206,7 +1206,7 @@ export const getEyeRecordByPatientId = catchAsync(async (req: Request, res: Resp
 
     res.status(200).json({
         status: "success",
-        message: "Eye record fetched successfully",
+        msg: "Eye record fetched successfully",
         data: doc
     });
 });
@@ -1240,12 +1240,12 @@ export const createEyeConsultation = catchAsync(
 
         const foundPatient: any = await readonepatient({ _id: patientId }, {}, '', '');
         if (!foundPatient) {
-            return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+            return next(new ApiError(404, `Patient do not already exists`));
         }
 
         const foundAppointment: any = await readoneappointment({ _id: appointmentId }, {}, '');
         if (!foundAppointment) {
-            return next(new ApiError(404, `appointment do not ${configuration.error.erroralreadyexit}`));
+            return next(new ApiError(404, `appointment do not already exists`));
         }
 
         /// first check if eye module instance aleady exist if not create one
@@ -1305,7 +1305,7 @@ export const createEyeConsultation = catchAsync(
 
         res.status(201).json({
             status: "success",
-            message: "Eye Consultation recorded successfully",
+            msg: "Eye Consultation recorded successfully",
             data: eyeDoc
         });
     }
@@ -1366,7 +1366,7 @@ export const updateEyeConsultation = catchAsync(
 
         res.status(200).json({
             status: "success",
-            message: "Eye Consultation updated successfully",
+            msg: "Eye Consultation updated successfully",
             data: updatedDoc
         });
     }

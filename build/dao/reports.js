@@ -26,6 +26,11 @@ exports.readprescriptionaggregate = readprescriptionaggregate;
 exports.readnutritionaggregate = readnutritionaggregate;
 exports.readimmunizationaggregate = readimmunizationaggregate;
 exports.readfamilyaggregate = readfamilyaggregate;
+exports.readthirdstageLabouraggregate = readthirdstageLabouraggregate;
+exports.readsecondstageLabouraggregate = readsecondstageLabouraggregate;
+exports.readfirststageLabouraggregate = readfirststageLabouraggregate;
+exports.readmortalityregisteraggregate = readmortalityregisteraggregate;
+exports.readbirthregisteraggregate = readbirthregisteraggregate;
 const payment_1 = __importDefault(require("../models/payment"));
 const admission_1 = __importDefault(require("../models/admission"));
 const appointment_1 = __importDefault(require("../models/appointment"));
@@ -38,9 +43,9 @@ const radiology_1 = __importDefault(require("../models/radiology"));
 const prescription_1 = __importDefault(require("../models/prescription"));
 const patientmanagement_1 = __importDefault(require("../models/patientmanagement"));
 const nutrition_1 = __importDefault(require("../models/nutrition"));
-const config_1 = __importDefault(require("../config"));
 const immunization_1 = __importDefault(require("../models/immunization"));
 const familyplanning_1 = __importDefault(require("../models/familyplanning"));
+const maternity_1 = require("../models/maternity");
 function readpatientsmanagementaggregate(input) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -48,7 +53,7 @@ function readpatientsmanagementaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -59,7 +64,7 @@ function readpaymentaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -70,7 +75,7 @@ function readhmoaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -81,7 +86,7 @@ function readappointmentaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -92,7 +97,7 @@ function readadmissionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -103,7 +108,7 @@ function readclinicaggregate(input) {
         }
         catch (e) {
             console.log(e.message);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -114,7 +119,7 @@ function readwardaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -125,7 +130,7 @@ function readprocedureaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -137,7 +142,7 @@ function readlabaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -149,7 +154,7 @@ function readradiologyaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -161,7 +166,7 @@ function readprescriptionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -173,7 +178,7 @@ function readnutritionaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -185,7 +190,7 @@ function readimmunizationaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
         }
     });
 }
@@ -197,7 +202,63 @@ function readfamilyaggregate(input) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update report");
+        }
+    });
+}
+// Maternity aggregates
+function readthirdstageLabouraggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield maternity_1.ThirdStageLabour.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error("Failed to update report");
+        }
+    });
+}
+function readsecondstageLabouraggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield maternity_1.SecondStageLabour.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error("Failed to update report");
+        }
+    });
+}
+function readfirststageLabouraggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield maternity_1.FirstStageLabour.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error("Failed to update report");
+        }
+    });
+}
+function readmortalityregisteraggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield maternity_1.MortalityRegister.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error("Failed to update report");
+        }
+    });
+}
+function readbirthregisteraggregate(input) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield maternity_1.BirthRegister.aggregate(input);
+        }
+        catch (e) {
+            console.log(e);
+            throw new Error("Failed to update report");
         }
     });
 }

@@ -10,7 +10,7 @@ import configuration from "../config";
       return { postanaetheticrecoverycharts, totalpostanaetheticrecoverycharts };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve post-anaesthetic recovery chart data");
     }
   };                                                                                                        
   export async function createpostanaetheticrecoverychart(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create post-anaesthetic recovery chart");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve post-anaesthetic recovery chart data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return postanaetheticrecoverychart;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update post-anaesthetic recovery chart");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return postanaetheticrecoverychart;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update post-anaesthetic recovery chart");
 
     }
 

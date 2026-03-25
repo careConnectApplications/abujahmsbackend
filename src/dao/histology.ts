@@ -10,7 +10,7 @@ import configuration from "../config";
       return { histologydetails, totalhistologydetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve histology data");
     }
   };
   export async function createhistologyrequest(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create histology");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve histology data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return histology;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update histology");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return histology;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update histology");
 
     }
 

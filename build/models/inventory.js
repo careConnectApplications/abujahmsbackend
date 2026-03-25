@@ -33,6 +33,20 @@ const inventorySchema = new mongoose_1.Schema({
         default: null,
     }
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes for primary lookups
+inventorySchema.index({ name: 1 });
+inventorySchema.index({ category: 1 });
+inventorySchema.index({ qty: 1 });
+inventorySchema.index({ lowstocklevel: 1 });
+inventorySchema.index({ expirationdate: 1 });
+inventorySchema.index({ lastrestockdate: 1 });
+inventorySchema.index({ price: 1 });
+// Compound indexes for common query patterns
+inventorySchema.index({ category: 1, name: 1 }); // Category-based item lookup
+inventorySchema.index({ qty: 1, lowstocklevel: 1 }); // Low stock monitoring
+inventorySchema.index({ expirationdate: 1, category: 1 }); // Expiry tracking by category
+inventorySchema.index({ name: 1, category: 1, qty: 1 }); // Inventory search and status
 const inventory = (0, mongoose_1.model)('Inventory', inventorySchema);
 exports.default = inventory;
 /*
@@ -43,4 +57,4 @@ exports.default = inventory;
     order_price DECIMAL(10, 2),
     FOREIGN KEY (order_id) REFERENCES PurchaseOrders(order_id),
     FOREIGN KEY (drug_id) REFERENCES Drugs(drug_id)
-*/ 
+*/

@@ -8,6 +8,22 @@ export const OperationalNotesFileName = [
     { name: "FFA", label: "FFA" }
 ];
 
+export const eyeConditions = [
+    "Presbyopia",
+    "Myopia",
+    "Hypermetropia",
+    "Astigmatism",
+    "Cataract",
+    "Cataract Surgery",
+    "Glaucoma",
+    "Glaucoma Surgery",
+    "Trachoma",
+    "Trachoma Surgery",
+    "Pterygium",
+    "Pterygium Surgery",
+    "Other(Specify)"
+];
+
 export const LensTint = [
     "Amber",
     "Amethyst",

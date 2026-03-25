@@ -39,7 +39,7 @@ var createservicetypes = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const foundservicetype = yield (0, servicetype_1.readoneservicetype)({ category: servicecategory }, '');
         //update servicetype for New Patient Registration
         if (foundservicetype) {
-            throw new Error(`service category ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`service category already exists`);
         }
         const queryresult = yield (0, servicetype_1.createservicetype)({ type: servicetype, category: servicecategory, department, id });
         const { firstName, lastName } = (req.user).user;
@@ -84,7 +84,7 @@ function updateservicetypes(req, res) {
             /*
                for(var i =0; i < servicetype.length; i++){
                  if((foundservicetype.type).includes(servicetype[i]))
-                 throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+                 throw new Error(`${servicetype[i]} already exists`);
            
              }
                  */
@@ -124,7 +124,7 @@ function getpharmacyservicetype(req, res) {
 if(foundservicetype){
           for(var i =0; i < servicetype.length; i++){
             if((foundservicetype.type).includes(servicetype[i]))
-            throw new Error(`${servicetype[i]} ${configuration.error.erroralreadyexit}`);
+            throw new Error(`${servicetype[i]} already exists`);
 
         }
   export async function updatepricestatus(req:any, res:any){

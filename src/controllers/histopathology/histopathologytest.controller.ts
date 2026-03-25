@@ -58,7 +58,7 @@ export const CreateReportTest = catchAsync(async (req: Request, res: Response, n
 
     res.status(201).json({
         status: true,
-        message: `Test type '${testTypeId}' created successfully`,
+        msg: `Test type '${testTypeId}' created successfully`,
         data: newReportTest
     });
 })

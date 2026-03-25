@@ -5,7 +5,7 @@ import {reports,reportsummary,cashierreport} from '../controllers/reportingandan
 import {settingsresponse,settingsummaryresponse,cashiersettings} from '../controllers/settings/settings';
 const router = express.Router();
 
-router.get('/reports/:querytype/:querygroup/:startdate?/:enddate?', reports);
+router.post('/reports/:querytype', reports);
 router.get('/reportsummary/:querytype/:startdate?/:enddate?', reportsummary);
 router.get('/settings', settingsresponse);
 router.get('/settingsummaryresponse', settingsummaryresponse);

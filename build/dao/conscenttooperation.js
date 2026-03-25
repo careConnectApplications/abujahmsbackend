@@ -29,7 +29,7 @@ function readallconscentooperations(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve consent to operation data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createconscentooperation(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create consent to operation");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneconscentooperation(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve consent to operation data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updateconscentooperation(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update consent to operation");
         }
     });
 }
@@ -93,7 +93,7 @@ function updateconscentooperationquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update consent to operation");
         }
     });
 }

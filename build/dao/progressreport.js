@@ -29,7 +29,7 @@ function readallprogressreports(query, selectquery, populatequery, populatesecon
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve progress report data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createprogressreports(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create progress report");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneprogressreports(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve progress report data");
         }
     });
 }
@@ -74,7 +74,7 @@ function updateprogressreports(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update progress report");
         }
     });
 }
@@ -93,7 +93,7 @@ function updateprogressreportquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update progress report");
         }
     });
 }

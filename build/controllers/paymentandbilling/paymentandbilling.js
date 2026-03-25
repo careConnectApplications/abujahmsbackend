@@ -30,25 +30,83 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const errors_1 = require("../../errors");
 const price_1 = require("../../dao/price");
 const uuid_1 = require("uuid");
+const insuranceclaim_1 = require("../../dao/insuranceclaim");
+const hmomanagement_1 = require("../../dao/hmomanagement");
+const hmocategorycover_1 = require("../../dao/hmocategorycover");
 const generatePaymentNumber = () => {
     const uniqueId = (0, uuid_1.v4)();
     return `Billing-${new Date().getFullYear()}-${uniqueId}`;
 };
 exports.payAnnualSubscription = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { patientId } = req.body;
+    const { _id: userId } = (req.user).user;
     // Check patient exists
     const patient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
     if (!patient) {
         throw new Error("Patient not found");
     }
-    const subscriptionPrice = yield (0, price_1.readoneprice)({ servicecategory: config_1.default.category[8], servicetype: config_1.default.category[8] });
+    const subscriptionPrice = yield (0, price_1.readoneprice)({
+        servicecategory: config_1.default.category[8],
+        servicetype: config_1.default.category[8]
+    });
     if (!subscriptionPrice) {
         throw new Error(config_1.default.error.errornopriceset);
     }
-    const { amount } = subscriptionPrice;
-    var payment = yield (0, payment_1.createpayment)({ firstName: patient === null || patient === void 0 ? void 0 : patient.firstName, lastName: patient === null || patient === void 0 ? void 0 : patient.lastName, MRN: patient === null || patient === void 0 ? void 0 : patient.MRN, phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber, paymentreference: patient._id, paymentype: config_1.default.category[8], paymentcategory: config_1.default.category[8], patient: patient._id, amount });
+    let paymentAmount = Number(subscriptionPrice.amount);
+    let hmoCoveragePercentage = 0;
+    let gethmo = null;
+    // Check if patient has HMO coverage
+    if (patient.isHMOCover === config_1.default.ishmo[1] || patient.isHMOCover === true) {
+        // Get HMO details
+        if (patient.HMOName) {
+            gethmo = yield (0, hmomanagement_1.readonehmomanagement)({ hmoname: patient.HMOName }, { _id: 1, hmopercentagecover: 1 });
+            if (gethmo) {
+                // Get HMO coverage percentage for annual subscription
+                const hmoCoverage = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: gethmo._id, category: config_1.default.category[8] }, { hmopercentagecover: 1 });
+                hmoCoveragePercentage = (_a = hmoCoverage === null || hmoCoverage === void 0 ? void 0 : hmoCoverage.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+                // Calculate patient payment amount after HMO coverage
+                if (hmoCoveragePercentage > 0) {
+                    paymentAmount = (0, otherservices_1.calculateAmountPaidByHMO)(hmoCoveragePercentage, Number(subscriptionPrice.amount));
+                }
+            }
+        }
+    }
+    // Create payment with adjusted amount
+    const payment = yield (0, payment_1.createpayment)({
+        firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
+        lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
+        MRN: patient === null || patient === void 0 ? void 0 : patient.MRN,
+        phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber,
+        paymentreference: patient._id,
+        paymentype: config_1.default.category[8],
+        paymentcategory: config_1.default.category[8],
+        patient: patient._id,
+        amount: paymentAmount
+    });
+    // Create insurance claim for HMO patients
+    if ((patient.isHMOCover === config_1.default.ishmo[1] || patient.isHMOCover === true) &&
+        hmoCoveragePercentage > 0 && payment) {
+        const insuranceClaim = {
+            patient: patient._id,
+            serviceCategory: config_1.default.category[8],
+            payment: payment._id,
+            authorizationCode: patient.authorizationCode || req.body.authorizationCode || "",
+            approvalCode: patient.approvalCode || req.body.approvalCode || "",
+            amountClaimed: Number(subscriptionPrice.amount),
+            amountApproved: Number(subscriptionPrice.amount),
+            insurer: patient.HMOName,
+            createdBy: userId,
+            action: "approve"
+        };
+        yield (0, insuranceclaim_1.createInsuranceClaim)(insuranceClaim);
+    }
     // Extend subscription by 1 year
-    res.status(201).json({ queryresult: "Subscription payment recorded", payment, status: true });
+    res.status(201).json({
+        queryresult: "Subscription payment recorded",
+        payment,
+        status: true
+    });
 }));
 ///deactivate a user
 //show total for each login cashier
@@ -75,7 +133,6 @@ exports.getCashierTotal = (0, catchAsync_1.default)((req, res, next) => __awaite
 //confirm payment
 function confirmgrouppayment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        //console.log(req.user);
         try {
             const { paymentreferenceid } = req.params;
             //check for null of id
@@ -87,36 +144,11 @@ function confirmgrouppayment(req, res) {
                 let { paymentype, paymentcategory, paymentreference, patient, _id } = paymentdetails[i];
                 //const {patient} = paymentdetails[i];
                 const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
-                let cardFeePaid;
-                let subscriptionfeePaid;
-                console.log('*********', paymentcategory);
-                console.log('*********', config_1.default.category[3]);
-                console.log('*********', config_1.default.category[8]);
-                console.log('*********', config_1.default.category[9]);
-                if (!patientrecord && !(paymentcategory == config_1.default.category[3] || paymentcategory == config_1.default.category[8] || paymentcategory == config_1.default.category[9])) {
-                    throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
+                // if patient not found and patient is not paying for card return error
+                if (!patientrecord && !paymentcategory == config_1.default.category[9]) {
+                    throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for card`);
                 }
-                if (paymentcategory == config_1.default.category[3]) {
-                    cardFeePaid = yield (0, payment_1.readonepayment)({
-                        patient,
-                        paymentype: config_1.default.category[9],
-                        paymentreference,
-                        paymentcategory: config_1.default.category[9],
-                        status: config_1.default.status[2]
-                    });
-                    //read payment for subscription fee
-                    subscriptionfeePaid = yield (0, payment_1.readonepayment)({
-                        patient,
-                        paymentype: config_1.default.category[8],
-                        paymentreference,
-                        paymentcategory: config_1.default.category[8],
-                        status: config_1.default.status[2]
-                    });
-                }
-                //ensure card fee and annual fee is paid before confirming payment for patient registration
-                if (paymentcategory == config_1.default.category[3] && (cardFeePaid || subscriptionfeePaid)) {
-                    throw new Error(`Patient has not paid for ${config_1.default.category[9]} or ${config_1.default.category[8]}`);
-                }
+                //ensure card fee and annual fee is paid before confirming payment for patient registration 
                 //var settings =await  configuration.settings();
                 const status = config_1.default.status[3];
                 const { email, staffId, firstName, lastName } = (req.user).user;
@@ -124,7 +156,8 @@ function confirmgrouppayment(req, res) {
                 const queryresult = yield (0, payment_1.updatepayment)(_id, { status, cashieremail: email, cashiername, cashierid: staffId });
                 //const {paymentype,paymentcategory,paymentreference} = queryresult;
                 //for patient registration
-                if (paymentcategory == config_1.default.category[3]) {
+                if (paymentcategory == config_1.default.category[9]) {
+                    console.log('*********', patient);
                     //update patient registration status
                     yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1], paymentstatus: status, paymentreference });
                 }
@@ -134,9 +167,10 @@ function confirmgrouppayment(req, res) {
                     yield (0, lab_1.updatelabbyquery)({ payment: _id }, { status: config_1.default.status[5] });
                 }
                 else if (paymentcategory == config_1.default.category[8]) {
+                    console.log('*********', config_1.default.category[8]);
                     const nextYear = new Date();
                     nextYear.setFullYear(nextYear.getFullYear() + 1);
-                    yield (0, payment_1.updatepayment)(_id, { subscriptionPaidUntil: nextYear });
+                    yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { subscriptionPaidUntil: nextYear, subscriptionExpired: false });
                 }
             }
             res.status(200).json({
@@ -376,28 +410,8 @@ function confirmpayment(req, res) {
             const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, {}, '', '');
             let cardFeePaid;
             let subscriptionfeePaid;
-            if (!patientrecord && paymentcategory !== config_1.default.category[3]) {
-                throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit} or has not made payment for registration`);
-            }
-            if (paymentcategory == config_1.default.category[3]) {
-                cardFeePaid = yield (0, payment_1.readonepayment)({
-                    patient,
-                    paymentype: config_1.default.category[9],
-                    paymentreference,
-                    paymentcategory: config_1.default.category[9],
-                    status: config_1.default.status[2]
-                });
-                //read payment for subscription fee
-                subscriptionfeePaid = yield (0, payment_1.readonepayment)({
-                    patient,
-                    paymentype: config_1.default.category[8],
-                    paymentreference,
-                    paymentcategory: config_1.default.category[8],
-                    status: config_1.default.status[2]
-                });
-            }
-            if (paymentcategory == config_1.default.category[3] && (cardFeePaid || subscriptionfeePaid)) {
-                throw new Error(`Patient has not paid for ${config_1.default.category[9]} or ${config_1.default.category[8]}`);
+            if (!patientrecord && paymentcategory !== config_1.default.category[9]) {
+                throw new Error(`Patient does not ${config_1.default.error.erroralreadyexit} or has not made payment for card`);
             }
             //var settings =await  configuration.settings();
             const status = config_1.default.status[3];
@@ -406,11 +420,10 @@ function confirmpayment(req, res) {
             //const queryresult:any =await updatepayment(id,{status});
             //confirm payment of the service paid for 
             //for patient registration
-            if (paymentcategory == config_1.default.category[3]) {
+            if (paymentcategory == config_1.default.category[9]) {
                 //update patient registration status
                 yield (0, patientmanagement_1.updatepatientbyanyquery)({ _id: patient }, { status: config_1.default.status[1] });
-            }
-            /*
+            } /*
             
             //for appointment
             else if(paymentcategory == configuration.category[0]){
@@ -428,6 +441,7 @@ function confirmpayment(req, res) {
             else if (paymentcategory == config_1.default.category[8]) {
                 const nextYear = new Date();
                 nextYear.setFullYear(nextYear.getFullYear() + 1);
+                patientrecord.subscriptionExpired = false;
                 patientrecord.subscriptionPaidUntil = nextYear;
                 yield patientrecord.save();
             }
@@ -492,27 +506,76 @@ function printreceipt(req, res) {
     });
 }
 exports.CreateBilingRecord = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { patientId } = req.params;
-    const { serviceCategory, amount, serviceType, phoneNumber } = req.body;
+    const { serviceCategory, amount, serviceType, phoneNumber, option, department } = req.body;
     const { _id: userId } = (req.user).user;
-    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, '', '');
+    // Fetch patient with insurance populated (like laborder does)
+    const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: patientId }, {}, 'insurance', '');
     if (!foundPatient) {
-        return next(new errors_1.ApiError(404, `Patient do not ${config_1.default.error.erroralreadyexit}`));
+        return next(new errors_1.ApiError(404, `Patient do not already exists`));
     }
     const { firstName, lastName, } = foundPatient;
+    // Handle fixed pricing option
+    let finalAmount = Number(amount);
+    let actualAmount = Number(amount); // Store original amount for insurance claims
+    if (option === "fixed") {
+        // Fetch price from database like laborder does
+        const servicePrice = yield (0, price_1.readoneprice)({
+            servicecategory: serviceCategory,
+            servicetype: serviceType
+        });
+        if (!servicePrice || servicePrice.amount == null) {
+            throw new Error(`${config_1.default.error.errornopriceset} for ${serviceCategory}/${serviceType}`);
+        }
+        finalAmount = Number(servicePrice.amount);
+        actualAmount = Number(servicePrice.amount);
+    }
+    // Calculate HMO coverage for insurance patients (like laborder)
+    let hmopercentagecover = 0;
+    if (foundPatient.insurance) {
+        const insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({
+            hmoId: foundPatient.insurance._id,
+            category: serviceCategory
+        }, { hmopercentagecover: 1 });
+        hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+        // Adjust amount based on HMO coverage
+        if (hmopercentagecover > 0) {
+            finalAmount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), actualAmount);
+        }
+    }
     const refNumber = generatePaymentNumber();
     const paymentInfo = yield (0, payment_1.createpayment)({
         firstName,
         lastName,
-        MRN: req.body.MRN,
+        MRN: req.body.MRN || foundPatient.MRN,
         phoneNumber,
+        billingtype: "custom-billing",
+        department, // Add department to payment
         paymentreference: refNumber,
         paymentype: serviceType,
         paymentcategory: serviceCategory,
         patient: foundPatient._id,
-        amount: Number(amount),
+        amount: finalAmount,
         createdById: userId,
     });
+    // Create insurance claim for HMO patients with coverage > 0
+    if (hmopercentagecover > 0 && paymentInfo) {
+        const insuranceClaim = {
+            patient: foundPatient._id,
+            serviceCategory: serviceCategory,
+            payment: paymentInfo._id,
+            authorizationCode: foundPatient.authorizationCode || req.body.authorizationCode || "",
+            approvalCode: foundPatient.approvalCode || req.body.approvalCode || "",
+            amountClaimed: finalAmount, // Original amount before HMO adjustment
+            amountApproved: finalAmount,
+            insurer: foundPatient.HMOName,
+            createdBy: userId,
+            action: "approve",
+            actualcost: actualAmount
+        };
+        yield (0, insuranceclaim_1.createInsuranceClaim)(insuranceClaim);
+    }
     res.status(201).json({
         status: true,
         message: "custom billing info created for user!",

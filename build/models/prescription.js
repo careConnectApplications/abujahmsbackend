@@ -84,6 +84,23 @@ const prescriptionSchema = new mongoose_1.Schema({
         default: config_1.default.servedstatus[1]
     }
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+prescriptionSchema.index({ patient: 1 });
+prescriptionSchema.index({ appointment: 1 });
+prescriptionSchema.index({ appointmentid: 1 });
+prescriptionSchema.index({ orderid: 1 });
+prescriptionSchema.index({ dispensestatus: 1 });
+prescriptionSchema.index({ pharmacy: 1 });
+prescriptionSchema.index({ createdAt: -1 });
+prescriptionSchema.index({ payment: 1 });
+prescriptionSchema.index({ MRN: 1 });
+// Compound indexes for common query patterns
+prescriptionSchema.index({ patient: 1, dispensestatus: 1 });
+prescriptionSchema.index({ appointmentid: 1, dispensestatus: 1 });
+prescriptionSchema.index({ pharmacy: 1, dispensestatus: 1 });
+prescriptionSchema.index({ dispensestatus: 1, createdAt: -1 });
+prescriptionSchema.index({ orderid: 1, dispensestatus: 1 });
 const prescription = (0, mongoose_1.model)('Prescription', prescriptionSchema);
 exports.default = prescription;
 /*
@@ -94,4 +111,4 @@ exports.default = prescription;
     order_price DECIMAL(10, 2),
     FOREIGN KEY (order_id) REFERENCES PurchaseOrders(order_id),
     FOREIGN KEY (drug_id) REFERENCES Drugs(drug_id)
-*/ 
+*/

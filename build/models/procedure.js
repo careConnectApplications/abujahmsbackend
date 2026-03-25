@@ -29,6 +29,16 @@ const procedureSchema = new mongoose_1.Schema({
     processby: {
         type: String
     },
+    proceduretype: {
+        type: String,
+        enum: [
+            "Major Operation",
+            "Intermediate Operation",
+            "Minor Operation",
+            "Circumcision",
+        ],
+        required: true,
+    },
     amount: Number,
     hmopercentagecover: Number,
     actualcost: Number,
@@ -43,5 +53,19 @@ const procedureSchema = new mongoose_1.Schema({
         default: config_1.default.status[9],
     }
 }, { timestamps: true });
+// Add indexes for performance optimization
+// Single field indexes
+procedureSchema.index({ patient: 1 });
+procedureSchema.index({ procedureid: 1 });
+procedureSchema.index({ status: 1 });
+procedureSchema.index({ proceduretype: 1 });
+procedureSchema.index({ payment: 1 });
+procedureSchema.index({ createdAt: -1 });
+procedureSchema.index({ clinic: 1 });
+// Compound indexes for common query patterns
+procedureSchema.index({ patient: 1, status: 1 });
+procedureSchema.index({ procedureid: 1, status: 1 });
+procedureSchema.index({ proceduretype: 1, status: 1 });
+procedureSchema.index({ status: 1, createdAt: -1 });
 const procedure = (0, mongoose_1.model)('Procedure', procedureSchema);
 exports.default = procedure;

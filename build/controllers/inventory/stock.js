@@ -127,7 +127,7 @@ var createstock = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //check for duplicate product id
         const foundPrice = yield (0, price_1.readoneprice)({ servicecategory, productid, pharmacy });
         if (foundPrice) {
-            throw new Error(`${servicetype} ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`${servicetype} already exists`);
         }
         //const queryresult=await createprice({servicecategory,amount,servicetype,category,qty,lowstocklevel,expirationdate,lastrestockdate} );
         var id = `${servicetype[0]}${(0, otherservices_1.generateRandomNumber)(5)}${servicetype[servicetype.length - 1]}`;
@@ -162,7 +162,7 @@ function updatestocks(req, res) {
                 throw new Error(`servicetype ${config_1.default.error.errornotfound}`);
             }
             if (foundPrice.servicecategory !== config_1.default.category[1]) {
-                throw new Error(`${foundPrice.servicecategory} ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`${foundPrice.servicecategory} already exists`);
             }
             //var queryresult = await updateprice(id, req.body);
             var servicetypeid = `${servicetype[0]}${(0, otherservices_1.generateRandomNumber)(5)}${servicetype[servicetype.length - 1]}`;

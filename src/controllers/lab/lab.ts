@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { readalllab, updatelab, readonelab, readlabaggregate, optimizedreadalllab } from "../../dao/lab";
+import { readalllab, updatelab, readonelab, readlabaggregate, optimizedreadalllab, readLabFullDetails } from "../../dao/lab";
 import { updatepatient } from "../../dao/patientmanagement";
 import { validateinputfaulsyvalue } from "../../utils/otherservices";
 import { createpayment } from "../../dao/payment";
@@ -9,7 +9,8 @@ import { readone } from "../../dao/users";
 import configuration from "../../config";
 import catchAsync from "../../utils/catchAsync";
 
-import { HmoLabConfirmationStrategy, SelfPayLabConfirmationStrategy,LabConfirmationContext } from "./lab.helper";
+import { HmoLabConfirmationStrategy, SelfPayLabConfirmationStrategy, LabConfirmationContext } from "./lab.helper";
+import { ApiError } from "../../errors";
 
 
 
@@ -162,7 +163,7 @@ export const readallscheduledlaboptimized = async (req: any, res: any) => {
             HMOId: "$patient.HMOId",
             HMOName: "$patient.HMOName",
             status: 1,
-            filename:1
+            filename: 1
           }
         },
         {
@@ -357,31 +358,31 @@ export const listlabreportbypatient = async (req: any, res: any) => {
 //this endpoint is use to accept or reject lab order
 
 //isHMOCover: { $eq: configuration.ishmo[0] }
-export const confirmlaborder = catchAsync(async (req:any,res:Response,next: NextFunction) =>{
-    const { option, remark } = req.body;
-    const { id } = req.params;
-    validateinputfaulsyvalue({id});
-    const lab: any = await readonelab({ _id: id }, {}, "patient");
-    if (lab.status !== configuration.status[14]) {
-      throw new Error(configuration.error.errorLabStatus);
-    }
-    const { patient } = lab;
-    // choose strategy based on isHMOCover
-    const strategyFn =
-    !(patient.isHMOCover == configuration.ishmo[1]  || patient.isHMOCover == true)
-        ? SelfPayLabConfirmationStrategy
-        : HmoLabConfirmationStrategy;
-    const context = LabConfirmationContext(strategyFn);
-    const queryresult = await context.execute({
-      id,
-      option,
-      remark,
-      lab,
-      patient
-    });
+export const confirmlaborder = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+  const { option, remark } = req.body;
+  const { id } = req.params;
+  validateinputfaulsyvalue({ id });
+  const lab: any = await readonelab({ _id: id }, {}, "patient");
+  if (lab.status !== configuration.status[14]) {
+    throw new Error(configuration.error.errorLabStatus);
+  }
+  const { patient } = lab;
+  // choose strategy based on isHMOCover
+  const strategyFn =
+    !(patient.isHMOCover == configuration.ishmo[1] || patient.isHMOCover == true)
+      ? SelfPayLabConfirmationStrategy
+      : HmoLabConfirmationStrategy;
+  const context = LabConfirmationContext(strategyFn);
+  const queryresult = await context.execute({
+    id,
+    option,
+    remark,
+    lab,
+    patient
+  });
 
 
-    res.status(200).json({ queryresult, status: true });
+  res.status(200).json({ queryresult, status: true });
 
 });
 
@@ -431,8 +432,16 @@ export const readallscheduledlaboptimizedhemathologyandchemicalpathology = catch
   const page = parseInt(req.query.page) || 1;
   const size = parseInt(req.query.size) || 150;
   const filter: any = {};
-  var statusfilter: any = status ? { status } : testname ? { testname } : {};
-  statusfilter.labcategory = labcategory;
+  var statusfilter: any = testname ? { testname } : {};
+  //statusfilter.labcategory = labcategory;
+
+  // Use $or to match either configuration.status[7] or req.body.status
+  const statusConditions = [{ status: configuration.status[7] }, { labcategory }];
+  if (status) {
+    statusConditions.push({ status });
+  }
+  statusfilter.$or = statusConditions;
+
   if (firstName) {
     filter.firstName = new RegExp(firstName, 'i'); // Case-insensitive search for name
   }
@@ -562,6 +571,81 @@ export const labresultprocessinghemathologychemicalpathology = catchAsync(async 
   });
 
 })
+
+// Validate lab result
+export const validatelabresult = catchAsync(async (req: any, res: Response, next: NextFunction) => {
+  // Get lab ID from params
+  const { id } = req.params;
+
+  // Get validation remarks from body
+  const { validationremarks } = req.body;
+
+  // Get user details from authenticated user
+  const { firstName, lastName, email } = (req.user).user;
+
+  // Validate required inputs
+  validateinputfaulsyvalue({ id, validationremarks });
+
+  // Find the lab and check if it exists
+  const lab = await readonelab({ _id: id }, {}, '');
+
+  if (!lab) {
+    throw new Error(configuration.error.errorinvalidcredentials);
+  }
+
+  // Check if lab has been processed (status must be "processed")
+  if (lab.status !== configuration.status[7]) {
+    throw new Error("Lab result must be processed before validation");
+  }
+
+  // Check if lab has already been validated
+  if (lab.validatedby && lab.validateddate) {
+    throw new Error("Lab result has already been validated");
+  }
+
+  // Prepare validation data
+  const validatedby = `${firstName} ${lastName}`;
+  const validateddate = new Date();
+
+  // Update lab with validation information
+  const queryresult = await updatelab(
+    { _id: id },
+    {
+      validatedby,
+      validateddate,
+      validationremarks
+    }
+  );
+
+  res.status(200).json({
+    queryresult,
+    status: true,
+    message: "Lab result validated successfully"
+  });
+});
+
+/// fetch lab bottle label
+export const printLabBottleLabels = catchAsync(async (req: Request | any, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+
+  const user = (req.user).user;
+
+  if (!id) return next(new ApiError(400, `id ${configuration.error.errornotfound}`));
+  if (!mongoose.Types.ObjectId.isValid(id)) return next(new ApiError(404, configuration.error.errorInvalidObjectId));
+
+  const data: any = await readLabFullDetails(id, next);
+
+   if (data && data.status != configuration.status[5]) {
+    return next(new ApiError(401, "lab result must be scheduled"))
+  }
+
+  return res.status(200).json({
+    status: true,
+    message: "success",
+    data,
+    user
+  });
+});
 
 // get all rejected orders
 

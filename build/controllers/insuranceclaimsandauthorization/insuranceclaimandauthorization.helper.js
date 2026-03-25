@@ -42,7 +42,7 @@ function handlePayment(patient, paymentData, updateFn, updateFilter, amountstatu
     });
 }
 // 🔹 Generate insurance claim
-function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy }) {
+function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action, actualcost }) {
     return {
         patient: patient._id,
         serviceCategory,
@@ -52,19 +52,23 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
         amountClaimed: amount,
         amountApproved: amount,
         insurer: patient.HMOName,
-        createdBy
+        createdBy,
+        action,
+        actualcost
     };
 }
 // 🔹 Common payment reference resolver
 // 🟢 LAB HANDLER
 function processLab(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { authorizationCode, approvalCode, createdBy } = ctx;
+        const { authorizationCode, approvalCode, createdBy, action } = ctx;
+        console.log("action", action);
         //find lab by id
         const lab = yield (0, lab_1.readonelab)({ _id: id }, {}, "patient");
         //get patient details, testname, testid, amount from lab
-        const { testname, testid, patient, amount } = lab;
+        const { testname, testid, patient, amount, actualcost } = lab;
         //check if patient is admitted, if yes use admission number as payment reference
+        const approvedamount = action == "approve" ? amount : actualcost;
         const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, testid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
@@ -75,7 +79,7 @@ function processLab(id, ctx) {
             paymentype: testname,
             paymentcategory: config_1.default.category[2],
             patient: patient._id,
-            amount
+            amount: approvedamount
         };
         //create payment if amount is greater than 0
         //update lab status to processed and add payment reference
@@ -88,19 +92,23 @@ function processLab(id, ctx) {
             entityKey: "lab",
             authorizationCode,
             approvalCode,
-            amount,
-            createdBy
+            amount: approvedamount,
+            createdBy,
+            action,
+            actualcost
         });
     });
 }
 // 🟢 RADIOLOGY HANDLER
 function processRadiology(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { authorizationCode, approvalCode, createdBy } = ctx;
+        const { authorizationCode, approvalCode, createdBy, action } = ctx;
         // find radiology by id
         const radiology = yield (0, radiology_1.readoneradiology)({ _id: id }, {}, "patient");
         // get patient details, testname, testid, amount from radiology
-        const { testname, testid, patient, amount } = radiology;
+        const { testname, testid, patient, amount, actualcost } = radiology;
+        //check if patient is admitted, if yes use admission number as payment reference
+        const approvedamount = action == "approve" ? amount : actualcost;
         const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, testid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
@@ -111,7 +119,7 @@ function processRadiology(id, ctx) {
             paymentype: testname,
             paymentcategory: config_1.default.category[4],
             patient: patient._id,
-            amount
+            amount: approvedamount
         };
         yield handlePayment(patient, paymentData, radiology_1.updateradiology, { _id: id }, config_1.default.status[9], config_1.default.status[9], "status");
         return buildInsuranceClaim({
@@ -121,18 +129,22 @@ function processRadiology(id, ctx) {
             entityKey: "radiology",
             authorizationCode,
             approvalCode,
-            amount,
-            createdBy
+            amount: approvedamount,
+            createdBy,
+            action,
+            actualcost
         });
     });
 }
 // 🟢 PROCEDURE HANDLER
 function processProcedure(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { authorizationCode, approvalCode, createdBy } = ctx;
+        const { authorizationCode, approvalCode, createdBy, action } = ctx;
         //find procedure by id
         const findprocedure = yield (0, procedure_1.readoneprocedure)({ _id: id }, {}, "patient");
-        const { procedure, procedureid, patient, amount } = findprocedure;
+        const { procedure, procedureid, patient, amount, actualcost } = findprocedure;
+        //check if patient is admitted, if yes use admission number as payment reference
+        const approvedamount = action == "approve" ? amount : actualcost;
         const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, procedureid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
@@ -143,7 +155,7 @@ function processProcedure(id, ctx) {
             paymentype: procedure,
             paymentcategory: config_1.default.category[5],
             patient: patient._id,
-            amount
+            amount: approvedamount
         };
         yield handlePayment(patient, paymentData, procedure_1.updateprocedure, { _id: id }, config_1.default.status[9], config_1.default.status[9], "status");
         return buildInsuranceClaim({
@@ -153,17 +165,21 @@ function processProcedure(id, ctx) {
             entityKey: "procedure",
             authorizationCode,
             approvalCode,
-            amount,
-            createdBy
+            amount: approvedamount,
+            createdBy,
+            action,
+            actualcost
         });
     });
 }
 // 🟢 PHARMACY HANDLER
 function processPharmacy(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { authorizationCode, approvalCode, createdBy } = ctx;
+        const { authorizationCode, approvalCode, createdBy, action } = ctx;
         const findPharmacy = yield (0, prescription_1.readoneprescription)({ _id: id }, {}, 'patient', '', '');
-        const { prescription, orderid, patient, amount, qty, pharmacy } = findPharmacy;
+        const { prescription, orderid, patient, amount, actualcost, qty, pharmacy } = findPharmacy;
+        //check if patient is admitted, if yes use admission number as payment reference
+        const approvedamount = action == "approve" ? amount : actualcost;
         const paymentreference = yield (0, otherservices_1.getPaymentReference)(patient._id, orderid);
         const paymentData = {
             firstName: patient === null || patient === void 0 ? void 0 : patient.firstName,
@@ -174,7 +190,7 @@ function processPharmacy(id, ctx) {
             paymentype: prescription,
             paymentcategory: pharmacy,
             patient: patient._id,
-            amount,
+            amount: approvedamount,
             qty
         };
         yield handlePayment(patient, paymentData, prescription_1.updateprescription, { _id: id }, config_1.default.status[10], config_1.default.status[10], "dispensestatus");
@@ -185,16 +201,20 @@ function processPharmacy(id, ctx) {
             entityKey: "pharmacy",
             authorizationCode,
             approvalCode,
-            amount,
-            createdBy
+            amount: approvedamount,
+            createdBy,
+            action,
+            actualcost
         });
     });
 }
 function processHistopathology(id, ctx) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { authorizationCode, approvalCode, createdBy } = ctx;
+        const { authorizationCode, approvalCode, createdBy, action } = ctx;
         const findHistopathology = yield (0, histopathology_dao_1.getHistopathologyByIdPopulate)(id);
-        const { patient, amount, refNumber } = findHistopathology;
+        const { patient, amount, actualcost, refNumber } = findHistopathology;
+        //check if patient is admitted, if yes use admission number as payment reference
+        const approvedamount = action == "approve" ? amount : actualcost;
         const paymentData = {
             paymentreference: refNumber,
             paymentype: config_1.default.category[6],
@@ -204,7 +224,7 @@ function processHistopathology(id, ctx) {
             lastName: patient === null || patient === void 0 ? void 0 : patient.lastName,
             MRN: patient === null || patient === void 0 ? void 0 : patient.MRN,
             phoneNumber: patient === null || patient === void 0 ? void 0 : patient.phoneNumber,
-            amount
+            amount: approvedamount
         };
         yield handlePayment(patient, paymentData, histopathology_dao_1.updateHistopathologyRecord, { _id: id }, config_1.default.status[5], config_1.default.status[5], "status");
         return buildInsuranceClaim({
@@ -214,8 +234,10 @@ function processHistopathology(id, ctx) {
             entityKey: "histopathology",
             authorizationCode,
             approvalCode,
-            amount,
-            createdBy
+            amount: approvedamount,
+            createdBy,
+            action,
+            actualcost
         });
     });
 }

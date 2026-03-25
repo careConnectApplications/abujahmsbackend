@@ -65,7 +65,7 @@ const { ObjectId } = mongoose_1.default.Types;
 const config_1 = __importDefault(require("../../config"));
 //lab order
 var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     try {
         //accept _id from request
         const { id } = req.params;
@@ -80,17 +80,17 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const foundPatient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, 'insurance', '');
         //category
         if (!foundPatient) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Patient does not exist`);
         }
-        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance._id, category: config_1.default.category[4] }, { hmopercentagecover: 1 });
-        var hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[4] }, { hmopercentagecover: 1 });
+        var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
         var appointment;
         if (appointmentid) {
             appointmentid = new ObjectId(appointmentid);
             appointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentid }, {}, '');
             if (!appointment) {
                 //create an appointment
-                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Appointment does not exist`);
             }
         }
         let filename;
@@ -100,10 +100,13 @@ var radiologyorder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         for (var i = 0; i < testname.length; i++) {
             //search for price of test name
             var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i] });
+            console.log("testPrice", testPrice);
             if (!testPrice) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
+            console.log("hmopercentage", hmopercentagecover);
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
+            console.log("amount", amount);
             //create payment
             //var createpaymentqueryresult =await createpayment({paymentreference:id,paymentype:testname[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
             let testrecord = yield (0, radiology_1.createradiology)({ hmopercentagecover,
@@ -268,7 +271,7 @@ function updateradiologys(req, res) {
             const { servicetypedetails } = yield (0, servicetype_1.readallservicetype)({ category: config_1.default.category[4] }, { type: 1, category: 1, department: 1, _id: 0 });
             var testsetting = servicetypedetails.filter(item => (item.type).includes(testname));
             if (!testsetting || testsetting.length < 1) {
-                throw new Error(`${testname} donot ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
+                throw new Error(`${testname} does not ${config_1.default.error.erroralreadyexit} in ${config_1.default.category[4]} as a service type  `);
             }
             // await updatepayment({_id:myradiologystatus.payment},{paymentype:testname,amount:Number(testPrice.amount)});
             var queryresult = yield (0, radiology_1.updateradiology)(id, { testname, note });

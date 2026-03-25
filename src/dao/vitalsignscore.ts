@@ -10,7 +10,7 @@ import configuration from "../config";
       return { vitalsignscoredetails, totalvitalsignscoredetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve vital sign score data");
     }
   };
   export async function createvitalsignscore(input:any){
@@ -21,7 +21,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create vital sign score");
 
     }
   }
@@ -32,7 +32,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve vital sign score data");
 
     }
   }
@@ -53,7 +53,7 @@ import configuration from "../config";
       return vitalsignscore;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update vital sign score");
 
     }
 
@@ -71,7 +71,7 @@ import configuration from "../config";
       return vitalsignscore;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update vital sign score");
 
     }
 

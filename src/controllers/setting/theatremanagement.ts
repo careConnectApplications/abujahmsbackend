@@ -14,7 +14,7 @@ export var createtheatre = async (req:any,res:any) =>{
        //validate that totalbed is created or equal to occupiedbed
        if(occupiedbed >  totalbed){
        
-        throw new Error(`Occupied bed ${configuration.error.errorgreaterthan} Total bed`);
+        throw new Error(`Occupied beds cannot be greater than total beds`);
 
 
        }
@@ -23,7 +23,7 @@ export var createtheatre = async (req:any,res:any) =>{
        //validate specialization
        const foundSpecilization =  await readoneclinic({clinic:bedspecialization},'');
        if(!foundSpecilization){
-           throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
+           throw new Error(`Specialization does not exist`);
 
        }
        
@@ -32,7 +32,7 @@ export var createtheatre = async (req:any,res:any) =>{
       // validate ward
         const foundtheatre =  await readonetheatremanagement({theatrename},'');
         if(foundtheatre){
-            throw new Error(`Theatre ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Theatre already exists`);
 
         }
          const queryresult=await createtheatremanagement({bedspecialization,vacantbed,theatrename,totalbed,occupiedbed,theatreid});
@@ -79,7 +79,7 @@ export async function updatetheatre(req:any, res:any){
     //validate that totalbed is created or equal to occupiedbed
     if(occupiedbed >  totalbed){
     
-     throw new Error(`Occupied bed ${configuration.error.errorgreaterthan} Total bed`);
+     throw new Error(`Occupied beds cannot be greater than total beds`);
 
 
     }

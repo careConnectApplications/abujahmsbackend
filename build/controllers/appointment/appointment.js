@@ -22,6 +22,7 @@ const vitalcharts_1 = require("../../dao/vitalcharts");
 const vitalcharts_2 = require("../../dao/vitalcharts");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const hmocategorycover_1 = require("../../dao/hmocategorycover");
+const clinics_1 = require("../../dao/clinics");
 const users_1 = require("../../dao/users");
 const price_1 = require("../../dao/price");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
@@ -33,62 +34,54 @@ const otherservices_1 = require("../../utils/otherservices");
 const config_1 = __importDefault(require("../../config"));
 const errors_1 = require("../../errors");
 const { ObjectId } = mongoose_1.default.Types;
+const appointment_helper_1 = require("./appointment.helper");
 //add vitals for 
 // Create a new schedule
-const scheduleappointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    try {
-        //req.body.appointmentdate=new Date(req.body.appointmentdate);
-        var appointmentid = String(Date.now());
-        //const {id} = req.params;
-        var { clinic, reason, appointmentdate, appointmentcategory, appointmenttype, patient, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division } = req.body;
-        (0, otherservices_1.validateinputfaulsyvalue)({ clinic, appointmentdate, appointmentcategory, appointmenttype, patient });
-        //pending
-        //validatioborder
-        var selectquery = {
-            "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-            "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
-        };
-        //search patient if available and por
-        const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, selectquery, 'insurance', '');
-        // const patientrecord =  await readonepatient({_id:patient},selectquery,'','');
-        if (!patientrecord) {
-            throw new Error(`Patient donot ${config_1.default.error.erroralreadyexit}`);
-        }
-        var { firstName, lastName, MRN, HMOId, HMOName } = patientrecord;
-        //search for price if available
-        var appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
-        if (!appointmentPrice) {
-            throw new Error(config_1.default.error.errornopriceset);
-        }
-        let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[0] }, { hmopercentagecover: 1 });
-        var hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
-        var amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(appointmentPrice.amount));
-        //create appointment
-        //create payment
-        let createpaymentqueryresult;
-        let queryresult;
-        if (amount == 0) {
-            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
-            queryresult = yield (0, appointment_1.createappointment)({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
-            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { appointment: queryresult._id } });
-        }
-        else if (amount > 0) {
-            createpaymentqueryresult = yield (0, payment_1.createpayment)({ firstName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.firstName, lastName: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.lastName, MRN: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.MRN, phoneNumber: patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.phoneNumber, paymentreference: appointmentid, paymentype: appointmenttype, paymentcategory: appointmentcategory, patient, amount });
-            let vitals = yield (0, vitalcharts_1.createvitalcharts)({ status: config_1.default.status[8], patient: patientrecord._id });
-            queryresult = yield (0, appointment_1.createappointment)({ amount, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, payment: createpaymentqueryresult._id, patient: patientrecord._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN, HMOId, HMOName });
-            //create vitals
-            yield (0, patientmanagement_1.updatepatient)(patient, { $push: { payment: createpaymentqueryresult._id, appointment: queryresult._id } });
-        }
-        //create vitals
-        //update patient
-        res.status(200).json({ queryresult, status: true });
-    }
-    catch (error) {
-        res.status(403).json({ status: false, msg: error.message });
-    }
-});
-exports.scheduleappointment = scheduleappointment;
+exports.scheduleappointment = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e;
+    const appointmentid = String(Date.now());
+    //clean the req body
+    req.body = (0, otherservices_1.removeEmpty)(req.body);
+    console.log("req.body", req.body);
+    const { clinic, unit, reason, appointmentdate, appointmentcategory, appointmenttype, patient } = req.body;
+    // validate input
+    (0, otherservices_1.validateinputfaulsyvalue)({ clinic, unit, appointmentdate, appointmentcategory, appointmenttype, patient });
+    // check patient
+    const selectquery = { firstName: 1, lastName: 1, MRN: 1, HMOId: 1, HMOName: 1, phoneNumber: 1 };
+    const patientrecord = yield (0, patientmanagement_1.readonepatient)({ _id: patient, status: config_1.default.status[1] }, selectquery, "insurance", "");
+    if (!patientrecord)
+        throw new Error("Patient not found");
+    // check clinic
+    const foundclinic = yield (0, clinics_1.readoneclinic)({ clinic }, {});
+    if (!foundclinic || !foundclinic.category)
+        throw new Error("Clinic invalid or missing category");
+    req.body.category = foundclinic.category;
+    // price
+    const appointmentPrice = yield (0, price_1.readoneprice)({ servicecategory: appointmentcategory, servicetype: appointmenttype });
+    if (!appointmentPrice)
+        throw new Error("Price not set");
+    const insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = patientrecord === null || patientrecord === void 0 ? void 0 : patientrecord.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[0] }, { hmopercentagecover: 1 });
+    const hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+    const amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(appointmentPrice.amount));
+    // Extract createdBy from req.user (if available)
+    const createdBy = ((_d = (_c = req.user) === null || _c === void 0 ? void 0 : _c.user) === null || _d === void 0 ? void 0 : _d._id) || ((_e = req.user) === null || _e === void 0 ? void 0 : _e._id);
+    exports.laborder;
+    // choose strategy
+    const strategy = amount === 0 ? appointment_helper_1.FreeAppointmentStrategy : appointment_helper_1.PaidAppointmentStrategy;
+    const context = (0, appointment_helper_1.AppointmentContext)(strategy);
+    const queryresult = yield context.execute({
+        patientrecord,
+        appointmentid,
+        req,
+        amount,
+        configuration: config_1.default,
+        services: { createpayment: payment_1.createpayment, createvitalcharts: vitalcharts_1.createvitalcharts, createappointment: appointment_1.createappointment, updatepatient: patientmanagement_1.updatepatient },
+        hmopercentagecover,
+        appointmentPrice,
+        createdBy
+    });
+    res.status(200).json({ queryresult, status: true });
+}));
 // Get all schedueled records
 const getAllSchedulesoptimized = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -733,7 +726,7 @@ var examinepatient = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.examinepatient = examinepatient;
 //lab order
 exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c;
     try {
         const { firstName, lastName } = (req.user).user;
         //accept _id from request.
@@ -758,11 +751,11 @@ exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
             fileName = yield (0, otherservices_1.uploadbase64image)(imageBase64);
         //insurance
         if (foundPatient) {
-            if (!(foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance))
-                return next(new errors_1.ApiError(404, "patient does not have insurance info"));
+            if (!foundPatient)
+                return next(new errors_1.ApiError(404, "patient do not exist"));
             //console.log({ hmoId: foundPatient?.insurance._id, category: configuration.category[2] }, { hmopercentagecover: 1 });
-            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance._id, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
-            hmopercentagecover = (_a = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _a !== void 0 ? _a : 0;
+            let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: (_a = foundPatient === null || foundPatient === void 0 ? void 0 : foundPatient.insurance) === null || _a === void 0 ? void 0 : _a._id, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
+            hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
             patientappointment = yield (0, appointment_1.readoneappointment)({ _id: appointmentunderscoreid }, {}, 'patient');
             appointment = {
                 patient: id,
@@ -776,22 +769,24 @@ exports.laborder = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
             appointment = yield (0, appointment_1.readoneappointment)({ _id: id }, {}, 'patient');
             if (!appointment) {
                 //create an appointment
-                throw new Error(`Appointment donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Appointment does not exist`);
             }
             //read insurance
             let insurance = yield (0, hmocategorycover_1.readonehmocategorycover)({ hmoId: appointment.patient.insurance, category: config_1.default.category[2] }, { hmopercentagecover: 1 });
-            hmopercentagecover = (_b = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _b !== void 0 ? _b : 0;
+            hmopercentagecover = (_c = insurance === null || insurance === void 0 ? void 0 : insurance.hmopercentagecover) !== null && _c !== void 0 ? _c : 0;
         }
         for (var i = 0; i < testname.length; i++) {
             //    console.log(testname[i]);
             //console.log(isHMOCover);
             var testPrice = yield (0, price_1.readoneprice)({ servicetype: testname[i] });
+            //search in clinic
             if ((testPrice === null || testPrice === void 0 ? void 0 : testPrice.amount) == null) {
                 throw new Error(`${config_1.default.error.errornopriceset}  ${testname[i]}`);
             }
+            let labcategory = testPrice === null || testPrice === void 0 ? void 0 : testPrice.category;
             let amount = (0, otherservices_1.calculateAmountPaidByHMO)(Number(hmopercentagecover), Number(testPrice.amount));
             //create testrecord
-            let testrecord = yield (0, lab_1.createlab)({ hmopercentagecover, actualcost: testPrice.amount, note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby, filename: fileName });
+            let testrecord = yield (0, lab_1.createlab)({ hmopercentagecover, actualcost: testPrice.amount, note, priority, testname: testname[i], patient: appointment.patient, appointment: appointment._id, appointmentid: appointment.appointmentid, testid, department, amount, raiseby, filename: fileName, labcategory });
             testsid.push(testrecord._id);
             //paymentids.push(createpaymentqueryresult._id);
         }

@@ -1,5 +1,64 @@
 import configuration from "../../config";
 export const appointmentaggregatereports=(startdate:any,enddate:any)=>{
+const outpatientdepartmentpipeline = [
+  
+    {
+      $match: {
+        createdAt: { $gte: startdate, $lt: enddate },
+      },
+    },
+    
+    {
+     $lookup: {
+        from: "patientsmanagements", // collection name of Patientsmanagement
+        localField: "patient",
+        foreignField: "_id",
+        as: "patientInfo",
+      },
+    },
+    { $unwind: "$patientInfo" },
+    {
+      $project: {
+        clinic: 1,
+        appointmenttype: 1,
+        category: 1,
+        gender: "$patientInfo.gender",
+        patientCreatedAt: "$patientInfo.createdAt",
+        patient: "$patient",
+        
+      },
+    },
+ 
+    {
+      $facet: {
+        newAdult: [
+          { $match: { category: configuration.cliniccategory[0],patientCreatedAt: { $gte: startdate, $lt: enddate } } },
+          { $group: { _id: { patient: "$patient", gender: "$gender" } } },
+          { $group: { _id: "$_id.gender", count: { $sum: 1 } } },
+        ],
+         
+        newPaediatrics: [
+          { $match: { category: configuration.cliniccategory[1],patientCreatedAt: { $gte: startdate, $lt: enddate },} },
+          { $group: { _id: { patient: "$patient", gender: "$gender" } } },
+          { $group: { _id: "$_id.gender", count: { $sum: 1 } } },
+        ],
+        familyMedicine: [
+          { $match: { category: configuration.cliniccategory[0] } },
+          { $group: { _id: "$gender", count: { $sum: 1 } } },
+        ],
+        popd: [
+          { $match: { category: configuration.cliniccategory[1] } },
+          { $group: { _id: "$gender", count: { $sum: 1 } } },
+        ],
+        
+      },
+      
+    },
+    
+  
+  ];
+
+  
 const appointmentaggregatescheduled = [
       {   
       
@@ -8,7 +67,7 @@ const appointmentaggregatescheduled = [
 
 },
       {
-        $group: {
+       $group: {
           _id: "$clinic",                // Group by product
           Numberofappointment: { $sum: 1 },
         }
@@ -123,6 +182,87 @@ const appointmentaggregatescheduled = [
           }
             
         ];
-    return {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate}
+    const accidentEmergencyRecordsPipeline = [
+      {
+        $match: {
+          createdAt: { $gte: startdate, $lt: enddate },
+          category: configuration.cliniccategory[2], // Assuming "Accident & Emergency" is represented by "Adult"
+        },
+      },
+      {
+        $lookup: {from: "patientsmanagements",
+          localField: "patient",
+          foreignField: "_id",
+          as: "patientInfo",
+        },
+      },
+      { $unwind: "$patientInfo" },
+      {
+        $project: {
+          appointmenttype: 1,
+          gender: "$patientInfo.gender",
+          category: 1,
+          "clinicalencounter.outcome": 1,
+          referredIn: 1, 
+        },
+      },
+      {
+        $facet: {
+          accidentAndEmergencyAttendance: [
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          roadTrafficAccident: [
+            { $match: { accidentType: { $ne: null } } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          epuAttendance: [
+            { $match: { unit: configuration.unitcategory[0] } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          /*
+          dressing: [
+            { $match: { appointmenttype: "Dressing" } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          */
+          aAndEDeath: [
+            { $match: { "clinicalencounter.outcome": configuration.encounterplanoutcome[0] } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          epuDeath: [
+            {
+              $match: {
+              unit: configuration.unitcategory[0],
+              "clinicalencounter.outcome": configuration.encounterplanoutcome[0],
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          broughtInDeath: [
+            { $match: { arrivalMode: configuration.arrivalMode[3] } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          bidInEpu: [
+            {
+              $match: {
+                arrivalMode: configuration.arrivalMode[3],
+                unit: configuration.unitcategory[0]
+              },
+            },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          outpatientsReferredIn: [
+            { $match: { arrivalMode: configuration.arrivalMode[2] } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+          outpatientsReferredOut: [
+            { $match: { "clinicalencounter.outcome": configuration.encounterplanoutcome[1] } },
+            { $group: { _id: "$gender", count: { $sum: 1 } } },
+          ],
+        },
+      },
+    ];
+    return {appointmentaggregatescheduled,appointmentaggregatecomplete,appointmentaggregateinprogress,appointmentaggregatetotalnumberofappointments,clinicalaggregate,outpatientdepartmentpipeline, accidentEmergencyRecordsPipeline}
 }
     
+

@@ -27,7 +27,7 @@ async function handlePayment(patient: any, paymentData: any, updateFn: Function,
 
 
 // 🔹 Generate insurance claim
-function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy }: any) {
+function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, authorizationCode, approvalCode, amount, createdBy, action,actualcost }: any) {
   return {
     patient: patient._id,
     serviceCategory,
@@ -37,7 +37,9 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
     amountClaimed: amount,
     amountApproved: amount,
     insurer: patient.HMOName,
-    createdBy
+    createdBy,
+    action,
+    actualcost
   };
 }
 
@@ -49,12 +51,14 @@ function buildInsuranceClaim({ patient, serviceCategory, entityId, entityKey, au
 
 // 🟢 LAB HANDLER
 export async function processLab(id: string, ctx: any) {  
-  const { authorizationCode, approvalCode, createdBy } = ctx;
+  const { authorizationCode, approvalCode, createdBy,action } = ctx;
+  console.log("action", action);
   //find lab by id
   const lab: any = await readonelab({ _id: id }, {}, "patient");
   //get patient details, testname, testid, amount from lab
-  const { testname, testid, patient, amount } = lab;
+  const { testname, testid, patient, amount,actualcost } = lab;
 //check if patient is admitted, if yes use admission number as payment reference
+  const approvedamount = action == "approve" ? amount : actualcost;
   const paymentreference = await getPaymentReference(patient._id, testid);
 
   const paymentData = {
@@ -66,7 +70,7 @@ export async function processLab(id: string, ctx: any) {
     paymentype: testname,
     paymentcategory: configuration.category[2],
     patient: patient._id,
-    amount
+    amount:approvedamount
   };
     //create payment if amount is greater than 0
     //update lab status to processed and add payment reference
@@ -80,19 +84,22 @@ export async function processLab(id: string, ctx: any) {
     entityKey: "lab",
     authorizationCode,
     approvalCode,
-    amount,
-    createdBy
+    amount:approvedamount,
+    createdBy,
+    action,
+    actualcost
   });
 }
 
 // 🟢 RADIOLOGY HANDLER
 export async function processRadiology(id: string, ctx: any) {
-  const { authorizationCode, approvalCode, createdBy } = ctx;
+  const { authorizationCode, approvalCode, createdBy, action } = ctx;
 // find radiology by id
   const radiology: any = await readoneradiology({ _id: id }, {}, "patient");
   // get patient details, testname, testid, amount from radiology
-  const { testname, testid, patient, amount } = radiology;
-
+  const { testname, testid, patient, amount, actualcost } = radiology;
+  //check if patient is admitted, if yes use admission number as payment reference
+  const approvedamount = action == "approve" ? amount : actualcost;
   const paymentreference = await getPaymentReference(patient._id, testid);
 
   const paymentData = {
@@ -104,7 +111,7 @@ export async function processRadiology(id: string, ctx: any) {
     paymentype: testname,
     paymentcategory: configuration.category[4],
     patient: patient._id,
-    amount
+    amount:approvedamount
   };
 
   await handlePayment(patient, paymentData, updateradiology, { _id: id },configuration.status[9],configuration.status[9],"status");
@@ -116,17 +123,21 @@ export async function processRadiology(id: string, ctx: any) {
     entityKey: "radiology",
     authorizationCode,
     approvalCode,
-    amount,
-    createdBy
+    amount:approvedamount,
+    createdBy,
+    action,
+    actualcost
   });
 }
 
 // 🟢 PROCEDURE HANDLER
 export async function processProcedure(id: string, ctx: any) {
-  const { authorizationCode, approvalCode, createdBy } = ctx;
+  const { authorizationCode, approvalCode, createdBy, action } = ctx;
  //find procedure by id
   const findprocedure: any = await readoneprocedure({ _id: id }, {}, "patient");
-  const { procedure, procedureid, patient, amount } = findprocedure;
+  const { procedure, procedureid, patient, amount, actualcost } = findprocedure;
+  //check if patient is admitted, if yes use admission number as payment reference
+  const approvedamount = action == "approve" ? amount : actualcost;
   const paymentreference = await getPaymentReference(patient._id, procedureid);
 
   const paymentData = {
@@ -138,7 +149,7 @@ export async function processProcedure(id: string, ctx: any) {
     paymentype: procedure,
     paymentcategory: configuration.category[5],
     patient: patient._id,
-    amount
+    amount:approvedamount
   };
 
   await handlePayment(patient, paymentData, updateprocedure, { _id: id },configuration.status[9],configuration.status[9],"status");
@@ -150,16 +161,20 @@ export async function processProcedure(id: string, ctx: any) {
     entityKey: "procedure",
     authorizationCode,
     approvalCode,
-    amount,
-    createdBy
+    amount:approvedamount,
+    createdBy,
+    action,
+    actualcost
   });
 }
 
 // 🟢 PHARMACY HANDLER
 export async function processPharmacy(id: string, ctx: any) {
-  const { authorizationCode, approvalCode, createdBy } = ctx;
+  const { authorizationCode, approvalCode, createdBy, action } = ctx;
   const findPharmacy: any = await readoneprescription({_id:id},{},'patient','','');
-  const { prescription, orderid, patient, amount,qty,pharmacy } = findPharmacy;
+  const { prescription, orderid, patient, amount, actualcost, qty, pharmacy } = findPharmacy;
+  //check if patient is admitted, if yes use admission number as payment reference
+  const approvedamount = action == "approve" ? amount : actualcost;
   const paymentreference = await getPaymentReference(patient._id, orderid);
 
   const paymentData = {
@@ -171,7 +186,7 @@ export async function processPharmacy(id: string, ctx: any) {
     paymentype: prescription,
     paymentcategory: pharmacy,
     patient: patient._id,
-    amount,
+    amount:approvedamount,
     qty
   };
 
@@ -184,15 +199,19 @@ export async function processPharmacy(id: string, ctx: any) {
     entityKey: "pharmacy",
     authorizationCode,
     approvalCode,
-    amount,
-    createdBy
+    amount:approvedamount,
+    createdBy,
+    action,
+    actualcost
   });
 }
 
 export async function processHistopathology(id: any, ctx: any){
-     const { authorizationCode, approvalCode, createdBy } = ctx;
+     const { authorizationCode, approvalCode, createdBy, action } = ctx;
    const findHistopathology =await  getHistopathologyByIdPopulate(id);
-     const { patient, amount,refNumber } = findHistopathology;   
+     const { patient, amount, actualcost, refNumber } = findHistopathology;
+     //check if patient is admitted, if yes use admission number as payment reference
+     const approvedamount = action == "approve" ? amount : actualcost;   
     const paymentData = {
             paymentreference: refNumber,
             paymentype: configuration.category[6],
@@ -202,7 +221,7 @@ export async function processHistopathology(id: any, ctx: any){
             lastName: patient?.lastName,
             MRN: patient?.MRN,
             phoneNumber: patient?.phoneNumber,
-            amount
+            amount:approvedamount
         }
       await handlePayment(patient, paymentData, updateHistopathologyRecord, { _id: id },configuration.status[5],configuration.status[5],"status");  
       return buildInsuranceClaim({
@@ -212,8 +231,10 @@ export async function processHistopathology(id: any, ctx: any){
     entityKey: "histopathology",
     authorizationCode,
     approvalCode,
-    amount,
-    createdBy
+    amount:approvedamount,
+    createdBy,
+    action,
+    actualcost
   });
     
     

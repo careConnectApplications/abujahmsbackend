@@ -103,7 +103,6 @@ const labSchema = new Schema({
     default: null,
   },
   labcategory: {
-    required: true,
     type: String,
     default: "lab",
 
@@ -113,6 +112,9 @@ const labSchema = new Schema({
   priority: { type: String, enum: ["urgent", "routine"] },
   sortbydate: Date,
   amount: Number,
+  validatedby: String,
+  validateddate: Date,
+  validationremarks: String,
   hmopercentagecover:Number,
   actualcost:Number,
   chemicalpathologyhemathologyreviewtstatus:{
@@ -135,6 +137,20 @@ const labSchema = new Schema({
 },
   { timestamps: true }
 );
+
+// Indexes to optimize common queries
+labSchema.index({ patient: 1 });                          // Lookup by patient
+labSchema.index({ appointment: 1 });                      // Lookup by appointment
+labSchema.index({ appointmentid: 1 });                    // Lookup by appointment ID
+labSchema.index({ status: 1 });                           // Filter by status
+labSchema.index({ testid: 1 });                           // Lookup by test ID
+labSchema.index({ sortbydate: 1 });                       // Sort by date
+labSchema.index({ createdAt: -1 });                       // Sort by creation time (descending)
+
+// Compound indexes for common query combinations
+labSchema.index({ patient: 1, status: 1 });               // Patient's tests by status
+labSchema.index({ appointmentid: 1, status: 1 });         // Appointment tests by status
+labSchema.index({ status: 1, createdAt: -1 });            // Recent tests by status
 
 const lab = model('Lab', labSchema);
 export default lab;

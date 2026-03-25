@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isObjectAvailable = exports.uploadbase64image = exports.mail = exports.sendTokenResponse = exports.isValidPassword = exports.encrypt = void 0;
+exports.removeEmpty = removeEmpty;
 exports.storeUniqueNumber = storeUniqueNumber;
 exports.generateRandomNumber = generateRandomNumber;
 exports.validateinputfaulsyvalue = validateinputfaulsyvalue;
@@ -68,6 +69,14 @@ const config_1 = __importDefault(require("../config"));
 const patientmanagement_1 = require("../dao/patientmanagement");
 const admissions_1 = require("../dao/admissions");
 const { v4: uuidv4 } = require('uuid');
+function removeEmpty(obj) {
+    for (let key in obj) {
+        if (obj[key] === '' || obj[key] === null || obj[key] === undefined) {
+            delete obj[key];
+        }
+    }
+    return obj;
+}
 var encrypt = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -259,7 +268,7 @@ function parseDate(input) {
     return m.isValid() ? m.toDate() : null;
 }
 function isValidPhoneNumber(phoneNumber) {
-    if (!phoneNumber || typeof phoneNumber === 'string') {
+    if (!phoneNumber) {
         return false;
     }
     const phoneNumberRegex = /^(\+?234|0)(70|80|81|90|91)\d{8}$/;

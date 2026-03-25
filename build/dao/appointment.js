@@ -31,7 +31,7 @@ function countappointment(query) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -45,7 +45,7 @@ function modifiedreadallappointment(query, aggregatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -61,7 +61,7 @@ function optimizedreadallappointment(aggregatequery, page, size) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -72,7 +72,7 @@ function readallappointmentfirstfive(query, selectquery, populatequery, populate
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -88,7 +88,7 @@ function readallappointmentpaginated(input, page, size) {
         }
         catch (e) {
             console.log(e);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update appointment");
         }
     });
 }
@@ -102,7 +102,7 @@ function readallappointment(query, selectquery, populatequery, populatesecondque
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -115,7 +115,7 @@ function createappointment(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create appointment");
         }
     });
 }
@@ -127,7 +127,7 @@ function readoneappointment(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve appointment data");
         }
     });
 }
@@ -146,7 +146,7 @@ function updateappointment(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update appointment");
         }
     });
 }
@@ -166,7 +166,7 @@ function updateappointmentbyquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update appointment");
         }
     });
 }

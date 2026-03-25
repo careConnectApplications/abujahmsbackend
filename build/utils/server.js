@@ -32,11 +32,21 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
+const prom_client_1 = __importDefault(require("prom-client"));
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
@@ -76,8 +86,41 @@ const phisiotherapy_1 = __importDefault(require("../routes/phisiotherapy"));
 const eye_module_route_1 = __importDefault(require("../routes/eye-module.route"));
 const doctor_ward_round_route_1 = __importDefault(require("../routes/doctor-ward-round.route"));
 const insuranceauthorizationandclaims_1 = __importDefault(require("../routes/insuranceauthorizationandclaims"));
+const maternity_1 = __importDefault(require("../routes/maternity"));
 function createServer() {
     const app = (0, express_1.default)();
+    // ✅ Collect default Node.js metrics (CPU, memory, event loop, GC, etc.)
+    prom_client_1.default.collectDefaultMetrics({ prefix: "node_" });
+    // 1. Total number of requests (Counter)
+    const totalRequests = new prom_client_1.default.Counter({
+        name: "http_requests_total",
+        help: "Total number of HTTP requests",
+        labelNames: ["method", "route", "status"],
+    });
+    // 2. Total number of errors (Counter)
+    const totalErrors = new prom_client_1.default.Counter({
+        name: "http_request_errors_total",
+        help: "Total number of failed HTTP requests",
+        labelNames: ["method", "route", "status"],
+    });
+    // 3. CPU utilization (Gauge)
+    const cpuUsage = new prom_client_1.default.Gauge({
+        name: "process_cpu_user_seconds_total",
+        help: "Total user CPU time spent in seconds",
+    });
+    // 4. Memory usage (Gauge)
+    const memoryUsage = new prom_client_1.default.Gauge({
+        name: "process_resident_memory_bytes",
+        help: "Resident memory size in bytes",
+    });
+    setInterval(() => {
+        const usage = process.cpuUsage();
+        const memory = process.memoryUsage();
+        // CPU user time in seconds
+        cpuUsage.set(usage.user / 1e6); // microseconds → seconds
+        // Memory RSS (Resident Set Size)
+        memoryUsage.set(memory.rss);
+    }, 5000);
     if (process.env.NODE_ENV !== "test") {
         app.use(logger_1.morgan.successHandler);
         app.use(logger_1.morgan.errorHandler);
@@ -86,6 +129,16 @@ function createServer() {
     app.use((0, cors_1.default)({
         origin: "*",
     }));
+    // Middleware to track requests & errors
+    app.use((req, res, next) => {
+        res.on("finish", () => {
+            totalRequests.labels(req.method, req.path, res.statusCode.toString()).inc();
+            if (res.statusCode >= 400) {
+                totalErrors.labels(req.method, req.path, res.statusCode.toString()).inc();
+            }
+        });
+        next();
+    });
     app.use(express_1.default.static(__dirname + '/downloads'));
     app.use(express_1.default.static(path.join(__dirname, 'uploads')));
     //middleware to process json
@@ -103,6 +156,11 @@ function createServer() {
      */
     //import("../jobs/checkExpiredSubscriptionDate.job");
     app.use((0, express_fileupload_1.default)());
+    // Expose /metrics endpoint
+    app.get("/api/v1/metrics", (req, res) => __awaiter(this, void 0, void 0, function* () {
+        res.set("Content-Type", prom_client_1.default.register.contentType);
+        res.end(yield prom_client_1.default.register.metrics());
+    }));
     app.use('/api/v1/downloads', downloads_1.default);
     app.use('/api/v1/uploads', express_1.default.static('uploads'));
     app.use('/api/v1/auth', auth_1.default);
@@ -137,6 +195,7 @@ function createServer() {
     app.use("/api/v1/eye-module", middleware_1.protect, eye_module_route_1.default);
     app.use("/api/v1/doctor-ward-round", middleware_1.protect, doctor_ward_round_route_1.default);
     app.use("/api/v1/insuranceauthorizationandclaims", middleware_1.protect, insuranceauthorizationandclaims_1.default);
+    app.use("/api/v1/maternity", middleware_1.protect, maternity_1.default);
     // Handle POST requests to /webhook
     /*
   app.post('/api/v1/webhook', (req, res) => {

@@ -29,7 +29,7 @@ function readallimmunization(query, selectquery, populatequery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve immunization data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createimmunization(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create immunization");
         }
     });
 }
@@ -55,7 +55,7 @@ function readoneimmunization(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve immunization data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updateimmunization(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update immunization");
         }
     });
 }
@@ -91,7 +91,7 @@ function updateimmunizationequery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update immunization");
         }
     });
 }

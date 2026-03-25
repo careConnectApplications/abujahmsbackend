@@ -29,7 +29,7 @@ function readallbloodmonitoring(query, selectquery, populatequery, populatesecon
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve blood monitoring data");
         }
     });
 }
@@ -43,7 +43,7 @@ function createbloodmonitoring(input) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.errorusercreate);
+            throw new Error("Failed to create blood monitoring");
         }
     });
 }
@@ -55,7 +55,7 @@ function readonebloodmonitoring(query, selectquery) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserread);
+            throw new Error("Failed to retrieve blood monitoring data");
         }
     });
 }
@@ -72,7 +72,7 @@ function updatebloodmonitoring(id, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update blood monitoring");
         }
     });
 }
@@ -91,7 +91,7 @@ function updatebloodmonitoringquery(query, reqbody) {
         }
         catch (err) {
             console.log(err);
-            throw new Error(config_1.default.error.erroruserupdate);
+            throw new Error("Failed to update blood monitoring");
         }
     });
 }

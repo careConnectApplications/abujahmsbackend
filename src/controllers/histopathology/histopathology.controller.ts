@@ -57,7 +57,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
 
   const { _id: userId } = (req.user).user;
   const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
-  if (!foundPatient) return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+  if (!foundPatient) return next(new ApiError(404, `Patient do not already exists`));
 
   let insurance: any = await readonehmocategorycover(
     { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
@@ -82,7 +82,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
 
   res.status(201).json({
     status: true,
-    message: "Histopathology created successfully",
+    msg: "Histopathology created successfully",
     data: savedHistopathology
   });
 });
@@ -134,7 +134,7 @@ export const CreateHistopatholgyService = catchAsync(async (req: Request | any, 
     const foundPatient: any = await readonepatient({ _id: patientId }, {}, 'insurance', '');
 
     if (!foundPatient) {
-        return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+        return next(new ApiError(404, `Patient do not already exists`));
     }
 let insurance: any = await readonehmocategorycover(
   { hmoId: foundPatient?.insurance?._id, category: configuration.category[6] },
@@ -233,7 +233,7 @@ if (imageBase64) fileName = await uploadbase64image(imageBase64);
 
     res.status(201).json({
         status: true,
-        message: "Histopathology  created successfully",
+        msg: "Histopathology  created successfully",
         data: savedHistopathology
     });
 });

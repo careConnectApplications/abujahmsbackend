@@ -78,7 +78,7 @@ const createmedicationchart = (req, res) => __awaiter(void 0, void 0, void 0, fu
         else {
             admissionrecord = yield (0, admissions_1.readoneadmission)({ _id: id }, {}, '');
             if (!admissionrecord) {
-                throw new Error(`Admission donot ${config_1.default.error.erroralreadyexit}`);
+                throw new Error(`Admission does not exist`);
             }
         }
         const queryresult = yield (0, medicationcharts_1.createmedicationcharts)({ referedward: admissionrecord.referedward, prescription, admission: admissionrecord._id, patient: admissionrecord.patient, drug, note, dose, frequency, route, staffname });

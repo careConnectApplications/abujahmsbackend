@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePhysiotherapyAssessment = exports.readOnePhysiotherapyAssessments = exports.readAllPhysiotherapyAssessmentByPatient = exports.createPhysiotherapyAssessments = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const config_1 = __importDefault(require("../../config"));
 const otherservices_1 = require("../../utils/otherservices");
 const patientmanagement_1 = require("../../dao/patientmanagement");
 const appointment_1 = require("../../dao/appointment");
@@ -31,7 +30,7 @@ exports.createPhysiotherapyAssessments = (0, catchAsync_1.default)((req, res, ne
     //const appointmentId = new ObjectId(appointmentunderscoreid);
     const patient = yield (0, patientmanagement_1.readonepatient)({ _id: id }, {}, '', '');
     if (!patient)
-        return next(new Error(`Patient does not exist ${config_1.default.error.erroralreadyexit}`));
+        return next(new Error(`Patient does not exist already exists`));
     var checkappointmentId = new ObjectId(appointmentoradmissionunderscoreid);
     const appointment = yield (0, appointment_1.readoneappointment)({ _id: checkappointmentId }, {}, '');
     var checkadimmison = yield (0, admissions_1.readoneadmission)({ _id: checkappointmentId }, {}, '');
@@ -43,7 +42,7 @@ exports.createPhysiotherapyAssessments = (0, catchAsync_1.default)((req, res, ne
     if (appointment) {
         appointmentId = checkappointmentId;
     }
-    //if (!appointment) return next(new Error(`Appointment does not exist ${configuration.error.erroralreadyexit}`));
+    //if (!appointment) return next(new Error(`Appointment does not exist already exists`));
     const input = {
         patientId: patient._id,
         appointmentId,

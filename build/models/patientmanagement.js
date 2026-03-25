@@ -190,7 +190,7 @@ const patientSchema = new mongoose_1.Schema({
     },
     subscriptionExpired: {
         type: Boolean,
-        default: null
+        default: true
     },
     status: {
         required: true,

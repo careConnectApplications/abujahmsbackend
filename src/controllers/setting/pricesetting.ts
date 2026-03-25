@@ -13,7 +13,7 @@ export var createprices = async (req:any,res:any) =>{
    
     try{
     
-       var {servicecategory,amount,servicetype,isHMOCover} = req.body;
+       var {servicecategory,amount,servicetype,isHMOCover, category} = req.body;
       if(!isHMOCover){
         isHMOCover =configuration.ishmo[0];
       }
@@ -36,13 +36,13 @@ export var createprices = async (req:any,res:any) =>{
         }
        
         //validation
-        validateinputfaulsyvalue({servicecategory,amount,servicetype});
+        validateinputfaulsyvalue({servicecategory,amount,servicetype,category});
         const foundPrice =  await readoneprice({servicecategory,servicetype,isHMOCover});
         //update servicetype for New Patient Registration
        
        
         if(foundPrice){
-            throw new Error(`service category and type ${configuration.error.erroralreadyexit}`);
+            throw new Error(`service category and type already exists`);
 
         }
          const queryresult=await createprice(req.body);
@@ -140,7 +140,7 @@ export async function searchprocedure(req:any, res:any){
     const queryresult = await readallprices({servicecategory:configuration.category[5],servicetype: { $regex:searchparams , $options: 'i' }},{servicetype:1,_id:0});
     res.status(200).json({
         queryresult:queryresult.pricedetails,
-        status:true
+       status:true
       }); 
 
 }
@@ -187,7 +187,7 @@ export const getpriceofservice = catchAsync(async (req: Request | any, res: Resp
   );
 
   if (!foundPatient) {
-    throw new Error(`Patient does not ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient does not exist`);
   }
 
   // Fetch price for the service type
@@ -214,4 +214,39 @@ export const getpriceofservice = catchAsync(async (req: Request | any, res: Resp
 
       
   })
-  
+
+// Get all service types for a received service category
+export async function getServiceTypesByCategory(req: any, res: any) {
+  try {
+    const { servicecategory } = req.params;
+    
+    // Validate that service category is provided
+    if (!servicecategory) {
+      throw new Error("Service category is required");
+    }
+    
+    // Query to get all service types for the given service category
+    const queryresult = await readallprices(
+      { 
+        servicecategory: servicecategory,
+        status: configuration.status[1] // Only get active prices
+      },
+      { 
+        servicetype: 1, 
+        _id: 0 
+      }
+    );
+    
+    // Extract unique service types
+    const uniqueServiceTypes = [...new Set(queryresult.pricedetails.map((item: any) => item.servicetype))];
+    
+    res.status(200).json({
+      queryresult: uniqueServiceTypes,
+      status: true
+    });
+    
+  } catch (e: any) {
+    console.log(e);
+    res.status(403).json({ status: false, msg: e.message });
+  }
+}

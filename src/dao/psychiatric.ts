@@ -18,7 +18,7 @@ export async function readAllPsychiatricEvaluations(query: any, selectquery: any
     return { evaluations, total };
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve psychiatric data");
   }
 }
 
@@ -29,7 +29,7 @@ export async function createPsychiatricEvaluation(input: any) {
     return await newEvaluation.save();
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create psychiatric");
   }
 }
 
@@ -39,7 +39,7 @@ export async function readOnePsychiatricEvaluation(query: any, selectquery: any)
     return await PsychiatricEvaluation.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve psychiatric data");
   }
 }
 
@@ -55,7 +55,7 @@ export async function updatePsychiatricEvaluationById(id: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update psychiatric");
   }
 }
 
@@ -71,6 +71,6 @@ export async function updatePsychiatricEvaluationByQuery(query: any, reqbody: an
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update psychiatric");
   }
 }

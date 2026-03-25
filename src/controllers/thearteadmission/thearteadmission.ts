@@ -26,14 +26,14 @@ export var refertheatreadmission= async (req:any, res:any) =>{
       const referedtheatreid = new ObjectId(referedtheatre);
       const foundTheatre =  await readonetheatremanagement({_id:referedtheatreid},'');
       if(!foundTheatre){
-          throw new Error(`Theatre doesnt ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Theatre does not exist`);
 
       }
       //confrim admittospecialization
       //validate specialization
           const foundSpecilization =  await readoneclinic({clinic},'');
           if(!foundSpecilization){
-              throw new Error(`Specialization doesnt ${configuration.error.erroralreadyexit}`);
+              throw new Error(`Specialization does not exist`);
       
           }
 
@@ -42,14 +42,14 @@ export var refertheatreadmission= async (req:any, res:any) =>{
     var patient = await readonepatient({_id:id,status:configuration.status[1]},{},'','');
       
       if(!patient){
-        throw new Error(`Patient donot ${configuration.error.erroralreadyexit} or has not made payment for registration`);
+        throw new Error(`Patient does not ${configuration.error.erroralreadyexit} or has not made payment for registration`);
 
       }
    
   //check that patient have not been admitted
   var  findAdmission = await readonethearteadmission({patient:patient._id, status:{$ne: configuration.admissionstatus[5]}},{},'');
   if(findAdmission){
-    throw new Error(`Patient Admission to Theatre ${configuration.error.erroralreadyexit}`);
+    throw new Error(`Patient admission to theatre already exists`);
 
 }
 // validate and create  procedure 
@@ -71,7 +71,7 @@ for(var i =0; i < procedures.length; i++){
     var testsetting = servicetypedetails.filter(item => (item.type).includes(procedures[i]));
     
     if(!testsetting || testsetting.length < 1){
-      throw new Error(`${procedures[i]} donot ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
+      throw new Error(`${procedures[i]} does not ${configuration.error.erroralreadyexit} in ${configuration.category[4]} as a service type  `);
   }
        //create payment
     var createpaymentqueryresult =await createpayment({firstName:patient?.firstName,lastName:patient?.lastName,MRN:patient?.MRN,phoneNumber:patient?.phoneNumber,paymentreference:id,paymentype:procedures[i],paymentcategory:testsetting[0].category,patient:id,amount:Number(testPrice.amount)})
@@ -143,25 +143,25 @@ export async function updatetheatreadmissionstatus(req:any, res:any){
   try{
     //validate that status is included in te status choice
     if(!(configuration.admissionstatus).includes(status))
-      throw new Error(`${status} status doesnt ${configuration.error.erroralreadyexit}`);
+      throw new Error(`${status} status does not exist`);
 
     //if status = discharge
     
       const response = await readonethearteadmission({_id:id},{},'');
       // check for availability of bed spaces in ward only for admitted
       if(!response){
-          throw new Error(`Theatre Admission donot ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Theatre Admission does not exist`);
       }
       var theatre:any = await readonetheatremanagement({_id:response?.referedtheatre},{});
       if(!theatre){
         // return error
-        throw new Error(`Theatre donot ${configuration.error.erroralreadyexit}`);
+        throw new Error(`Theatre does not exist`);
       }
      
       var transftertotheatre:any= await readonetheatremanagement({_id:transfterto},{});
       if(transfterto && status == configuration.admissionstatus[2] &&  !transftertotheatre){
           // return error
-          throw new Error(`Theatre to be transfered donot  ${configuration.error.erroralreadyexit}`);
+          throw new Error(`Theatre to be transfered does not  already exists`);
       }
       if(transfterto && status == configuration.admissionstatus[2] && transftertotheatre.vacantbed < 1){
         throw new Error(`${transftertotheatre.theatrename}  ${configuration.error.errorvacantspace}`);

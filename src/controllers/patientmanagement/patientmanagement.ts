@@ -18,7 +18,13 @@ import {readonehmocategorycover} from "../../dao/hmocategorycover";
 import { ApiError } from "../../errors";
 import catchAsync from "../../utils/catchAsync";
 import { createDeflateRaw } from "zlib";
+import {selectPatientStrategy,PatientRegistrationContext} from "./patientmanagement.helper"
+import {readoneclinic} from "../../dao/clinics";
+import { cachePatientList, invalidateAllPatientCache } from "../../utils/cache/patientCache";
+import { initializeRedis } from "../../utils/redisClient";
 
+// Initialize Redis on module load
+initializeRedis().catch(console.error);
 
 
 
@@ -79,8 +85,8 @@ export async function searchpartient(req: any, res: any) {
     const queryresult = await readallpatientpaginated(query, selectquery, '', '', page, size);
 
     res.status(200).json({
-      queryresult,
-      status: true
+      status: true,
+      queryresult
     });
   }
   catch (e: any) {
@@ -188,7 +194,7 @@ export async function bulkuploadhmopatients(req: any, res: any) {
         const foundUser:any =  await readonepatient({phoneNumber},{},'','');
         //category
         if(foundUser && phoneNumber !== configuration.defaultphonenumber){
-            throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+            throw new Error(`Patient already exists`);
  
         }
             */
@@ -203,6 +209,10 @@ export async function bulkuploadhmopatients(req: any, res: any) {
     }
 
     await createaudit({ action: "Bulk Uploaded HMO Patient", actor, affectedentity: HMOName });
+    
+    // Invalidate cache after bulk upload
+    await invalidateAllPatientCache();
+    
     res.status(200).json({ status: true, queryresult: 'Bulk upload was successfull' });
   }
   catch (e: any) {
@@ -221,6 +231,10 @@ export async function updateauthorizationcode(req: any, res: any) {
     const { id } = req.params;
     const { authorizationcode } = req.body;
     var queryresult = await updatepatient(id, { authorizationcode });
+    
+    // Invalidate cache after update
+    await invalidateAllPatientCache();
+    
     res.status(200).json({
       queryresult,
       status: true
@@ -233,57 +247,24 @@ export async function updateauthorizationcode(req: any, res: any) {
 
 }
 
-
-//add patiient
 export var createpatients = async (req: any, res: any) => {
-
   try {
-    const {
-      alternatePhoneNumber,
+    const appointmentid: any = String(Date.now());
+    const { unit,clinic,dateOfBirth,phoneNumber,isHMOCover,alternatePhoneNumber,bloodGroup, genotype, bp, heartRate, temperature, appointmentdate, appointmentcategory, appointmenttype,HMOName,HMOId,HMOPlan } = req.body;
+    const clinicalInformation = {
       bloodGroup, genotype, bp, heartRate, temperature
-    } = req.body;
+    }
 
-    var appointmentid: any = String(Date.now());
+    req.body.clinicalInformation = clinicalInformation;
+    var uniqunumber = await storeUniqueNumber(4);
+    // chaorten the MRN to alphanumeric 
+    req.body.MRN = uniqunumber;
+    req.body.password = configuration.defaultPassword;
+    if(HMOName || HMOId || HMOPlan) req.body.isHMOCover = configuration.ishmo[1];
+
     if (!(req.body.isHMOCover)) {
-      req.body.isHMOCover = configuration.ishmo[0]
-
+      req.body.isHMOCover = configuration.ishmo[0];
     }
-
-
-    if (!(req.body.isHMOCover == configuration.ishmo[1] || req.body.isHMOCover == true)) {
-
-      delete req.body.authorizationcode;
-      delete req.body.facilitypateintreferedfrom;
-    }
-    req.body.appointmentcategory = configuration.category[3];
-    req.body.appointmenttype = configuration.category[3];
-    var { facilitypateintreferedfrom, authorizationcode, policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, dateOfBirth, phoneNumber, firstName, lastName, gender, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, isHMOCover,HMOName,HMOId,HMOPlan } = req.body;
-    //validation
-    validateinputfaulsyvalue({ phoneNumber, firstName, lastName, gender,  isHMOCover });
-    //define the service type
-   
-
-    if (authorizationcode) {
-      req.body.patienttype = configuration.patienttype[1];
-
-    }
-    let gethmo:any;
-    //define the service type
-    if (isHMOCover == configuration.ishmo[1] || isHMOCover == true) {
-       validateinputfaulsyvalue({ HMOName,HMOId,HMOPlan });
-      gethmo = await readonehmomanagement({hmoname:req.body.HMOName},{_id:1,hmopercentagecover:1});
-    if(!gethmo){
-      throw new Error("HMONAME does not exist");
-    }
-    req.body.insurance=gethmo._id;
-
-    }
-
-
-
-    //get token from header and extract clinic
-
-    //check for 11 digit
     if (phoneNumber.length !== 11) {
       throw new Error(configuration.error.errorelevendigit);
     }
@@ -296,162 +277,74 @@ export var createpatients = async (req: any, res: any) => {
     if (dateOfBirth) req.body.age = moment().diff(moment(dateOfBirth), 'years');
     //if not dateObirth but age calculate date of birth
     if (!dateOfBirth && req.body.age) req.body.dateOfBirth = moment().subtract(Number(req.body.age), 'years').format('YYYY-MM-DD');
-    var selectquery = {
+      var selectquery = {
       "title": 1, "firstName": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
       "maritalStatus": 1, "disability": 1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1
     };
     const foundUser: any = await readonepatient({ phoneNumber }, selectquery, '', '');
     //category
     if (foundUser && phoneNumber !== configuration.defaultphonenumber) {
-      throw new Error(`Patient ${configuration.error.erroralreadyexit}`);
+      throw new Error(`Patient already exists`);
 
     }
-   
-    var { isHMOCover } = req.body;
-      var [
-  newRegistrationPrice,
-  annualsubscriptionnewRegistrationPrice,
-  cardfeenewRegistrationPrice
-] = await Promise.all([
-  readoneprice({
-    servicecategory: configuration.category[3],
-    servicetype: configuration.category[3]
-  }),
-  readoneprice({
-    servicecategory: configuration.category[8],
-    servicetype: configuration.category[8]
-  }),
-  readoneprice({
-    servicecategory: configuration.category[9],
-    servicetype: configuration.category[9]
-  })
-]);
+    // fetch prices for optional services only
+    const [
+      annualsubscriptionnewRegistrationPrice,
+      cardfeenewRegistrationPrice,
+    ] = await Promise.all([
+      readoneprice({
+        servicecategory: configuration.category[8],
+        servicetype: configuration.category[8],
+      }),
+      readoneprice({
+        servicecategory: configuration.category[9],
+        servicetype: configuration.category[9],
+      }),
+    ]);
 
-
-
-
-    //use age to calculate price
-    if ( !newRegistrationPrice || !annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
-      throw new Error(`Price for ${configuration.category[3]}  or ${configuration.category[8]} or ${configuration.category[9]} is not set`);
-
+    if (!annualsubscriptionnewRegistrationPrice || !cardfeenewRegistrationPrice) {
+      throw new Error(
+        `Price for ${configuration.category[8]} or ${configuration.category[9]} is not set`
+      );
     }
-    const clinicalInformation = {
-      bloodGroup, genotype, bp, heartRate, temperature
-    }
-
-    req.body.clinicalInformation = clinicalInformation;
-
-    var uniqunumber = await storeUniqueNumber(4);
-    // chaorten the MRN to alphanumeric 
-    req.body.MRN = uniqunumber;
-    req.body.password = configuration.defaultPassword;
-    //other validations
-    var payment = [];
-    //create payment
-    //create payment for only none hmo patient
-    let queryappointmentresult;
-    let queryresult;
-
-    let vitals:any; 
-   const [insurance, annualsubscription, cardfee] = await Promise.all([
-  readonehmocategorycover(
-    { hmoId: gethmo?._id, category: configuration.category[3] },
-    { hmopercentagecover: 1 }
-  ),
-  readonehmocategorycover(
-    { hmoId: gethmo?._id, category: configuration.category[8] },
-    { hmopercentagecover: 1 }
-  ),
-  readonehmocategorycover(
-    { hmoId: gethmo?._id, category: configuration.category[9] },
-    { hmopercentagecover: 1 }
-  )
-]);
-
-    var hmopercentagecover=insurance?.hmopercentagecover ?? 0;
-    var annualsubscriptionhmopercentagecover=annualsubscription?.hmopercentagecover ?? 0;
-    var cardfeehmopercentagecover=cardfee?.hmopercentagecover ?? 0;
-    var amount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-     var annualsubscriptionamount =calculateAmountPaidByHMO(Number(annualsubscriptionhmopercentagecover), Number(annualsubscriptionnewRegistrationPrice.amount));
-      var cardfeeamountamount =calculateAmountPaidByHMO(Number(cardfeehmopercentagecover), Number(cardfeenewRegistrationPrice.amount));
-     //var annualsubscriptionamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-      //var cardfeeamount =calculateAmountPaidByHMO(Number(hmopercentagecover), Number(newRegistrationPrice.amount));
-     if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-      req.body.status = configuration.status[1];
-     }
-    const createpatientqueryresult = await createpatient(req.body);
-    if (amount == 0 && annualsubscriptionamount == 0 && cardfeeamountamount == 0) {
-
-      if (appointmentdate) {
-        queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, appointmentid, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, firstName, lastName, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
-        queryresult = await updatepatient(createpatientqueryresult._id, { $push: { appointment: queryappointmentresult._id } });
+    // Fetch appointment price if appointment details are provided
+    let appointmentPrice = null;
+    if (appointmentdate && appointmentcategory && appointmenttype) {
+      appointmentPrice = await readoneprice({
+        servicecategory: appointmentcategory,
+        servicetype: appointmenttype,
+      });
+      
+      if (!appointmentPrice) {
+        throw new Error(`Price for ${appointmentcategory}/${appointmenttype} is not set`);
       }
-
-    }
-    else {
-      //add year suscription fee
-      //add 
-      const [
-  createpaymentqueryresult,
-  annualsubscriptioncreatepaymentqueryresult,
-  cardfeecreatepaymentqueryresult
-] = await Promise.all([
-  createpayment({
-    firstName,
-    lastName,
-    MRN: req.body.MRN,
-    phoneNumber,
-    paymentreference: req.body.MRN,
-    paymentype: newRegistrationPrice.servicetype,
-    paymentcategory: newRegistrationPrice.servicecategory,
-    patient: createpatientqueryresult._id,
-    amount
-  }),
-  createpayment({
-    firstName,
-    lastName,
-    MRN: req.body.MRN,
-    phoneNumber,
-    paymentreference: req.body.MRN,
-    paymentype: annualsubscriptionnewRegistrationPrice.servicetype,
-    paymentcategory: annualsubscriptionnewRegistrationPrice.servicecategory,
-    patient: createpatientqueryresult._id,
-    amount:annualsubscriptionamount
-  }),
-  createpayment({
-    firstName,
-    lastName,
-    MRN: req.body.MRN,
-    phoneNumber,
-    paymentreference: req.body.MRN,
-    paymentype: cardfeenewRegistrationPrice.servicetype,
-    paymentcategory: cardfeenewRegistrationPrice.servicecategory,
-    patient: createpatientqueryresult._id,
-    amount:cardfeeamountamount
-  })
-]);
-
-      // const createappointmentpaymentqueryresult =await createpayment({paymentreference:appointmentid,paymentype:appointmenttype,paymentcategory:appointmentcategory,patient:createpatientqueryresult._id,amount:Number(appointmentPrice.amount)})
-      payment.push(createpaymentqueryresult._id);
-      payment.push(annualsubscriptioncreatepaymentqueryresult._id);
-      payment.push(cardfeecreatepaymentqueryresult._id);
-      //payment.push(createappointmentpaymentqueryresult._id);
-      //update createpatientquery
-      if (appointmentdate) {
-        queryappointmentresult = await createappointment({ policecase, physicalassault, sexualassault, policaename, servicenumber, policephonenumber, division, status: configuration.status[5], appointmentid, payment: createpaymentqueryresult._id, patient: createpatientqueryresult._id, clinic, reason, appointmentdate, appointmentcategory, appointmenttype, vitals: vitals._id, MRN: createpatientqueryresult?.MRN, HMOId: createpatientqueryresult?.HMOId, HMOName: createpatientqueryresult?.HMOName });
-        queryresult = await updatepatient(createpatientqueryresult._id, { payment, $push: { appointment: queryappointmentresult._id } });
-      }
+       const foundclinic = await readoneclinic({ clinic }, {});
+          if (!foundclinic || !foundclinic.category || !unit) throw new Error("Clinic invalid or missing category or missing unit");
+          req.body.category = foundclinic.category;
+      
     }
 
-    res.status(200).json({
-      queryresult: appointmentdate ? queryresult : createpatientqueryresult,
-      status: true
+    // pick strategy
+    const strategy = selectPatientStrategy(req.body.isHMOCover);
+    const context = PatientRegistrationContext(strategy);
+
+    const result = await context.execute({
+      reqBody: req.body,
+      appointmentid,
+      annualsubscriptionnewRegistrationPrice,
+      cardfeenewRegistrationPrice,
+      appointmentPrice,
     });
+
+    // Invalidate cache after patient creation
+    await invalidateAllPatientCache();
+
+    res.status(200).json({ queryresult: result, status: true });
   } catch (error: any) {
-    console.log(error);
     res.status(403).json({ status: false, msg: error.message });
   }
-}
+};
+//add patiient
 //read all patients
 export async function getallpatients(req: any, res: any) {
   try {
@@ -487,7 +380,7 @@ export async function getallpatients(req: any, res: any) {
     //var settings = await configuration.settings();
     var selectquery = {
       "title": 1, "firstName": 1, "status": 1, "middleName": 1, "lastName": 1, "country": 1, "stateOfResidence": 1, "LGA": 1, "address": 1, "age": 1, "dateOfBirth": 1, "gender": 1, "nin": 1, "phoneNumber": 1, "email": 1, "oldMRN": 1, "nextOfKinName": 1, "nextOfKinRelationship": 1, "nextOfKinPhoneNumber": 1, "nextOfKinAddress": 1,
-      "maritalStatus": 1, "disability": 1,"subscriptionPaidUntil":1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
+      "maritalStatus": 1, "disability": 1,"subscriptionPaidUntil":1,"subscriptionExpired":1, "occupation": 1, "isHMOCover": 1, "HMOName": 1, "HMOId": 1, "HMOPlan": 1, "MRN": 1, "createdAt": 1, "passport": 1, "authorizationcode": 1, "patienttype": 1
     };
     //var populatequery="payment";
 
@@ -501,7 +394,18 @@ export async function getallpatients(req: any, res: any) {
       },
     };
     var populateappointmentquery = "appointment";
-    const queryresult = await readallpatientpaginated(filter, selectquery, populatequery, populateappointmentquery, page, size);
+    
+    // Implement cache-aside pattern
+    const queryresult = await cachePatientList(
+      page, 
+      size, 
+      filter,
+      async () => {
+        // This function is called only if data is not in cache
+        return await readallpatientpaginated(filter, selectquery, populatequery, populateappointmentquery, page, size);
+      }
+    );
+    
     res.status(200).json({
       queryresult,
       status: true
@@ -556,7 +460,7 @@ export const updatepatients = catchAsync(async (req: Request | any, res: Respons
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
   const clinicalInformation = {
     bloodGroup, genotype, bp, heartRate, temperature
@@ -567,6 +471,9 @@ export const updatepatients = catchAsync(async (req: Request | any, res: Respons
   var queryresult = await updatepatient(id, req.body);
 
   if (!queryresult) return next(new ApiError(401, "update failed"));
+
+  // Invalidate cache after patient update
+  await invalidateAllPatientCache();
 
   res.status(200).json({
     queryresult,
@@ -591,6 +498,10 @@ export var uploadpix = async (req: any, res: any) => {
 
     //update pix name in patient
     const queryresult = await updatepatient(id, { passport: renamedurl });
+    
+    // Invalidate cache after patient update
+    await invalidateAllPatientCache();
+    
     res.json({
       queryresult,
       status: true
@@ -620,7 +531,7 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
   /// fetch patient info
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   /// check if patient hmo is false
@@ -634,9 +545,12 @@ export const updatePatientToHmo = catchAsync(async (req: Request, res: Response,
   const updatedPatient = await updatepatient(id, { isHMOCover: configuration.ishmo[1], previouslyNotHmo: true });
   /// save db
 
+  // Invalidate cache after HMO update
+  await invalidateAllPatientCache();
+
   res.status(200).json({
     status: true,
-    message: "patient hmo info updated successfully",
+    msg: "patient hmo info updated successfully",
     data: updatedPatient
   })
 });
@@ -655,7 +569,7 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
   const foundPatient: any = await readonepatient({ _id: _Id }, {}, '', '');
 
   if (!foundPatient) {
-    return next(new ApiError(404, `Patient do not ${configuration.error.erroralreadyexit}`));
+    return next(new ApiError(404, `Patient do not already exists`));
   }
 
   const clinicalInformation = {
@@ -667,6 +581,9 @@ export const updatePatientClinicalInformation = catchAsync(async (req: Request |
     specialNeeds,
     updatedBy: userId
   });
+
+  // Invalidate cache after clinical information update
+  await invalidateAllPatientCache();
 
   res.status(200).json({
     status: true,
@@ -704,6 +621,9 @@ export const updatePatientFluidBalancing = catchAsync(async (req: Request | any,
       fluidBalance: newFluidRecord
     }
   });
+
+  // Invalidate cache after fluid balance update
+  await invalidateAllPatientCache();
 
   res.status(200).json({
     status: true,

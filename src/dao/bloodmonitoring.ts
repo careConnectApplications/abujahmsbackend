@@ -9,7 +9,7 @@ import configuration from "../config";
       return { bloodmonitoringdetails, totalbloodmonitoringdetails };
     } catch (err) {
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve blood monitoring data");
     }
   };
   export async function createbloodmonitoring(input:any){
@@ -20,7 +20,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.errorusercreate);
+      throw new Error("Failed to create blood monitoring");
 
     }
   }
@@ -31,7 +31,7 @@ import configuration from "../config";
     }
     catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserread);
+      throw new Error("Failed to retrieve blood monitoring data");
 
     }
   }
@@ -49,7 +49,7 @@ import configuration from "../config";
       return bloodmonitoring;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update blood monitoring");
 
     }
 
@@ -67,7 +67,7 @@ import configuration from "../config";
       return bloodmonitoring;
     }catch(err){
       console.log(err);
-      throw new Error(configuration.error.erroruserupdate);
+      throw new Error("Failed to update blood monitoring");
 
     }
 

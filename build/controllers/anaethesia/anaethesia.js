@@ -8,14 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createfoodgivens = exports.readallfoodgivenByTheatreAdmission = exports.createdruggivens = exports.readalldruggivenByTheatreAdmission = exports.updateanaethesiaform = exports.readreadoneanaethesiaformbytheatreadmission = exports.fillanaethesiaform = void 0;
 exports.updatedruggivens = updatedruggivens;
 exports.updatefoodgivens = updatefoodgivens;
-const config_1 = __importDefault(require("../../config"));
 const otherservices_1 = require("../../utils/otherservices");
 const theatreadmission_1 = require("../../dao/theatreadmission");
 const anaethesia_1 = require("../../dao/anaethesia");
@@ -31,7 +27,7 @@ const fillanaethesiaform = (req, res) => __awaiter(void 0, void 0, void 0, funct
         //validate theatre admission
         var findAdmission = yield (0, theatreadmission_1.readonethearteadmission)({ _id: theatreadmission }, {}, '');
         if (!findAdmission) {
-            throw new Error(`Theatre Admission ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Theatre Admission already exists`);
         }
         //const queryresult:any =await updatethearteadmission(id,{status});
         //create conscent
@@ -73,7 +69,7 @@ const updateanaethesiaform = (req, res) => __awaiter(void 0, void 0, void 0, fun
         //validate theatre admission
         var findAdmission = yield (0, anaethesia_1.readoneanaethesia)({ _id: id }, {}, '', '');
         if (!findAdmission) {
-            throw new Error(`Anaethesia Form ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Anaethesia Form already exists`);
         }
         //const queryresult:any =await updatethearteaadmission(id,{status});
         //create conscent
@@ -116,7 +112,7 @@ const createdruggivens = (req, res) => __awaiter(void 0, void 0, void 0, functio
         //route must contain allowed options
         var findanathesia = yield (0, anaethesia_1.readoneanaethesia)({ _id: anathesia }, {}, '', '');
         if (!findanathesia) {
-            throw new Error(`Anathesia record ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Anathesia record already exists`);
         }
         const queryresult = yield (0, druggiven_1.createdruggiven)({ druggiven, timegiven, bp, pulse, temp, staffname, anathesia: findanathesia._id });
         res.status(200).json({ queryresult, status: true });
@@ -175,7 +171,7 @@ const createfoodgivens = (req, res) => __awaiter(void 0, void 0, void 0, functio
         //route must contain allowed options
         var findanathesia = yield (0, anaethesia_1.readoneanaethesia)({ _id: anathesia }, {}, '', '');
         if (!findanathesia) {
-            throw new Error(`Anathesia record ${config_1.default.error.erroralreadyexit}`);
+            throw new Error(`Anathesia record already exists`);
         }
         const queryresult = yield (0, foodgiven_1.createfoodgiven)({ foodgiven, timegiven, bp, pulse, temp, staffname, anathesia: findanathesia._id });
         res.status(200).json({ queryresult, status: true });

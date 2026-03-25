@@ -25,7 +25,7 @@ const ProcedureScheduleContext = (strategyFn) => ({
     execute: (args) => __awaiter(void 0, void 0, void 0, function* () { return strategyFn(args); }),
 });
 exports.ProcedureScheduleContext = ProcedureScheduleContext;
-const SelfPayProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid, raiseby, procedureid, foundPatient, hmopercentagecover, }) {
+const SelfPayProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid, raiseby, procedureid, foundPatient, hmopercentagecover, proceduretype }) {
     const proceduresid = [];
     const paymentids = [];
     for (let i = 0; i < procedure.length; i++) {
@@ -59,6 +59,7 @@ const SelfPayProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, functio
             cptcodes,
             dxcodes,
             raiseby,
+            proceduretype,
         });
         proceduresid.push(procedurerecord._id);
         paymentids.push(createpaymentqueryresult._id);
@@ -72,7 +73,7 @@ const SelfPayProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, functio
     return queryresult;
 });
 exports.SelfPayProcedureStrategy = SelfPayProcedureStrategy;
-const HmoProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid, raiseby, procedureid, hmopercentagecover, }) {
+const HmoProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* ({ id, procedure, clinic, indicationdiagnosisprocedure, appointmentdate, cptcodes, dxcodes, appointmentid, raiseby, procedureid, hmopercentagecover, proceduretype }) {
     const proceduresid = [];
     for (let i = 0; i < procedure.length; i++) {
         const testPrice = yield (0, price_1.readoneprice)({ servicetype: procedure[i] });
@@ -94,6 +95,7 @@ const HmoProcedureStrategy = (_a) => __awaiter(void 0, [_a], void 0, function* (
             raiseby,
             status: config_1.default.otherstatus[0],
             amount,
+            proceduretype,
         });
         proceduresid.push(procedurerecord._id);
     }

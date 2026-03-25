@@ -14,7 +14,7 @@ export var createhmo = async (req: any, res: any) => {
     const foundHmo = await readonehmomanagement({ hmoname }, '');
     //update servicetype for New Patient Registration
     if (foundHmo) {
-      throw new Error(`HMO ${configuration.error.erroralreadyexit}`);
+      throw new Error(`HMO already exists`);
 
     }
     const queryresult = await createhmomanagement({ hmoname, id});

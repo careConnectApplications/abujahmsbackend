@@ -69,7 +69,19 @@ const radiologySchema = new Schema({
   { timestamps: true }
 );
 
+// Add indexes for performance optimization
+// Single field indexes
+radiologySchema.index({ patient: 1 });
+radiologySchema.index({ status: 1 });
+radiologySchema.index({ testid: 1 });
+radiologySchema.index({ createdAt: -1 });
+radiologySchema.index({ payment: 1 });
+radiologySchema.index({ processeddate: 1 });
+
+// Compound indexes for common query patterns
+radiologySchema.index({ patient: 1, status: 1 });
+radiologySchema.index({ status: 1, createdAt: -1 });
+radiologySchema.index({ testid: 1, status: 1 });
+
 const radiology = model('Radiology', radiologySchema);
 export default radiology;
-
-

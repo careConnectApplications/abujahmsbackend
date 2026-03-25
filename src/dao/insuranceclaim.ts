@@ -52,7 +52,7 @@ export async function readAllInsuranceClaims(
     
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve insurance claim data");
   }
 }
 
@@ -64,7 +64,7 @@ export async function createInsuranceClaim(input: any) {
     return await newClaim.save();
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create insurance claim");
   }
 }
   */
@@ -80,7 +80,7 @@ export async function createInsuranceClaim(input: any) {
     }
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.errorusercreate);
+    throw new Error("Failed to create insurance claim");
   }
 }
 
@@ -91,7 +91,7 @@ export async function readOneInsuranceClaim(query: any, selectquery = {}) {
     return await InsuranceClaim.findOne(query).select(selectquery);
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserread);
+    throw new Error("Failed to retrieve insurance claim data");
   }
 }
 
@@ -109,7 +109,7 @@ export async function updateInsuranceClaimById(id: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update insurance claim");
   }
 }
 
@@ -125,6 +125,6 @@ export async function updateInsuranceClaimByQuery(query: any, reqbody: any) {
     return updated;
   } catch (err) {
     console.error(err);
-    throw new Error(configuration.error.erroruserupdate);
+    throw new Error("Failed to update insurance claim");
   }
 }
