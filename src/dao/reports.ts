@@ -14,6 +14,7 @@ import configuration from "../config";
 import Immunization from "../models/immunization";
 import Familyplanning from "../models/familyplanning";
 import { ThirdStageLabour, SecondStageLabour, FirstStageLabour, MortalityRegister, BirthRegister } from "../models/maternity";
+import EyeModule from "../models/eye-module/eye-module.model";
 export async function readpatientsmanagementaggregate(input:any) {
   try{
   return await Patientsmanagement.aggregate(input);
@@ -205,6 +206,16 @@ export async function readpaymentaggregate(input:any) {
               export async function readbirthregisteraggregate(input:any) {
                 try{
                   return await BirthRegister.aggregate(input);
+                }
+                catch(e:any){
+                  console.log(e);
+                  throw new Error("Failed to update report");
+                }
+              }
+
+              export async function readeyeconditionaggregate(input:any) {
+                try{
+                  return await EyeModule.aggregate(input);
                 }
                 catch(e:any){
                   console.log(e);

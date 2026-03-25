@@ -3,7 +3,7 @@ import {
     createpatients, getallpatients,
     updatepatients, uploadpix,
     getonepatients, bulkuploadhmopatients,
-    getallhmopatients, searchpartient,
+    getallhmopatients, searchpartient, searchpatient,
     updateauthorizationcode, updatePatientToHmo,
     updatePatientClinicalInformation,
     updatePatientFluidBalancing
@@ -20,6 +20,7 @@ router.get('/getonepatients/:id', getonepatients);
 router.post('/bulkuploadhmopatients', bulkuploadhmopatients);
 router.get('/getallhmopatients', getallhmopatients);
 router.get('/searchpartient/:searchparams', searchpartient);
+router.get('/searchpatient/:searchparams', searchpatient);
 router.put("/update-to-hmo/:id", updatePatientToHmo);
 router.put("/update-clinical-information/:id", updatePatientClinicalInformation);
 router.put("/update-fluid-balancing/:patientId", updatePatientFluidBalancing);

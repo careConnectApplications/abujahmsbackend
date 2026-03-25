@@ -1,7 +1,7 @@
 import * as path from 'path';
 import client from 'prom-client';
 import cors from 'cors';
-import express, { Application,Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import fileUpload from "express-fileupload";
 import httpStatus from "http-status";
 import { readicdeleven } from '../controllers/icdten/icdten';
@@ -46,45 +46,45 @@ import maternity from '../routes/maternity';
 function createServer() {
   const app: Application = express();
   // ✅ Collect default Node.js metrics (CPU, memory, event loop, GC, etc.)
-client.collectDefaultMetrics({ prefix: "node_" });
+  client.collectDefaultMetrics({ prefix: "node_" });
 
-// 1. Total number of requests (Counter)
-const totalRequests = new client.Counter({
-  name: "http_requests_total",
-  help: "Total number of HTTP requests",
-  labelNames: ["method", "route", "status"] as const,
-});
+  // 1. Total number of requests (Counter)
+  const totalRequests = new client.Counter({
+    name: "http_requests_total",
+    help: "Total number of HTTP requests",
+    labelNames: ["method", "route", "status"] as const,
+  });
 
-// 2. Total number of errors (Counter)
-const totalErrors = new client.Counter({
-  name: "http_request_errors_total",
-  help: "Total number of failed HTTP requests",
-  labelNames: ["method", "route", "status"] as const,
-});
+  // 2. Total number of errors (Counter)
+  const totalErrors = new client.Counter({
+    name: "http_request_errors_total",
+    help: "Total number of failed HTTP requests",
+    labelNames: ["method", "route", "status"] as const,
+  });
 
-// 3. CPU utilization (Gauge)
-const cpuUsage = new client.Gauge({
-  name: "process_cpu_user_seconds_total",
-  help: "Total user CPU time spent in seconds",
-});
+  // 3. CPU utilization (Gauge)
+  const cpuUsage = new client.Gauge({
+    name: "process_cpu_user_seconds_total",
+    help: "Total user CPU time spent in seconds",
+  });
 
-// 4. Memory usage (Gauge)
-const memoryUsage = new client.Gauge({
-  name: "process_resident_memory_bytes",
-  help: "Resident memory size in bytes",
-});
+  // 4. Memory usage (Gauge)
+  const memoryUsage = new client.Gauge({
+    name: "process_resident_memory_bytes",
+    help: "Resident memory size in bytes",
+  });
 
 
-setInterval(() => {
-  const usage = process.cpuUsage();
-  const memory = process.memoryUsage();
+  setInterval(() => {
+    const usage = process.cpuUsage();
+    const memory = process.memoryUsage();
 
-  // CPU user time in seconds
-  cpuUsage.set(usage.user / 1e6); // microseconds → seconds
+    // CPU user time in seconds
+    cpuUsage.set(usage.user / 1e6); // microseconds → seconds
 
-  // Memory RSS (Resident Set Size)
-  memoryUsage.set(memory.rss);
-}, 5000);
+    // Memory RSS (Resident Set Size)
+    memoryUsage.set(memory.rss);
+  }, 5000);
 
 
   if (process.env.NODE_ENV !== "test") {
@@ -96,16 +96,16 @@ setInterval(() => {
     origin: "*",
   }));
   // Middleware to track requests & errors
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.on("finish", () => {
-    totalRequests.labels(req.method, req.path, res.statusCode.toString()).inc();
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.on("finish", () => {
+      totalRequests.labels(req.method, req.path, res.statusCode.toString()).inc();
 
-    if (res.statusCode >= 400) {
-      totalErrors.labels(req.method, req.path, res.statusCode.toString()).inc();
-    }
+      if (res.statusCode >= 400) {
+        totalErrors.labels(req.method, req.path, res.statusCode.toString()).inc();
+      }
+    });
+    next();
   });
-  next();
-});
   app.use(express.static(__dirname + '/downloads'));
   app.use(express.static(path.join(__dirname, 'uploads')));
 
@@ -125,19 +125,19 @@ app.use((req: Request, res: Response, next: NextFunction) => {
    * Cron Jobs
    */
   //import("../jobs/checkExpiredSubscriptionDate.job");
-  
+
   app.use(fileUpload());
   // Expose /metrics endpoint
-app.get("/api/v1/metrics", async (req: Request, res: Response) => {
-  res.set("Content-Type", client.register.contentType);
-  res.end(await client.register.metrics());
-});
+  app.get("/api/v1/metrics", async (req: Request, res: Response) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
+  });
   app.use('/api/v1/downloads', downloads);
   app.use('/api/v1/uploads', express.static('uploads'));
   app.use('/api/v1/auth', auth);
   app.use('/api/v1/users', protect, users);
   app.use('/api/v1/billing', protect, billingandpayment);
-  app.use('/api/v1/patientsmanagement', protect, patientsmanagement);
+  app.use('/api/v1/patientsmanagement',  patientsmanagement);
   app.use('/api/v1/appointment', protect, appointment);
   app.use('/api/v1/lab', protect, lab);
   app.use('/api/v1/settings', protect, settings);
